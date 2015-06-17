@@ -25,26 +25,17 @@ Annotation.prototype.init = function(){
 		var stringForColour = ""
 		if (this.fragmentNames.indexOf('b') !== -1){ stringForColour += "b";}
 		if (this.fragmentNames.indexOf('y') !== -1){ stringForColour += "y";}
-		//~ console.log(stringForColour);
 		this.circle.attr("fill",Annotation.colours(stringForColour));
 		this.circle.append("svg:title").text(this.fragmentNames);
 		this.circle.on("click", function(){
 			self.graph.setTitle(self.sequences);
 		});
 	}
-	//~ else {
-		//~ this.circle.attr("r",5);
-	//~ }
-	//~ this.line.attr("stroke-width","1");
-	//~ this.annotation.init();
 }
 
 Annotation.prototype.update = function(){
 	if (this.primary){
-	this.circle.attr("cx", this.graph.x(this.x));
-	this.circle.attr("cy", this.graph.y(this.y));
-}
-	//~ this.line.attr("x2", this.graph.x(this.x));
-	//~ this.line.attr("y2", this.graph.y(0));
-	//~ this.annotation.update();
+		this.circle.attr("cx", this.graph.x(this.x));
+		this.circle.attr("cy", this.graph.y(this.y));
+	}
 }
