@@ -66,7 +66,9 @@ Graph = function(elemid, options) {
       .attr("height", this.size.height)
       .style("fill", "#EEEEEE")
       .attr("pointer-events", "all");
-      this.plot.call(d3.behavior.zoom().x(this.x).y(this.y).on("zoom", this.redraw()));
+      
+  //~ this.zoom = d3.behavior.zoom();
+  this.plot.call(d3.behavior.zoom().x(this.x).y(this.y).on("zoom", this.redraw()));
 
   this.innerSVG = this.vis.append("svg")
       .attr("top", 0)
@@ -108,37 +110,75 @@ Graph = function(elemid, options) {
         .style("text-anchor","middle")
         .attr("transform","translate(" + -90 + " " + this.size.height/2+") rotate(-90)");
   }
-  
+
+    //~ d3.select(this.chart)
+      //~ .on("mousemove.drag", self.mousemove())
+      //~ .on("touchmove.drag", self.mousemove())
+      //~ .on("mouseup.drag",   self.mouseup())
+      //~ .on("touchend.drag",  self.mouseup());
+
   for (var i = 0; i < this.points.length; i++){
 	  this.points[i].init();
   }
   console.log(Annotation.colours.domain());
   
-  this.redraw()();//in turn calls self.update()
+  this.redraw()();
 };
   
 //
 // Graph methods
 //
-
 Graph.prototype.update = function() {
-  var self = this;
-
-  for (var i = 0; i < this.points.length; i++){
+    for (var i = 0; i < this.points.length; i++){
 	  this.points[i].update();
-  }
+	}
 }
+//~ Graph.prototype.mousemove = function() {
+  //~ var self = this;
+  //~ return function() {
+    //~ var p = d3.mouse(self.vis[0][0]),
+        //~ t = d3.event.changedTouches;
+    //~ 
+//~ 
+    //~ if (!isNaN(self.downy)) {
+      //~ d3.select('body').style("cursor", "ns-resize");
+      //~ var rupy = self.y.invert(p[1]),
+          //~ yaxis1 = 0;//self.y.domain()[1],
+          //~ yaxis2 = self.y.domain()[0],
+          //~ yextent = yaxis2 - yaxis1;
+      //~ if (rupy != 0) {
+        //~ var changey, new_domain;
+        //~ changey = self.downy / rupy;
+        //~ new_domain = [yaxis1 + (yextent * changey), yaxis1];
+        //~ self.y.domain(new_domain);
+        //~ self.redraw()();
+      //~ }
+      //~ d3.event.preventDefault();
+      //~ d3.event.stopPropagation();
+    //~ }
+  //~ }
+//~ };
 
-Graph.prototype.datapoint_drag = function() {
-  var self = this;
-  return function(d) {
-    registerKeyboardHandler(self.keydown());
-    document.onselectstart = function() { return false; };
-    self.selected = self.dragged = d;
-    self.update();
-    
-  }
-};
+    //~ document.onselectstart = function() { return true; };
+    //~ d3.select('body').style("cursor", "auto");
+    //~ d3.select('body').style("cursor", "auto");
+    //if (!isNaN(self.downx)) {
+      //self.redraw()();
+      //self.downx = Math.NaN;
+      //d3.event.preventDefault();
+      //d3.event.stopPropagation();
+    //};
+    //~ if (!isNaN(self.downy)) {
+      //~ self.redraw()();
+      //~ self.downy = Math.NaN;
+      //~ d3.event.preventDefault();
+      //~ d3.event.stopPropagation();
+    //~ }
+    //if (self.dragged) { 
+      //self.dragged = null 
+    //}
+  //~ }
+//~ }
 
 Graph.prototype.redraw = function() {
   var self = this;
@@ -177,11 +217,8 @@ Graph.prototype.redraw = function() {
         .attr("y", self.size.height)
         .attr("dy", "1em")
         .attr("text-anchor", "middle")
-        .text(fx)
-        .style("cursor", "ew-resize")
-        .on("mouseover", function(d) { d3.select(this).style("font-weight", "bold");})
-        .on("mouseout",  function(d) { d3.select(this).style("font-weight", "normal");});
-
+        .text(fx);
+       
     gx.exit().remove();
 
     // Regenerate y-ticks…
@@ -208,16 +245,33 @@ Graph.prototype.redraw = function() {
         .attr("dy", ".35em")
         .attr("text-anchor", "end")
         .text(fy)
-        .style("cursor", "ns-resize")
-        .on("mouseover", function(d) { d3.select(this).style("font-weight", "bold");})
-        .on("mouseout",  function(d) { d3.select(this).style("font-weight", "normal");});
+        .style("cursor", "ns-resize");
+        //~ .on("mouseover", function(d) { d3.select(this).style("font-weight", "bold");})
+        //~ .on("mouseout",  function(d) { d3.select(this).style("font-weight", "normal");})
+        //~ .on("mousedown.drag",  self.yaxis_drag())
+        //~ .on("touchstart.drag", self.yaxis_drag());
 
     gy.exit().remove();
     self.plot.call(d3.behavior.zoom().x(self.x).y(self.y).on("zoom", self.redraw()));
-    self.update();    
+    self.update();
   }  
 }
 
+//~ Graph.prototype.yaxis_drag = function(d) {
+  //~ var self = this;
+  //~ return function(d) {
+    //~ document.onselectstart = function() { return false; };
+    //~ var p = d3.mouse(self.vis[0][0]);
+    //~ self.downy = self.y.invert(p[1]);
+  //~ }
+//~ };
+
 Graph.prototype.setTitle = function(text) {
 	this.title.text(text);
+};
+
+Graph.prototype.resetScales = function(text) {
+
+  
+  this.redraw();
 };
