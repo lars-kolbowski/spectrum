@@ -26,12 +26,27 @@ Annotation.prototype.init = function(){
 		if (this.fragmentNames.indexOf('b') !== -1){ stringForColour += "b";}
 		if (this.fragmentNames.indexOf('y') !== -1){ stringForColour += "y";}
 		this.circle.attr("fill",Annotation.colours(stringForColour));
-		this.circle.append("svg:title").text(this.fragmentNames);
 		this.circle.on("mouseover", function(){
 			self.graph.setTitle(self.sequences);
 		}).on("mouseout", function(){
 			self.graph.setTitle("");
 		});
+		
+		this.label = this.graph.annotations.append('text');
+		this.label.text(this.fragmentNames);
+		//~ this.circle.attr("r",15);
+		//~ var stringForColour = ""
+		//~ if (this.fragmentNames.indexOf('b') !== -1){ stringForColour += "b";}
+		//~ if (this.fragmentNames.indexOf('y') !== -1){ stringForColour += "y";}
+		//~ this.circle.attr("fill",Annotation.colours(stringForColour));
+		//~ this.circle.append("svg:title").text(this.fragmentNames);
+		this.label.on("mouseover", function(){
+			self.graph.setTitle(self.sequences);
+		}).on("mouseout", function(){
+			self.graph.setTitle("");
+		});
+		
+		
 	}
 }
 
@@ -39,5 +54,7 @@ Annotation.prototype.update = function(){
 	if (this.primary){
 		this.circle.attr("cx", this.graph.x(this.x));
 		this.circle.attr("cy", this.graph.y(this.y));
+		this.label.attr("x", this.graph.x(this.x));
+		this.label.attr("y", this.graph.y(this.y));
 	}
 }
