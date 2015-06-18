@@ -58,10 +58,7 @@ Graph = function(elemid, options) {
       .attr("height", this.size.height)
       .style("fill", "#EEEEEE")
       .attr("pointer-events", "all");
-      
-  this.zoom = d3.behavior.zoom().x(this.x).on("zoom", this.redraw());
-  this.plot.call(this.zoom);
-
+  
   this.innerSVG = this.vis.append("svg")
       .attr("top", 0)
       .attr("left", 0)
@@ -69,6 +66,12 @@ Graph = function(elemid, options) {
       .attr("height", this.size.height)
       .attr("viewBox", "0 0 "+this.size.width+" "+this.size.height)
       .attr("class", "line");
+  
+      
+  this.zoom = d3.behavior.zoom().x(this.x).on("zoom", this.redraw());
+  this.plot.call(this.zoom);
+	this.innerSVG.call(this.zoom);
+
       
    this.annotations = this.innerSVG.append("g");
    this.peaks = this.innerSVG.append("g");
@@ -149,7 +152,9 @@ Graph.prototype.mouseup = function() {
   var self = this;
   return function() {
 		document.onselectstart = function() { return true; };
-		if (!isNaN(self.downy)) {
+	    d3.select('body').style("cursor", "auto");
+    	d3.select('body').style("cursor", "auto");
+ 		if (!isNaN(self.downy)) {
 		  self.redraw()();
 		  self.downy = Math.NaN;
 		  d3.event.preventDefault();
@@ -231,6 +236,7 @@ Graph.prototype.redraw = function() {
 
     gy.exit().remove();
     self.plot.call(self.zoom);
+    self.innerSVG.call(self.zoom);
     for (var i = 0; i < self.points.length; i++){
 	  self.points[i].update();
 	}
@@ -251,6 +257,12 @@ Graph.prototype.setTitle = function(text) {
 };
 
 Graph.prototype.resetScales = function(text) {
+	  this.y = d3.scale.linear()
+      .domain([this.options.ymax, this.options.ymin])
+      .nice()
+      .range([0, this.size.height])
+      .nice();
+
 	this.zoom.scale(1, 1);
 	this.zoom.translate([0, 0]);
 	this.redraw()();

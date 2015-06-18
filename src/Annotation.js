@@ -27,8 +27,10 @@ Annotation.prototype.init = function(){
 		if (this.fragmentNames.indexOf('y') !== -1){ stringForColour += "y";}
 		this.circle.attr("fill",Annotation.colours(stringForColour));
 		this.circle.append("svg:title").text(this.fragmentNames);
-		this.circle.on("click", function(){
+		this.circle.on("mouseover", function(){
 			self.graph.setTitle(self.sequences);
+		}).on("mouseout", function(){
+			self.graph.setTitle("");
 		});
 	}
 }
