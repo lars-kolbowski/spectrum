@@ -1,8 +1,15 @@
+//		a spectrum viewer
+//		Copyright 2015 Rappsilber Laboratory
+//
+//		author: Colin Combe
+//		
+//		graph/Peak.js
+
 function Peak (data, graph){
 	this.x = data[0].expmz - 0;
-	this.y = data[0].absoluteintesity - 0; //typo in column name
+	this.y = data[0].intensity - 0;
 	this.graph = graph;	
-	this.annotation = new Annotation(data, graph);
+	this.annotation = new PeakAnnotation(data, graph);
 }
 
 Peak.prototype.init = function(){

@@ -1,6 +1,13 @@
-function Annotation (data, graph){
+//		a spectrum viewer
+//		Copyright 2015 Rappsilber Laboratory
+//
+//		author: Colin Combe
+//		
+//		graph/PeakAnnotations.js
+
+function PeakAnnotation (data, graph){
 	this.x = data[0].expmz - 0;
-	this.y = data[0].absoluteintesity - 0; //typo in column name
+	this.y = data[0].intensity - 0; //typo in column name
 	this.graph = graph;	
 	this.fragmentNames = "";
 	this.sequences = "";
@@ -16,8 +23,8 @@ function Annotation (data, graph){
 		this.sequences += annot.sequence;	
 	}
 }
-Annotation.colours = d3.scale.ordinal().range(colorbrewer.Set2[3]);
-Annotation.prototype.init = function(){
+PeakAnnotation.colours = d3.scale.ordinal().range(colorbrewer.Set2[3]);
+PeakAnnotation.prototype.init = function(){
 	var self = this;
 	if (this.primary){
 		this.circle = this.graph.annotations.append('circle');
@@ -25,6 +32,7 @@ Annotation.prototype.init = function(){
 		var stringForColour = ""
 		if (this.fragmentNames.indexOf('b') !== -1){ stringForColour += "b";}
 		if (this.fragmentNames.indexOf('y') !== -1){ stringForColour += "y";}
+		this.circle.attr("fill",PeakAnnotation.colours(stringForColour));
 		this.circle.attr("fill",Annotation.colours(stringForColour));
 		this.circle.on("mouseover", function(){
 			self.graph.setTitle(self.sequences);
@@ -50,7 +58,7 @@ Annotation.prototype.init = function(){
 	}
 }
 
-Annotation.prototype.update = function(){
+PeakAnnotation.prototype.update = function(){
 	if (this.primary){
 		this.circle.attr("cx", this.graph.x(this.x));
 		this.circle.attr("cy", this.graph.y(this.y));

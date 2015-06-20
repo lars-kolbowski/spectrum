@@ -1,12 +1,57 @@
-Graph = function(elemid, options) {
-  var self = this;
-  this.chart = document.getElementById(elemid);
-  this.cx = this.chart.clientWidth;
-  this.cy = this.chart.clientHeight;
+//		a spectrum viewer
+//		
+//		code in this file originally derived from :-
+//	 	http://bl.ocks.org/stepheneb/1182434
+//
+//		modified by Colin Combe, Rappsilber Laboratory, 2015
+//
+//		graph/Graph.js
+
+Graph = function(targetDiv, options) {
+	//to contain registered callback functions
+	this.highlightChangedCallbacks = [];
+	// targetDiv could be div itself or id of div - lets deal with that
+	if (typeof targetDiv === "string"){
+		targetDiv = document.getElementById(targetDiv);
+	}
+	//avoids prob with 'save - web page complete'
+	SpectrumViewer.emptyElement(targetDiv);
+
+ this.chart = targetDiv;
   this.options = options || {};
- 	var nested =  d3.nest()
+
+  
+  this.padding = {
+     "top":    this.options.title  ? 40 : 20,
+     "right":                 30,
+     "bottom": this.options.xlabel ? 60 : 10,
+     "left":   this.options.ylabel ? 120 : 45
+  };
+
+
+  // drag x-axis logic
+  this.downx = Math.NaN;
+
+  // drag y-axis logic
+  this.downy = Math.NaN;
+
+	var self = this;
+    d3.select(this.chart)
+      .on("mousemove.drag", self.mousemove())
+      .on("touchmove.drag", self.mousemove())
+      .on("mouseup.drag",   self.mouseup())
+      .on("touchend.drag",  self.mouseup());
+
+};
+
+
+Graph.prototype.setData = function(annotatedPeaks){
+ 	//~ var self = this;
+ this.cx = this.chart.clientWidth;
+  this.cy = this.chart.clientHeight;
+  	var nested =  d3.nest()
 		.key(function(d) { return d.expmz +'-'+ d.absoluteintensity; })
-		.entries(this.options.identData);
+		.entries(annotatedPeaks);
 	this.points = new Array();
 	for (var i = 0; i < nested.length; i++){
 		this.points.push(new Peak(nested[i].values, this));
@@ -106,19 +151,32 @@ Graph = function(elemid, options) {
         .attr("transform","translate(" + -90 + " " + this.size.height/2+") rotate(-90)");
   }
 
-    d3.select(this.chart)
-      .on("mousemove.drag", self.mousemove())
-      .on("touchmove.drag", self.mousemove())
-      .on("mouseup.drag",   self.mouseup())
-      .on("touchend.drag",  self.mouseup());
-
   for (var i = 0; i < this.points.length; i++){
 	  this.points[i].init();
   }
-  console.log(Annotation.colours.domain());
+  //~ console.log(PeakAnnotation.colours.domain());
   
   this.redraw()();
-};
+
+}
+
+Graph.prototype.clear = function(){
+	this.points= [];
+	//this.redraw()();
+}
+
+Graph.prototype.highlightChanged = function(fragments){
+	var callbackCount = this.highlightChangedCallbacks.length;
+	for (var i = 0; i < callbackCount; i++) {
+		this.highlightChangedCallbacks[i](fragments);
+	}
+}
+
+Graph.prototype.setHighlight = function(fragments){
+	//~ this.messageDiv.innerHTML = this.toString() + "<br>Hightlight:" + JSON.stringify(fragments);
+}
+
+
   
 //
 // Graph methods
@@ -253,7 +311,7 @@ Graph.prototype.yaxis_drag = function(d) {
 };
 
 Graph.prototype.setTitle = function(text) {
-	this.title.text(text);
+	//~ this.title.text(text);
 };
 
 Graph.prototype.resetScales = function(text) {
