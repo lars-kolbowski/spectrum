@@ -1,7 +1,6 @@
 //		a spectrum viewer
 //		
-//		code in this file originally derived from :-
-//	 	http://bl.ocks.org/stepheneb/1182434
+//		Colin Combe, Rappsilber Laboratory, 2015
 //
 //		modified by Colin Combe, Rappsilber Laboratory, 2015
 //
@@ -15,17 +14,15 @@ Graph = function(targetDiv, options) {
 		targetDiv = document.getElementById(targetDiv);
 	}
 	//avoids prob with 'save - web page complete'
-	SpectrumViewer.emptyElement(targetDiv);
+	d3.select(targetDiv).style("position","relative").selectAll("*").remove();
+	this.targetDiv = targetDiv;
 
- this.chart = targetDiv;
   this.options = options || {};
-
-  
-  this.padding = {
-     "top":    this.options.title  ? 40 : 20,
-     "right":                 30,
-     "bottom": this.options.xlabel ? 60 : 10,
-     "left":   this.options.ylabel ? 120 : 45
+	this.margin = {
+		 "top":    this.options.title  ? 30 : 20,
+		 "right":  50,
+		 "bottom": this.options.xlabel ? 60 : 40,
+		 "left":   this.options.ylabel ? 90 : 60
   };
 
 
@@ -47,8 +44,8 @@ Graph = function(targetDiv, options) {
 
 Graph.prototype.setData = function(annotatedPeaks){
  	//~ var self = this;
- this.cx = this.chart.clientWidth;
-  this.cy = this.chart.clientHeight;
+ this.cx = 100;//this.chart.clientWidth;
+  this.cy = 100;//this.chart.clientHeight;
   	var nested =  d3.nest()
 		.key(function(d) { return d.expmz +'-'+ d.absoluteintensity; })
 		.entries(annotatedPeaks);

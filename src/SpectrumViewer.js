@@ -1,18 +1,25 @@
 //		a spectrum viewer
-//		Copyright 2015 Rappsilber Laboratory
+//      Copyright  2015 Rappsilber Laboratory
+// 
+// 		Licensed under the Apache License, Version 2.0 (the "License");
+// 		you may not use this file except in compliance with the License.
+// 		You may obtain a copy of the License at
+// 
+// 		http://www.apache.org/licenses/LICENSE-2.0
 //
 //		author: Colin Combe
 //		
 //		SpectrumViewer.js
 
-function SpectrumViewer (pepFragDiv, graphDiv){
+function SpectrumViewer (spectrumSVG){
 	//create peptide frag key
-	this.peptideFragKey = new PeptideFragmentationKey(pepFragDiv);
+	this.peptideFragKey = new PeptideFragmentationKey(spectrumSVG);
 	//create graph
-	this.graph = new Graph (graphDiv);
+	this.graph = new Graph (spectrumSVG);
+	
 	//link each to other by registering callbacks
-	this.peptideFragKey.highlightChangedCallbacks.push(this.graph.setHighlights);
-	this.graph.highlightChangedCallbacks.push(this.peptideFragKey.setHighlights);
+	//~ this.peptideFragKey.highlightChangedCallbacks.push(this.graph.setHighlights);
+	//~ this.graph.highlightChangedCallbacks.push(this.peptideFragKey.setHighlights);
 }
 
 SpectrumViewer.prototype.setData = function(pepSeq1, linkPos1, pepSeq2, linkPos2, annotatedPeaksCSV){
