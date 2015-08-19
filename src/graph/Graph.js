@@ -1,52 +1,42 @@
 //		a spectrum viewer
 //		
 //		Colin Combe, Rappsilber Laboratory, 2015
-//
-//		modified by Colin Combe, Rappsilber Laboratory, 2015
-//
+// 
 //		graph/Graph.js
 
-Graph = function(targetDiv, options) {
-	//to contain registered callback functions
-	this.highlightChangedCallbacks = [];
-	// targetDiv could be div itself or id of div - lets deal with that
-	if (typeof targetDiv === "string"){
-		targetDiv = document.getElementById(targetDiv);
-	}
-	//avoids prob with 'save - web page complete'
-	d3.select(targetDiv).style("position","relative").selectAll("*").remove();
-	this.targetDiv = targetDiv;
+//		//see https://gist.github.com/mbostock/3019563
 
-  this.options = options || {};
+Graph = function(targetSvg, options) {
+
+
+	this.options = options || {};
 	this.margin = {
-		 "top":    this.options.title  ? 30 : 20,
-		 "right":  50,
-		 "bottom": this.options.xlabel ? 60 : 40,
-		 "left":   this.options.ylabel ? 90 : 60
-  };
+		"top":    this.options.title  ? 40 : 20,
+		"right":  20,
+		"bottom": this.options.xlabel ? 60 : 40,
+		"left":   this.options.ylabel ? 100 : 80
+	};
 
+	this.g =  targetSvg.append("g").attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
 
-  // drag x-axis logic
-  this.downx = Math.NaN;
+	// drag x-axis logic
+	//~ this.downx = Math.NaN;
 
-  // drag y-axis logic
-  this.downy = Math.NaN;
+	// drag y-axis logic
+	//~ this.downy = Math.NaN;
 
-	var self = this;
-    d3.select(this.chart)
-      .on("mousemove.drag", self.mousemove())
-      .on("touchmove.drag", self.mousemove())
-      .on("mouseup.drag",   self.mouseup())
-      .on("touchend.drag",  self.mouseup());
+	//~ var self = this;
+    //~ d3.select(this.chart)
+      //~ .on("mousemove.drag", self.mousemove())
+      //~ .on("touchmove.drag", self.mousemove())
+      //~ .on("mouseup.drag",   self.mouseup())
+      //~ .on("touchend.drag",  self.mouseup());
 
 };
 
 
 Graph.prototype.setData = function(annotatedPeaks){
- 	//~ var self = this;
- this.cx = 100;//this.chart.clientWidth;
-  this.cy = 100;//this.chart.clientHeight;
-  	var nested =  d3.nest()
+ 	var nested =  d3.nest()
 		.key(function(d) { return d.expmz +'-'+ d.absoluteintensity; })
 		.entries(annotatedPeaks);
 	this.points = new Array();
@@ -54,111 +44,109 @@ Graph.prototype.setData = function(annotatedPeaks){
 		this.points.push(new Peak(nested[i].values, this));
 	}
 		
-  this.options.xmax = d3.max(this.points, function(d){return d.x;}) + 100;
-  this.options.xmin = d3.min(this.points, function(d){return d.x;}) - 100;
-  this.options.ymax = d3.max(this.points, function(d){return d.y;});
-  this.options.ymin = d3.min(this.points, function(d){return d.y;});
-  
-  this.padding = {
-     "top":    this.options.title  ? 40 : 20,
-     "right":                 30,
-     "bottom": this.options.xlabel ? 60 : 10,
-     "left":   this.options.ylabel ? 120 : 45
-  };
+	this.xmax = d3.max(this.points, function(d){return d.x;}) + 100;
+	this.xmin = d3.min(this.points, function(d){return d.x;}) - 100;
+	this.ymax = d3.max(this.points, function(d){return d.y;});
+	this.ymin = 0;//3.min(this.points, function(d){return d.y;});	
+	
+	this.resize()();
+}
 
-  this.size = {
-    "width":  this.cx - this.padding.left - this.padding.right,
-    "height": this.cy - this.padding.top  - this.padding.bottom
-  };
-        	
-   // x-scale
-  this.x = d3.scale.linear()
-      .domain([this.options.xmin, this.options.xmax])
-      .range([0, this.size.width]);
+Graph.prototype.resize = function() {
+	var self = this;
 
-  // drag x-axis logic
-  //~ this.downx = Math.NaN;
+	//see https://gist.github.com/mbostock/3019563
+	return function() {
+		console.log("doing it");
+		var cx = self.g.node().parentNode.clientWidth;
+		var cy = self.g.node().parentNode.clientHeight;
+		self.g.attr("width", cx).attr("height", cy);
+		self.g.attr("width", cx).attr("height", cy).selectAll("*").remove();
+		
+		var width = cx - self.margin.left - self.margin.right;
+		var height = cy - self.margin.top  - self.margin.bottom;
+		
+		  
+		self.x = d3.scale.linear()
+			.domain([self.xmin, self.xmax])
+			.range([0, width]);
+//~ 
+		// y-scale (inverted domain)
+		self.y = d3.scale.linear()
+			.domain([0, self.ymax]).nice()
+			.range([height, 0]).nice();
+		
+		self.g.append("g")
+			.attr("class", "y axis")
+			.call(d3.svg.axis().scale(self.y).orient("left"));
+//~ 
+		self.g.append("g")
+			.attr("class", "x axis")
+			.attr("transform", "translate(0," + height + ")")
+			.call(d3.svg.axis().scale(self.x).orient("bottom"));
 
-  // y-scale (inverted domain)
-  this.y = d3.scale.linear()
-      .domain([this.options.ymax, this.options.ymin])
-      .nice()
-      .range([0, this.size.height])
-      .nice();
-
-  // drag y-axis logic
-  this.downy = Math.NaN;
+  /*
 
   this.vis = d3.select(this.chart).append("svg")
       .attr("width",  this.cx)
       .attr("height", this.cy)
       .append("g")
         .attr("transform", "translate(" + this.padding.left + "," + this.padding.top + ")");
-
-  this.plot = this.vis.append("rect")
-      .attr("width", this.size.width)
-      .attr("height", this.size.height)
+*/
+  self.plot = self.g.append("rect")
+      .attr("width", width)
+      .attr("height", height)
       .style("fill", "#EEEEEE")
       .attr("pointer-events", "all");
   
-  this.innerSVG = this.vis.append("svg")
+  self.innerSVG = self.g.append("svg")
       .attr("top", 0)
       .attr("left", 0)
-      .attr("width", this.size.width)
-      .attr("height", this.size.height)
-      .attr("viewBox", "0 0 "+this.size.width+" "+this.size.height)
+      .attr("width", width)
+      .attr("height", height)
+      .attr("viewBox", "0 0 "+width+" "+height)
       .attr("class", "line");
   
       
-  this.zoom = d3.behavior.zoom().x(this.x).on("zoom", this.redraw());
-  this.plot.call(this.zoom);
-	this.innerSVG.call(this.zoom);
+   self.zoom = d3.behavior.zoom().x(self.x).on("zoom", self.redraw());
+  self.plot.call(self.zoom);
+	self.innerSVG.call(self.zoom);
 
       
-   this.annotations = this.innerSVG.append("g");
-   this.peaks = this.innerSVG.append("g");
+   self.annotations = self.innerSVG.append("g");
+   self.peaks = self.innerSVG.append("g");
 
   // add Chart Title
-  if (this.options.title) {
-    this.title = this.vis.append("text")
+  if (self.options.title) {
+    self.title = self.vis.append("text")
         .attr("class", "axis")
-        .text(this.options.title)
-        .attr("x", this.size.width/2)
+        .text(self.options.title)
+        .attr("x", self.size.width/2)
         .attr("dy","-0.8em")
         .style("text-anchor","middle");
   }
-
-  // Add the x-axis label
-  if (this.options.xlabel) {
-    this.vis.append("text")
-        .attr("class", "axis")
-        .text(this.options.xlabel)
-        .attr("x", this.size.width/2)
-        .attr("y", this.size.height)
-        .attr("dy","2.4em")
-        .style("text-anchor","middle");
-  }
-
-  // add y-axis label
-  if (this.options.ylabel) {
-    this.vis.append("g").append("text")
-        .attr("class", "axis")
-        .text(this.options.ylabel)
-        .style("text-anchor","middle")
-        .attr("transform","translate(" + -90 + " " + this.size.height/2+") rotate(-90)");
-  }
-
-  for (var i = 0; i < this.points.length; i++){
-	  this.points[i].init();
-  }
-  //~ console.log(PeakAnnotation.colours.domain());
-  
-  this.redraw()();
-
+}
 }
 
+Graph.prototype.redraw = function(){
+
+  for (var i = 0; i < self.points.length; i++){
+	  self.points[i].init();
+  }
+  //~ console.log(PeakAnnotation.colours.domain());
+	  
+	  
+	  
+	 
+    //~ self.plot.call(self.zoom);
+    //~ self.innerSVG.call(self.zoom);
+    for (var i = 0; i < self.points.length; i++){
+	  self.points[i].update();
+	}
+  }
+
 Graph.prototype.clear = function(){
-	this.points= [];
+	//~ this.points= [];
 	//this.redraw()();
 }
 
@@ -173,11 +161,6 @@ Graph.prototype.setHighlight = function(fragments){
 	//~ this.messageDiv.innerHTML = this.toString() + "<br>Hightlight:" + JSON.stringify(fragments);
 }
 
-
-  
-//
-// Graph methods
-//
 
 Graph.prototype.mousemove = function() {
   var self = this;
@@ -218,85 +201,7 @@ Graph.prototype.mouseup = function() {
     }
 }
 
-Graph.prototype.redraw = function() {
-  var self = this;
-  return function() {
-    var tx = function(d) { 
-      return "translate(" + self.x(d) + ",0)"; 
-    },
-    ty = function(d) { 
-      return "translate(0," + self.y(d) + ")";
-    },
-    stroke = function(d) { 
-      return d ? "#ccc" : "#666"; 
-    },
-    fx = self.x.tickFormat(10),
-    fy = self.y.tickFormat(10);
 
-    // Regenerate x-ticks…
-    var gx = self.vis.selectAll("g.x")
-        .data(self.x.ticks(10), String)
-        .attr("transform", tx);
-
-    gx.select("text")
-        .text(fx);
-
-    var gxe = gx.enter().insert("g", "a")
-        .attr("class", "x")
-        .attr("transform", tx);
-
-    gxe.append("line")
-        .attr("stroke", stroke)
-        .attr("y1", 0)
-        .attr("y2", self.size.height);
-
-    gxe.append("text")
-        .attr("class", "axis")
-        .attr("y", self.size.height)
-        .attr("dy", "1em")
-        .attr("text-anchor", "middle")
-        .text(fx);
-       
-    gx.exit().remove();
-
-    // Regenerate y-ticks…
-    var gy = self.vis.selectAll("g.y")
-        .data(self.y.ticks(10), String)
-        .attr("transform", ty);
-
-    gy.select("text")
-        .text(fy);
-
-    var gye = gy.enter().insert("g", "a")
-        .attr("class", "y")
-        .attr("transform", ty)
-        .attr("background-fill", "#FFEEB6");
-
-    gye.append("line")
-        .attr("stroke", stroke)
-        .attr("x1", 0)
-        .attr("x2", self.size.width);
-
-    gye.append("text")
-        .attr("class", "axis")
-        .attr("x", -3)
-        .attr("dy", ".35em")
-        .attr("text-anchor", "end")
-        .text(fy)
-        .style("cursor", "ns-resize")
-        .on("mouseover", function(d) { d3.select(this).style("font-weight", "bold");})
-        .on("mouseout",  function(d) { d3.select(this).style("font-weight", "normal");})
-        .on("mousedown.drag",  self.yaxis_drag())
-        .on("touchstart.drag", self.yaxis_drag());
-
-    gy.exit().remove();
-    self.plot.call(self.zoom);
-    self.innerSVG.call(self.zoom);
-    for (var i = 0; i < self.points.length; i++){
-	  self.points[i].update();
-	}
-  }  
-}
 
 Graph.prototype.yaxis_drag = function(d) {
   var self = this;

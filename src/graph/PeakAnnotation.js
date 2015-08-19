@@ -33,7 +33,6 @@ PeakAnnotation.prototype.init = function(){
 		if (this.fragmentNames.indexOf('b') !== -1){ stringForColour += "b";}
 		if (this.fragmentNames.indexOf('y') !== -1){ stringForColour += "y";}
 		this.circle.attr("fill",PeakAnnotation.colours(stringForColour));
-		this.circle.attr("fill",Annotation.colours(stringForColour));
 		this.circle.on("mouseover", function(){
 			self.graph.setTitle(self.sequences);
 		}).on("mouseout", function(){

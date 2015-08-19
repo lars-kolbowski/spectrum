@@ -7,26 +7,26 @@
 
 //		Just boilerplate...
 
-function PeptideFragmentationKey (targetDiv){
+function PeptideFragmentationKey (targetSvg){
 	//to contain registered callback functions
 	this.highlightChangedCallbacks = [];
 
 	// targetDiv could be div itself or id of div - lets deal with that
-	if (typeof targetDiv === "string"){
-		targetDiv = document.getElementById(targetDiv);
+	if (typeof targetSvg === "string"){
+		targetSvg = document.getElementById(targetSvg);
 	}
 	//avoids prob with 'save - web page complete'
-	SpectrumViewer.emptyElement(targetDiv);
+	//d3.select(targetSvg).selectAll("*").remove();
 
-	this.messageDiv = document.createElement('div');
-	targetDiv.appendChild(this.messageDiv);
-
-	this.spuriousEventButton = document.createElement('button');
-	this.spuriousEventButton.innerHTML = "fire highlight changed"
-	this.spuriousEventButton.onclick = function(){
-		this.fireRandomEvent();
-	}
-	targetDiv.appendChild(this.spuriousEventButton);
+	//~ this.messageDiv = document.createElement('div');
+	//~ targetDiv.appendChild(this.messageDiv);
+//~ 
+	//~ this.spuriousEventButton = document.createElement('button');
+	//~ this.spuriousEventButton.innerHTML = "fire highlight changed"
+	//~ this.spuriousEventButton.onclick = function(){
+		//~ this.fireRandomEvent();
+	//~ }
+	//~ targetDiv.appendChild(this.spuriousEventButton);
 }
 
 PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2, linkPos2, annotatedPeaks){
@@ -36,7 +36,7 @@ PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2,
 	this.linkPos2 = linkPos2;
 	this.annotatedPeaks = annotatedPeaks;
 
-	this.messageDiv.innerHTML = this.toString();
+	//~ this.messageDiv.innerHTML = this.toString();
 }
 
 PeptideFragmentationKey.prototype.clear = function(){
@@ -46,7 +46,7 @@ PeptideFragmentationKey.prototype.clear = function(){
 	this.linkPos2 = null;
 	this.annotatedPeaks = null;
 
-	this.messageDiv.innerHTML = "";
+	//~ this.messageDiv.innerHTML = "";
 }
 
 PeptideFragmentationKey.prototype.highlightChanged = function(fragments){
