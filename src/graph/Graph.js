@@ -108,9 +108,9 @@ Graph.prototype.resize = function() {
       .attr("class", "line");
   
       
-   self.zoom = d3.behavior.zoom().x(self.x).on("zoom", self.redraw());
-  self.plot.call(self.zoom);
-	self.innerSVG.call(self.zoom);
+   //~ self.zoom = d3.behavior.zoom().x(self.x).on("zoom", self.redraw());
+  //~ self.plot.call(self.zoom);
+	//~ self.innerSVG.call(self.zoom);
 
       
    self.annotations = self.innerSVG.append("g");
@@ -125,13 +125,15 @@ Graph.prototype.resize = function() {
         .attr("dy","-0.8em")
         .style("text-anchor","middle");
   }
+  
+  self.redraw();
 }
 }
 
 Graph.prototype.redraw = function(){
 
-  for (var i = 0; i < self.points.length; i++){
-	  self.points[i].init();
+  for (var i = 0; i < this.points.length; i++){
+	  this.points[i].init();
   }
   //~ console.log(PeakAnnotation.colours.domain());
 	  
@@ -140,8 +142,8 @@ Graph.prototype.redraw = function(){
 	 
     //~ self.plot.call(self.zoom);
     //~ self.innerSVG.call(self.zoom);
-    for (var i = 0; i < self.points.length; i++){
-	  self.points[i].update();
+    for (var i = 0; i < this.points.length; i++){
+	  this.points[i].update();
 	}
   }
 
