@@ -1,7 +1,20 @@
 //		a spectrum viewer
-//		Copyright 2015 Rappsilber Laboratory
 //
-//		author: Sven Giese, Colin Combe
+//      Copyright  2015 Rappsilber Laboratory, Edinburgh University
+// 
+// 		Licensed under the Apache License, Version 2.0 (the "License");
+// 		you may not use this file except in compliance with the License.
+// 		You may obtain a copy of the License at
+// 
+// 		http://www.apache.org/licenses/LICENSE-2.0
+//
+//   	Unless required by applicable law or agreed to in writing, software
+//   	distributed under the License is distributed on an "AS IS" BASIS,
+//   	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//   	See the License for the specific language governing permissions and
+//   	limitations under the License.
+//
+//		authors: Sven Giese, Colin Combe
 //
 //		PeptideFragmentationKey.js
 
@@ -21,135 +34,157 @@ function PeptideFragmentationKey (targetSvg, options){
 }
 
 PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2, linkPos2, annotatedPeaks){
-	this.pepSeq1 = pepSeq1;
+	   var self = this;
+	   
+	this.pepSeq1 = pepSeq1; //contains modification info
 	this.linkPos1 = linkPos1;
-	this.pepSeq2 = pepSeq2;
+	this.pepSeq2 = pepSeq2; // contains modification info
 	this.linkPos2 = linkPos2;
 	this.annotatedPeaks = annotatedPeaks;
 
 
-	//~ def plot_spectrum(cl_pep, XiDB, removeisotopes=False, ppmmean=0, ppmstds=0,
-                  //~ annotate_verbose=True):
-    //~ """
-    //~ Plots a spectrum from v_spec_viewer_advanced materizalzed.
-    //~ """
-
+	// def plot_spectrum(cl_pep, XiDB, removeisotopes=False, ppmmean=0, ppmstds=0,
+    //               annotate_verbose=True):
 	var removeisotopes = false, ppmmean = 0, ppmstds = 0,
 				annotate_verbose = true;
 				
-    //~ #get colors:
-    //~ cmap = brewer2mpl.get_map("Paired", "Qualitative", 6).mpl_colors
-    var cmap = colorbrewer.Paired[6];
+    // #==========================================================================
+    // # retrieve data from DB and cl_pep object
+    // #==========================================================================
+    // pep1 = cl_pep.peptide1.sequence
+    // pep2 = cl_pep.peptide2.sequence
+   var pep1 = this.pepSeq1.replace(SpectrumViewer.notUpperCase, '');
+    var pep2 = this.pepSeq2.replace(SpectrumViewer.notUpperCase, '');
+
+    // #get modifications
+    // mods1_dic = get_mods(unmodified_peps["peptide1"][0])
+    // mods2_dic = get_mods(unmodified_peps["peptide2"][0])
+	//~ var mods1_dic = get_mods(this.pepSeq1);
+    //~ var mods2_dic = get_mods(this.pepSeq2);
     
-    //~ p1color = cmap[5]
-    //~ p1color_loss = cmap[4]
-    //~ p2color = cmap[1]
-    //~ p2color_loss = cmap[0]
-	var p1color = cmap[5];
-    var p1color_loss = cmap[4];
-    var p2color = cmap[1];
-    var p2color_loss = cmap[0];
-
-
-    //~ #==========================================================================
-    //~ # retrieve data from DB and cl_pep object
-    //~ #==========================================================================
-    //~ pep1 = cl_pep.peptide1.sequence
-    //~ pep2 = cl_pep.peptide2.sequence
-    var upperCaseOnly = /[^A-Z]/g;
-    var pep1 = this.pepSeq1.replace(upperCaseOnly, '');
-    var pep2 = this.pepSeq2.replace(upperCaseOnly, '');
-
-    //~ #get the modifications straight
-    //~ unmodified_peps = XiDB.get_query("""SELECT peptide1, peptide2
-        //~ FROM v_export_materialized where spectrum_match_id =
-        //~ {}""".format(cl_pep.meta["spectrum_id"]))
-    var unmodified_peps = {peptide1:this.pepSeq1, peptide2: this.pepSeq2};
-    //~ unmod1 = "".join([i for i in unmodified_peps["peptide1"].values[0]
-                      //~ if i.isupper()])
-	var unmod1 = this.pepSeq1;
-	
-    //~ #swap columns for peptide definition
-    //~ if unmod1 == pep1:
-        //~ pass
-    //~ else:
-        //~ unmodified_peps.columns = ["peptide2", "peptide1"]
-	if (unmod1 == pep1){
-		unmodified_peps = {peptide1:this.pepSeq2, peptide2: this.pepSeq1};
+    // #get ion data for annotation
+    // ions1 = set([i.name if "_" not in i.loss else i.name+"loss" for i in
+    //              cl_pep.fragment_series["pep1"].get_ions()])
+    // ions2 = set([i.name if "_" not in i.loss else i.name+"loss" for i in
+    //              cl_pep.fragment_series["pep2"].get_ions()])
+    var fragRegex = /(.*)(_|\+)(.*)/g;
+    var ions1 = d3.set(), ions2 = d3.set(); //replaced with plain arrays at end
+    var pLength = annotatedPeaks.length;
+    for (var p = 0; p < annotatedPeaks; p++){
+		var peak = annoatatedPeaks[p];
+		var ion, loss = "";
+		var regexMatch = fragRegex.exec(peak.fragment_name);
+		if (!regexMatch){
+			ion = peak.fragment_name;
+		}
+		else{
+			ion = regexMatch[0];
+			loss = regexMatch[2];
+		}
+		console.log("ion:" + ion + "\t" + "loss:" + loss); 
+		if (loss != "") loss = "loss";
+		var matchedPeptide = peak.matchedpeptide.replace(notUpperCase, '');//uncertain about whether this property includes mod info?sv
+		if (matchedPeptide == pep1){
+			ions1.add(ion + loss);
+		} else {
+			ions2.add(ion + loss);
+		}
 	}
-
-    //~ #get modifications
-    //~ mods1_dic = get_mods(unmodified_peps["peptide1"][0])
-    //~ mods2_dic = get_mods(unmodified_peps["peptide2"][0])
-	var mods1_dic = get_mods(unmodified_peps.peptide1);
-    var mods2_dic = get_mods(unmodified_peps.peptide2);
+    ions1 = ions1.values(); // get rid of d3 map, have plain array
+    ions2 = ions2.values(); // get rid of d3 map, have plain array
+    console.log(ions1);
+    console.log(ions2);
     
-    //~ #get ion data for annotation
-    //~ ions1 = set([i.name if "_" not in i.loss else i.name+"loss" for i in
-                 //~ cl_pep.fragment_series["pep1"].get_ions()])
-    //~ ions2 = set([i.name if "_" not in i.loss else i.name+"loss" for i in
-                 //~ cl_pep.fragment_series["pep2"].get_ions()])
+    // #get the indicator array for observed fragments
+    // alpha_annotation = get_fragment_annotation(ions1, pep1)
+    var alpha_annotation = get_fragment_annotation(ions1, pep1);
+    // beta_annotation = get_fragment_annotation(ions2, pep2)
+	var beta_annotation = get_fragment_annotation(ions2, pep2);
     
-    // **OK... stuck... **
-    
-    //~ #get the indicator array for observed fragments
-    //~ alpha_annotation = get_fragment_annotation(ions1, pep1)
-    var alpha_annotation = null;
-    //~ beta_annotation = get_fragment_annotation(ions2, pep2)
-    var beta_annotation = null;
-  /*  columns = ['expmz', 'absoluteintesity', 'fragment_name', 'sequence',
-               'mass', 'loss', 'peptide_id', 'scan_number', u'matchedpeptide',
-               'description', 'matched_peptide_id', 'charge']
+    // columns = ['expmz', 'absoluteintesity', 'fragment_name', 'sequence',
+               // 'mass', 'loss', 'peptide_id', 'scan_number', u'matchedpeptide',
+               // 'description', 'matched_peptide_id', 'charge']
+	 
+    // if removeisotopes:
+        // spec = XiDB.get_query("SELECT {} FROM v_spec_viewer_advanced_materialized \
+        // where spectrum_match_id = {} and (isprimarymatch like '1' or \
+        // isprimarymatch is Null) and (isotope_peak_info = 'monoisotopic' or \
+        // isotope_peak_info is Null)".format(",".join(columns),
+                                        // cl_pep.meta["spectrum_id"]))
+    // else:
+        // spec = XiDB.get_query("SELECT {} FROM v_spec_viewer_advanced_materialized \
+        // where spectrum_match_id = {} and (isprimarymatch like '1' or \
+        // isprimarymatch is Null)".format(",".join(columns),
+                                        //~ cl_pep.meta["spectrum_id"]))
 
-    if removeisotopes:
-        spec = XiDB.get_query("SELECT {} FROM v_spec_viewer_advanced_materialized \
-        where spectrum_match_id = {} and (isprimarymatch like '1' or \
-        isprimarymatch is Null) and (isotope_peak_info = 'monoisotopic' or \
-        isotope_peak_info is Null)".format(",".join(columns),
-                                        cl_pep.meta["spectrum_id"]))
-    else:
-        spec = XiDB.get_query("SELECT {} FROM v_spec_viewer_advanced_materialized \
-        where spectrum_match_id = {} and (isprimarymatch like '1' or \
-        isprimarymatch is Null)".format(",".join(columns),
-                                        cl_pep.meta["spectrum_id"]))*/
-
-
-    //~ #==========================================================================
-    //~ #    account for crosslink shift
-    //~ #    this alings the peptide sequences at the cross-link site
-    //~ #==========================================================================
-    //~ shift = cl_pep.linkpos1 - cl_pep.linkpos2
+    // #==========================================================================
+    // #    account for crosslink shift
+    // #    this alings the peptide sequences at the cross-link site
+    // #==========================================================================
+    // shift = cl_pep.linkpos1 - cl_pep.linkpos2
     var shift = linkPos1 - linkPos2;
     var linkpos;
     //if shift <= 0:
     if  (shift <= 0) {
-        //~ pep1 = "".join(["#"] * np.abs(shift) + list(pep1))
-        pep1 = ("#" * Math.abs(shift)) + pep1;
-        //~ alpha_annotation = ["#"] * np.abs(shift) + list(alpha_annotation)
-        //alpha_annotation = 
-        //~ linkpos = cl_pep.linkpos2
+        // pep1 = "".join(["#"] * np.abs(shift) + list(pep1))
+        pep1 = Array(Math.abs(shift) + 1).join(" ") + pep1;  // u r here
+        // alpha_annotation = ["#"] * np.abs(shift) + list(alpha_annotation)
+        //~alpha_annotation = "#" * Math.abs(shift)) + alpha_annotation; // *check what the list python function is doing 
+        // linkpos = cl_pep.linkpos2
         linkpos = linkPos2;
     }    
-    //~ else:
+    // else:
     else {
         //~ pep2 = "".join(["#"] * np.abs(shift) + list(pep2))
-        pep1 = ("#" * Math.abs(shift)) + pep2;
-        //~ beta_annotation = ["#"] * np.abs(shift) + list(beta_annotation)
-        // beta_annotation = 
-        //~ linkpos = cl_pep.linkpos1
+        pep2 = Array(shift + 1).join(" ") + pep2;
+        // beta_annotation = ["#"] * np.abs(shift) + list(beta_annotation)
+        //~beta_annotation = "#" * Math.abs(shift)) + beta_annotation; // *check what the list python function is doing 
+        // linkpos = cl_pep.linkpos1
         linkpos = linkPos1;
 	}
-
-    //~ diff = len(pep1) - len(pep2)
-    //~ if diff <= 0:
-        //~ pep1 = "".join(list(pep1) + ["#"] * np.abs(diff))
-        //~ alpha_annotation = list(alpha_annotation) + ["#"] * np.abs(diff)
-//~ 
-    //~ else:
-        //~ pep2 = "".join(list(pep2) + ["#"] * np.abs(diff))
-        //~ beta_annotation = list(beta_annotation) + ["#"] * np.abs(diff)
+	
+	console.log("linkpos: "+linkpos);
+	
+    // diff = len(pep1) - len(pep2)
+    var diff = pep1.length - pep2.length;
+    // if diff <= 0:
+    if (diff <= 0) {
+        // pep1 = "".join(list(pep1) + ["#"] * np.abs(diff))
+        pep1 = pep1 + Array(Math.abs(diff) + 1).join(" ");
+        // alpha_annotation = list(alpha_annotation) + ["#"] * np.abs(diff)
+		//~  alpha_annotation = alpha_annotation + ("#" * Math.abs(diff));
+	}
+    // else:
+    else {
+        // pep2 = "".join(list(pep2) + ["#"] * np.abs(diff))
+        pep2 = pep2 + Array(diff + 1).join(" ");
+        // beta_annotation = list(beta_annotation) + ["#"] * np.abs(diff)
+//~	     beta_annotation = beta_annotation + ("#" * Math.abs(diff));
+	}
         
-        
+    
+    var xStep = 20;
+    drawPeptide( pep1, 20);
+    drawPeptide( pep2, 60);
+     
+    function drawPeptide( pep, y) {
+		var l = pep.length;
+		for (var i = 0; i < l; i++){
+			self.g.append("text")
+				.attr("x", xStep * i)
+				.attr("y", y)
+				.attr("text-anchor", "middle")
+				.text(pep[i]);
+		}
+	}
+	
+	self.g.append("line")
+		.attr("x1", xStep * (linkpos - 1))//the one...
+		.attr("y1", 22)
+		.attr("x2", xStep * (linkpos - 1))//the one...
+		.attr("y2", 42)
+		.attr("stroke", "black")
+		.attr("stroke-width", 1.5);
 
  /*   #prep data, normalize intensities and adjust the axes span
     spec["norm_int"] = (spec["absoluteintesity"] /
@@ -214,8 +249,8 @@ PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2,
                         (x, y + 0.5), ha='center', fontsize=15,
                         color=base_color)
 */
-
-   /* #==========================================================================
+/*
+    #==========================================================================
     #  FRAGMENTATION KEY STARTS HERE
     #==========================================================================
     const = 0
@@ -493,45 +528,50 @@ def draw_mod_annotation(aminoacid, xpos, ypos, idx_pos, mods, ax):
 		return null;
 	}
 
-	//~ def get_fragment_annotation(ions, pep):
-	function get_fragment_annotations(ions, pep){
-		//~ """
-		//~ Creates an indicator array for the peptide that contains the information
-		//~ about observed ions.
-	//~ 
-		//~ Parameter:
-		//~ -----------------------
-		//~ ions: set,
+	// def get_fragment_annotation(ions, pep):
+	function get_fragment_annotation(ions, pep){
+		// """
+		// Creates an indicator array for the peptide that contains the information
+		// about observed ions.
+		// 
+		// Parameter:
+		// -----------------------
+		// ions: set,
 			  //~ ion names
-	//~ 
-		//~ pep: str,
+		// 
+		// pep: str,
 			 //~ peptide sequence (without mods)
-	//~ 
-		//~ ion
-		//~ """
+		// 
+		// ion
+		// """
 
-		//~ annotation = []
-		//~ #iterate over peptide and find all fragment ions
-		//~ for i in range(1, len(pep)):
-			//~ gotb = ""
-			//~ goty = ""
-			//~ if "b"+str(i) in ions or "a"+str(i) in ions or "c"+str(i) in ions:
-				//~ gotb = "b"
-			//~ elif "b"+str(i)+"loss" in ions or "a"+str(i)+"loss" in ions or "c"+str(i)+"loss" in ions:
-				//~ gotb = "bloss"
-			//~ else:
-				//~ pass
-//~ 
-			//~ if "y"+str(len(pep)-i) in ions or "x"+str(len(pep)-i) in ions or "z"+str(len(pep)-i) in ions:
-				//~ goty = "y"
-			//~ elif "y"+str(len(pep)-i)+"loss" in ions or "x"+str(len(pep)-i)+"loss" in ions or "z"+str(len(pep)-i)+"loss" in ions:
-				//~ goty = "yloss"
-			//~ else:
-				//~ pass
-			//~ annotation.append(gotb+goty)
-		//~ return(annotation)
-		
-		return null;
+		// annotation = []
+		var annotation = [];
+		// #iterate over peptide and find all fragment ions
+		// for i in range(1, len(pep)):
+		for (var i = 1; i < pep.length; i++){
+			// gotb = ""
+			// goty = ""
+			var gotb = "";
+			var goty = "";
+			// if "b"+str(i) in ions or "a"+str(i) in ions or "c"+str(i) in ions:
+				// gotb = "b"
+			// elif "b"+str(i)+"loss" in ions or "a"+str(i)+"loss" in ions or "c"+str(i)+"loss" in ions:
+				// gotb = "bloss"
+			// else:
+				// pass
+			// 
+			// if "y"+str(len(pep)-i) in ions or "x"+str(len(pep)-i) in ions or "z"+str(len(pep)-i) in ions:
+				// goty = "y"
+			// elif "y"+str(len(pep)-i)+"loss" in ions or "x"+str(len(pep)-i)+"loss" in ions or "z"+str(len(pep)-i)+"loss" in ions:
+				// goty = "yloss"
+			// else:
+				// pass
+			// annotation.append(gotb+goty)
+			annotation.push(gotb + goty);
+		}
+		// return(annotation)
+		return annotation;
 	}
 
 }
@@ -542,8 +582,10 @@ PeptideFragmentationKey.prototype.clear = function(){
 	this.pepSeq2 = null;
 	this.linkPos2 = null;
 	this.annotatedPeaks = null;
+	this.g.selectAll("*").remove();
 }
 
+/*
 PeptideFragmentationKey.prototype.highlightChanged = function(fragments){
 	var callbackCount = this.highlightChangedCallbacks.length;
 	for (var i = 0; i < callbackCount; i++) {
@@ -566,3 +608,4 @@ PeptideFragmentationKey.prototype.fireRandomEvent = function(){
 		this.highlightChanged([this.annotatedPeaks[Math.floor(rnd)]]); //note param is array of fragments
 	}
 }
+*/
