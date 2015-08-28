@@ -67,27 +67,29 @@ PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2,
     //              cl_pep.fragment_series["pep1"].get_ions()])
     // ions2 = set([i.name if "_" not in i.loss else i.name+"loss" for i in
     //              cl_pep.fragment_series["pep2"].get_ions()])
-    var fragRegex = /(.*)(_|\+)(.*)/g;
+    var fragRegex = /(.\d*)/g;
+    
     var ions1 = d3.set(), ions2 = d3.set(); //replaced with plain arrays at end
     var pLength = annotatedPeaks.length;
-    for (var p = 0; p < annotatedPeaks; p++){
-		var peak = annoatatedPeaks[p];
-		var ion, loss = "";
-		var regexMatch = fragRegex.exec(peak.fragment_name);
-		if (!regexMatch){
-			ion = peak.fragment_name;
-		}
-		else{
-			ion = regexMatch[0];
-			loss = regexMatch[2];
-		}
-		console.log("ion:" + ion + "\t" + "loss:" + loss); 
-		if (loss != "") loss = "loss";
-		var matchedPeptide = peak.matchedpeptide.replace(notUpperCase, '');//uncertain about whether this property includes mod info?sv
-		if (matchedPeptide == pep1){
-			ions1.add(ion + loss);
-		} else {
-			ions2.add(ion + loss);
+    for (var p = 0; p < pLength; p++){
+		var peak = annotatedPeaks[p];
+		fragRegex.lastIndex = 0;
+		//~ console.log(peak.fragment_name.trim());
+		var regexMatch = fragRegex.exec(peak.fragment_name.trim());
+		if (peak.fragment_name.trim() != ""){
+			//~ console.log(regexMatch[0]);
+			if (peak.fragment_name.indexOf("_") == -1){
+				ion = regexMatch[0];
+			}
+			else{
+				ion = regexMatch[0] + "loss"
+			}
+			var matchedPeptide = peak.matchedpeptide.replace(SpectrumViewer.notUpperCase, '');//uncertain about whether this property includes mod info?sv
+			if (matchedPeptide == pep1){
+				ions1.add(ion);
+			} else {
+				ions2.add(ion);
+			}
 		}
 	}
     ions1 = ions1.values(); // get rid of d3 map, have plain array
@@ -123,22 +125,24 @@ PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2,
     // #==========================================================================
     // shift = cl_pep.linkpos1 - cl_pep.linkpos2
     var shift = linkPos1 - linkPos2;
+    var spaceArray = arrayOfSpaces(Math.abs(shift));
     var linkpos;
     //if shift <= 0:
     if  (shift <= 0) {
         // pep1 = "".join(["#"] * np.abs(shift) + list(pep1))
-        pep1 = Array(Math.abs(shift) + 1).join(" ") + pep1;  // u r here
+        pep1 = Array(Math.abs(shift) + 1).join(" ") + pep1; 
         // alpha_annotation = ["#"] * np.abs(shift) + list(alpha_annotation)
-        //~alpha_annotation = "#" * Math.abs(shift)) + alpha_annotation; // *check what the list python function is doing 
+        alpha_annotation = spaceArray.concat(alpha_annotation); 
         // linkpos = cl_pep.linkpos2
         linkpos = linkPos2;
     }    
     // else:
     else {
         //~ pep2 = "".join(["#"] * np.abs(shift) + list(pep2))
+        
         pep2 = Array(shift + 1).join(" ") + pep2;
         // beta_annotation = ["#"] * np.abs(shift) + list(beta_annotation)
-        //~beta_annotation = "#" * Math.abs(shift)) + beta_annotation; // *check what the list python function is doing 
+        beta_annotation = spaceArray.concat(beta_annotation); 
         // linkpos = cl_pep.linkpos1
         linkpos = linkPos1;
 	}
@@ -147,25 +151,37 @@ PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2,
 	
     // diff = len(pep1) - len(pep2)
     var diff = pep1.length - pep2.length;
+    spaceArray = arrayOfSpaces(Math.abs(diff));
     // if diff <= 0:
     if (diff <= 0) {
         // pep1 = "".join(list(pep1) + ["#"] * np.abs(diff))
         pep1 = pep1 + Array(Math.abs(diff) + 1).join(" ");
         // alpha_annotation = list(alpha_annotation) + ["#"] * np.abs(diff)
-		//~  alpha_annotation = alpha_annotation + ("#" * Math.abs(diff));
+		alpha_annotation = alpha_annotation.concat(spaceArray);
 	}
     // else:
     else {
         // pep2 = "".join(list(pep2) + ["#"] * np.abs(diff))
         pep2 = pep2 + Array(diff + 1).join(" ");
         // beta_annotation = list(beta_annotation) + ["#"] * np.abs(diff)
-//~	     beta_annotation = beta_annotation + ("#" * Math.abs(diff));
+		beta_annotation = beta_annotation.concat(spaceArray);
 	}
-        
+     
+    function arrayOfSpaces(n){
+		var arr = [];
+		for (var a = 0; a < n; a++) {arr.push("#")}
+		return arr;
+	}    
     
     var xStep = 20;
     drawPeptide( pep1, 20);
     drawPeptide( pep2, 60);
+    
+    console.log(alpha_annotation);
+    console.log(beta_annotation);
+    
+    drawFragmented(alpha_annotation, 20);
+    drawFragmented(beta_annotation, 60);
      
     function drawPeptide( pep, y) {
 		var l = pep.length;
@@ -175,6 +191,21 @@ PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2,
 				.attr("y", y)
 				.attr("text-anchor", "middle")
 				.text(pep[i]);
+		}
+	}
+	function drawFragmented( fragAnno, y) {
+		var l = pep1.length; // shouldn't matter which pep you use
+		for (var i = 0; i < l; i++){
+			if (fragAnno[i] != "#" && fragAnno[i].trim() != "") {
+				var x = (xStep * i) + (xStep / 2);
+				self.g.append("line")
+					.attr("x1", x)
+					.attr("y1", y)
+					.attr("x2", x)
+					.attr("y2", y - 20)
+					.attr("stroke", "black")
+					.attr("stroke-width", 1.5);
+			}
 		}
 	}
 	
@@ -549,24 +580,51 @@ def draw_mod_annotation(aminoacid, xpos, ypos, idx_pos, mods, ax):
 		var annotation = [];
 		// #iterate over peptide and find all fragment ions
 		// for i in range(1, len(pep)):
-		for (var i = 1; i < pep.length; i++){
+		for (var i = 1; i < (pep.length + 1); i++){
 			// gotb = ""
 			// goty = ""
-			var gotb = "";
-			var goty = "";
+			var gotb = " ";
+			var goty = " ";
+			
+			var aIonId = "a" + i;
+			var bIonId = "b" + i;
+			var cIonId = "c" + i;
+			
 			// if "b"+str(i) in ions or "a"+str(i) in ions or "c"+str(i) in ions:
+			if (ions.indexOf(aIonId) != -1 || ions.indexOf(bIonId) != -1 || ions.indexOf(cIonId) != -1){
 				// gotb = "b"
+				gotb = "b";
+			}
 			// elif "b"+str(i)+"loss" in ions or "a"+str(i)+"loss" in ions or "c"+str(i)+"loss" in ions:
+			else if (ions.indexOf(aIonId + "loss") != -1 
+						|| ions.indexOf(bIonId + "loss") != -1 
+						|| ions.indexOf(cIonId + "loss") != -1){
 				// gotb = "bloss"
+				gotb = "bloss";
+			}
 			// else:
 				// pass
-			// 
+			
+			var xIonId = "x" + (pep.length - i); // u r here
+			var yIonId = "y" + (pep.length - i);
+			var zIonId = "z" + (pep.length - i);
+			
+			
 			// if "y"+str(len(pep)-i) in ions or "x"+str(len(pep)-i) in ions or "z"+str(len(pep)-i) in ions:
+			if (ions.indexOf(xIonId) != -1 || ions.indexOf(yIonId) != -1 || ions.indexOf(zIonId) != -1){
 				// goty = "y"
+				goty = "y"
+			}
 			// elif "y"+str(len(pep)-i)+"loss" in ions or "x"+str(len(pep)-i)+"loss" in ions or "z"+str(len(pep)-i)+"loss" in ions:
+			else if (ions.indexOf(xIonId + "loss") != -1 
+						|| ions.indexOf(yIonId + "loss") != -1 
+						|| ions.indexOf(zIonId + "loss") != -1) {
 				// goty = "yloss"
+				goty = "yloss";
+			}
 			// else:
 				// pass
+
 			// annotation.append(gotb+goty)
 			annotation.push(gotb + goty);
 		}

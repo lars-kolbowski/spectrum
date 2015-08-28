@@ -24,22 +24,23 @@ function Peak (data, graph){
 	this.graph = graph;	
 	
 	var matchedPeptide = data[0].matchedpeptide;
-	this.colour = "black";
+	this.colour = "grey";
 	if (graph.spectrumViewer.pep1 == matchedPeptide.replace(SpectrumViewer.notUpperCase, '')){
 		this.colour = SpectrumViewer.p1color;
 	}
 	if (graph.spectrumViewer.pep2 == matchedPeptide.replace(SpectrumViewer.notUpperCase, '')){
 		this.colour = SpectrumViewer.p2color;
 	}
-	
-	this.annotation = new PeakAnnotation(data, graph, this.colour);
+	if (data[0].fragment_name.indexOf("_") == -1) {
+		this.annotation = new PeakAnnotation(data, graph, this.colour);
+	}
 }
 
 Peak.prototype.init = function(){
 	this.line = this.graph.peaks.append('line');
 	this.line.attr("stroke",this.colour);
 	this.line.attr("stroke-width","1");
-	this.annotation.init();
+	if (this.annotation) this.annotation.init();
 }
 
 Peak.prototype.update = function(){
@@ -47,5 +48,5 @@ Peak.prototype.update = function(){
 	this.line.attr("y1", this.graph.y(this.y));
 	this.line.attr("x2", this.graph.x(this.x));
 	this.line.attr("y2", this.graph.y(0));
-	this.annotation.update();
+	if (this.annotation) this.annotation.update();
 }
