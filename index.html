@@ -7,26 +7,49 @@
 <!--
     <script type="text/javascript" src="./build/spectrum.js"></script>
 -->
-    <script type="text/javascript" src="./src/Graph.js"></script>
-    <script type="text/javascript" src="./src/Peak.js"></script>
-    <script type="text/javascript" src="./src/Annotation.js"></script>
+    <script type="text/javascript" src="./src/SpectrumViewer.js"></script>
+    <script type="text/javascript" src="./src/PeptideFragmentationKey.js"></script>
+    <script type="text/javascript" src="./src/graph/Graph.js"></script>
+    <script type="text/javascript" src="./src/graph/Peak.js"></script>
+    <script type="text/javascript" src="./src/graph/PeakAnnotation.js"></script>
     <style type="text/css">
-	
-  </style>
+		html, body, #spectrumDiv {
+			background-color: white;
+			height:100%;
+			width:100%;
+		}
+		
+		*{
+			margin:0px;
+			padding:0px;
+		}
+		
+		.axis path, .axis line {
+			fill: none;
+			stroke: #000;
+<!--
+			stoke-width:1.2px;
+-->
+		}
+	</style>
   </head>
   <body>
-	todo: demo page
 	  
-	<div id='spectrum'>
+	<div id='spectrumDiv'>
 	</div>
 	
 	<script type="text/javascript">		
-		var spectrumViewer = new SpectrumViewer();
-		window.addEventListener("load", function() {
-			d3.csv("./test.csv", function(csv) {
+		var spectrumViewer = new SpectrumViewer(document.getElementById('spectrumDiv'));
 				
+		window.addEventListener("load", function() {
+			d3.text("./test.csv", function(csv) {
+				spectrumViewer.setData("VGQQYSSAPLR", 3, "EKELESIDVLLEQTTGGNNKDLK", 5, csv);
+				window.addEventListener("resize", function() {
+					spectrumViewer.resize();
+				});
 			});
 		});
+		
 	</script>
     
 	</body>

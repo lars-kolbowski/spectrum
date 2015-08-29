@@ -24,8 +24,7 @@ function SpectrumViewer (targetDiv){
 		targetDiv = document.getElementById(targetDiv);
 	}
 	//avoids prob with 'save - web page complete'
-	d3.select(targetDiv).style("position","relative").selectAll("*").remove();
-	//~ this.targetDiv = d3.select(targetDiv).style("height", "100%");//.style("overflow","hidden");
+	d3.select(targetDiv).selectAll("*").remove();
 		
 	this.svg = d3.select(targetDiv).append("svg").style("width", "100%").style("height", "100%");
 	//create peptide frag key
@@ -69,9 +68,7 @@ SpectrumViewer.prototype.clear = function(){
 }
 
 SpectrumViewer.prototype.resize = function(){
-	//~ this.peptideFragKey.clear();
-	//~ this.graph.clear();
-	this.graph.resize()();
+	this.graph.resize();
 }
 
 //SpectrumViewer.prototype.destroy(){} //if multiple viewers need to make sure don't cause memory leaks, see -

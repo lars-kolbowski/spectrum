@@ -130,7 +130,7 @@ PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2,
     //if shift <= 0:
     if  (shift <= 0) {
         // pep1 = "".join(["#"] * np.abs(shift) + list(pep1))
-        pep1 = Array(Math.abs(shift) + 1).join(" ") + pep1; 
+        pep1 = Array(Math.abs(shift) + 1).join("#") + pep1; 
         // alpha_annotation = ["#"] * np.abs(shift) + list(alpha_annotation)
         alpha_annotation = spaceArray.concat(alpha_annotation); 
         // linkpos = cl_pep.linkpos2
@@ -140,7 +140,7 @@ PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2,
     else {
         //~ pep2 = "".join(["#"] * np.abs(shift) + list(pep2))
         
-        pep2 = Array(shift + 1).join(" ") + pep2;
+        pep2 = Array(shift + 1).join("#") + pep2;
         // beta_annotation = ["#"] * np.abs(shift) + list(beta_annotation)
         beta_annotation = spaceArray.concat(beta_annotation); 
         // linkpos = cl_pep.linkpos1
@@ -155,14 +155,14 @@ PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2,
     // if diff <= 0:
     if (diff <= 0) {
         // pep1 = "".join(list(pep1) + ["#"] * np.abs(diff))
-        pep1 = pep1 + Array(Math.abs(diff) + 1).join(" ");
+        pep1 = pep1 + Array(Math.abs(diff) + 1).join("#");
         // alpha_annotation = list(alpha_annotation) + ["#"] * np.abs(diff)
 		alpha_annotation = alpha_annotation.concat(spaceArray);
 	}
     // else:
     else {
         // pep2 = "".join(list(pep2) + ["#"] * np.abs(diff))
-        pep2 = pep2 + Array(diff + 1).join(" ");
+        pep2 = pep2 + Array(diff + 1).join("#");
         // beta_annotation = list(beta_annotation) + ["#"] * np.abs(diff)
 		beta_annotation = beta_annotation.concat(spaceArray);
 	}
@@ -174,8 +174,8 @@ PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2,
 	}    
     
     var xStep = 20;
-    drawPeptide( pep1, 20);
-    drawPeptide( pep2, 60);
+    drawPeptide( pep1, 20, SpectrumViewer.p1color);
+    drawPeptide( pep2, 60, SpectrumViewer.p2color);
     
     console.log(alpha_annotation);
     console.log(beta_annotation);
@@ -183,20 +183,21 @@ PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2,
     drawFragmented(alpha_annotation, 20);
     drawFragmented(beta_annotation, 60);
      
-    function drawPeptide( pep, y) {
+    function drawPeptide( pep, y, colour) {
 		var l = pep.length;
 		for (var i = 0; i < l; i++){
 			self.g.append("text")
 				.attr("x", xStep * i)
 				.attr("y", y)
 				.attr("text-anchor", "middle")
+				.attr("fill", colour)
 				.text(pep[i]);
 		}
 	}
 	function drawFragmented( fragAnno, y) {
 		var l = pep1.length; // shouldn't matter which pep you use
 		for (var i = 0; i < l; i++){
-			if (fragAnno[i] != "#" && fragAnno[i].trim() != "") {
+			if (fragAnno[i] != "#" && fragAnno[i] != "--") {
 				var x = (xStep * i) + (xStep / 2);
 				self.g.append("line")
 					.attr("x1", x)
@@ -583,8 +584,8 @@ def draw_mod_annotation(aminoacid, xpos, ypos, idx_pos, mods, ax):
 		for (var i = 1; i < (pep.length + 1); i++){
 			// gotb = ""
 			// goty = ""
-			var gotb = " ";
-			var goty = " ";
+			var gotb = "-";
+			var goty = "-";
 			
 			var aIonId = "a" + i;
 			var bIonId = "b" + i;
@@ -593,19 +594,19 @@ def draw_mod_annotation(aminoacid, xpos, ypos, idx_pos, mods, ax):
 			// if "b"+str(i) in ions or "a"+str(i) in ions or "c"+str(i) in ions:
 			if (ions.indexOf(aIonId) != -1 || ions.indexOf(bIonId) != -1 || ions.indexOf(cIonId) != -1){
 				// gotb = "b"
-				gotb = "b";
+				gotb = bIonId;
 			}
 			// elif "b"+str(i)+"loss" in ions or "a"+str(i)+"loss" in ions or "c"+str(i)+"loss" in ions:
 			else if (ions.indexOf(aIonId + "loss") != -1 
 						|| ions.indexOf(bIonId + "loss") != -1 
 						|| ions.indexOf(cIonId + "loss") != -1){
 				// gotb = "bloss"
-				gotb = "bloss";
+				gotb = bIonId + "loss";
 			}
 			// else:
 				// pass
 			
-			var xIonId = "x" + (pep.length - i); // u r here
+			var xIonId = "x" + (pep.length - i);
 			var yIonId = "y" + (pep.length - i);
 			var zIonId = "z" + (pep.length - i);
 			
@@ -613,14 +614,14 @@ def draw_mod_annotation(aminoacid, xpos, ypos, idx_pos, mods, ax):
 			// if "y"+str(len(pep)-i) in ions or "x"+str(len(pep)-i) in ions or "z"+str(len(pep)-i) in ions:
 			if (ions.indexOf(xIonId) != -1 || ions.indexOf(yIonId) != -1 || ions.indexOf(zIonId) != -1){
 				// goty = "y"
-				goty = "y"
+				goty = yIonId;
 			}
 			// elif "y"+str(len(pep)-i)+"loss" in ions or "x"+str(len(pep)-i)+"loss" in ions or "z"+str(len(pep)-i)+"loss" in ions:
 			else if (ions.indexOf(xIonId + "loss") != -1 
 						|| ions.indexOf(yIonId + "loss") != -1 
 						|| ions.indexOf(zIonId + "loss") != -1) {
 				// goty = "yloss"
-				goty = "yloss";
+				goty = yIonId + "loss";
 			}
 			// else:
 				// pass

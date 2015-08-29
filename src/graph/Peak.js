@@ -20,7 +20,7 @@
 
 function Peak (data, graph){
 	this.x = data[0].expmz - 0;
-	this.y = data[0].intensity - 0;
+	this.y = data[0].absolute_intensity - 0;
 	this.graph = graph;	
 	
 	var matchedPeptide = data[0].matchedpeptide;
