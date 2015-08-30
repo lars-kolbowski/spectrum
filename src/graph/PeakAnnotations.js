@@ -52,7 +52,8 @@ PeakAnnotations.prototype.init = function(){
 			label.text("");
 			//hack to take out lossi peaks
 		}
-		label.attr("text-anchor", "middle");
+		label.attr("text-anchor", "middle")
+			.attr("class", "peakAnnot");
 		
 		var c = "pink";//colour for annotation
 		var matchedPeptide = this.annotations[a].matchedpeptide;
