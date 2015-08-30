@@ -26,45 +26,56 @@ function PeakAnnotations (data, peak){
 	for (var a= 0; a < data.length; a++){
 		var fragName = data[a].fragment_name;
 		if (fragName.trim() != "") {
-			this.annotations.push(fragName);
+			this.annotations.push(data[a]);
 		}	
 	}
 	//sort
 	this.annotations.sort(function(a, b){
-		return a.length - b.length; // ASC -> a - b; DESC -> b - a
+		return a.fragment_name.length - b.fragment_name.length; // ASC -> a - b; DESC -> b - a
 	});
 }
 
 	
 PeakAnnotations.prototype.init = function(){	
-	/*	//~ var matchedPeptide = data[0].matchedpeptide;
-	//~ this.colour = "grey";
-	//~ if (graph.spectrumViewer.pep1 == matchedPeptide.replace(SpectrumViewer.notUpperCase, '')){
-		//~ this.colour = SpectrumViewer.p1color;
-	//~ }
-	//~ if (graph.spectrumViewer.pep2 == matchedPeptide.replace(SpectrumViewer.notUpperCase, '')){
-		//~ this.colour = SpectrumViewer.p2color;
-	//~ }*/
-	
 	//create
 	this.labels = []; // will be array of d3 selections
 	var annotCount = this.annotations.length;
+	var unlossiFound = false;
 	for (var a = 0; a < annotCount; a++){
-		var fragName = this.annotations[a];
-		var label = this.peak.graph.annotations.append('text')
-			.text(fragName)
-			.attr("text-anchor", "middle");
+		var fragName = this.annotations[a].fragment_name;
+		var label;
+		if (fragName.indexOf("_") == -1){ // put lossi peaks in seperate layer
+			 label = this.peak.graph.annotations.append('text');
+			label.text(fragName)
+		} else {
+			label = this.peak.graph.lossiAnnotations.append('text');
+			label.text("");
+			//hack to take out lossi peaks
+		}
+		label.attr("text-anchor", "middle");
 		
-		var c;//colour for annotation
+		var c = "pink";//colour for annotation
+		var matchedPeptide = this.annotations[a].matchedpeptide;
+		var pep; 
+		if (this.peak.graph.spectrumViewer.pep1 == matchedPeptide.replace(SpectrumViewer.notUpperCase, '')){
+			pep = "p1";
+		}
+		if (this.peak.graph.spectrumViewer.pep2 == matchedPeptide.replace(SpectrumViewer.notUpperCase, '')){
+			pep = "p2";
+		}
 		if (fragName.indexOf("_") == -1){ //is not lossi
-		
-		
+			c = SpectrumViewer[pep + "color"];	
+			this.colour = c;	
+			unlossiFound = true;		
 		} else { // is lossi
-		
+			c = SpectrumViewer[pep + "color_loss"]; //javascript lets you do this...
+			if (unlossiFound == false) {
+				this.colour = c;
+			};
 		}		
-		label.attr("fill", c);				
+		label.attr("fill", c);	
 		this.labels.push(label);
-		// this.circle.append("svg:title").text(this.fragmentNames);	
+		// this.circle.append("svg:title").text(this.fragmentNames);	// easy tooltip
 	}
 }
 

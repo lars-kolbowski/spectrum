@@ -115,6 +115,7 @@ Graph.prototype.resize = function() {
 
 
 	self.peaks = self.innerSVG.append("g");
+	self.lossiAnnotations = self.innerSVG.append("g");
 	self.annotations = self.innerSVG.append("g");
 	for (var i = 0; i < self.points.length; i++){
 		self.points[i].init();

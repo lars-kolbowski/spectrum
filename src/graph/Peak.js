@@ -32,9 +32,9 @@ function Peak (data, graph){
 
 Peak.prototype.init = function(){
 	this.line = this.graph.peaks.append('line');
-	this.line.attr("stroke", this.annotations.colour);
-	this.line.attr("stroke-width","1");
 	this.annotations.init();
+	this.line.attr("stroke", this.annotations.colour);
+	this.line.attr("stroke-width","1");// use css
 }
 
 Peak.prototype.update = function(){
