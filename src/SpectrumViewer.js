@@ -1,11 +1,11 @@
 //		a spectrum viewer
 //
 //      Copyright  2015 Rappsilber Laboratory, Edinburgh University
-// 
+//
 // 		Licensed under the Apache License, Version 2.0 (the "License");
 // 		you may not use this file except in compliance with the License.
 // 		You may obtain a copy of the License at
-// 
+//
 // 		http://www.apache.org/licenses/LICENSE-2.0
 //
 //   	Unless required by applicable law or agreed to in writing, software
@@ -15,7 +15,7 @@
 //   	limitations under the License.
 //
 //		author: Colin Combe
-//		
+//
 //		SpectrumViewer.js
 
 function SpectrumViewer (targetDiv){
@@ -25,13 +25,13 @@ function SpectrumViewer (targetDiv){
 	}
 	//avoids prob with 'save - web page complete'
 	d3.select(targetDiv).selectAll("*").remove();
-		
+
 	this.svg = d3.select(targetDiv).append("svg").style("width", "100%").style("height", "100%");
 	//create peptide frag key
 	this.peptideFragKey = new PeptideFragmentationKey(this.svg);
 	//create graph
 	this.graph = new Graph (this.svg, this);
-	
+
 	//link each to other by registering callbacks
 	//~ this.peptideFragKey.highlightChangedCallbacks.push(this.graph.setHighlights);
 	//~ this.graph.highlightChangedCallbacks.push(this.peptideFragKey.setHighlights);
@@ -60,7 +60,7 @@ SpectrumViewer.prototype.setData = function(pepSeq1, linkPos1, pepSeq2, linkPos2
 	this.peptideFragKey.setData(pepSeq1, linkPos1, pepSeq2, linkPos2, annotatedPeaks);
 	//graph doesn't need peptide sequences and link positions, only annotated peaks
 	this.graph.setData(annotatedPeaks);
-	
+
 	/* #writes additional info into the plot, mz, precursor charge etc.
     if annotate_verbose:
         pre_info = "search: {} \n PSMID: {}\n scan: {}\n m/z: {}\n z: {}\n\n score: {:.2f} \n mean(ppmerror): {:.2f} \n std(ppmerror): {:.2f}".format(

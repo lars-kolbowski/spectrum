@@ -35,13 +35,13 @@ Graph = function(targetSvg, spectrumViewer, options) {
 
 
 Graph.prototype.setData = function(annotatedPeaks){
- 	this.xmaxPrimary = d3.max(annotatedPeaks, 
+ 	this.xmaxPrimary = d3.max(annotatedPeaks,
 			function(d){
 				return ((d.isprimarymatch == 1)? d.expmz - 0 : 0);
 			}
 		) + 50;
 	this.xminPrimary = d3.min(annotatedPeaks, function(d){return ((d.isprimarymatch == 1)?  d.expmz - 0 : this.xmaxPrimary);}) - 50;
-	
+
 	var nested =  d3.nest()
 		.key(function(d) { return d.expmz +'-'+ d.absoluteintensity; })
 		.entries(annotatedPeaks);
@@ -52,11 +52,11 @@ Graph.prototype.setData = function(annotatedPeaks){
 
 	//~ this.xmax = d3.max(this.points, function(d){return d.x;}) + 10;
 	//~ this.xmin = d3.min(this.points, function(d){return d.x;}) - 10;
-	
+
 	this.xmax = this.xmaxPrimary;
 	this.xmin = this.xminPrimary;
-	
-	
+
+
 	this.ymax = d3.max(this.points, function(d){return d.y;});
 	this.ymin = 0;//d3.min(this.points, function(d){return d.y;});
 
@@ -67,72 +67,72 @@ Graph.prototype.resize = function() {
 	var self = this;
 
 	//see https://gist.github.com/mbostock/3019563
-		//~ console.log("doing it");
-		var cx = self.g.node().parentNode.clientWidth;
-		var cy = self.g.node().parentNode.clientHeight;
-		self.g.attr("width", cx).attr("height", cy);
-		self.g.attr("width", cx).attr("height", cy).selectAll("*").remove();
+	var cx = self.g.node().parentNode.clientWidth;
+	var cy = self.g.node().parentNode.clientHeight;
+	self.g.attr("width", cx).attr("height", cy);
+	self.g.attr("width", cx).attr("height", cy).selectAll("*").remove();
+	// remove not needed if create groups in contructors and change attributes here
+	// (i.e. this could be tidied up)
 
-		var width = cx - self.margin.left - self.margin.right;
-		var height = cy - self.margin.top  - self.margin.bottom;
-
-
-		self.x = d3.scale.linear()
-			.domain([self.xmin, self.xmax])
-			.range([0, width]);
-
-		// y-scale (inverted domain)
-		self.y = d3.scale.linear()
-			.domain([0, self.ymax]).nice()
-			.range([height, 0]).nice();
-
-		self.g.append("g")
-			.attr("class", "y axis")
-			.call(d3.svg.axis().scale(self.y).orient("left"));
-
-		self.xAxis = d3.svg.axis().scale(self.x).orient("bottom");
-		self.xaxis = self.g.append("g")
-			.attr("class", "x axis")
-			.attr("transform", "translate(0," + height + ")")
-			.call(self.xAxis);
-
-	  self.plot = self.g.append("rect")
-		  .attr("width", width)
-		  .attr("height", height)
-		  .style("fill", "white")
-		  .attr("pointer-events", "all");
-
-	  self.innerSVG = self.g.append("g")//"svg") //make this svg to plot clip at axes
-		  .attr("top", 0)
-		  .attr("left", 0)
-		  .attr("width", width)
-		  .attr("height", height)
-		  .attr("viewBox", "0 0 "+width+" "+height)
-		  .attr("class", "line");
+	var width = cx - self.margin.left - self.margin.right;
+	var height = cy - self.margin.top  - self.margin.bottom;
 
 
+	self.x = d3.scale.linear()
+		.domain([self.xmin, self.xmax])
+		.range([0, width]);
+
+	//todo: don't recreate things, create them in constructor and change attributes here
+
+	// y-scale (inverted domain)
+	self.y = d3.scale.linear()
+		.domain([0, self.ymax]).nice()
+		.range([height, 0]).nice();
+
+	self.g.append("g")
+		.attr("class", "y axis")
+		.call(d3.svg.axis().scale(self.y).orient("left"));
+
+	self.xAxis = d3.svg.axis().scale(self.x).orient("bottom");
+	self.xaxis = self.g.append("g")
+		.attr("class", "x axis")
+		.attr("transform", "translate(0," + height + ")")
+		.call(self.xAxis);
+
+	self.plot = self.g.append("rect")
+		.attr("width", width)
+		.attr("height", height)
+		.style("fill", "white")
+		.attr("pointer-events", "all");
+
+	self.innerSVG = self.g.append("g")//"svg") //make this svg to clip plot at axes
+		.attr("top", 0)
+		.attr("left", 0)
+		.attr("width", width)
+		.attr("height", height)
+		.attr("viewBox", "0 0 "+width+" "+height)
+		.attr("class", "line");
 
 
-	   self.annotations = self.innerSVG.append("g");
-	   self.peaks = self.innerSVG.append("g");
-	   for (var i = 0; i < self.points.length; i++){
-			self.points[i].init();
-		}
-		self.zoom = d3.behavior.zoom().x(self.x).on("zoom", self.redraw());
-	 	
-	 	self.plot.call( d3.behavior.zoom().x(self.x).on("zoom", self.redraw()));
-		//~ self.xaxis.call( d3.behavior.zoom().x(self.x).on("zoom", self.redraw()));
-		//self.innerSVG.call(self.zoom);
+	self.peaks = self.innerSVG.append("g");
+	self.annotations = self.innerSVG.append("g");
+	for (var i = 0; i < self.points.length; i++){
+		self.points[i].init();
+	}
+	self.zoom = d3.behavior.zoom().x(self.x).on("zoom", self.redraw());
+
+	self.plot.call( d3.behavior.zoom().x(self.x).on("zoom", self.redraw()));
+	self.innerSVG.call(self.zoom);
 
 	  // add Chart Title
-	  if (self.options.title) {
-		self.title = self.vis.append("text")
-			.attr("class", "axis")
-			.text(self.options.title)
-			.attr("x", self.size.width/2)
-			.attr("dy","-0.8em")
-			.style("text-anchor","middle");
-	  }
+	  //~ if (self.options.title) {
+		//~ self.title = self.vis.append("text")
+			//~ .attr("class", "axis")
+			//~ .text(self.options.title)
+			//~ .attr("x", self.size.width/2)
+			//~ .attr("dy","-0.8em")
+			//~ .style("text-anchor","middle");
+	  //~ }
 
 	  self.redraw()();
 }
@@ -148,7 +148,7 @@ Graph.prototype.redraw = function(){
 		}
 		self.xaxis.call( self.xAxis);//d3.behavior.zoom().x(self.x).on("zoom", self.redraw()));
 		self.plot.call( d3.behavior.zoom().x(self.x).on("zoom", self.redraw()));
-		//~ this.innerSVG.call(this.zoom);
+		self.innerSVG.call( d3.behavior.zoom().x(self.x).on("zoom", self.redraw()));
 	};
 }
 
