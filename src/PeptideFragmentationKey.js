@@ -16,6 +16,8 @@
 //
 //		authors: Sven Giese, Colin Combe
 //
+//		based on Sven's python code, bits of python code left in as comments, can tidy later
+//
 //		PeptideFragmentationKey.js
 
 function PeptideFragmentationKey (targetSvg, options){
@@ -34,7 +36,7 @@ function PeptideFragmentationKey (targetSvg, options){
 }
 
 PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2, linkPos2, annotatedPeaks){
-	   var self = this;
+	var self = this;
 	   
 	this.pepSeq1 = pepSeq1; //contains modification info
 	this.linkPos1 = linkPos1;
@@ -53,7 +55,7 @@ PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2,
     // #==========================================================================
     // pep1 = cl_pep.peptide1.sequence
     // pep2 = cl_pep.peptide2.sequence
-   var pep1 = this.pepSeq1.replace(SpectrumViewer.notUpperCase, '');
+	var pep1 = this.pepSeq1.replace(SpectrumViewer.notUpperCase, '');
     var pep2 = this.pepSeq2.replace(SpectrumViewer.notUpperCase, '');
 
     // #get modifications
@@ -67,8 +69,7 @@ PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2,
     //              cl_pep.fragment_series["pep1"].get_ions()])
     // ions2 = set([i.name if "_" not in i.loss else i.name+"loss" for i in
     //              cl_pep.fragment_series["pep2"].get_ions()])
-    var fragRegex = /(.\d*)/g;
-    
+    var fragRegex = /(.\d*)/g;    
     var ions1 = d3.set(), ions2 = d3.set(); //replaced with plain arrays at end
     var pLength = annotatedPeaks.length;
     for (var p = 0; p < pLength; p++){
@@ -138,8 +139,7 @@ PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2,
     }    
     // else:
     else {
-        //~ pep2 = "".join(["#"] * np.abs(shift) + list(pep2))
-        
+        //~ pep2 = "".join(["#"] * np.abs(shift) + list(pep2))        
         pep2 = Array(shift + 1).join("#") + pep2;
         // beta_annotation = ["#"] * np.abs(shift) + list(beta_annotation)
         beta_annotation = spaceArray.concat(beta_annotation); 
@@ -165,122 +165,17 @@ PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2,
         pep2 = pep2 + Array(diff + 1).join("#");
         // beta_annotation = list(beta_annotation) + ["#"] * np.abs(diff)
 		beta_annotation = beta_annotation.concat(spaceArray);
-	}
-     
+	}    
+    console.log(alpha_annotation);
+    console.log(beta_annotation);     
     function arrayOfSpaces(n){
 		var arr = [];
 		for (var a = 0; a < n; a++) {arr.push("#")}
 		return arr;
 	}    
-    
-    var xStep = 20;
-    drawPeptide( pep1, 20, SpectrumViewer.p1color);
-    drawPeptide( pep2, 60, SpectrumViewer.p2color);
-    
-    console.log(alpha_annotation);
-    console.log(beta_annotation);
-    
-    drawFragmented(alpha_annotation, 20);
-    drawFragmented(beta_annotation, 60);
-     
-    function drawPeptide( pep, y, colour) {
-		var l = pep.length;
-		for (var i = 0; i < l; i++){
-			self.g.append("text")
-				.attr("x", xStep * i)
-				.attr("y", y)
-				.attr("text-anchor", "middle")
-				.attr("fill", colour)
-				.text(pep[i]);
-		}
-	}
-	function drawFragmented( fragAnno, y) {
-		var l = pep1.length; // shouldn't matter which pep you use
-		for (var i = 0; i < l; i++){
-			if (fragAnno[i] != "#" && fragAnno[i] != "--") {
-				var x = (xStep * i) + (xStep / 2);
-				self.g.append("line")
-					.attr("x1", x)
-					.attr("y1", y)
-					.attr("x2", x)
-					.attr("y2", y - 20)
-					.attr("stroke", "black")
-					.attr("stroke-width", 1.5);
-			}
-		}
-	}
-	
-	self.g.append("line")
-		.attr("x1", xStep * (linkpos - 1))//the one...
-		.attr("y1", 22)
-		.attr("x2", xStep * (linkpos - 1))//the one...
-		.attr("y2", 42)
-		.attr("stroke", "black")
-		.attr("stroke-width", 1.5);
+    	
+   /* noise = spec[pd.isnull(spec["fragment_name"])] */ //not sure what this is for
 
- /*   #prep data, normalize intensities and adjust the axes span
-    spec["norm_int"] = (spec["absoluteintesity"] /
-                        np.max(spec["absoluteintesity"].values) * 100)
-    noise = spec[pd.isnull(spec["fragment_name"])]
-    groups = spec.groupby(["matchedpeptide"])
-    xmin = np.min(spec["expmz"])
-    xmax1 = np.max(spec["norm_int"]) + 20
-    xmax2 = np.max(spec["norm_int"]) + 10
-
-    #get a good distance between letters / stuff
-    # mainly done by trial and error
-    mzs = [i for i, j in zip(spec["expmz"], spec["fragment_name"]) if j
-           is not None]
-    xax_min = np.min(mzs)
-    xax_max = np.max(mzs)
-    xax_min = np.floor(xax_min / 15) * 15
-    xax_max = np.ceil(xax_max / 15) * 15
-    xax_range = xax_max - xax_min
-    xstep = 4 * xax_range / 100
-
-    #==========================================================================
-    # START PLOTTING
-    #==========================================================================
-    if xax_range <= 600:
-        bwidth = 0.5
-    else:
-        bwidth = 1
-
-    f, ax = plt.subplots(1, figsize=(14.69, 8.27))
-    #plot the peptides per group (colored)
-    ax.bar(noise["expmz"], noise["norm_int"], width=bwidth, color="grey",
-           edgecolor="grey", alpha=0.7)
-    for i, j in groups:
-        unmod = "".join([aa for aa in i if aa.isupper()])
-        if unmod == cl_pep.peptide1.sequence:
-            base_color = p1color
-            base_color_loss = p1color_loss
-        else:
-            base_color = p2color
-            base_color_loss = p2color_loss
-        barcolors = [base_color if "_" not in i else base_color_loss for i in j["fragment_name"]]
-        lbls = []
-        ax.bar(j["expmz"], j["norm_int"], width=bwidth, color=barcolors,
-               edgecolor=barcolors)
-
-        #annotate the peaks in the spectrum
-        for x, y, lbl in zip(j["expmz"], j["norm_int"], j["fragment_name"]):
-            fnames = ["", ""]
-
-            try:
-                fname = str(re.match("(a|b|c|x|y|z)(\d+)", lbl).group(0))
-            except:
-                fname = lbl
-            if "+P" in lbl:
-                fname += "+P"
-            if "_" in lbl:
-                continue
-                fnames = lbl.split("_")
-            lbls.append("{}\n{}".format(fname, fnames[1]))
-            ax.annotate("{}\n{}".format(fname, fnames[1]),
-                        (x, y + 0.5), ha='center', fontsize=15,
-                        color=base_color)
-*/
 /*
     #==========================================================================
     #  FRAGMENTATION KEY STARTS HERE
@@ -302,208 +197,145 @@ PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2,
                     [xmax1-2, xmax1-8], color='k', linestyle='-',
                     linewidth=2)
         const += xstep
+	*/
+	
+    var xStep = 20;
+    // the letters
+    drawPeptide( pep1, 20, SpectrumViewer.p1color);
+    drawPeptide( pep2, 60, SpectrumViewer.p2color);   
+    function drawPeptide( pep, y, colour) {
+		var l = pep.length;
+		for (var i = 0; i < l; i++){
+			if (pep[i] != "#") {
+				self.g.append("text")
+					.attr("x", xStep * i)
+					.attr("y", y)
+					.attr("text-anchor", "middle")
+					.attr("fill", colour)
+					.text(pep[i]);
+				}
+		}
+	}	
+	
+	// the the link line
+	self.g.append("line")
+		.attr("x1", xStep * (linkpos - 1))//the one...
+		.attr("y1", 22)
+		.attr("x2", xStep * (linkpos - 1))//the one...
+		.attr("y2", 42)
+		.attr("stroke", "black")
+		.attr("stroke-width", 1.5);	
 
-    # plot annotation lines
-    const = xstep / 1.5
-    for anno_alpha, anno_beta in zip(alpha_annotation, beta_annotation):
-        plotxy(xax_min+const+10, xmax2-5, ax, xstep/3, fgm=anno_beta)
-        plotxy(xax_min+const+10, xmax1, ax, xstep/3, fgm=anno_alpha)
-        const += xstep
+    // # plot annotation lines
+    // const = xstep / 1.5
+    // for anno_alpha, anno_beta in zip(alpha_annotation, beta_annotation):
+        // plotxy(xax_min+const+10, xmax2-5, ax, xstep/3, fgm=anno_beta)
+        // plotxy(xax_min+const+10, xmax1, ax, xstep/3, fgm=anno_alpha)
+        // const += xstep
 
-    xmin = np.min(spec["expmz"]) - 50
-    xmax = np.max(spec["expmz"]) + 50
-    xmin = np.ceil(xmin / 100.0) * 100.0
-    xmax = np.ceil(xmax / 100.0) * 100.0
+    drawFragmentationEvents(alpha_annotation, 25);
+    drawFragmentationEvents(beta_annotation, 65);
 
-    #writes additional info into the plot, mz, precursor charge etc.
-    if annotate_verbose:
-        pre_info = "search: {} \n PSMID: {}\n scan: {}\n m/z: {}\n z: {}\n\n score: {:.2f} \n mean(ppmerror): {:.2f} \n std(ppmerror): {:.2f}".format(
-                    cl_pep.meta["search_id"], cl_pep.meta['spectrum_id'], cl_pep.scan, np.round(cl_pep.get_mz() + 1.002, 4), cl_pep.charge, cl_pep.score, ppmmean, ppmstds)
-    else:
-        pre_info = "PSMID: {}\n m/z: {}\n z:{}".format(
-                    cl_pep.meta['spectrum_id'], round(cl_pep.get_mz() + 1.002, 4), cl_pep.charge)
+	function drawFragmentationEvents( fragAnno, y) {
+		var l = pep1.length; // shouldn't matter which pep you use
+		for (var i = 0; i < l; i++){
+			if (fragAnno[i] != "#" && fragAnno[i] != "--") {
+				var x = (xStep * i) + (xStep / 2);
+				drawFragmentationEvent( x, y, fragAnno[i]);
+			}
+		}
+	}
 
-    #write info about the PSMID into right iddle of the plot
-    ax.text(0.95, 0.9, pre_info,  horizontalalignment='right',
-            verticalalignment='top', transform=ax.transAxes, fontsize=12)
-    ax.set(ylim=(0, 135), yticks=[0, 25, 50, 75, 100],
-           xticks=np.arange(xax_min, xax_max, np.round(xax_range/4.0)),
-           xlim=(xax_min, xax_max))
-    sns.despine()
-    ax.set(xlabel="m/z", ylabel="% of base peak")
-    return (f, ax)
+	// def plotxy(xcoord, ycoord, ax, lengthstick=20, fgm="by"):
+	function drawFragmentationEvent( x, y, frag) {
+		// """
+		// Plots one of these |^ things for fragmented ions...
+		// 
+		// Paramters:
+		// --------------------------
+		// xcoord: float,
+				// xcoordinate of the line
+		// ycoord: float,
+				// ycoordinate of the line
+		// lengthstick: int
+					 // length of the line
+		// fgm: char,
+			 // fragment ion type decoding
+		// """
+		
+		var barHeight = 20, tailX = 5, tailY = 5;
+				 
+		// # bions; either normal or lossy; have different colors
+		if (frag.indexOf("b") != -1){ // really a, b, or c , see get_fragment_annotation()
+			var bTail = self.g.append("line")
+				.attr("x1", x)
+				.attr("y1", y)
+				.attr("x2", x - tailX)
+				.attr("y2", y + tailY)
+				.attr("class", "fragBar");	
+			// if "bloss" in fgm:
+			if (frag.indexOf("bloss") != -1){
+				// ax.plot([xcoord, xcoord-lengthstick], [ycoord, ycoord-3],
+						// color='#E0E0E0', alpha=0.9, linestyle='-', linewidth=2)
+				bTail.attr("stroke", SpectrumViewer.lossFragBarColour);					
+			}
+			// elif "b" in fgm or "a" in fgm or "c" in fgm:
+			else {
+				// ax.plot([xcoord, xcoord-lengthstick], [ycoord, ycoord-3],
+						// color='k', linestyle='-', linewidth=2)
+				bTail.attr("stroke", "black");					
+			}
+			// else:
+				// pass
+		}
+	   
+		// # yions; either normal or lossy; have different colors
+		if (frag.indexOf("y") != -1){
+			var yTail = self.g.append("line")
+				.attr("x1", x)
+				.attr("y1", y - barHeight)
+				.attr("x2", x + tailX)
+				.attr("y2", y - barHeight - tailY)
+				.attr("class", "fragBar");
+			// if "yloss" in fgm:
+			if (frag.indexOf("yloss") != -1){
+				// ax.plot([xcoord, xcoord+lengthstick], [ycoord+5, ycoord+8],
+						// color='#E0E0E0', alpha=0.9, linestyle='-', linewidth=2)
+				yTail.attr("stroke", SpectrumViewer.lossFragBarColour);					
+			}
+			// elif "x" in fgm or "y" in fgm or "z" in fgm:
+			else {
+				// ax.plot([xcoord, xcoord+lengthstick], [ycoord+5, ycoord+8],
+						// color='k', linestyle='-', linewidth=2)
+				yTail.attr("stroke", "black");					
+			}
+			// else:
+				// pass     
+		}
+				
+		var fragBar = self.g.append("line")
+			.attr("x1", x)
+			.attr("y1", y)
+			.attr("x2", x)
+			.attr("y2", y - barHeight)
+			.attr("class", "fragBar");				
+		// if fgm.count("loss") == 2 or fgm == "yloss" or fgm == "bloss":
+		var lossCount = (frag.match(/loss/g) || []).length;
+		if (lossCount == 2 || frag == "-yloss" || frag == "bloss-"){
+			fragBar.attr("stroke", SpectrumViewer.lossFragBarColour);
+			// ax.plot([xcoord, xcoord], [ycoord, ycoord+5], color='#E0E0E0',
+					// linestyle='-', linewidth=2)
+		}
+		// else:
+		else {
+			// ax.plot([xcoord, xcoord], [ycoord, ycoord+5], color='k',
+						// linestyle='-', linewidth=2)
+			fragBar.attr("stroke", "black");
+		}
+		
+	}    
 
-
-def plot_linear_spectrum(cl_pep, XiDB, color="red"):
-    """
-    Plots a spectrum from v_spec_viewer_advanced materizalzed.
-    """
-    #get colors:
-    cmap = brewer2mpl.get_map("Paired", "Qualitative", 6).mpl_colors
-    if color == "red":
-        p1color = cmap[5]
-        p1color_loss = cmap[4]
-    else:
-        p1color = cmap[1]
-        p1color_loss = cmap[0]
-    pep1 = cl_pep.peptide.sequence
-
-    #get the modifications straight
-    unmodified_peps = XiDB.get_query("""SELECT peptide1, peptide2
-        FROM v_export_materialized where spectrum_match_id =
-        {}""".format(cl_pep.meta["spectrum_id"]))
-
-    #get modifications
-    mods1_dic = get_mods(unmodified_peps["peptide1"][0])
-
-    #get ion data for annotation
-    ions1 = set([i.name if "_" not in i.loss else i.name+"loss" for i in cl_pep.fragment_series.get_ions()])
-
-    #get the indicator array for observed fragments
-    alpha_annotation = get_fragment_annotation(ions1, pep1)
-
-    columns = ['expmz', 'absoluteintesity', 'fragment_name', 'sequence',
-               'mass', 'loss', 'peptide_id', 'scan_number', u'matchedpeptide',
-               'description', 'matched_peptide_id', 'charge']
-
-    spec = XiDB.get_query("SELECT {} FROM v_spec_viewer_advanced_materialized \
-    where spectrum_match_id = {} and (isprimarymatch like '1' or \
-    isprimarymatch is Null)".format(",".join(columns),
-                                    cl_pep.meta["spectrum_id"]))
-
-    #prep data
-    spec["norm_int"] = (spec["absoluteintesity"] /
-                        np.max(spec["absoluteintesity"].values) * 100)
-    noise = spec[pd.isnull(spec["fragment_name"])]
-    groups = spec.groupby(["matchedpeptide"])
-    xmin = np.min(spec["expmz"])
-    xmax1 = np.max(spec["norm_int"]) + 20
-
-    mzs = [i for i, j in zip(spec["expmz"], spec["fragment_name"]) if j
-           is not None]
-    #get a good distance between letters / stuff
-    xax_min = np.min(mzs)
-    xax_max = np.max(mzs)
-    xax_min = np.floor(xax_min / 15) * 15
-    xax_max = np.ceil(xax_max / 15) * 15
-    xax_range = xax_max - xax_min
-    xstep = 4 * xax_range / 100
-    #==========================================================================
-    # START PLOTTING
-    #==========================================================================
-    #plot the peptides per group (colored)
-    if xax_range <= 600:
-        bwidth = 1
-    else:
-        bwidth = 2
-
-    f, ax = plt.subplots(1, figsize=(14.69, 8.27))
-    ax.bar(noise["expmz"], noise["norm_int"], width=bwidth, color="grey",
-           edgecolor="grey", alpha=0.7)
-    for i, j in groups:
-
-        unmod = "".join([aa for aa in i if aa.isupper()])
-        pcolor = [p1color if "_" not in i else p1color_loss for i in j["fragment_name"]]
-        lbls = []
-        ax.bar(j["expmz"], j["norm_int"], width=bwidth, color=pcolor,
-               edgecolor=pcolor)
-        pcolor = p1color
-        for x, y, lbl in zip(j["expmz"], j["norm_int"], j["fragment_name"]):
-            fnames = ["", ""]
-            try:
-                fname = str(re.match("(a|b|c|x|y|z)(\d+)", lbl).group(0))
-            except:
-                fname = lbl
-            if "+P" in lbl:
-                fname += "+P"
-            if "_" in lbl:
-                continue
-                fnames = lbl.split("_")
-            lbls.append("{}\n{}".format(fname, fnames[1]))
-            ax.annotate("{}\n{}".format(fname, fnames[1]),
-                        (x, y + 0.5), ha='center', fontsize=15, color=pcolor)
-    # annotate the amino acids letters
-    const = 0
-    pos_alpha = 0
-    # annotate and plot the amino acids
-    for AAalpha in pep1:
-        #draw the modifications (cm, ox etc.)
-        pos_alpha += draw_mod_annotation(AAalpha, xax_min+10+const,
-                                         xmax1, pos_alpha,
-                                         mods1_dic, ax)
-        const += xstep
-
-    # annotate the symbols for fragmentation events
-    const = xstep / 1.5
-    for anno_alpha in alpha_annotation:
-        plotxy(xax_min+10+const, xmax1, ax, xstep/3, fgm=anno_alpha)
-        const += xstep
-
-    xmin = np.min(spec["expmz"]) - 50
-    xmax = np.max(spec["expmz"]) + 50
-    xmin = np.ceil(xmin / 100.0) * 100.0
-    xmax = np.ceil(xmax / 100.0) * 100.0
-    pre_info = "PSMID: {}\n scan: {}\n m/z: {}\n z: {}\n ".format(
-                cl_pep.meta['spectrum_id'], cl_pep.scan,
-                np.round(cl_pep.get_mz() + 1.002, 2), cl_pep.charge)
-
-    #write info about the PSMID into right iddle of the plot
-    ax.text(0.9, 0.9, pre_info,  horizontalalignment='right',
-            verticalalignment='top', transform=ax.transAxes, fontsize=12)
-    ax.set(ylim=(0, 135), yticks=[0, 25, 50, 75, 100],
-           xticks=np.arange(xax_min, xax_max, np.round(xax_range/4.0)),
-           xlim=(xax_min, xax_max))
-    sns.despine()
-    ax.set(xlabel="m/z", ylabel="% of base peak")
-    return(f, ax)
-
-
-def plotxy(xcoord, ycoord, ax, lengthstick=20, fgm="by"):
-    """
-    Plots one of these |^ things for fragmented ions...
-
-    Paramters:
-    --------------------------
-    xcoord: float,
-            xcoordinate of the line
-    ycoord: float,
-            ycoordinate of the line
-    lengthstick: int
-                 length of the line
-    fgm: char,
-         fragment ion type decoding
-    """
-    #decoding of non observed fragments ("") and aritificall introduced positions
-    # to align the sequences ("#")
-    if fgm != "" and fgm != "#":
-        if fgm.count("loss") == 2 or fgm == "yloss" or fgm == "bloss":
-            ax.plot([xcoord, xcoord], [ycoord, ycoord+5], color='#E0E0E0',
-                    linestyle='-', linewidth=2)
-        else:
-            ax.plot([xcoord, xcoord], [ycoord, ycoord+5], color='k',
-                    linestyle='-', linewidth=2)
-
-    # bions; either normal or lossy; have different colors
-    if "bloss" in fgm:
-        ax.plot([xcoord, xcoord-lengthstick], [ycoord, ycoord-3],
-                color='#E0E0E0', alpha=0.9, linestyle='-', linewidth=2)
-    elif "b" in fgm or "a" in fgm or "c" in fgm:
-        ax.plot([xcoord, xcoord-lengthstick], [ycoord, ycoord-3],
-                color='k', linestyle='-', linewidth=2)
-    else:
-        pass
-
-    # yions; either normal or lossy; have different colors
-    if "yloss" in fgm:
-        ax.plot([xcoord, xcoord+lengthstick], [ycoord+5, ycoord+8],
-                color='#E0E0E0', alpha=0.9, linestyle='-', linewidth=2)
-    elif "x" in fgm or "y" in fgm or "z" in fgm:
-        ax.plot([xcoord, xcoord+lengthstick], [ycoord+5, ycoord+8],
-                color='k', linestyle='-', linewidth=2)
-    else:
-        pass
-
-
+/*
 def draw_mod_annotation(aminoacid, xpos, ypos, idx_pos, mods, ax):
     """
     Draws the specific annotation for the peptide (which fragments
@@ -536,26 +368,26 @@ def draw_mod_annotation(aminoacid, xpos, ypos, idx_pos, mods, ax):
     return(topp_up)
 */
 
-	//~ def get_mods(modified_peptide):
+	// def get_mods(modified_peptide):
 	function get_mods(modified_peptide){
-		//~ """
-		//~ Returns a dictionary with the position f the modification (based
-		//~ on the unmodified peptide) and the modification itself (str)
-	//~ 
-		//~ Parameter:
-		//~ ------------------------------
-		//~ modified_peptide: str,
+		// """
+		// Returns a dictionary with the position f the modification (based
+		// on the unmodified peptide) and the modification itself (str)
+	// 
+		// Parameter:
+		// ------------------------------
+		// modified_peptide: str,
 						 //~ peptide sequence with modifications in it in lower case
 						 //~ letters
-		//~ """
+		// """
 		
-		//~ mods = re.finditer("[^A-Z]+", modified_peptide)
-		//~ subs = 0
-		//~ mods_dic = {}
-		//~ for i in mods:
-			//~ mods_dic[i.start()-subs] = i.group(0)
-			//~ subs += len(i.group(0))
-		//~ return(mods_dic)
+		// mods = re.finditer("[^A-Z]+", modified_peptide)
+		// subs = 0
+		// mods_dic = {}
+		// for i in mods:
+			// mods_dic[i.start()-subs] = i.group(0)
+			// subs += len(i.group(0))
+		// return(mods_dic)
 		
 		return null;
 	}
@@ -569,10 +401,10 @@ def draw_mod_annotation(aminoacid, xpos, ypos, idx_pos, mods, ax):
 		// Parameter:
 		// -----------------------
 		// ions: set,
-			  //~ ion names
+			  // ion names
 		// 
 		// pep: str,
-			 //~ peptide sequence (without mods)
+			 // peptide sequence (without mods)
 		// 
 		// ion
 		// """
@@ -594,14 +426,14 @@ def draw_mod_annotation(aminoacid, xpos, ypos, idx_pos, mods, ax):
 			// if "b"+str(i) in ions or "a"+str(i) in ions or "c"+str(i) in ions:
 			if (ions.indexOf(aIonId) != -1 || ions.indexOf(bIonId) != -1 || ions.indexOf(cIonId) != -1){
 				// gotb = "b"
-				gotb = bIonId;
+				gotb = "b";
 			}
 			// elif "b"+str(i)+"loss" in ions or "a"+str(i)+"loss" in ions or "c"+str(i)+"loss" in ions:
 			else if (ions.indexOf(aIonId + "loss") != -1 
 						|| ions.indexOf(bIonId + "loss") != -1 
 						|| ions.indexOf(cIonId + "loss") != -1){
 				// gotb = "bloss"
-				gotb = bIonId + "loss";
+				gotb = "bloss";
 			}
 			// else:
 				// pass
@@ -614,14 +446,14 @@ def draw_mod_annotation(aminoacid, xpos, ypos, idx_pos, mods, ax):
 			// if "y"+str(len(pep)-i) in ions or "x"+str(len(pep)-i) in ions or "z"+str(len(pep)-i) in ions:
 			if (ions.indexOf(xIonId) != -1 || ions.indexOf(yIonId) != -1 || ions.indexOf(zIonId) != -1){
 				// goty = "y"
-				goty = yIonId;
+				goty = "y";
 			}
 			// elif "y"+str(len(pep)-i)+"loss" in ions or "x"+str(len(pep)-i)+"loss" in ions or "z"+str(len(pep)-i)+"loss" in ions:
 			else if (ions.indexOf(xIonId + "loss") != -1 
 						|| ions.indexOf(yIonId + "loss") != -1 
 						|| ions.indexOf(zIonId + "loss") != -1) {
 				// goty = "yloss"
-				goty = yIonId + "loss";
+				goty = "yloss";
 			}
 			// else:
 				// pass
@@ -654,17 +486,5 @@ PeptideFragmentationKey.prototype.highlightChanged = function(fragments){
 
 PeptideFragmentationKey.prototype.setHighlight = function(fragments){
 	this.messageDiv.innerHTML = this.toString() + "<br>Hightlight:" + JSON.stringify(fragments);
-}
-
-PeptideFragmentationKey.prototype.toString = function(){
-	return 	this.pepSeq1 +", xl@"+ this.linkPos1 +" | "+ this.pepSeq2 + ", xl@" + this.linkPos2;
-}
-
-PeptideFragmentationKey.prototype.fireRandomEvent = function(){
-	if (this.annotatedPeaks) {//if data loaded
-		var dataCount = this.annotatedPeaks.length;
-		var rnd = Math.random() * dataCount;
-		this.highlightChanged([this.annotatedPeaks[Math.floor(rnd)]]); //note param is array of fragments
-	}
 }
 */

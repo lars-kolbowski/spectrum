@@ -39,16 +39,18 @@ function SpectrumViewer (targetDiv){
 
 // #get colors:
 // cmap = brewer2mpl.get_map("Paired", "Qualitative", 6).mpl_colors
-SpectrumViewer.cmap = colorbrewer.Paired[6];
 // p1color = cmap[5]
 // p1color_loss = cmap[4]
 // p2color = cmap[1]
 // p2color_loss = cmap[0]
-// this doesn't account for possibility ion could be in both p1 and p2
+SpectrumViewer.cmap = colorbrewer.Paired[6];
 SpectrumViewer.p1color = SpectrumViewer.cmap[5];
 SpectrumViewer.p1color_loss = SpectrumViewer.cmap[4];
 SpectrumViewer.p2color = SpectrumViewer.cmap[1];
 SpectrumViewer.p2color_loss = SpectrumViewer.cmap[0];
+SpectrumViewer.lossFragBarColour = "#E0E0E0";
+// todo - should use css for colours
+
 SpectrumViewer.notUpperCase = /[^A-Z]/g;
 
 SpectrumViewer.prototype.setData = function(pepSeq1, linkPos1, pepSeq2, linkPos2, annotatedPeaksCSV){
@@ -58,6 +60,17 @@ SpectrumViewer.prototype.setData = function(pepSeq1, linkPos1, pepSeq2, linkPos2
 	this.peptideFragKey.setData(pepSeq1, linkPos1, pepSeq2, linkPos2, annotatedPeaks);
 	//graph doesn't need peptide sequences and link positions, only annotated peaks
 	this.graph.setData(annotatedPeaks);
+	
+	/* #writes additional info into the plot, mz, precursor charge etc.
+    if annotate_verbose:
+        pre_info = "search: {} \n PSMID: {}\n scan: {}\n m/z: {}\n z: {}\n\n score: {:.2f} \n mean(ppmerror): {:.2f} \n std(ppmerror): {:.2f}".format(
+                    cl_pep.meta["search_id"], cl_pep.meta['spectrum_id'], cl_pep.scan, np.round(cl_pep.get_mz() + 1.002, 4), cl_pep.charge, cl_pep.score, ppmmean, ppmstds)
+    else:
+        pre_info = "PSMID: {}\n m/z: {}\n z:{}".format(
+                    cl_pep.meta['spectrum_id'], round(cl_pep.get_mz() + 1.002, 4), cl_pep.charge)
+
+    #write info about the PSMID into right iddle of the plot
+    */
 }
 
 SpectrumViewer.prototype.clear = function(){

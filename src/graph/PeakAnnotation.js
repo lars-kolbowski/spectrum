@@ -39,7 +39,25 @@ PeakAnnotation.prototype.init = function(){
 		*/	
 
 		// this.circle.append("svg:title").text(this.fragmentNames);
+/*
+        #annotate the peaks in the spectrum
+        for x, y, lbl in zip(j["expmz"], j["norm_int"], j["fragment_name"]):
+            fnames = ["", ""]
 
+            try:
+                fname = str(re.match("(a|b|c|x|y|z)(\d+)", lbl).group(0))
+            except:
+                fname = lbl
+            if "+P" in lbl:
+                fname += "+P"
+            if "_" in lbl:
+                continue
+                fnames = lbl.split("_")
+            lbls.append("{}\n{}".format(fname, fnames[1]))
+            ax.annotate("{}\n{}".format(fname, fnames[1]),
+                        (x, y + 0.5), ha='center', fontsize=15,
+                        color=base_color)
+*/
 }
 
 PeakAnnotation.prototype.update = function(){

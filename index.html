@@ -27,9 +27,11 @@
 		.axis path, .axis line {
 			fill: none;
 			stroke: #000;
-<!--
-			stoke-width:1.2px;
--->
+		}
+		
+		.fragBar{
+			stroke-width:1.3px;
+			stroke-linecap:round;
 		}
 	</style>
   </head>
@@ -43,7 +45,7 @@
 				
 		window.addEventListener("load", function() {
 			d3.text("./test.csv", function(csv) {
-				spectrumViewer.setData("VGQQYSSAPLR", 3, "EKELESIDVLLEQTTGGNNKDLK", 5, csv);
+				spectrumViewer.setData("VGQQYSSAPLR", 3, "EKELESIDVLLEQTTGGNNKDLK", 5, csv); // not the real link positions
 				window.addEventListener("resize", function() {
 					spectrumViewer.resize();
 				});

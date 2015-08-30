@@ -1,1 +1,1 @@
-# spectrum
+a spectrum viewer

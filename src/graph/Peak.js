@@ -19,6 +19,11 @@
 //		graph/Peak.js
 
 function Peak (data, graph){
+	
+	 /*   #prep data, normalize intensities and adjust the axes span
+    spec["norm_int"] = (spec["absoluteintesity"] /
+                        np.max(spec["absoluteintesity"].values) * 100)*/
+	
 	this.x = data[0].expmz - 0;
 	this.y = data[0].absolute_intensity - 0;
 	this.graph = graph;	
