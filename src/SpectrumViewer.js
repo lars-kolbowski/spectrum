@@ -48,7 +48,7 @@ SpectrumViewer.p1color = SpectrumViewer.cmap[5];
 SpectrumViewer.p1color_loss = SpectrumViewer.cmap[4];
 SpectrumViewer.p2color = SpectrumViewer.cmap[1];
 SpectrumViewer.p2color_loss = SpectrumViewer.cmap[0];
-SpectrumViewer.lossFragBarColour = "#E0E0E0";
+SpectrumViewer.lossFragBarColour = "#cccccc";
 // todo - should use css for colours
 
 SpectrumViewer.notUpperCase = /[^A-Z]/g;

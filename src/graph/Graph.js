@@ -65,10 +65,11 @@ Graph.prototype.setData = function(annotatedPeaks){
 
 Graph.prototype.resize = function() {
 	var self = this;
-
+	
 	//see https://gist.github.com/mbostock/3019563
-	var cx = self.g.node().parentNode.clientWidth;
-	var cy = self.g.node().parentNode.clientHeight;
+	var cx = self.g.node().parentNode.parentNode.clientWidth;
+	var cy = self.g.node().parentNode.parentNode.clientHeight;
+	
 	self.g.attr("width", cx).attr("height", cy);
 	self.g.attr("width", cx).attr("height", cy).selectAll("*").remove();
 	// remove not needed if create groups in contructors and change attributes here
