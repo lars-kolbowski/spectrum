@@ -26,7 +26,10 @@ function SpectrumViewer (targetDiv){
 	//avoids prob with 'save - web page complete'
 	d3.select(targetDiv).selectAll("*").remove();
 
-	this.svg = d3.select(targetDiv).append("svg").style("width", "100%").style("height", "100%");
+	//the div in following facilitates SVG export
+	this.svg = d3.select(targetDiv)
+				.append("div").style("height","100%").style("width","100%")
+				.append("svg").style("width", "100%").style("height", "100%");
 	//create peptide frag key
 	this.peptideFragKey = new PeptideFragmentationKey(this.svg);
 	//create graph
@@ -34,28 +37,21 @@ function SpectrumViewer (targetDiv){
 
 	//link each to other by registering callbacks
 	//~ this.peptideFragKey.highlightChangedCallbacks.push(this.graph.setHighlights);
-	//~ this.graph.highlightChangedCallbacks.push(this.peptideFragKey.setHighlights);
+	this.graph.highlightChanged.add(this.peptideFragKey.setHighlights);
 }
 
-// #get colors:
-// cmap = brewer2mpl.get_map("Paired", "Qualitative", 6).mpl_colors
-// p1color = cmap[5]
-// p1color_loss = cmap[4]
-// p2color = cmap[1]
-// p2color_loss = cmap[0]
 SpectrumViewer.cmap = colorbrewer.Paired[6];
 SpectrumViewer.p1color = SpectrumViewer.cmap[5];
 SpectrumViewer.p1color_loss = SpectrumViewer.cmap[4];
 SpectrumViewer.p2color = SpectrumViewer.cmap[1];
 SpectrumViewer.p2color_loss = SpectrumViewer.cmap[0];
 SpectrumViewer.lossFragBarColour = "#cccccc";
-// todo - should use css for colours
-
-SpectrumViewer.notUpperCase = /[^A-Z]/g;
+SpectrumViewer.highlightColour = "yellow";
+SpectrumViewer.highlightWidth = 11;
 
 SpectrumViewer.prototype.setData = function(pepSeq1, linkPos1, pepSeq2, linkPos2, annotatedPeaksCSV){
-	this.pep1 = pepSeq1.replace(SpectrumViewer.notUpperCase, '');
-    this.pep2 = pepSeq2.replace(SpectrumViewer.notUpperCase, '');
+	this.pep1 = pepSeq1;
+    this.pep2 = pepSeq2;
 	var annotatedPeaks = d3.csv.parse(annotatedPeaksCSV.trim());
 	this.peptideFragKey.setData(pepSeq1, linkPos1, pepSeq2, linkPos2, annotatedPeaks);
 	//graph doesn't need peptide sequences and link positions, only annotated peaks
@@ -81,6 +77,10 @@ SpectrumViewer.prototype.clear = function(){
 }
 
 SpectrumViewer.prototype.resize = function(){
+	this.graph.resize();
+}
+
+SpectrumViewer.prototype.getSVG = function(){
 	this.graph.resize();
 }
 

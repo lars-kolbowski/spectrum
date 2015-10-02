@@ -22,6 +22,9 @@
 //		and https://gist.github.com/mbostock/3019563
 
 Graph = function(targetSvg, spectrumViewer, options) {
+	this.highlightChanged = new signals.Signal();
+	
+	
 	this.spectrumViewer = spectrumViewer;
 	this.options = options || {};
 	this.margin = {
@@ -115,14 +118,15 @@ Graph.prototype.resize = function() {
 		.attr("class", "line");
 
 
+	self.highlights = self.innerSVG.append("g");
 	self.peaks = self.innerSVG.append("g");
 	self.lossiAnnotations = self.innerSVG.append("g");
 	self.annotations = self.innerSVG.append("g");
 	for (var i = 0; i < self.points.length; i++){
 		self.points[i].init();
 	}
+	
 	self.zoom = d3.behavior.zoom().x(self.x).on("zoom", self.redraw());
-
 	self.plot.call( d3.behavior.zoom().x(self.x).on("zoom", self.redraw()));
 	self.innerSVG.call(self.zoom);
 
