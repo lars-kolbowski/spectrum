@@ -31,13 +31,14 @@ function SpectrumViewer (targetDiv){
 				.append("div").style("height","100%").style("width","100%")
 				.append("svg").style("width", "100%").style("height", "100%");
 	//create peptide frag key
-	this.peptideFragKey = new PeptideFragmentationKey(this.svg);
+	this.peptideFragKey = new PeptideFragmentationKey(this.svg, this);
 	//create graph
 	this.graph = new Graph (this.svg, this);
 
 	//link each to other by registering callbacks
 	//~ this.peptideFragKey.highlightChangedCallbacks.push(this.graph.setHighlights);
-	this.graph.highlightChanged.add(this.peptideFragKey.setHighlights);
+	var binding = this.graph.highlightChanged.add(this.peptideFragKey.setHighlights);
+	binding.context = this.peptideFragKey;
 }
 
 SpectrumViewer.cmap = colorbrewer.Paired[6];

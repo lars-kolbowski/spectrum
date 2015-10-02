@@ -62,19 +62,19 @@ PeakAnnotations.prototype.init = function(){
 		
 		var c = "pink";//colour for annotation
 		var matchedPeptide = annotation.matchedpeptide;
-		//~ var pep; 
+		var pep; 
 		if (this.peak.graph.spectrumViewer.pep1 == matchedPeptide){
-			this.pep = "p1";
+			pep = "p1";
 		}
 		else{
-			this.pep = "p2";
+			pep = "p2";
 		}
 		if (fragName.indexOf("_") == -1){ //is not lossi
-			c = SpectrumViewer[this.pep + "color"];	
+			c = SpectrumViewer[pep + "color"];	
 			this.colour = c;	
 			//~ unlossiFound = true;		
 		} else { // is lossy
-			c = SpectrumViewer[this.pep + "color_loss"]; //javascript lets you do this...
+			c = SpectrumViewer[pep + "color_loss"]; //javascript lets you do this...
 			//~ if (unlossiFound == false) {
 				this.colour = c;
 			//~ };
