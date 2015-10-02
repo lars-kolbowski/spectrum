@@ -71,7 +71,7 @@ Peak.prototype.init = function(){
 Peak.prototype.highlight = function(show){
 	if (show == true) {
 		this.highlightLine.attr("opacity","1");
-		this.graph.highlightChanged.dispatch(this.annotations);
+		this.graph.highlightChanged.dispatch(this.annotations.annotations);//yes, clearly this is a mess
 	} else {
 		this.highlightLine.attr("opacity","0");
 		this.graph.highlightChanged.dispatch([]);
