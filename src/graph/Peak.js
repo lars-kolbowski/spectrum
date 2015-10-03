@@ -50,7 +50,7 @@ Peak.prototype.init = function(){
 		
 		//set the dom events for it
 		var self = this;
-		var line = this.highlightLine[0][0];
+		var line = this.line[0][0];
 		line.onmouseover = function(evt) {
 			self.highlight(true);
 			self.graph.highlightChanged.dispatch(self.fragments);
@@ -67,20 +67,70 @@ Peak.prototype.init = function(){
 			self.highlight(false);
 			self.graph.highlightChanged.dispatch([]);
 		};
-		//~ var highlightLine = this.highlightLine[0][0];
-		//~ highlightLine.onmouseover = function(evt) {
-			//~ self.highlight(true);
-		//~ };
-		//~ highlightLine.onmouseout = function(evt) {
-			//~ self.highlight(false);
-		//~ };
-		//~ highlightLine.ontouchstart = function(evt) {
-			//~ self.highlight(true);
-		//~ };
-		//~ highlightLine.ontouchend = function(evt) {
-			//~ self.highlight(false);
-		//~ };
+		line = this.highlightLine[0][0];
+		line.onmouseover = function(evt) {
+			self.highlight(true);
+			self.graph.highlightChanged.dispatch(self.fragments);
+		};
+		line.onmouseout = function(evt) {
+			self.highlight(false);
+			self.graph.highlightChanged.dispatch([]);
+		};
+		line.ontouchstart = function(evt) {
+			self.highlight(true);
+			self.graph.highlightChanged.dispatch(self.fragments);
+		};
+		line.ontouchend = function(evt) {
+			self.highlight(false);
+			self.graph.highlightChanged.dispatch([]);
+		};
+	
+	
+		
+	  	//create frag labels
+		this.labels = []; // will be array of d3 selections
+		var fragCount = this.fragments.length;
+		//~ var unlossiFound = false;
+		for (var f = 0; f < fragCount; f++){
+			var frag = this.fragments[f];
+			var label;
+			//~ if (fragName.indexOf("_") == -1){ // put lossi peaks in seperate layer
+				label = this.graph.annotations.append('text');
+				label.text(frag.name)
+			//~ } else {
+				//~ label = this.peak.graph.lossiAnnotations.append('text');
+				//~ label.text(fragName);
+				//~ //hack to take out lossi peaks
+			//~ }
+			label.attr("text-anchor", "middle")
+				.attr("class", "peakAnnot");
+			
+			var c = "pink";//colour for annotation
+			var matchedPeptide = frag.peptide;
+			var pep; 
+			if (this.graph.spectrumViewer.pep1 == matchedPeptide){
+				pep = "p1";
+			}
+			else{
+				pep = "p2";
+			}
+			if (frag.name.indexOf("_") == -1){ //is not lossi
+				c = SpectrumViewer[pep + "color"];	
+				this.colour = c;	
+				//~ unlossiFound = true;		
+			} else { // is lossy
+				c = SpectrumViewer[pep + "color_loss"]; //javascript lets you do this...
+				//~ if (unlossiFound == false) {
+					this.colour = c;
+				//~ };
+			}		
+			label.attr("fill", c);	
+			label.append("svg:title").text("m/z: " + this.x + ", i: " + this.y);	// easy tooltip
+			this.labels.push(label);
+		}
+	
 	//~ }
+	
 }
 
 Peak.prototype.highlight = function(show){
@@ -92,6 +142,7 @@ Peak.prototype.highlight = function(show){
 		//~ 
 	}
 	//~ this.annotations.highlight(show);
+
 		
 }
 
@@ -107,4 +158,12 @@ Peak.prototype.update = function(){
 		this.highlightLine.attr("y2", this.graph.y(0));
 	//~ }
 	//~ this.annotations.update();
+	
+	var yStep = 20;
+	var labelCount = this.labels.length;
+	for (var a = 0; a < labelCount; a++){
+		var label = this.labels[a];
+		label.attr("x", this.graph.x(this.x));
+		label.attr("y", this.graph.y(this.y) - 10 - (yStep * a));
+	}
 }

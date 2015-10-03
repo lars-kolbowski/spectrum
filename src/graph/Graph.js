@@ -175,12 +175,17 @@ Graph.prototype.setHighlights = function(peptide, pepI){
 			for (var pf = 0; pf < fragCount; pf++) {
 				var frag = peak.fragments[pf];
 				var pepSeq = frag.peptide;
-				var yIon = "y" + (pepSeq.length - pepI + 1); 
-				var bIon = "b" + (pepI - 0 + 1);
-				
-				var fragName = frag.name;
-				if (fragName.indexOf(yIon) === 0 || fragName.indexOf(bIon) === 0) {
-					match = true;
+				//~ var yIon = "y" + (pepSeq.length - pepI - 1); 
+				//~ var bIon = "b" + (pepI - 0 + 1);
+				if (peptide == frag.peptide
+					&& ((frag.ionType == 'y' && frag.ionNumber == (pepSeq.length - pepI - 1))
+						||(frag.ionType == 'b' && frag.ionNumber == (pepI - 0 + 1))
+						)
+					) {
+					//~ var fragName = frag.name;
+					//~ if (fragName.indexOf(yIon) === 0 || fragName.indexOf(bIon) === 0) {
+						match = true;
+					//~ }
 				}
 			}
 			

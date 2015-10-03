@@ -184,8 +184,8 @@ PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2,
 		.attr("stroke", "black")
 		.attr("stroke-width", 1.5);
 
-    drawFragmentationEvents(alpha_annotation, 25, "pep1");
-    drawFragmentationEvents(beta_annotation, 65, "pep2");
+    drawFragmentationEvents(alpha_annotation, 25, self.spectrumViewer.pep1);
+    drawFragmentationEvents(beta_annotation, 65, self.spectrumViewer.pep2);
 
 	function drawFragmentationEvents( fragAnno, y, peptide) {
 		var l = pep1.length; // shouldn't matter which pep you use
@@ -227,7 +227,7 @@ PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2,
 						highlight();
 					};
 								
-					if (peptide === "pep1") {
+					if (peptide === self.spectrumViewer.pep1) {
 						self.pep1bFragHighlights[i] = bHighlight;	
 					} else {
 						self.pep2bFragHighlights[i] = bHighlight;	
@@ -278,7 +278,7 @@ PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2,
 						highlight();
 					};
 								
-					if (peptide === "pep1") {
+					if (peptide === self.spectrumViewer.pep1) {
 						self.pep1yFragHighlights[i] = yHighlight;	
 					} else {
 						self.pep2yFragHighlights[i] = yHighlight;	
@@ -322,7 +322,7 @@ PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2,
 	function highlight(peptide, i){
 		self.clearHighlights();
 		var pepI;
-		if (peptide === "pep1"){
+		if (peptide === self.spectrumViewer.pep1){
 			if (self.pep1bFragHighlights[i]) self.pep1bFragHighlights[i].attr("opacity",1);
 			if (self.pep1yFragHighlights[i]) self.pep1yFragHighlights[i].attr("opacity",1);
 			pepI = i - self.pep1offset;
@@ -415,24 +415,24 @@ PeptideFragmentationKey.prototype.setHighlights = function(fragments){
 		var offset, pepLength;
 
 			
-			if (this.spectrumViewer.pep1 == matchedPeptide){
-				fragHighlightsArrayName = "pep1";
-				offset = this.pep1offset;
-				pepLength = this.pepSeq1.length
-			}
-			else{
-				fragHighlightsArrayName = "pep2";
-				offset = this.pep2offset;
-				pepLength = this.pepSeq2.length
-			}
-			var ionType = frag.ionType;
-			fragHighlightsArrayName += ionType + "FragHighlights";
-			if (ionType == "b") { // or a or c
-				this[fragHighlightsArrayName][frag.ionNumber + offset - 1].attr("opacity",1);
-			} else {
-				this[fragHighlightsArrayName][pepLength - frag.ionNumber + offset - 1].attr("opacity",1);
-			}
+		if (this.spectrumViewer.pep1 == matchedPeptide){
+			fragHighlightsArrayName = "pep1";
+			offset = this.pep1offset;
+			pepLength = this.pepSeq1.length
 		}
+		else{
+			fragHighlightsArrayName = "pep2";
+			offset = this.pep2offset;
+			pepLength = this.pepSeq2.length
+		}
+		var ionType = frag.ionType;
+		fragHighlightsArrayName += ionType + "FragHighlights";
+		if (ionType == "b") { // or a or c
+			this[fragHighlightsArrayName][frag.ionNumber + offset - 1].attr("opacity",1);
+		} else {
+			this[fragHighlightsArrayName][pepLength - frag.ionNumber + offset - 1].attr("opacity",1);
+		}
+	}
 	
 	
 	/*var fragRegex = /(.(\d*))/g;
