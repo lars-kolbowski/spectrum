@@ -56,10 +56,13 @@ SpectrumViewer.notUpperCase = /[^A-Z]/g;
 SpectrumViewer.prototype.setData = function(pepSeq1, linkPos1, pepSeq2, linkPos2, annotatedPeaksCSV){
 	this.pep1 = pepSeq1.replace(SpectrumViewer.notUpperCase, '');
     this.pep2 = pepSeq2.replace(SpectrumViewer.notUpperCase, '');
-	var annotatedPeaks = d3.csv.parse(annotatedPeaksCSV.trim());
-	this.peptideFragKey.setData(pepSeq1, linkPos1, pepSeq2, linkPos2, annotatedPeaks);
+	this.annotatedPeaks = d3.csv.parse(annotatedPeaksCSV.trim());
+	this.linkPos1 = linkPos1;
+	this.linkPos2 = linkPos2;
+	
+	this.peptideFragKey.setData(this.pep1, this.linkPos1, this.pep2, this.linkPos2, this.annotatedPeaks);
 	//graph doesn't need peptide sequences and link positions, only annotated peaks
-	this.graph.setData(annotatedPeaks);
+	this.graph.setData(this.annotatedPeaks);
 
 	/* #writes additional info into the plot, mz, precursor charge etc.
     if annotate_verbose:
@@ -76,6 +79,7 @@ SpectrumViewer.prototype.setData = function(pepSeq1, linkPos1, pepSeq2, linkPos2
 SpectrumViewer.prototype.clear = function(){
 	this.pep1 = "";
 	this.pep2 = "";
+	this.lossyShown = false;
 	this.peptideFragKey.clear();
 	this.graph.clear();
 }
@@ -85,6 +89,13 @@ SpectrumViewer.prototype.resize = function(){
 }
 
 SpectrumViewer.prototype.getSVG = function(){
+	
+}
+
+SpectrumViewer.prototype.showLossy = function(show){
+	this.lossyShown = show;
+	this.peptideFragKey.clear();
+	this.peptideFragKey.setData(this.pep1, this.linkPos1, this.pep2, this.linkPos2, this.annotatedPeaks);
 	this.graph.resize();
 }
 

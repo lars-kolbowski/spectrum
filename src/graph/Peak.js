@@ -22,12 +22,18 @@ function Peak (data, graph){
 	this.x = data[0].expmz - 0;
 	this.y = data[0].absolute_intensity - 0;
 	this.graph = graph;	
-	this.fragments = [];//split into lossy / non lossy
+	this.notLossyFragments = [];
+	this.lossyFragments = [];
 	
 	var fragCount = data.length;
 	for (var f = 0; f < fragCount; f++) {
 		if (data[f].fragment_name.trim() != "") {
-			this.fragments.push(new Fragment (data[f]));
+			var frag = new Fragment (data[f]);
+			if (frag.lossy === false) {
+				this.notLossyFragments.push(frag);
+			} else {
+				this.lossyFragments.push(frag);
+			}
 		}		
 	}
 		//~ //sort so lossy at top
@@ -37,6 +43,11 @@ function Peak (data, graph){
 }
 
 Peak.prototype.init = function(){
+	if (this.graph.spectrumViewer.lossyShown == false){
+		this.fragments = this.notLossyFragments;
+	} else {
+		this.fragments = this.notLossyFragments.concat(this.lossyFragments);
+	}
 	this.line = this.graph.peaks.append('line').attr("stroke-width","1");
 	//~ this.annotations.init();
 	this.line.attr("stroke", "black");// this.annotations.colour);
@@ -159,11 +170,11 @@ Peak.prototype.update = function(){
 	//~ }
 	//~ this.annotations.update();
 	
-	var yStep = 20;
+	var yStep = 15;
 	var labelCount = this.labels.length;
 	for (var a = 0; a < labelCount; a++){
 		var label = this.labels[a];
 		label.attr("x", this.graph.x(this.x));
-		label.attr("y", this.graph.y(this.y) - 10 - (yStep * a));
+		label.attr("y", this.graph.y(this.y) - 5 - (yStep * a));
 	}
 }

@@ -366,7 +366,7 @@ PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2,
 			else if (ions.indexOf(aIonId + "loss") != -1
 						|| ions.indexOf(bIonId + "loss") != -1
 						|| ions.indexOf(cIonId + "loss") != -1){
-				gotb = "bloss";
+				if (self.spectrumViewer.lossyShown == true) gotb = "bloss";
 			}
 
 			var xIonId = "x" + (pep.length - i);
@@ -381,7 +381,7 @@ PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2,
 			else if (ions.indexOf(xIonId + "loss") != -1
 						|| ions.indexOf(yIonId + "loss") != -1
 						|| ions.indexOf(zIonId + "loss") != -1) {
-				goty = "yloss";
+				if (self.spectrumViewer.lossyShown == true) goty = "yloss";
 			}
 			annotation.push(gotb + goty);
 		}

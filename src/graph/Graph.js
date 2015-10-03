@@ -109,7 +109,7 @@ Graph.prototype.resize = function() {
 		.style("fill", "white")
 		.attr("pointer-events", "all");
 
-	self.innerSVG = self.g.append("g")//"svg") //make this svg to clip plot at axes
+	self.innerSVG = self.g.append("svg") //make this svg to clip plot at axes
 		.attr("top", 0)
 		.attr("left", 0)
 		.attr("width", width)
