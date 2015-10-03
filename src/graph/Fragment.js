@@ -16,28 +16,68 @@
 //
 //		author: Colin Combe
 //		
-//		graph/PeakAnnotations.js
+//		graph/Fragment.js
 
-function PeakAnnotations (data, peak){
-	this.peak = peak;	
-	this.colour = "grey";
-	this.isPrimaryMatch = false;
+function Fragment (data){
+	this.name = data.fragment_name.trim();
+	this.peptide = data.matchedpeptide;
 	
-	this.annotations = [];
-	for (var a= 0; a < data.length; a++){
-		var fragName = data[a].fragment_name;
-		if (fragName.trim() != "") {
-			this.annotations.push(data[a]);
-		}	
+	var ion = this.name.split('')[0];
+	if (ion == 'a' || ion == 'b' || ion == 'c') {
+		this.ionType = 'b';
+	} else {
+		this.ionType = 'y';
 	}
-	//sort so lossy at top
-	this.annotations.sort(function(a, b){
-		return a.fragment_name.length - b.fragment_name.length; // ASC -> a - b; DESC -> b - a
-	});
+	
+	var fragRegex = /(.(\d*))/g;
+	var regexMatch = fragRegex.exec(this.name);
+		
+    this.ionNumber = regexMatch[2] - 0;
+    
+	//~ this.peak = peak;	
+	//~ this.colour = "grey";
+	//~ this.isPrimaryMatch = false;
+	//~ 
+/*
+ 	this.clearHighlights();
+	var pLength = fragments.length;
+    for (var p = 0; p < pLength; p++){
+		var peak = fragments[p];
+		fragRegex.lastIndex = 0;
+		//~ console.log(peak.fragment_name.trim());
+		var regexMatch = fragRegex.exec(peak.fragment_name.trim());
+		if (peak.fragment_name.trim() != ""){
+			//~ console.log(regexMatch[0]);
+			console.log(regexMatch[2]);
+			var matchedPeptide = peak.matchedpeptide;
+			var fragHighlightsArrayName; 
+			var offset, pepLength;
+
+			
+			if (this.spectrumViewer.pep1 == matchedPeptide){
+				fragHighlightsArrayName = "pep1";
+				offset = this.pep1offset;
+				pepLength = this.pepSeq1.length
+			}
+			else{
+				fragHighlightsArrayName = "pep2";
+				offset = this.pep2offset;
+				pepLength = this.pepSeq2.length
+			}
+			var ionType = peak.fragment_name.split("")[0];
+			fragHighlightsArrayName += peak.fragment_name.split("")[0] + "FragHighlights";
+			if (ionType == "b") { // or a or c
+				this[fragHighlightsArrayName][(regexMatch[2] - 0) + offset - 1].attr("opacity",1);
+			} else {
+				this[fragHighlightsArrayName][pepLength - (regexMatch[2] - 0) + offset - 1].attr("opacity",1);
+			}
+		}
+	}
+*/
 }
 
 	
-PeakAnnotations.prototype.init = function(){	
+Fragment.prototype.init = function(){	
 	//create
 	this.labels = []; // will be array of d3 selections
 	var annotCount = this.annotations.length;
@@ -85,7 +125,7 @@ PeakAnnotations.prototype.init = function(){
 	}
 }
 
-PeakAnnotations.prototype.update = function(){
+Fragment.prototype.update = function(){
 	var yStep = 20;
 	var labelCount = this.labels.length;
 	for (var a = 0; a < labelCount; a++){
