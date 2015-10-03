@@ -49,8 +49,9 @@ PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2,
 	var removeisotopes = false, ppmmean = 0, ppmstds = 0,
 				annotate_verbose = true;
 
-	var pep1 = this.pepSeq1;
-    var pep2 = this.pepSeq2;
+
+	var pep1 = this.pepSeq1.replace(SpectrumViewer.notUpperCase, '');
+    var pep2 = this.pepSeq2.replace(SpectrumViewer.notUpperCase, '');
 
     // #get ion data for annotation
     // ions1 = set([i.name if "_" not in i.loss else i.name+"loss" for i in
@@ -73,7 +74,7 @@ PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2,
 			else{
 				ion = regexMatch[0] + "loss"
 			}
-			var matchedPeptide = peak.matchedpeptide;
+			var matchedPeptide = peak.matchedpeptide.replace(SpectrumViewer.notUpperCase, '');//uncertain about whether this property includes mod info?
 			if (matchedPeptide == pep1){
 				ions1.add(ion);
 			} else {
@@ -183,10 +184,10 @@ PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2,
 		.attr("stroke", "black")
 		.attr("stroke-width", 1.5);
 
-    drawFragmentationEvents(alpha_annotation, 25, true);
-    drawFragmentationEvents(beta_annotation, 65, false);
+    drawFragmentationEvents(alpha_annotation, 25, "pep1");
+    drawFragmentationEvents(beta_annotation, 65, "pep2");
 
-	function drawFragmentationEvents( fragAnno, y, isPep1) {
+	function drawFragmentationEvents( fragAnno, y, peptide) {
 		var l = pep1.length; // shouldn't matter which pep you use
 		for (var i = 0; i < l; i++){
 			var frag = fragAnno[i];
@@ -208,9 +209,25 @@ PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2,
 						.attr("d", highlightPath)
 						.attr("stroke",SpectrumViewer.highlightColour)
 						.attr("stroke-width", SpectrumViewer.highlightWidth)
-						.attr("opacity", 0);
+						.attr("opacity", 0)						
+						.attr("peptide", peptide)
+						.attr("fragKeyIndex", i);
 					
-					if (isPep1 === true) {
+					var line = bHighlight[0][0];
+					line.onmouseover = function(evt) {
+						highlight(this.getAttribute("peptide"), this.getAttribute("fragKeyIndex"));
+					};
+					line.onmouseout = function(evt) {
+						highlight();
+					};
+					line.ontouchstart = function(evt) {
+						highlight(this.getAttribute("peptide"), this.getAttribute("fragKeyIndex"));
+					};
+					line.ontouchend = function(evt) {
+						highlight();
+					};
+								
+					if (peptide === "pep1") {
 						self.pep1bFragHighlights[i] = bHighlight;	
 					} else {
 						self.pep2bFragHighlights[i] = bHighlight;	
@@ -243,9 +260,25 @@ PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2,
 						.attr("d", highlightPath)
 						.attr("stroke",SpectrumViewer.highlightColour)
 						.attr("stroke-width", SpectrumViewer.highlightWidth)
-						.attr("opacity", 0);
+						.attr("opacity", 0)
+						.attr("peptide", peptide)
+						.attr("fragKeyIndex", i);
 					
-					if (isPep1 === true) {
+					var line = yHighlight[0][0];
+					line.onmouseover = function(evt) {
+						highlight(this.getAttribute("peptide"), this.getAttribute("fragKeyIndex"));
+					};
+					line.onmouseout = function(evt) {
+						highlight();
+					};
+					line.ontouchstart = function(evt) {
+						highlight(this.getAttribute("peptide"), this.getAttribute("fragKeyIndex"));
+					};
+					line.ontouchend = function(evt) {
+						highlight();
+					};
+								
+					if (peptide === "pep1") {
 						self.pep1yFragHighlights[i] = yHighlight;	
 					} else {
 						self.pep2yFragHighlights[i] = yHighlight;	
@@ -284,6 +317,21 @@ PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2,
 				
 			}
 		}
+	}
+
+	function highlight(peptide, i){
+		self.clearHighlights();
+		var pepI;
+		if (peptide === "pep1"){
+			if (self.pep1bFragHighlights[i]) self.pep1bFragHighlights[i].attr("opacity",1);
+			if (self.pep1yFragHighlights[i]) self.pep1yFragHighlights[i].attr("opacity",1);
+			pepI = i - self.pep1offset;
+		} else {
+			if (self.pep2bFragHighlights[i]) self.pep2bFragHighlights[i].attr("opacity",1);
+			if (self.pep2yFragHighlights[i]) self.pep2yFragHighlights[i].attr("opacity",1);
+			pepI = i - self.pep2offset;
+		}
+		self.highlightChanged.dispatch(peptide, pepI);
 	}
 
 	// def get_fragment_annotation(ions, pep):
@@ -390,7 +438,6 @@ PeptideFragmentationKey.prototype.setHighlights = function(fragments){
 			} else {
 				this[fragHighlightsArrayName][pepLength - (regexMatch[2] - 0) + offset - 1].attr("opacity",1);
 			}
-				//this.pep
 		}
 	}
 }
@@ -402,7 +449,7 @@ PeptideFragmentationKey.prototype.clearHighlights = function(){
 		var pLength = hightlightArray.length;
 		for (var p = 0; p < pLength; p++){
 			if (hightlightArray[p]){
-				console.log(hightlightArray[p]);
+			//	console.log(hightlightArray[p]);
 				hightlightArray[p].attr("opacity",0);
 			}
 		}	

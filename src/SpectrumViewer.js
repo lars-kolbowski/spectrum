@@ -36,9 +36,10 @@ function SpectrumViewer (targetDiv){
 	this.graph = new Graph (this.svg, this);
 
 	//link each to other by registering callbacks
-	//~ this.peptideFragKey.highlightChangedCallbacks.push(this.graph.setHighlights);
-	var binding = this.graph.highlightChanged.add(this.peptideFragKey.setHighlights);
-	binding.context = this.peptideFragKey;
+	var gBinding = this.peptideFragKey.highlightChanged.add(this.graph.setHighlights);
+	gBinding.context = this.graph;
+	var pfBinding = this.graph.highlightChanged.add(this.peptideFragKey.setHighlights);
+	pfBinding.context = this.peptideFragKey;
 }
 
 SpectrumViewer.cmap = colorbrewer.Paired[6];
@@ -49,10 +50,12 @@ SpectrumViewer.p2color_loss = SpectrumViewer.cmap[0];
 SpectrumViewer.lossFragBarColour = "#cccccc";
 SpectrumViewer.highlightColour = "yellow";
 SpectrumViewer.highlightWidth = 11;
+SpectrumViewer.notUpperCase = /[^A-Z]/g;
+
 
 SpectrumViewer.prototype.setData = function(pepSeq1, linkPos1, pepSeq2, linkPos2, annotatedPeaksCSV){
-	this.pep1 = pepSeq1;
-    this.pep2 = pepSeq2;
+	this.pep1 = pepSeq1.replace(SpectrumViewer.notUpperCase, '');
+    this.pep2 = pepSeq2.replace(SpectrumViewer.notUpperCase, '');
 	var annotatedPeaks = d3.csv.parse(annotatedPeaksCSV.trim());
 	this.peptideFragKey.setData(pepSeq1, linkPos1, pepSeq2, linkPos2, annotatedPeaks);
 	//graph doesn't need peptide sequences and link positions, only annotated peaks

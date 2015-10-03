@@ -163,6 +163,10 @@ Graph.prototype.clear = function(){
 	this.g.selectAll("*").remove();
 }
 
+Graph.prototype.setHighlights = function(peptide, pepI){
+	console.log(peptide +"\t"+ pepI);
+}
+
 /*
 Graph.prototype.highlightChanged = function(fragments){
 	var callbackCount = this.highlightChangedCallbacks.length;
@@ -171,9 +175,6 @@ Graph.prototype.highlightChanged = function(fragments){
 	}
 }
 
-Graph.prototype.setHighlight = function(fragments){
-	//~ this.messageDiv.innerHTML = this.toString() + "<br>Hightlight:" + JSON.stringify(fragments);
-}
 
 Graph.prototype.resetScales = function(text) {
 	  this.y = d3.scale.linear()
