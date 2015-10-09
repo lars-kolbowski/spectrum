@@ -28,8 +28,8 @@ function SpectrumViewer (targetDiv){
 
 	//the div in following facilitates SVG export
 	this.svg = d3.select(targetDiv)
-				.append("div").style("height","100%").style("width","100%")
-				.append("svg").style("width", "100%").style("height", "100%");
+				//~ .append("div").style("height","100%").style("width","100%")
+				.append("svg").style("width", "100%").style("height", "85%");
 	//create peptide frag key
 	this.peptideFragKey = new PeptideFragmentationKey(this.svg, this);
 	//create graph
