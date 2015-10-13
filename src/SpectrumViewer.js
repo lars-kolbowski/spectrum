@@ -18,22 +18,22 @@
 //
 //		SpectrumViewer.js
 
-function SpectrumViewer (targetDiv){
+function SpectrumViewer (targetDiv){ // maybe make this param the SVG element
 	// targetDiv could be div itself or id of div - lets deal with that
 	if (typeof targetDiv === "string"){
 		targetDiv = document.getElementById(targetDiv);
 	}
 	//avoids prob with 'save - web page complete'
 	d3.select(targetDiv).selectAll("*").remove();
-
-	//the div in following facilitates SVG export
+	
 	this.svg = d3.select(targetDiv)
 				//~ .append("div").style("height","100%").style("width","100%")
-				.append("svg").style("width", "100%").style("height", "85%");
+				.append("svg").style("width", "100%").style("height", "100%");
+	
 	//create peptide frag key
 	this.peptideFragKey = new PeptideFragmentationKey(this.svg, this);
 	//create graph
-	this.graph = new Graph (this.svg, this);
+	this.graph = new Graph (this.svg, this, {xlabel:"m/z", ylabel:"intensity"});
 
 	//link each to other by registering callbacks
 	var gBinding = this.peptideFragKey.highlightChanged.add(this.graph.setHighlights);
@@ -96,7 +96,7 @@ SpectrumViewer.prototype.showLossy = function(show){
 	this.lossyShown = show;
 	this.peptideFragKey.clear();
 	this.peptideFragKey.setData(this.pep1, this.linkPos1, this.pep2, this.linkPos2, this.annotatedPeaks);
-	this.graph.resize();
+	this.graph.setData(this.annotatedPeaks);
 }
 
 //SpectrumViewer.prototype.destroy(){} //if multiple viewers need to make sure don't cause memory leaks, see -

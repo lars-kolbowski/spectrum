@@ -36,10 +36,6 @@ function Peak (data, graph){
 			}
 		}		
 	}
-		//~ //sort so lossy at top
-	//~ this.annotations.sort(function(a, b){
-		//~ return a.fragment_name.length - b.fragment_name.length; // ASC -> a - b; DESC -> b - a
-	//~ });
 }
 
 Peak.prototype.init = function(){
@@ -49,10 +45,24 @@ Peak.prototype.init = function(){
 		this.fragments = this.notLossyFragments.concat(this.lossyFragments);
 	}
 	this.line = this.graph.peaks.append('line').attr("stroke-width","1");
-	//~ this.annotations.init();
-	this.line.attr("stroke", "black");// this.annotations.colour);
 	this.line.append("svg:title").text("m/z: " + this.x + ", i: " + this.y);	// easy tooltip
-	//~ if (this.fragments.length > 0) {
+	if (this.fragments.length > 0) {
+		if (this.fragments[0].peptide === this.graph.spectrumViewer.pep1 
+				&& this.fragments[0].lossy === false) {
+			this.line.attr("stroke", SpectrumViewer.p1color);
+		}
+		else if (this.fragments[0].peptide === this.graph.spectrumViewer.pep2 
+				&& this.fragments[0].lossy === false) {
+			this.line.attr("stroke", SpectrumViewer.p2color);
+		}
+		else if (this.fragments[0].peptide === this.graph.spectrumViewer.pep1 
+				&& this.fragments[0].lossy === true) {
+			this.line.attr("stroke", SpectrumViewer.p1color_loss);
+		}
+		else if (this.fragments[0].peptide === this.graph.spectrumViewer.pep2 
+				&& this.fragments[0].lossy === true) {
+			this.line.attr("stroke", SpectrumViewer.p2color_loss);
+		}
 		this.highlightLine = this.graph.highlights.append('line')
 							.attr("stroke", SpectrumViewer.highlightColour)
 							.attr("stroke-width", SpectrumViewer.highlightWidth)
@@ -104,17 +114,10 @@ Peak.prototype.init = function(){
 		//~ var unlossiFound = false;
 		for (var f = 0; f < fragCount; f++){
 			var frag = this.fragments[f];
-			var label;
-			//~ if (fragName.indexOf("_") == -1){ // put lossi peaks in seperate layer
-				label = this.graph.annotations.append('text');
-				label.text(frag.name)
-			//~ } else {
-				//~ label = this.peak.graph.lossiAnnotations.append('text');
-				//~ label.text(fragName);
-				//~ //hack to take out lossi peaks
-			//~ }
-			label.attr("text-anchor", "middle")
-				.attr("class", "peakAnnot");
+			var label = this.graph.annotations.append('text')
+					.text(frag.name)
+					.attr("text-anchor", "middle")
+					.attr("class", "peakAnnot");
 			
 			var c = "pink";//colour for annotation
 			var matchedPeptide = frag.peptide;
@@ -127,34 +130,25 @@ Peak.prototype.init = function(){
 			}
 			if (frag.name.indexOf("_") == -1){ //is not lossi
 				c = SpectrumViewer[pep + "color"];	
-				this.colour = c;	
-				//~ unlossiFound = true;		
 			} else { // is lossy
 				c = SpectrumViewer[pep + "color_loss"]; //javascript lets you do this...
-				//~ if (unlossiFound == false) {
-					this.colour = c;
-				//~ };
 			}		
 			label.attr("fill", c);	
 			label.append("svg:title").text("m/z: " + this.x + ", i: " + this.y);	// easy tooltip
 			this.labels.push(label);
 		}
-	
-	//~ }
-	
+	}
+	else { //no fragment annotations for this peak
+		this.line.attr("stroke", "black");
+	}
 }
 
 Peak.prototype.highlight = function(show){
 	if (show == true) {
 		this.highlightLine.attr("opacity","1");
-		//~ 
 	} else {
 		this.highlightLine.attr("opacity","0");
-		//~ 
 	}
-	//~ this.annotations.highlight(show);
-
-		
 }
 
 Peak.prototype.update = function(){
@@ -162,19 +156,17 @@ Peak.prototype.update = function(){
 	this.line.attr("y1", this.graph.y(this.y));
 	this.line.attr("x2", this.graph.x(this.x));
 	this.line.attr("y2", this.graph.y(0));
-	//~ if (this.fragments.length > 0) {
+	if (this.fragments.length > 0) {
 		this.highlightLine.attr("x1", this.graph.x(this.x));
 		this.highlightLine.attr("y1", this.graph.y(this.y));
 		this.highlightLine.attr("x2", this.graph.x(this.x));
-		this.highlightLine.attr("y2", this.graph.y(0));
-	//~ }
-	//~ this.annotations.update();
-	
-	var yStep = 15;
-	var labelCount = this.labels.length;
-	for (var a = 0; a < labelCount; a++){
-		var label = this.labels[a];
-		label.attr("x", this.graph.x(this.x));
-		label.attr("y", this.graph.y(this.y) - 5 - (yStep * a));
+		this.highlightLine.attr("y2", this.graph.y(0));	
+		var yStep = 15;
+		var labelCount = this.labels.length;
+		for (var a = 0; a < labelCount; a++){
+			var label = this.labels[a];
+			label.attr("x", this.graph.x(this.x));
+			label.attr("y", this.graph.y(this.y) - 5 - (yStep * a));
+		}	
 	}
 }

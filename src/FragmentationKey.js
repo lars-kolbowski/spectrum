@@ -18,6 +18,8 @@
 //
 //		based on Sven's python code, bits of python code left in as comments, can tidy later
 //
+//		scope for refactoring all this to make more use of Fragment object type, I think 
+//
 //		PeptideFragmentationKey.js
 
 function PeptideFragmentationKey (targetSvg, spectrumViewer, options){
@@ -194,7 +196,7 @@ PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2,
 			if (frag != "#" && frag != "--") {
 				var x = (xStep * i) + (xStep / 2);
 				
-				console.log("frag:"+frag);
+				//~ console.log("frag:"+frag);
 		
 				var barHeight = 20, tailX = 5, tailY = 5;
 
@@ -433,42 +435,6 @@ PeptideFragmentationKey.prototype.setHighlights = function(fragments){
 			this[fragHighlightsArrayName][pepLength - frag.ionNumber + offset - 1].attr("opacity",1);
 		}
 	}
-	
-	
-	/*var fragRegex = /(.(\d*))/g;
-    var pLength = fragments.length;
-    for (var p = 0; p < pLength; p++){
-		var peak = fragments[p];
-		fragRegex.lastIndex = 0;
-		//~ console.log(peak.fragment_name.trim());
-		var regexMatch = fragRegex.exec(peak.fragment_name.trim());
-		if (peak.fragment_name.trim() != ""){
-			//~ console.log(regexMatch[0]);
-			console.log(regexMatch[2]);
-			var matchedPeptide = peak.matchedpeptide;
-			var fragHighlightsArrayName; 
-			var offset, pepLength;
-
-			
-			if (this.spectrumViewer.pep1 == matchedPeptide){
-				fragHighlightsArrayName = "pep1";
-				offset = this.pep1offset;
-				pepLength = this.pepSeq1.length
-			}
-			else{
-				fragHighlightsArrayName = "pep2";
-				offset = this.pep2offset;
-				pepLength = this.pepSeq2.length
-			}
-			var ionType = peak.fragment_name.split("")[0];
-			fragHighlightsArrayName += peak.fragment_name.split("")[0] + "FragHighlights";
-			if (ionType == "b") { // or a or c
-				this[fragHighlightsArrayName][(regexMatch[2] - 0) + offset - 1].attr("opacity",1);
-			} else {
-				this[fragHighlightsArrayName][pepLength - (regexMatch[2] - 0) + offset - 1].attr("opacity",1);
-			}
-		}
-	}*/
 }
 
 
@@ -478,7 +444,6 @@ PeptideFragmentationKey.prototype.clearHighlights = function(){
 		var pLength = hightlightArray.length;
 		for (var p = 0; p < pLength; p++){
 			if (hightlightArray[p]){
-			//	console.log(hightlightArray[p]);
 				hightlightArray[p].attr("opacity",0);
 			}
 		}	
@@ -489,4 +454,3 @@ PeptideFragmentationKey.prototype.clearHighlights = function(){
 	clear(this.pep2bFragHighlights);
 	clear(this.pep2yFragHighlights);
 }
-

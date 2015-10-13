@@ -14,9 +14,14 @@
     <script type="text/javascript" src="./src/graph/Peak.js"></script>
     <script type="text/javascript" src="./src/graph/Fragment.js"></script>
     <style type="text/css">
-		html, body, #spectrumDiv {
+		html, body{
 			background-color: white;
 			height:100%;
+			width:100%;
+		}
+		
+		#spectrumDiv {
+			height:calc(100% - 40px);
 			width:100%;
 		}
 		
@@ -44,6 +49,9 @@
 				type="checkbox">
 	</label>
 					
+	<button onclick="spectrumViewer.ressize();">reset zoom</button>
+	
+	
 	
 	<div id='spectrumDiv'>
 	</div>
