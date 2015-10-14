@@ -60,7 +60,7 @@ SpectrumViewer.prototype.setData = function(pepSeq1, linkPos1, pepSeq2, linkPos2
 	this.annotatedPeaks = d3.csv.parse(annotatedPeaksCSV.trim());
 	this.linkPos1 = linkPos1;
 	this.linkPos2 = linkPos2;
-	
+	this.lossyShown = false;
 	this.peptideFragKey.setData(this.pep1, this.linkPos1, this.pep2, this.linkPos2, this.annotatedPeaks);
 	//graph doesn't need peptide sequences and link positions, only annotated peaks
 	this.graph.setData(this.annotatedPeaks);
