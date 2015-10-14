@@ -18,6 +18,7 @@
 //
 //		SpectrumViewer.js
 
+
 function SpectrumViewer (targetDiv){ // maybe make this param the SVG element
 	// targetDiv could be div itself or id of div - lets deal with that
 	if (typeof targetDiv === "string"){
@@ -28,7 +29,7 @@ function SpectrumViewer (targetDiv){ // maybe make this param the SVG element
 	
 	this.svg = d3.select(targetDiv)
 				//~ .append("div").style("height","100%").style("width","100%")
-				.append("svg").style("width", "100%").style("height", "100%");
+				.append("svg").style("width", "100%").style("height", "85%");
 	
 	//create peptide frag key
 	this.peptideFragKey = new PeptideFragmentationKey(this.svg, this);
@@ -79,7 +80,7 @@ SpectrumViewer.prototype.setData = function(pepSeq1, linkPos1, pepSeq2, linkPos2
 SpectrumViewer.prototype.clear = function(){
 	this.pep1 = "";
 	this.pep2 = "";
-	this.lossyShown = false;
+	//~ this.lossyShown = false;
 	this.peptideFragKey.clear();
 	this.graph.clear();
 }
@@ -89,7 +90,12 @@ SpectrumViewer.prototype.resize = function(){
 }
 
 SpectrumViewer.prototype.getSVG = function(){
+	var svgXml = this.svg[0][0].parentNode.innerHTML;
+    svgXml = svgXml.replace('<svg ','<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events" ')
 	
+	return '<?xml version="1.0" encoding="UTF-8" standalone=\"no\"?>' 
+		+ "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">"
+		+ svgXml;	
 }
 
 SpectrumViewer.prototype.showLossy = function(show){

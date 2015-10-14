@@ -127,12 +127,20 @@ Graph.prototype.resize = function() {
 	self.y.domain([0, self.ymax]).nice()
 		.range([height, 0]).nice();
 
-	self.yaxis.call(d3.svg.axis().scale(self.y).orient("left"));
+	var yTicks = height / 40;
+	var xTicks = width / 100;
 
-	self.xAxis = d3.svg.axis().scale(self.x).orient("bottom");
+	
+	self.yaxis.call(d3.svg.axis().scale(self.y).ticks(yTicks).orient("left"));
+	
+
+	self.xAxis = d3.svg.axis().scale(self.x).ticks(xTicks).orient("bottom");
 		
 	self.xaxis.attr("transform", "translate(0," + height + ")")
 		.call(self.xAxis);
+	
+	this.g.selectAll('.axis line, .axis path')
+     .style({'stroke': 'Black', 'fill': 'none', 'stroke-width': '1.2px'});
 		
 	self.plot.attr("width", width)
 		.attr("height", height)
