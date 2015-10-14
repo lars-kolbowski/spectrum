@@ -256,7 +256,7 @@ PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2,
 				if (frag.indexOf("y") != -1){
 					var highlightPath = "M" + x + "," + y 
 										+" L" + x + "," +  (y - barHeight) 
-										+ " L" + (x - tailX) + "," + (y  - barHeight - tailY);
+										+ " L" + (x + tailX) + "," + (y  - barHeight - tailY);
 						
 					var yHighlight = self.g.append("path")
 						.attr("d", highlightPath)
