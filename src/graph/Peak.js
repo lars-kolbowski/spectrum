@@ -39,11 +39,11 @@ function Peak (data, graph){
 }
 
 Peak.prototype.init = function(){
-	if (this.graph.spectrumViewer.lossyShown == false){
-		this.fragments = this.notLossyFragments;
-	} else {
+	//~ if (this.graph.spectrumViewer.lossyShown == false){
+		//~ this.fragments = this.notLossyFragments;
+	//~ } else {
 		this.fragments = this.notLossyFragments.concat(this.lossyFragments);
-	}
+	//~ }
 	this.line = this.graph.peaks.append('line').attr("stroke-width","1");
 	this.line.append("svg:title").text("m/z: " + this.x + ", i: " + this.y);	// easy tooltip
 	if (this.fragments.length > 0) {
@@ -152,21 +152,44 @@ Peak.prototype.highlight = function(show){
 }
 
 Peak.prototype.update = function(){
-	this.line.attr("x1", this.graph.x(this.x));
-	this.line.attr("y1", this.graph.y(this.y));
-	this.line.attr("x2", this.graph.x(this.x));
-	this.line.attr("y2", this.graph.y(0));
-	if (this.fragments.length > 0) {
-		this.highlightLine.attr("x1", this.graph.x(this.x));
-		this.highlightLine.attr("y1", this.graph.y(this.y));
-		this.highlightLine.attr("x2", this.graph.x(this.x));
-		this.highlightLine.attr("y2", this.graph.y(0));	
-		var yStep = 15;
-		var labelCount = this.labels.length;
-		for (var a = 0; a < labelCount; a++){
-			var label = this.labels[a];
-			label.attr("x", this.graph.x(this.x));
-			label.attr("y", this.graph.y(this.y) - 5 - (yStep * a));
-		}	
+	var xDomain = this.graph.x.domain();
+	console.log(">" + xDomain);
+		this.line.attr("x1", this.graph.x(this.x));
+		this.line.attr("y1", this.graph.y(this.y));
+		this.line.attr("x2", this.graph.x(this.x));
+		this.line.attr("y2", this.graph.y(0));
+		if (this.fragments.length > 0) {
+			this.highlightLine.attr("x1", this.graph.x(this.x));
+			this.highlightLine.attr("y1", this.graph.y(this.y));
+			this.highlightLine.attr("x2", this.graph.x(this.x));
+			this.highlightLine.attr("y2", this.graph.y(0));	
+			var yStep = 15;
+			var labelCount = this.labels.length;
+			for (var a = 0; a < labelCount; a++){
+				var label = this.labels[a];
+				label.attr("display", "inline");
+				label.attr("x", this.graph.x(this.x));
+				label.attr("y", this.graph.y(this.y) - 5 - (yStep * a));
+			}	
+		}
+if (this.x > xDomain[0] && this.x < xDomain[1]){
+		this.line.attr("display","inline");
+		if (this.fragments.length > 0) {
+			var yStep = 15;
+			var labelCount = this.labels.length;
+			for (var a = 0; a < labelCount; a++){
+				var label = this.labels[a];
+				label.attr("display", "inline");
+			}	
+		}
+	} else {
+		this.line.attr("display","none");
+		if (this.fragments.length > 0) {
+			var labelCount = this.labels.length;
+			for (var a = 0; a < labelCount; a++){
+				var label = this.labels[a];
+				label.attr("display", "none");
+			}
+		}
 	}
 }

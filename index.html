@@ -15,43 +15,41 @@
     <script type="text/javascript" src="./src/graph/Fragment.js"></script>
     <style type="text/css">
 		html, body{
+<!--
 			background-color: white;
 			height:100%;
 			width:100%;
+-->
+			-webkit-user-select: none;
+			-khtml-user-select: none;
+			-moz-user-select: -moz-none;
+			-o-user-select: none;
+			user-select: none;
+		}		
+		*{
+			margin:0px;
+			padding:0px;
 		}
+<!--
 		
 		#spectrumDiv {
 			height:100%;
 			width:100%;
 		}
-		
-		*{
-			margin:0px;
-			padding:0px;
-		}
-		
-<!--
-		.axis path, .axis line {
-			fill: none;
-			stroke: #000;
-		}
-		
-		.fragBar{
-			stroke-width:1.3px;
-			stroke-linecap:round;
-		}
+
 -->
+		
 	</style>
   </head>
   <body>
 	  
-	<label>lossy
-		<input checked id="lossyChkBx" 
+	<label>lossy labels
+		<input id="lossyChkBx" 
 		onclick="spectrumViewer.showLossy(document.getElementById('lossyChkBx').checked)" 
 				type="checkbox">
 	</label>
 					
-	<button onclick="spectrumViewer.ressize();">reset zoom</button>
+	<button onclick="spectrumViewer.resize();">reset zoom</button>
 	
 	
 	

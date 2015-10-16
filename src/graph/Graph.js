@@ -28,29 +28,55 @@ Graph = function(targetSvg, spectrumViewer, options) {
 	this.spectrumViewer = spectrumViewer;
 	
 	this.margin = {
-		"top":    options.title  ? 140 : 120,
-		"right":  30,
-		"bottom": options.xlabel ? 60 : 40,
-		"left":   options.ylabel ? 120 : 100
+		"top":    options.title  ? 130 : 110,
+		"right":  10,
+		"bottom": options.xlabel ? 40 : 20,
+		"left":   options.ylabel ? 100 : 80
 	};
 	this.g =  targetSvg.append("g").attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
 	
 	this.xaxis = this.g.append("g")
 		.attr("class", "x axis");
+		//~ 
+	/*
+	 * -webkit-user-select: none;
+			-khtml-user-select: none;
+			-moz-user-select: -moz-none;
+			-o-user-select: none;
+			user-select: none;*/
+	//brush
+	this.brush = d3.svg.brush()
+		.x(this.x)
+		//~ .extent([15, 25])
+		.on("brushstart", brushstart)
+		.on("brush", brushmove)
+		.on("brushend", brushend);
+	this.xaxisRect = this.g.append("rect")
+					.attr("height", "25")
+					.attr("opacity", 0)
+					.attr("pointer-events", "all");
+	this.xaxisRect.call(this.brush);	
+	//~ this	
+		
 	this.yaxis = this.g.append("g")
 		.attr("class", "y axis");
 	this.plot = this.g.append("rect")
 		.style("fill", "white")
 		.attr("pointer-events", "all");
-	this.innerSVG = this.g.append("svg") //make this svg to clip plot at axes
+	this.innerSVG = this.g.append("g")
 		.attr("top", 0)
 		.attr("left", 0)
 		.attr("class", "line");
-		
+	
+	this.dragZoomHighlight = this.innerSVG.append("rect").attr("y", 0).attr("fill","#CCCCCC");	
+	
+	
 	this.highlights = this.innerSVG.append("g");
 	this.peaks = this.innerSVG.append("g");
 	this.lossiAnnotations = this.innerSVG.append("g");
 	this.annotations = this.innerSVG.append("g");
+	
+	
 	// add Chart Title
 	if (options.title) {
 		this.title = this.g.append("text")
@@ -73,6 +99,33 @@ Graph = function(targetSvg, spectrumViewer, options) {
 		.attr("class", "axis")
 		.text(options.ylabel)
 		.style("text-anchor","middle")
+	}
+	
+	
+		var self = this;
+	
+	//~ brushstart();
+
+	function brushstart() {
+		//brushmove();
+		self.dragZoomHighlight.attr("width",0);
+		self.dragZoomHighlight.attr("display","inline");
+	}
+
+	function brushmove() {
+	  var s = self.brush.extent();
+	  var width = self.x(s[1] - s[0]) - self.x(0);
+	  //console.log(s + "\t" + s[0] + "\t" + s[1] + "\t" + width);
+	  console.log(s[0]);
+	  self.dragZoomHighlight.attr("x",self.x(s[0])).attr("width", width);
+	}
+
+	function brushend() {
+	  self.dragZoomHighlight.attr("display","none");
+	  var s = self.brush.extent();
+	  self.x.domain(s);
+	  self.brush.x(self.x)
+	  self.redraw()();
 	}
 };
 
@@ -140,7 +193,10 @@ Graph.prototype.resize = function() {
 		.call(self.xAxis);
 	
 	this.g.selectAll('.axis line, .axis path')
-     .style({'stroke': 'Black', 'fill': 'none', 'stroke-width': '1.2px'});
+			.style({'stroke': 'Black', 'fill': 'none', 'stroke-width': '1.2px'});
+	
+	//~ this.g.selectAll('.tick')
+		//~ .attr("pointer-events", "none");
 		
 	self.plot.attr("width", width)
 		.attr("height", height)
@@ -148,6 +204,9 @@ Graph.prototype.resize = function() {
 	self.innerSVG.attr("width", width)
 			.attr("height", height)
 			.attr("viewBox", "0 0 "+width+" "+height);
+	
+	self.xaxisRect.attr("width",width).attr("y", height).attr("height", 25);
+	self.dragZoomHighlight.attr("height", height);
 				
 	self.zoom = d3.behavior.zoom().x(self.x).on("zoom", self.redraw());
 	self.plot.call( d3.behavior.zoom().x(self.x).on("zoom", self.redraw()));
@@ -157,7 +216,7 @@ Graph.prototype.resize = function() {
 		this.title.attr("x", width/2);
 	}
 	this.xlabel.attr("x", width/2).attr("y", height);
-	this.ylabel.attr("transform","translate(" + -90 + " " + height/2+") rotate(-90)");
+	this.ylabel.attr("transform","translate(" + -80 + " " + height/2+") rotate(-90)");
 	
 	self.redraw()();
 }
