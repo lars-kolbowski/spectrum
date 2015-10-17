@@ -23,6 +23,8 @@ function Fragment (data){
 	
 	this.peptide = data.matchedpeptide.replace(SpectrumViewer.notUpperCase, '');
 	
+	this.sequence = data.sequence;
+	
 	var ion = this.name.split('')[0];
 	if (ion == 'a' || ion == 'b' || ion == 'c') {
 		this.ionType = 'b';

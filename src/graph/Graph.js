@@ -68,7 +68,7 @@ Graph = function(targetSvg, spectrumViewer, options) {
 		.attr("left", 0)
 		.attr("class", "line");
 	
-	this.dragZoomHighlight = this.innerSVG.append("rect").attr("y", 0).attr("fill","#CCCCCC");	
+	this.dragZoomHighlight = this.innerSVG.append("rect").attr("y", 0).attr("fill","#addd8e");	
 	
 	
 	this.highlights = this.innerSVG.append("g");
@@ -116,7 +116,7 @@ Graph = function(targetSvg, spectrumViewer, options) {
 	  var s = self.brush.extent();
 	  var width = self.x(s[1] - s[0]) - self.x(0);
 	  //console.log(s + "\t" + s[0] + "\t" + s[1] + "\t" + width);
-	  console.log(s[0]);
+	  //~ console.log(s[0]);
 	  self.dragZoomHighlight.attr("x",self.x(s[0])).attr("width", width);
 	}
 
@@ -244,6 +244,7 @@ Graph.prototype.clear = function(){
 
 Graph.prototype.setHighlights = function(peptide, pepI){
 	this.clearHighlights();
+	this.clearLabels();
 	if (peptide) {
 		var peakCount = this.points.length;
 		for (var p = 0; p < peakCount; p++) {
@@ -265,8 +266,11 @@ Graph.prototype.setHighlights = function(peptide, pepI){
 			
 			if (match === true) {
 				this.points[p].highlight(true);
+				this.points[p].showLabels();
 			}
 		}	
+	} else {
+		this.showLabels();
 	}
 }
 
@@ -275,6 +279,25 @@ Graph.prototype.clearHighlights = function(peptide, pepI){
 	for (var p = 0; p < peakCount; p++) {
 		if (this.points[p].fragments.length > 0) {
 			this.points[p].highlight(false);
+		}
+	}
+}
+
+
+Graph.prototype.clearLabels = function(){
+	var peakCount = this.points.length;
+	for (var p = 0; p < peakCount; p++) {
+		if (this.points[p].fragments.length > 0) {
+			this.points[p].removeLabels();
+		}
+	}
+}
+
+Graph.prototype.showLabels = function(){
+	var peakCount = this.points.length;
+	for (var p = 0; p < peakCount; p++) {
+		if (this.points[p].fragments.length > 0) {
+			this.points[p].showLabels();
 		}
 	}
 }

@@ -100,9 +100,11 @@ SpectrumViewer.prototype.getSVG = function(){
 
 SpectrumViewer.prototype.showLossy = function(show){
 	this.lossyShown = show;
-	this.peptideFragKey.clear();
-	this.peptideFragKey.setData(this.pep1, this.linkPos1, this.pep2, this.linkPos2, this.annotatedPeaks);
-	this.graph.setData(this.annotatedPeaks);
+	this.graph.clearLabels();
+	this.graph.showLabels();
+	//~ this.peptideFragKey.clear();
+	//~ this.peptideFragKey.setData(this.pep1, this.linkPos1, this.pep2, this.linkPos2, this.annotatedPeaks);
+	//~ this.graph.setData(this.annotatedPeaks);
 }
 
 //SpectrumViewer.prototype.destroy(){} //if multiple viewers need to make sure don't cause memory leaks, see -

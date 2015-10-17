@@ -36,16 +36,23 @@ function Peak (data, graph){
 			}
 		}		
 	}
+	
+	this.fragments = this.notLossyFragments.concat(this.lossyFragments);
+	
+	var tooltip = "";
+	var fragCount = this.fragments.length;
+	for (var f = 0; f < fragCount; f++){
+		if (f > 0) {
+			tooltip += ", ";
+		}
+		tooltip += this.fragments[f].sequence;
+	}
+	this.tooltip = tooltip + " m/z: " + this.x + ", i: " + this.y
 }
 
 Peak.prototype.init = function(){
-	//~ if (this.graph.spectrumViewer.lossyShown == false){
-		//~ this.fragments = this.notLossyFragments;
-	//~ } else {
-		this.fragments = this.notLossyFragments.concat(this.lossyFragments);
-	//~ }
 	this.line = this.graph.peaks.append('line').attr("stroke-width","1");
-	this.line.append("svg:title").text("m/z: " + this.x + ", i: " + this.y);	// easy tooltip
+	this.line.append("svg:title").text(this.tooltip);	// easy tooltip
 	if (this.fragments.length > 0) {
 		if (this.fragments[0].peptide === this.graph.spectrumViewer.pep1 
 				&& this.fragments[0].lossy === false) {
@@ -67,7 +74,7 @@ Peak.prototype.init = function(){
 							.attr("stroke", SpectrumViewer.highlightColour)
 							.attr("stroke-width", SpectrumViewer.highlightWidth)
 							.attr("opacity","0");
-		this.highlightLine.append("svg:title").text("m/z: " + this.x + " i: " + this.y);	// easy tooltip
+		this.highlightLine.append("svg:title").text(this.tooltip);	// easy tooltip
 		
 		//set the dom events for it
 		var self = this;
@@ -134,12 +141,12 @@ Peak.prototype.init = function(){
 				c = SpectrumViewer[pep + "color_loss"]; //javascript lets you do this...
 			}		
 			label.attr("fill", c);	
-			label.append("svg:title").text("m/z: " + this.x + ", i: " + this.y);	// easy tooltip
+			label.append("svg:title").text(this.tooltip);	// easy tooltip
 			this.labels.push(label);
 		}
 	}
 	else { //no fragment annotations for this peak
-		this.line.attr("stroke", "black");
+		this.line.attr("stroke", "#777777");
 	}
 }
 
@@ -149,11 +156,12 @@ Peak.prototype.highlight = function(show){
 	} else {
 		this.highlightLine.attr("opacity","0");
 	}
+	this.highlighted = show;
 }
 
 Peak.prototype.update = function(){
 	var xDomain = this.graph.x.domain();
-	console.log(">" + xDomain);
+	//~ console.log(">" + xDomain);
 		this.line.attr("x1", this.graph.x(this.x));
 		this.line.attr("y1", this.graph.y(this.y));
 		this.line.attr("x2", this.graph.x(this.x));
@@ -167,29 +175,39 @@ Peak.prototype.update = function(){
 			var labelCount = this.labels.length;
 			for (var a = 0; a < labelCount; a++){
 				var label = this.labels[a];
-				label.attr("display", "inline");
 				label.attr("x", this.graph.x(this.x));
 				label.attr("y", this.graph.y(this.y) - 5 - (yStep * a));
 			}	
 		}
-if (this.x > xDomain[0] && this.x < xDomain[1]){
+	if (this.x > xDomain[0] && this.x < xDomain[1]){
 		this.line.attr("display","inline");
-		if (this.fragments.length > 0) {
-			var yStep = 15;
-			var labelCount = this.labels.length;
-			for (var a = 0; a < labelCount; a++){
-				var label = this.labels[a];
-				label.attr("display", "inline");
-			}	
-		}
+		if (this.fragments.length > 0) {this.highlightLine.attr("display","inline");}
+		this.showLabels();
 	} else {
 		this.line.attr("display","none");
-		if (this.fragments.length > 0) {
-			var labelCount = this.labels.length;
-			for (var a = 0; a < labelCount; a++){
-				var label = this.labels[a];
-				label.attr("display", "none");
-			}
-		}
+		if (this.fragments.length > 0) {this.highlightLine.attr("display","none");}
+		this.removeLabels();
 	}
+}
+
+Peak.prototype.removeLabels = function(){
+	if (this.fragments.length > 0) {
+		var labelCount = this.labels.length;
+		for (var a = 0; a < labelCount; a++){
+			var label = this.labels[a];
+			label.attr("display", "none");
+		}
+	}	
+}
+
+Peak.prototype.showLabels = function(){
+	if (this.fragments.length > 0) {
+		var labelCount = this.labels.length;
+		for (var a = 0; a < labelCount; a++){
+			if (this.graph.spectrumViewer.lossyShown === true || this.fragments[a].lossy === false || this.highlighted === true) {
+				var label = this.labels[a];
+				label.attr("display", "inline");
+			}
+		}	
+	}	
 }

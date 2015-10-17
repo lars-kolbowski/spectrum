@@ -240,6 +240,8 @@ PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2,
 						.attr("y1", y)
 						.attr("x2", x - tailX)
 						.attr("y2", y + tailY)
+						.attr("peptide", peptide)
+						.attr("fragKeyIndex", i)
 						.attr("class", "fragBar");
 					// if "bloss" in fgm:
 					if (frag.indexOf("bloss") != -1){
@@ -249,7 +251,19 @@ PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2,
 						bTail.attr("stroke", "black");
 					}
 					
-					
+				line = bTail[0][0];
+					line.onmouseover = function(evt) {
+						highlight(this.getAttribute("peptide"), this.getAttribute("fragKeyIndex"));
+					};
+					line.onmouseout = function(evt) {
+						highlight();
+					};
+					line.ontouchstart = function(evt) {
+						highlight(this.getAttribute("peptide"), this.getAttribute("fragKeyIndex"));
+					};
+					line.ontouchend = function(evt) {
+						highlight();
+					};	
 				}
 
 				// # yions; either normal or lossy; have different colors
@@ -291,6 +305,8 @@ PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2,
 						.attr("y1", y - barHeight)
 						.attr("x2", x + tailX)
 						.attr("y2", y - barHeight - tailY)
+						.attr("peptide", peptide)
+						.attr("fragKeyIndex", i)
 						.attr("class", "fragBar");
 					// if "yloss"
 					if (frag.indexOf("yloss") != -1){
@@ -299,7 +315,19 @@ PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2,
 					else {
 						yTail.attr("stroke", "black");
 					}
-
+				line = yTail[0][0];
+					line.onmouseover = function(evt) {
+						highlight(this.getAttribute("peptide"), this.getAttribute("fragKeyIndex"));
+					};
+					line.onmouseout = function(evt) {
+						highlight();
+					};
+					line.ontouchstart = function(evt) {
+						highlight(this.getAttribute("peptide"), this.getAttribute("fragKeyIndex"));
+					};
+					line.ontouchend = function(evt) {
+						highlight();
+					};
 				}
 
 				var fragBar = self.g.append("line")
@@ -307,6 +335,8 @@ PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2,
 					.attr("y1", y)
 					.attr("x2", x)
 					.attr("y2", y - barHeight)
+					.attr("peptide", peptide)
+					.attr("fragKeyIndex", i)
 					.attr("class", "fragBar");
 					
 				var lossCount = (frag.match(/loss/g) || []).length;
@@ -316,7 +346,20 @@ PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2,
 				else {
 					fragBar.attr("stroke", "black");
 				}
-				
+				line = fragBar[0][0];
+					line.onmouseover = function(evt) {
+						highlight(this.getAttribute("peptide"), this.getAttribute("fragKeyIndex"));
+					};
+					line.onmouseout = function(evt) {
+						highlight();
+					};
+					line.ontouchstart = function(evt) {
+						highlight(this.getAttribute("peptide"), this.getAttribute("fragKeyIndex"));
+					};
+					line.ontouchend = function(evt) {
+						highlight();
+					};
+					
 			}
 		}
 	}
