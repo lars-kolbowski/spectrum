@@ -148,6 +148,7 @@ Peak.prototype.init = function(){
 	else { //no fragment annotations for this peak
 		this.line.attr("stroke", "#777777");
 	}
+	this.removeLabels();
 }
 
 Peak.prototype.highlight = function(show){

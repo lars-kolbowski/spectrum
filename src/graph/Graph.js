@@ -30,7 +30,7 @@ Graph = function(targetSvg, spectrumViewer, options) {
 	this.margin = {
 		"top":    options.title  ? 130 : 110,
 		"right":  10,
-		"bottom": options.xlabel ? 40 : 20,
+		"bottom": options.xlabel ? 50 : 20,
 		"left":   options.ylabel ? 100 : 80
 	};
 	this.g =  targetSvg.append("g").attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
