@@ -31,7 +31,7 @@ Graph = function(targetSvg, spectrumViewer, options) {
 		"top":    options.title  ? 130 : 110,
 		"right":  10,
 		"bottom": options.xlabel ? 50 : 20,
-		"left":   options.ylabel ? 100 : 80
+		"left":   options.ylabel ? 60 : 30
 	};
 	this.g =  targetSvg.append("g").attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
 	
@@ -54,7 +54,8 @@ Graph = function(targetSvg, spectrumViewer, options) {
 	this.xaxisRect = this.g.append("rect")
 					.attr("height", "25")
 					.attr("opacity", 0)
-					.attr("pointer-events", "all");
+					.attr("pointer-events", "all")
+					.style("cursor", "crosshair");
 	this.xaxisRect.call(this.brush);	
 	//~ this	
 		
@@ -91,14 +92,14 @@ Graph = function(targetSvg, spectrumViewer, options) {
 		.attr("class", "aWWWAAAAAxis")
 		.text(options.xlabel)
 		.attr("dy","2.4em")
-		.style("text-anchor","middle");
+		.style("text-anchor","middle").style("pointer-events","none");
 	}
 	// add y-axis label
 	if (options.ylabel) {
 	this.ylabel = this.g.append("g").append("text")
 		.attr("class", "axis")
 		.text(options.ylabel)
-		.style("text-anchor","middle")
+		.style("text-anchor","middle").style("pointer-events","none");
 	}
 	
 	
@@ -184,7 +185,8 @@ Graph.prototype.resize = function() {
 	var xTicks = width / 100;
 
 	
-	self.yaxis.call(d3.svg.axis().scale(self.y).ticks(yTicks).orient("left"));
+	self.yaxis.call(d3.svg.axis().scale(self.y).ticks(yTicks)
+						.orient("left").tickFormat(d3.format("s")));
 	
 
 	self.xAxis = d3.svg.axis().scale(self.x).ticks(xTicks).orient("bottom");
@@ -205,7 +207,7 @@ Graph.prototype.resize = function() {
 			.attr("height", height)
 			.attr("viewBox", "0 0 "+width+" "+height);
 	
-	self.xaxisRect.attr("width",width).attr("y", height).attr("height", 25);
+	self.xaxisRect.attr("width",width).attr("y", height).attr("height", self.margin.bottom);
 	self.dragZoomHighlight.attr("height", height);
 				
 	self.zoom = d3.behavior.zoom().x(self.x).on("zoom", self.redraw());
@@ -216,7 +218,7 @@ Graph.prototype.resize = function() {
 		this.title.attr("x", width/2);
 	}
 	this.xlabel.attr("x", width/2).attr("y", height);
-	this.ylabel.attr("transform","translate(" + -80 + " " + height/2+") rotate(-90)");
+	this.ylabel.attr("transform","translate(" + -45 + " " + height/2+") rotate(-90)");
 	
 	self.redraw()();
 }

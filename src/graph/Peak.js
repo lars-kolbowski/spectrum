@@ -146,7 +146,7 @@ Peak.prototype.init = function(){
 		}
 	}
 	else { //no fragment annotations for this peak
-		this.line.attr("stroke", "#777777");
+		this.line.attr("stroke", SpectrumViewer.lossFragBarColour);
 	}
 	this.removeLabels();
 }

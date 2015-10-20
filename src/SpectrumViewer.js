@@ -34,7 +34,7 @@ function SpectrumViewer (targetDiv){ // maybe make this param the SVG element
 	//create peptide frag key
 	this.peptideFragKey = new PeptideFragmentationKey(this.svg, this);
 	//create graph
-	this.graph = new Graph (this.svg, this, {xlabel:"m/z", ylabel:"intensity"});
+	this.graph = new Graph (this.svg, this, {xlabel:"m/z", ylabel:"Intensity"});
 
 	//link each to other by registering callbacks
 	var gBinding = this.peptideFragKey.highlightChanged.add(this.graph.setHighlights);
