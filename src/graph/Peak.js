@@ -203,12 +203,15 @@ Peak.prototype.removeLabels = function(){
 
 Peak.prototype.showLabels = function(){
 	if (this.fragments.length > 0) {
-		var labelCount = this.labels.length;
-		for (var a = 0; a < labelCount; a++){
-			if (this.graph.spectrumViewer.lossyShown === true || this.fragments[a].lossy === false || this.highlighted === true) {
-				var label = this.labels[a];
-				label.attr("display", "inline");
-			}
-		}	
+		var xDomain = this.graph.x.domain();
+		if (this.x > xDomain[0] && this.x < xDomain[1]){
+			var labelCount = this.labels.length;
+			for (var a = 0; a < labelCount; a++){
+				if (this.graph.spectrumViewer.lossyShown === true || this.fragments[a].lossy === false || this.highlighted === true) {
+					var label = this.labels[a];
+					label.attr("display", "inline");
+				}
+			}	
+		}
 	}	
 }
