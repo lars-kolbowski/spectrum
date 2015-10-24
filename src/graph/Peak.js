@@ -1,11 +1,11 @@
 //		a spectrum viewer
 //
 //      Copyright  2015 Rappsilber Laboratory, Edinburgh University
-// 
+//
 // 		Licensed under the Apache License, Version 2.0 (the "License");
 // 		you may not use this file except in compliance with the License.
 // 		You may obtain a copy of the License at
-// 
+//
 // 		http://www.apache.org/licenses/LICENSE-2.0
 //
 //   	Unless required by applicable law or agreed to in writing, software
@@ -13,32 +13,33 @@
 //   	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //   	See the License for the specific language governing permissions and
 //   	limitations under the License.
-//		
+//
 //		author: Colin Combe
-//		
+//
 //		graph/Peak.js
 
 function Peak (data, graph){
 	this.x = data[0].expmz - 0;
 	this.y = data[0].absolute_intensity - 0;
-	this.graph = graph;	
-	this.notLossyFragments = [];
-	this.lossyFragments = [];
-	
+	this.graph = graph;
+
+	//make fragments
+	var notLossyFragments = [];
+	var lossyFragments = [];
 	var fragCount = data.length;
 	for (var f = 0; f < fragCount; f++) {
 		if (data[f].fragment_name.trim() != "") {
 			var frag = new Fragment (data[f]);
 			if (frag.lossy === false) {
-				this.notLossyFragments.push(frag);
+				notLossyFragments.push(frag);
 			} else {
-				this.lossyFragments.push(frag);
+				lossyFragments.push(frag);
 			}
-		}		
+		}
 	}
-	
-	this.fragments = this.notLossyFragments.concat(this.lossyFragments);
-	
+	this.fragments = notLossyFragments.concat(lossyFragments);
+
+	//make tooltip
 	var tooltip = "";
 	var fragCount = this.fragments.length;
 	for (var f = 0; f < fragCount; f++){
@@ -48,87 +49,76 @@ function Peak (data, graph){
 		tooltip += this.fragments[f].sequence;
 	}
 	this.tooltip = tooltip + " m/z: " + this.x + ", i: " + this.y
-}
 
-Peak.prototype.init = function(){
-	this.line = this.graph.peaks.append('line').attr("stroke-width","1");
-	this.line.append("svg:title").text(this.tooltip);	// easy tooltip
+	//svg elements
+	this.g = this.graph.peaks.append('g');
+	this.g.append("svg:title").text(this.tooltip);	// easy tooltip
 	if (this.fragments.length > 0) {
-		if (this.fragments[0].peptide === this.graph.spectrumViewer.pep1 
-				&& this.fragments[0].lossy === false) {
-			this.line.attr("stroke", SpectrumViewer.p1color);
-		}
-		else if (this.fragments[0].peptide === this.graph.spectrumViewer.pep2 
-				&& this.fragments[0].lossy === false) {
-			this.line.attr("stroke", SpectrumViewer.p2color);
-		}
-		else if (this.fragments[0].peptide === this.graph.spectrumViewer.pep1 
-				&& this.fragments[0].lossy === true) {
-			this.line.attr("stroke", SpectrumViewer.p1color_loss);
-		}
-		else if (this.fragments[0].peptide === this.graph.spectrumViewer.pep2 
-				&& this.fragments[0].lossy === true) {
-			this.line.attr("stroke", SpectrumViewer.p2color_loss);
-		}
-		this.highlightLine = this.graph.highlights.append('line')
+		this.highlightLine = this.g.append('line')
 							.attr("stroke", SpectrumViewer.highlightColour)
 							.attr("stroke-width", SpectrumViewer.highlightWidth)
 							.attr("opacity","0");
-		this.highlightLine.append("svg:title").text(this.tooltip);	// easy tooltip
-		
+		//this.highlightLine.append("svg:title").text(this.tooltip);	// easy tooltip
+		this.highlightLine.attr("x1", 0);
+		this.highlightLine.attr("x2", 0);
+				
 		//set the dom events for it
 		var self = this;
-		var line = this.line[0][0];
-		line.onmouseover = function(evt) {
+		var group = this.g[0][0];
+		group.onmouseover = function(evt) {
+			startHighlight();
+		};
+		group.onmouseout = function(evt) {
+			endHighlight();
+		};
+		group.ontouchstart = function(evt) {
+			startHighlight();
+		};
+		group.ontouchend = function(evt) {
+			endHighlight();
+		};
+
+		function startHighlight(){
+			self.graph.greyPeaks();
+			self.graph.clearLabels();
 			self.highlight(true);
 			self.graph.highlightChanged.dispatch(self.fragments);
-		};
-		line.onmouseout = function(evt) {
+		}
+		function endHighlight(){
 			self.highlight(false);
 			self.graph.highlightChanged.dispatch([]);
-		};
-		line.ontouchstart = function(evt) {
-			self.highlight(true);
-			self.graph.highlightChanged.dispatch(self.fragments);
-		};
-		line.ontouchend = function(evt) {
-			self.highlight(false);
-			self.graph.highlightChanged.dispatch([]);
-		};
-		line = this.highlightLine[0][0];
-		line.onmouseover = function(evt) {
-			self.highlight(true);
-			self.graph.highlightChanged.dispatch(self.fragments);
-		};
-		line.onmouseout = function(evt) {
-			self.highlight(false);
-			self.graph.highlightChanged.dispatch([]);
-		};
-		line.ontouchstart = function(evt) {
-			self.highlight(true);
-			self.graph.highlightChanged.dispatch(self.fragments);
-		};
-		line.ontouchend = function(evt) {
-			self.highlight(false);
-			self.graph.highlightChanged.dispatch([]);
-		};
-	
-	
-		
+			self.graph.colourPeaks();
+			self.graph.showLabels();
+		}
+
 	  	//create frag labels
 		this.labels = []; // will be array of d3 selections
+		this.labelHighlights = []; // will be array of d3 selections
 		var fragCount = this.fragments.length;
 		//~ var unlossiFound = false;
 		for (var f = 0; f < fragCount; f++){
 			var frag = this.fragments[f];
-			var label = this.graph.annotations.append('text')
-					.text(frag.name)
+			var labelHighlight, label;
+			if (frag.lossy === false){
+				labelHighlight  = this.graph.annotations.append('text');
+				label = this.graph.annotations.append('text');
+			} else {
+				labelHighlight  = this.graph.lossyAnnotations.append('text');
+				label = this.graph.lossyAnnotations.append('text');
+			}
+			labelHighlight.text(frag.name)
+					.attr("x", 0)
+					.attr("text-anchor", "middle")
+					.style("stroke-width", "5px")
+					.attr("stroke", SpectrumViewer.highlightColour);
+			label.text(frag.name)
+					.attr("x", 0)
 					.attr("text-anchor", "middle")
 					.attr("class", "peakAnnot");
-			
+
 			var c = "pink";//colour for annotation
 			var matchedPeptide = frag.peptide;
-			var pep; 
+			var pep;
 			if (this.graph.spectrumViewer.pep1 == matchedPeptide){
 				pep = "p1";
 			}
@@ -136,58 +126,100 @@ Peak.prototype.init = function(){
 				pep = "p2";
 			}
 			if (frag.name.indexOf("_") == -1){ //is not lossi
-				c = SpectrumViewer[pep + "color"];	
+				c = SpectrumViewer[pep + "color"];
 			} else { // is lossy
 				c = SpectrumViewer[pep + "color_loss"]; //javascript lets you do this...
-			}		
-			label.attr("fill", c);	
-			label.append("svg:title").text(this.tooltip);	// easy tooltip
+			}
+			label.attr("fill", c);
 			this.labels.push(label);
+			this.labelHighlights.push(labelHighlight);
+		}
+		this.highlight(false);
+	}
+	this.line = this.g.append('line').attr("stroke-width","1");
+	this.line.attr("x1", 0);
+	this.line.attr("x2", 0);
+	this.colour = SpectrumViewer.lossFragBarColour;
+	if (this.fragments.length > 0){
+		if (this.fragments[0].peptide === this.graph.spectrumViewer.pep1
+				&& this.fragments[0].lossy === false) {
+			this.colour = SpectrumViewer.p1color;
+		}
+		else if (this.fragments[0].peptide === this.graph.spectrumViewer.pep2
+				&& this.fragments[0].lossy === false) {
+			this.colour = SpectrumViewer.p2color;
+		}
+		else if (this.fragments[0].peptide === this.graph.spectrumViewer.pep1
+				&& this.fragments[0].lossy === true) {
+			this.colour = SpectrumViewer.p1color_loss;
+		}
+		else if (this.fragments[0].peptide === this.graph.spectrumViewer.pep2
+				&& this.fragments[0].lossy === true) {
+			this.colour = SpectrumViewer.p2color_loss;
 		}
 	}
-	else { //no fragment annotations for this peak
-		this.line.attr("stroke", SpectrumViewer.lossFragBarColour);
-	}
+	this.line.attr("stroke", this.colour);
+	
 	this.removeLabels();
+	this.showLabels();
 }
 
 Peak.prototype.highlight = function(show){
+	var labelCount = this.labels.length;
 	if (show == true) {
 		this.highlightLine.attr("opacity","1");
+		for (var a = 0; a < labelCount; a++){
+			this.labelHighlights[a].attr("opacity", 1);
+		}
+		this.graph.peaks[0][0].appendChild(this.g[0][0]);
+		this.line.attr("stroke", this.colour);
+		this.showLabels();
 	} else {
-		this.highlightLine.attr("opacity","0");
+		this.highlightLine.attr("opacity",0);
+		for (var a = 0; a < labelCount; a++){
+			this.labelHighlights[a].attr("opacity", 0);
+		}
 	}
-	this.highlighted = show;
 }
 
 Peak.prototype.update = function(){
-	var xDomain = this.graph.x.domain();
-	//~ console.log(">" + xDomain);
-		this.line.attr("x1", this.graph.x(this.x));
-		this.line.attr("y1", this.graph.y(this.y));
-		this.line.attr("x2", this.graph.x(this.x));
-		this.line.attr("y2", this.graph.y(0));
-		if (this.fragments.length > 0) {
-			this.highlightLine.attr("x1", this.graph.x(this.x));
-			this.highlightLine.attr("y1", this.graph.y(this.y));
-			this.highlightLine.attr("x2", this.graph.x(this.x));
-			this.highlightLine.attr("y2", this.graph.y(0));	
-			var yStep = 15;
-			var labelCount = this.labels.length;
-			for (var a = 0; a < labelCount; a++){
-				var label = this.labels[a];
-				label.attr("x", this.graph.x(this.x));
-				label.attr("y", this.graph.y(this.y) - 5 - (yStep * a));
-			}	
+	this.updateX();
+	this.updateY();
+}
+
+Peak.prototype.updateX = function(){
+	this.g.attr("transform", "translate("+this.graph.x(this.x)+",0)");
+	if (this.fragments.length > 0) {
+		var labelCount = this.labels.length;
+		for (var a = 0; a < labelCount; a++){
+			var label = this.labels[a];
+			label.attr("x", this.graph.x(this.x));
+			this.labelHighlights[a].attr("x", this.graph.x(this.x));
 		}
+	}
+	var xDomain = this.graph.x.domain();
 	if (this.x > xDomain[0] && this.x < xDomain[1]){
-		this.line.attr("display","inline");
-		if (this.fragments.length > 0) {this.highlightLine.attr("display","inline");}
-		this.showLabels();
+		this.g.attr("display","inline");
 	} else {
-		this.line.attr("display","none");
-		if (this.fragments.length > 0) {this.highlightLine.attr("display","none");}
-		this.removeLabels();
+		this.g.attr("display","none");
+	}
+	var xDomain = this.graph.x.domain();
+}
+
+Peak.prototype.updateY = function(){
+	this.line.attr("y1", this.graph.y(this.y));
+	this.line.attr("y2", this.graph.y(0));
+
+	if (this.fragments.length > 0) {
+		this.highlightLine.attr("y1", this.graph.y(this.y));
+		this.highlightLine.attr("y2", this.graph.y(0));
+		var yStep = 15;
+		var labelCount = this.labels.length;
+		for (var a = 0; a < labelCount; a++){
+			var label = this.labels[a];
+			label.attr("y", this.graph.y(this.y) - 5 - (yStep * a));
+			this.labelHighlights[a].attr("y", this.graph.y(this.y) - 5 - (yStep * a));
+		}
 	}
 }
 
@@ -195,23 +227,20 @@ Peak.prototype.removeLabels = function(){
 	if (this.fragments.length > 0) {
 		var labelCount = this.labels.length;
 		for (var a = 0; a < labelCount; a++){
-			var label = this.labels[a];
-			label.attr("display", "none");
+			this.labels[a].attr("display", "none");
+			this.labelHighlights[a].attr("display", "none");
 		}
-	}	
+	}
 }
 
 Peak.prototype.showLabels = function(){
 	if (this.fragments.length > 0) {
-		var xDomain = this.graph.x.domain();
-		if (this.x > xDomain[0] && this.x < xDomain[1]){
-			var labelCount = this.labels.length;
-			for (var a = 0; a < labelCount; a++){
-				if (this.graph.spectrumViewer.lossyShown === true || this.fragments[a].lossy === false || this.highlighted === true) {
-					var label = this.labels[a];
-					label.attr("display", "inline");
-				}
-			}	
+		var labelCount = this.labels.length;
+		for (var a = 0; a < labelCount; a++){
+			if (this.graph.spectrumViewer.lossyShown === true || this.fragments[a].lossy === false) {
+				this.labels[a].attr("display", "inline");
+				this.labelHighlights[a].attr("display", "inline");
+			}
 		}
-	}	
+	}
 }

@@ -74,7 +74,7 @@ Graph = function(targetSvg, spectrumViewer, options) {
 	
 	this.highlights = this.innerSVG.append("g");
 	this.peaks = this.innerSVG.append("g");
-	this.lossiAnnotations = this.innerSVG.append("g");
+	this.lossyAnnotations = this.innerSVG.append("g");
 	this.annotations = this.innerSVG.append("g");
 	
 	
@@ -138,7 +138,11 @@ Graph.prototype.setData = function(annotatedPeaks){
 				return ((d.isprimarymatch == 1)? d.expmz - 0 : 0);
 			}
 		) + 50;
-	this.xminPrimary = d3.min(annotatedPeaks, function(d){return ((d.isprimarymatch == 1)?  d.expmz - 0 : this.xmaxPrimary);}) - 50;
+	this.xminPrimary = d3.min(annotatedPeaks, 
+			function(d){
+				return ((d.isprimarymatch == 1)?  d.expmz - 0 : this.xmaxPrimary);
+			}
+		) - 50;
 
 	var nested =  d3.nest()
 		.key(function(d) { return d.expmz +'-'+ d.absoluteintensity; })
@@ -154,13 +158,8 @@ Graph.prototype.setData = function(annotatedPeaks){
 	this.xmax = this.xmaxPrimary;
 	this.xmin = this.xminPrimary;
 
-
 	this.ymax = d3.max(this.points, function(d){return d.y;});
 	this.ymin = 0;//d3.min(this.points, function(d){return d.y;});
-
-	for (var i = 0; i < this.points.length; i++){
-		this.points[i].init();
-	}	
 
 	this.resize();
 }
@@ -239,15 +238,16 @@ Graph.prototype.clear = function(){
 	this.points= [];
 	this.highlights.selectAll("*").remove();
 	this.peaks.selectAll("*").remove();
-	this.lossiAnnotations.selectAll("*").remove();
+	this.lossyAnnotations.selectAll("*").remove();
 	this.annotations.selectAll("*").remove();
 }
 
 
 Graph.prototype.setHighlights = function(peptide, pepI){
 	this.clearHighlights();
-	this.clearLabels();
 	if (peptide) {
+		this.clearLabels();
+		this.greyPeaks();
 		var peakCount = this.points.length;
 		for (var p = 0; p < peakCount; p++) {
 			var match = false;
@@ -273,6 +273,7 @@ Graph.prototype.setHighlights = function(peptide, pepI){
 		}	
 	} else {
 		this.showLabels();
+		this.colourPeaks();
 	}
 }
 
@@ -284,7 +285,6 @@ Graph.prototype.clearHighlights = function(peptide, pepI){
 		}
 	}
 }
-
 
 Graph.prototype.clearLabels = function(){
 	var peakCount = this.points.length;
@@ -305,7 +305,31 @@ Graph.prototype.showLabels = function(){
 }
 
 
+Graph.prototype.greyPeaks = function(){
+	var peakCount = this.points.length;
+	for (var p = 0; p < peakCount; p++) {
+		this.points[p].line.attr("stroke", SpectrumViewer.lossFragBarColour);
+	}
+}
+Graph.prototype.colourPeaks = function(){
+	var peakCount = this.points.length;
+	for (var p = 0; p < peakCount; p++) {
+		var peak = this.points[p];
+		peak.line.attr("stroke", peak.colour);
+	}
+}
 /*
+Graph.prototype.showLabels = function(){
+	var peakCount = this.points.length;
+	for (var p = 0; p < peakCount; p++) {
+		if (this.points[p].fragments.length > 0) {
+			this.points[p].showLabels();
+		}
+	}
+}
+
+
+
  * 
 
 Graph.prototype.resetScales = function(text) {
