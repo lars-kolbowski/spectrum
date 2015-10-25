@@ -28,10 +28,10 @@ function PeptideFragmentationKey (targetSvg, spectrumViewer, options){
 	
 	this.options = options || {};
 	this.margin = {
-		"top":    this.options.title  ? 40 : 20,
+		"top":    20,
 		"right":  20,
-		"bottom": this.options.xlabel ? 60 : 40,
-		"left":   this.options.ylabel ? 100 : 80
+		"bottom": 40,
+		"left":   40
 	};
 
 	this.g =  targetSvg.append("g").attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
@@ -161,13 +161,15 @@ PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2,
 
     var xStep = 20;
     // the letters
-    drawPeptide( pep1, 20, SpectrumViewer.p1color);
-    drawPeptide( pep2, 60, SpectrumViewer.p2color);
-    function drawPeptide( pep, y, colour) {
+    this.pep1letters = [];
+    this.pep2letters = [];
+    drawPeptide( pep1, 20, SpectrumViewer.p1color, this.pep1letters);
+    drawPeptide( pep2, 60, SpectrumViewer.p2color, this.pep2letters);
+    function drawPeptide( pep, y, colour, pepLetters) {
 		var l = pep.length;
 		for (var i = 0; i < l; i++){
 			if (pep[i] != "#") {
-				self.g.append("text")
+				pepLetters[i] = self.g.append("text")
 					.attr("x", xStep * i)
 					.attr("y", y)
 					.attr("text-anchor", "middle")
@@ -378,7 +380,7 @@ PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2,
 		}
 		self.highlightChanged.dispatch(peptide, pepI);
 	}
-
+	
 	// def get_fragment_annotation(ions, pep):
 	function get_fragment_annotation(ions, pep){
 		// """
@@ -455,35 +457,70 @@ PeptideFragmentationKey.prototype.setHighlights = function(fragments){
 	this.clearHighlights();
 	
 	var fragCount = fragments.length;
-    for (var f = 0; f < fragCount; f++){
-		var frag = fragments[f];
-		var matchedPeptide = frag.peptide;
-		var fragHighlightsArrayName; 
-		var offset, pepLength;
-
-			
-		if (this.spectrumViewer.pep1 == matchedPeptide){
-			fragHighlightsArrayName = "pep1";
-			offset = this.pep1offset;
-			pepLength = this.pepSeq1.length
-		}
-		else{
-			fragHighlightsArrayName = "pep2";
-			offset = this.pep2offset;
-			pepLength = this.pepSeq2.length
-		}
-		var ionType = frag.ionType;
-		fragHighlightsArrayName += ionType + "FragHighlights";
-		if (ionType == "b") { // or a or c
-			this[fragHighlightsArrayName][frag.ionNumber + offset - 1].attr("opacity",1);
-		} else {
-			this[fragHighlightsArrayName][pepLength - frag.ionNumber + offset - 1].attr("opacity",1);
+    if (fragCount > 0){
+		greyLetters(this.pep1letters);
+		greyLetters(this.pep2letters);
+		for (var f = 0; f < fragCount; f++){
+			var frag = fragments[f];
+			if (this.spectrumViewer.lossyShown === true || frag.lossy === false) {
+				var matchedPeptide = frag.peptide;
+				var fragHighlightsArrayName, offset, pepLength, pepLetters, pepColour;
+					
+				if (this.spectrumViewer.pep1 == matchedPeptide){
+					fragHighlightsArrayName = "pep1";
+					offset = this.pep1offset;
+					pepLength = this.pepSeq1.length
+					pepLetters = this.pep1letters;
+					pepColour = SpectrumViewer.p1color;
+				}
+				else{
+					fragHighlightsArrayName = "pep2";
+					offset = this.pep2offset;
+					pepLength = this.pepSeq2.length
+					pepLetters = this.pep2letters;
+					pepColour = SpectrumViewer.p2color;
+				}
+				var ionType = frag.ionType;
+				fragHighlightsArrayName += ionType + "FragHighlights";
+				if (ionType == "b") { // or a or c
+					this[fragHighlightsArrayName][frag.ionNumber + offset - 1].attr("opacity",1);
+					colourLetters(pepLetters, pepColour, 0, (frag.ionNumber + offset));
+				} else {
+					this[fragHighlightsArrayName][pepLength - frag.ionNumber + offset - 1].attr("opacity",1);
+					colourLetters(pepLetters, pepColour, (pepLength - frag.ionNumber + offset), pepLetters.length);
+				}
+			}
 		}
 	}
+
+	function greyLetters (pepLetters){
+		var letterCount = pepLetters.length;
+		for (var i = 0; i < letterCount; i++){
+			if (pepLetters[i]){
+				pepLetters[i].attr("fill", SpectrumViewer.lossFragBarColour);
+			}
+		}
+	}
+	function colourLetters(pepLetters, colour, start, end){
+		for (var i = start; i < end; i++){
+			if (pepLetters[i]){
+				pepLetters[i].attr("fill", colour);
+			}
+		}
+	}	
+	
 }
 
-
+	
 PeptideFragmentationKey.prototype.clearHighlights = function(){
+
+	clear(this.pep1bFragHighlights);
+	clear(this.pep1yFragHighlights);
+	clear(this.pep2bFragHighlights);
+	clear(this.pep2yFragHighlights);
+	
+	colour(this.pep1letters, SpectrumViewer.p1color);
+	colour(this.pep2letters, SpectrumViewer.p2color);
 	
 	function clear(hightlightArray){
 		var pLength = hightlightArray.length;
@@ -494,8 +531,12 @@ PeptideFragmentationKey.prototype.clearHighlights = function(){
 		}	
 	}
 	
-	clear(this.pep1bFragHighlights);
-	clear(this.pep1yFragHighlights);
-	clear(this.pep2bFragHighlights);
-	clear(this.pep2yFragHighlights);
+	function colour(pepLetters, colour){
+		var pLength = pepLetters.length;
+		for (var p = 0; p < pLength; p++){
+			if (pepLetters[p]){
+				pepLetters[p].attr("fill", colour);
+			}
+		}	
+	}
 }

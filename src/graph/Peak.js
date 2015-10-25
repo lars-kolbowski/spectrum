@@ -95,7 +95,6 @@ function Peak (data, graph){
 		this.labels = []; // will be array of d3 selections
 		this.labelHighlights = []; // will be array of d3 selections
 		var fragCount = this.fragments.length;
-		//~ var unlossiFound = false;
 		for (var f = 0; f < fragCount; f++){
 			var frag = this.fragments[f];
 			var labelHighlight, label;
@@ -203,7 +202,6 @@ Peak.prototype.updateX = function(){
 	} else {
 		this.g.attr("display","none");
 	}
-	var xDomain = this.graph.x.domain();
 }
 
 Peak.prototype.updateY = function(){
