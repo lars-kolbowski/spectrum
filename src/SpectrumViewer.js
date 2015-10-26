@@ -35,7 +35,9 @@ function SpectrumViewer (targetDiv){ // maybe make this param the SVG element
 	this.peptideFragKey = new PeptideFragmentationKey(this.svg, this);
 	//create graph
 	this.graph = new Graph (this.svg, this, {xlabel:"m/z", ylabel:"Intensity"});
-
+	
+	this.lossyShown = false;
+	
 	//link each to other by registering callbacks
 	var gBinding = this.peptideFragKey.highlightChanged.add(this.graph.setHighlights);
 	gBinding.context = this.graph;
@@ -60,7 +62,8 @@ SpectrumViewer.prototype.setData = function(pepSeq1, linkPos1, pepSeq2, linkPos2
 	this.annotatedPeaks = d3.csv.parse(annotatedPeaksCSV.trim());
 	this.linkPos1 = linkPos1;
 	this.linkPos2 = linkPos2;
-	this.lossyShown = false;
+	
+	
 	this.peptideFragKey.setData(this.pep1, this.linkPos1, this.pep2, this.linkPos2, this.annotatedPeaks);
 	//graph doesn't need peptide sequences and link positions, only annotated peaks
 	this.graph.setData(this.annotatedPeaks);
@@ -80,7 +83,6 @@ SpectrumViewer.prototype.setData = function(pepSeq1, linkPos1, pepSeq2, linkPos2
 SpectrumViewer.prototype.clear = function(){
 	this.pep1 = "";
 	this.pep2 = "";
-	//~ this.lossyShown = false;
 	this.peptideFragKey.clear();
 	this.graph.clear();
 }

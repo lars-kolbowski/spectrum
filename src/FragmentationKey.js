@@ -34,6 +34,7 @@ function PeptideFragmentationKey (targetSvg, spectrumViewer, options){
 		"left":   40
 	};
 
+	this.highlights =  targetSvg.append("g").attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
 	this.g =  targetSvg.append("g").attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
 
 }
@@ -209,7 +210,7 @@ PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2,
 										+" L" + x + "," +  y 
 										+ " L" + (x - tailX) + "," + (y + tailY);
 						
-					var bHighlight = self.g.append("path")
+					var bHighlight = self.highlights.append("path")
 						.attr("d", highlightPath)
 						.attr("stroke",SpectrumViewer.highlightColour)
 						.attr("stroke-width", SpectrumViewer.highlightWidth)
@@ -274,7 +275,7 @@ PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2,
 										+" L" + x + "," +  (y - barHeight) 
 										+ " L" + (x + tailX) + "," + (y  - barHeight - tailY);
 						
-					var yHighlight = self.g.append("path")
+					var yHighlight = self.highlights.append("path")
 						.attr("d", highlightPath)
 						.attr("stroke",SpectrumViewer.highlightColour)
 						.attr("stroke-width", SpectrumViewer.highlightWidth)

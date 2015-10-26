@@ -109,12 +109,39 @@ function Peak (data, graph){
 					.attr("x", 0)
 					.attr("text-anchor", "middle")
 					.style("stroke-width", "5px")
+					.style("font-size", "0.8em")
 					.attr("stroke", SpectrumViewer.highlightColour);
 			label.text(frag.name)
 					.attr("x", 0)
 					.attr("text-anchor", "middle")
+					.style("font-size", "0.8em")
 					.attr("class", "peakAnnot");
-
+					
+			label[0][0].onmouseover = function(evt) {
+				startHighlight();
+			};
+			label[0][0].onmouseout = function(evt) {
+				endHighlight();
+			};
+			label[0][0].ontouchstart = function(evt) {
+				startHighlight();
+			};
+			label[0][0].ontouchend = function(evt) {
+				endHighlight();
+			};
+			labelHighlight[0][0].onmouseover = function(evt) {
+				startHighlight();
+			};
+			labelHighlight[0][0].onmouseout = function(evt) {
+				endHighlight();
+			};
+			labelHighlight[0][0].ontouchstart = function(evt) {
+				startHighlight();
+			};
+			labelHighlight[0][0].ontouchend = function(evt) {
+				endHighlight();
+			};
+			
 			var c = "pink";//colour for annotation
 			var matchedPeptide = frag.peptide;
 			var pep;
@@ -188,20 +215,28 @@ Peak.prototype.update = function(){
 
 Peak.prototype.updateX = function(){
 	this.g.attr("transform", "translate("+this.graph.x(this.x)+",0)");
-	if (this.fragments.length > 0) {
-		var labelCount = this.labels.length;
-		for (var a = 0; a < labelCount; a++){
-			var label = this.labels[a];
-			label.attr("x", this.graph.x(this.x));
-			this.labelHighlights[a].attr("x", this.graph.x(this.x));
-		}
-	}
 	var xDomain = this.graph.x.domain();
 	if (this.x > xDomain[0] && this.x < xDomain[1]){
 		this.g.attr("display","inline");
 	} else {
 		this.g.attr("display","none");
+	}	
+	if (this.fragments.length > 0) {
+		var labelCount = this.labels.length;
+		for (var a = 0; a < labelCount; a++){
+			this.labels[a].attr("x", this.graph.x(this.x));
+			this.labelHighlights[a].attr("x", this.graph.x(this.x));
+			if ((this.x > xDomain[0] && this.x < xDomain[1])
+					&& (this.graph.spectrumViewer.lossyShown === true || this.fragments[a].lossy === false)){
+				this.labels[a].attr("display","inline");
+				this.labelHighlights[a].attr("display","inline");
+			} else {
+				this.labels[a].attr("display","none");
+				this.labelHighlights[a].attr("display","none");
+			}	
+		}
 	}
+
 }
 
 Peak.prototype.updateY = function(){
