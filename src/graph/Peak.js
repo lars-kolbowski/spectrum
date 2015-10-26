@@ -267,10 +267,12 @@ Peak.prototype.removeLabels = function(){
 }
 
 Peak.prototype.showLabels = function(){
+	var xDomain = this.graph.x.domain();
 	if (this.fragments.length > 0) {
 		var labelCount = this.labels.length;
 		for (var a = 0; a < labelCount; a++){
-			if (this.graph.spectrumViewer.lossyShown === true || this.fragments[a].lossy === false) {
+			if ((this.x > xDomain[0] && this.x < xDomain[1])
+					&& (this.graph.spectrumViewer.lossyShown === true || this.fragments[a].lossy === false)) {
 				this.labels[a].attr("display", "inline");
 				this.labelHighlights[a].attr("display", "inline");
 			}
