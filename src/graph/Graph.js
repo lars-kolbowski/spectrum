@@ -133,20 +133,23 @@ Graph = function(targetSvg, spectrumViewer, options) {
 
 Graph.prototype.setData = function(annotatedPeaks){
 	this.clear();
+	//get Max m/z value of primarymatches
  	this.xmaxPrimary = d3.max(annotatedPeaks,
 			function(d){
 				return ((d.isprimarymatch == 1)? d.expmz - 0 : 0);
 			}
 		) + 50;
+ 	//get Min m/z value of primarymatches
 	this.xminPrimary = d3.min(annotatedPeaks, 
 			function(d){
 				return ((d.isprimarymatch == 1)?  d.expmz - 0 : this.xmaxPrimary);
 			}
 		) - 50;
-
+	//sort Data by m/z and Int
 	var nested =  d3.nest()
-		.key(function(d) { return d.expmz +'-'+ d.absoluteintensity; })
+		.key(function(d) { return d.expmz + '-' + d.absoluteintensity; })
 		.entries(annotatedPeaks);
+	//create points array with Peaks
 	this.points = new Array();
 	for (var i = 0; i < nested.length; i++){
 		this.points.push(new Peak(nested[i].values, this));
