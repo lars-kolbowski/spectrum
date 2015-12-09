@@ -28,7 +28,7 @@ var SpectrumView = Backbone.View.extend({
 
 	render: function() {
 
-		this.graph.setData(this.model.annotatedPeaks);
+		this.graph.setData(this.model);
 
 		//this.lossyShown = false;
 

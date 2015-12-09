@@ -131,8 +131,8 @@ Graph = function(targetSvg, spectrumViewer, options) {
 };
 
 
-Graph.prototype.setData = function(annotatedPeaks){
-	this.clear();
+Graph.prototype.setData = function(model){
+/*	this.clear();
 	//get Max m/z value of primarymatches
  	this.xmaxPrimary = d3.max(annotatedPeaks,
 			function(d){
@@ -149,12 +149,13 @@ Graph.prototype.setData = function(annotatedPeaks){
 	var nested =  d3.nest()
 		.key(function(d) { return d.expmz + '-' + d.absoluteintensity; })
 		.entries(annotatedPeaks);
+		*/
 	//create points array with Peaks
 	this.points = new Array();
-	for (var i = 0; i < nested.length; i++){
-		this.points.push(new Peak(nested[i].values, this));
+	for (var i = 0; i < model.nested.length; i++){
+		this.points.push(new Peak(model.nested[i].values, this));
 	}
-
+/*
 	//~ this.xmax = d3.max(this.points, function(d){return d.x;}) + 10;
 	//~ this.xmin = d3.min(this.points, function(d){return d.x;}) - 10;
 
@@ -162,12 +163,12 @@ Graph.prototype.setData = function(annotatedPeaks){
 	this.xmin = this.xminPrimary;
 
 	this.ymax = d3.max(this.points, function(d){return d.y;});
-	this.ymin = 0;//d3.min(this.points, function(d){return d.y;});
+	this.ymin = 0;//d3.min(this.points, function(d){return d.y;});*/
 
-	this.resize();
+	this.resize(model);
 }
 
-Graph.prototype.resize = function() {
+Graph.prototype.resize = function(model) {
 	var self = this;
 	
 	//see https://gist.github.com/mbostock/3019563
@@ -177,10 +178,10 @@ Graph.prototype.resize = function() {
 	self.g.attr("width", cx).attr("height", cy);
 	var width = cx - self.margin.left - self.margin.right;
 	var height = cy - self.margin.top  - self.margin.bottom;
-	self.x.domain([self.xmin, self.xmax])
+	self.x.domain([model.xmin, model.xmax])
 		.range([0, width]);
 	// y-scale (inverted domain)
-	self.y.domain([0, self.ymax]).nice()
+	self.y.domain([0, model.ymax]).nice()
 		.range([height, 0]).nice();
 
 	var yTicks = height / 40;

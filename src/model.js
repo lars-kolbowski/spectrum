@@ -22,6 +22,7 @@ var SpectrumViewer = Backbone.Model.extend({
 		//this.set("pep2", this.get("pepSeq2").replace(this.get("notUpperCase"), ''));
 		this.linkPos1 = this.get("linkPos1");
 		this.linkPos2 = this.get("linkPos2");
+		this.notUpperCase = this.get("notUpperCase"),
 
 		this.setGraphData();
 	},
@@ -56,13 +57,11 @@ var SpectrumViewer = Backbone.Model.extend({
 		.key(function(d) { return d.expmz + '-' + d.absoluteintensity; })
 		.entries(annotatedPeaks);
 
-		//Points was here -> now in view
-
 
 		this.xmax = this.xmaxPrimary;
 		this.xmin = this.xminPrimary;
 
-		this.ymax = 200000;
+		this.ymax = d3.max(annotatedPeaks, function(d){return d.absolute_intensity - 0;});
 		//this.ymax = d3.max(this.points, function(d){return d.y;});
 		this.ymin = 0;//d3.min(this.points, function(d){return d.y;});
 	},
