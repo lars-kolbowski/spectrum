@@ -1,6 +1,10 @@
 var SpectrumView = Backbone.View.extend({
 
 	el: "#spectrumDiv",
+	events : {
+		'click #resize' : 'resize',
+		'click #lossyChkBx': 'showLossy',
+	},
 
 	initialize: function() {
 
@@ -33,5 +37,19 @@ var SpectrumView = Backbone.View.extend({
 		//this.lossyShown = false;
 
 	},
+
+	resize: function(){
+		this.graph.resize(this.model);
+	},
+
+	showLossy: function(e){
+		var $target = $(e.target);
+        var selected = $target .is(':checked');
+        this.lossyShown = selected;
+		this.graph.clearLabels();
+		this.graph.showLabels();
+	}
+	
+
 
 });

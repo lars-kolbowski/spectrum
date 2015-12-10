@@ -46,6 +46,7 @@
 			//console.log(SpectrumViewer.get("xMax"));
 		});
 
+
 		//SpectrumViewer.set({test: "test"});		
 
 /*		d3.csv("test.csv", function(error, data) {
@@ -71,8 +72,13 @@
 </head>
 
 <body>
+
 	<div id='fragKeyDiv'></div>
 	<div id='spectrumDiv'>
+		<label>lossy labels
+			<input id="lossyChkBx" type="checkbox">
+		</label>
+		<button id="resize">reset zoom</button>
 	</div>
 
 
