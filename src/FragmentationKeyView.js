@@ -12,6 +12,16 @@ var FragmentationKeyView = Backbone.View.extend({
 		};
 		this.highlights =  this.svg.append("g").attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
 		this.g =  this.svg.append("g").attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
+
+		this.cmap = colorbrewer.Paired[6];
+		this.p1color = this.cmap[5];
+		this.p1color_loss = this.cmap[4];
+		this.p2color = this.cmap[1];
+		this.p2color_loss = this.cmap[0];
+		this.lossFragBarColour = "#cccccc";
+		this.highlightColour = "yellow";
+		this.highlightWidth = 11;
+		this.notUpperCase = /[^A-Z]/g;
 		//d3.select(this.el).append("svg").attr("width", 50).attr("height", 50).append("circle").attr("cx", 25).attr("cy", 25).attr("r", 25).style("fill", "purple");
 		
 
@@ -23,7 +33,7 @@ var FragmentationKeyView = Backbone.View.extend({
 	},
 
 	render: function() {
-		this.peptideFragKey.setData(this.model.pep1, this.model.linkPos1, this.model.pep2, this.model.linkPos2, this.model.annotatedPeaks);
+		this.peptideFragKey.setData();
 	},
 
 });
