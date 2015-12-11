@@ -45,7 +45,7 @@ var SpectrumView = Backbone.View.extend({
 	showLossy: function(e){
 		var $target = $(e.target);
         var selected = $target .is(':checked');
-        this.lossyShown = selected;
+        this.graph.lossyShown = selected;
 		this.graph.clearLabels();
 		this.graph.showLabels();
 	}
