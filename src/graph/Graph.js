@@ -314,7 +314,7 @@ Graph.prototype.showLabels = function(){
 Graph.prototype.greyPeaks = function(){
 	var peakCount = this.points.length;
 	for (var p = 0; p < peakCount; p++) {
-		this.points[p].line.attr("stroke", SpectrumViewer.lossFragBarColour);
+		this.points[p].line.attr("stroke", this.spectrumViewer.lossFragBarColour);
 	}
 }
 Graph.prototype.colourPeaks = function(){

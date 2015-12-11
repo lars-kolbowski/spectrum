@@ -298,7 +298,7 @@ PeptideFragmentationKey.prototype.setData = function(){
 						highlight();
 					};
 								
-					if (peptide === self.spectrumViewer.pep1) {
+					if (peptide === self.spectrumViewer.model.pep1) {
 						self.pep1yFragHighlights[i] = yHighlight;	
 					} else {
 						self.pep2yFragHighlights[i] = yHighlight;	
