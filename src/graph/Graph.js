@@ -152,6 +152,8 @@ Graph.prototype.setData = function(model){
 		*/
 	//create points array with Peaks
 	this.points = new Array();
+	this.pep1 = model.pep1;
+	this.pep2 = model.pep2;
 	for (var i = 0; i < model.nested.length; i++){
 		this.points.push(new Peak(model.nested[i].values, this));
 	}

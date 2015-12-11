@@ -19,14 +19,32 @@
 	<script type="text/javascript" src="src/graph/Fragment.js"></script>	
 
 
-	<style>
-	body {
-		font: 14px sans-serif;
-		margin: 15px 20px;
-	}
-	h2 {
-		margin: 0 0 5px;
-	}
+    <style type="text/css">
+		html, body{
+<!--
+			background-color: white;
+			height:100%;
+			width:100%;
+-->
+			-webkit-user-select: none;
+			-khtml-user-select: none;
+			-moz-user-select: -moz-none;
+			-o-user-select: none;
+			user-select: none;
+		}		
+		*{
+			margin:0px;
+			padding:0px;
+		}
+<!--
+		
+		#spectrumDiv {
+			height:80%;
+			width:100%;
+		}
+
+-->
+		
 	</style>
 
 	<script>
@@ -73,13 +91,13 @@
 
 <body>
 
-	<div id='fragKeyDiv'></div>
-	<div id='spectrumDiv'>
-		<label>lossy labels
-			<input id="lossyChkBx" type="checkbox">
-		</label>
-		<button id="resize">reset zoom</button>
-	</div>
+		<div id='fragKeyDiv'></div>
+		<div id='spectrumDiv'>
+			<label>lossy labels
+				<input id="lossyChkBx" type="checkbox">
+			</label>
+			<button id="resize">reset zoom</button>
+		</div>
 
 
 </body>
