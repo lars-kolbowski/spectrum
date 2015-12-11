@@ -39,7 +39,7 @@
 <!--
 		
 		#spectrumDiv {
-			height:80%;
+			height:70%;
 			width:100%;
 		}
 
@@ -56,7 +56,11 @@
 	$(function() {
 		var FragmentationKey = new FragmentationKeyView({model: SpectrumViewer});
 		var Graph = new SpectrumView({model: SpectrumViewer});
-		
+
+		var gBinding = FragmentationKey.peptideFragKey.highlightChanged.add(Graph.graph.setHighlights);
+		gBinding.context = Graph.graph;
+		var pfBinding = Graph.graph.highlightChanged.add(FragmentationKey.peptideFragKey.setHighlights);
+		pfBinding.context = FragmentationKey.peptideFragKey;
 
 		d3.text("test.csv", function(csv) {
 			SpectrumViewer.set({annotatedPeaksCSV: csv});

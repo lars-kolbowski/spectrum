@@ -23,7 +23,14 @@ var SpectrumViewer = Backbone.Model.extend({
 		this.linkPos1 = this.get("linkPos1");
 		this.linkPos2 = this.get("linkPos2");
 		this.notUpperCase = this.get("notUpperCase"),
-
+		this.cmap = colorbrewer.Paired[6];
+		this.p1color = this.cmap[5];
+		this.p1color_loss = this.cmap[4];
+		this.p2color = this.cmap[1];
+		this.p2color_loss = this.cmap[0];
+		this.lossFragBarColour = "#cccccc";
+		this.highlightColour = "yellow";
+		this.highlightWidth = 11;
 		this.setGraphData();
 	},
 

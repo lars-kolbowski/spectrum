@@ -165,8 +165,8 @@ PeptideFragmentationKey.prototype.setData = function(){
     // the letters
     this.pep1letters = [];
     this.pep2letters = [];
-    drawPeptide( pep1, 20, self.spectrumViewer.p1color, this.pep1letters);
-    drawPeptide( pep2, 60, self.spectrumViewer.p2color, this.pep2letters);
+    drawPeptide( pep1, 20, this.spectrumViewer.model.p1color, this.pep1letters);
+    drawPeptide( pep2, 60, this.spectrumViewer.model.p2color, this.pep2letters);
     function drawPeptide( pep, y, colour, pepLetters) {
 		var l = pep.length;
 		for (var i = 0; i < l; i++){
@@ -213,8 +213,8 @@ PeptideFragmentationKey.prototype.setData = function(){
 						
 					var bHighlight = self.highlights.append("path")
 						.attr("d", highlightPath)
-						.attr("stroke", self.spectrumViewer.highlightColour)
-						.attr("stroke-width", self.spectrumViewer.highlightWidth)
+						.attr("stroke", self.spectrumViewer.model.highlightColour)
+						.attr("stroke-width", self.spectrumViewer.model.highlightWidth)
 						.attr("opacity", 0)						
 						.attr("peptide", peptide)
 						.attr("fragKeyIndex", i);
@@ -278,8 +278,8 @@ PeptideFragmentationKey.prototype.setData = function(){
 						
 					var yHighlight = self.highlights.append("path")
 						.attr("d", highlightPath)
-						.attr("stroke",self.spectrumViewer.highlightColour)
-						.attr("stroke-width", self.spectrumViewer.highlightWidth)
+						.attr("stroke",self.spectrumViewer.model.highlightColour)
+						.attr("stroke-width", self.spectrumViewer.model.highlightWidth)
 						.attr("opacity", 0)
 						.attr("peptide", peptide)
 						.attr("fragKeyIndex", i);
@@ -473,14 +473,14 @@ PeptideFragmentationKey.prototype.setHighlights = function(fragments){
 					offset = this.pep1offset;
 					pepLength = this.pepSeq1.length
 					pepLetters = this.pep1letters;
-					pepColour = self.spectrumViewer.p1color;
+					pepColour = this.spectrumViewer.model.p1color;
 				}
 				else{
 					fragHighlightsArrayName = "pep2";
 					offset = this.pep2offset;
 					pepLength = this.pepSeq2.length
 					pepLetters = this.pep2letters;
-					pepColour = self.spectrumViewer.p2color;
+					pepColour = this.spectrumViewer.model.p2color;
 				}
 				var ionType = frag.ionType;
 				fragHighlightsArrayName += ionType + "FragHighlights";
@@ -499,7 +499,7 @@ PeptideFragmentationKey.prototype.setHighlights = function(fragments){
 		var letterCount = pepLetters.length;
 		for (var i = 0; i < letterCount; i++){
 			if (pepLetters[i]){
-				pepLetters[i].attr("fill", self.spectrumViewer.lossFragBarColour);
+				pepLetters[i].attr("fill", this.SpectrumViewer.lossFragBarColour);
 			}
 		}
 	}
@@ -521,8 +521,8 @@ PeptideFragmentationKey.prototype.clearHighlights = function(){
 	clear(this.pep2bFragHighlights);
 	clear(this.pep2yFragHighlights);
 	
-	colour(this.pep1letters, this.spectrumViewer.p1color);
-	colour(this.pep2letters, this.spectrumViewer.p2color);
+	colour(this.pep1letters, this.spectrumViewer.model.p1color);
+	colour(this.pep2letters, this.spectrumViewer.model.p2color);
 	
 	function clear(hightlightArray){
 		var pLength = hightlightArray.length;
