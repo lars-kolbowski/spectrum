@@ -22,6 +22,7 @@ function Peak (data, graph){
 	//var SpectrumViewer = graph.spectrumViewer;
 	this.x = data[0].expmz - 0;
 	this.y = data[0].absolute_intensity - 0;
+	this.charge = data[0].charge - 0;
 	this.graph = graph;
 
 	//make fragments

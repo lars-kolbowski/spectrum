@@ -157,6 +157,28 @@ Graph.prototype.setData = function(model){
 	for (var i = 0; i < model.nested.length; i++){
 		this.points.push(new Peak(model.nested[i].values, this));
 	}
+
+	//Isotope cluster
+	var peakCount = this.points.length;
+	for (var p = 0; p < peakCount; p++) {
+		var peak = this.points[p];
+		if (peak.fragments.length > 0){
+			var delta = 1/peak.charge;
+			for (var i = 1; i < 6; i++){
+				var pi = (p - i < 0  ? 0 : p - i); //make sure pi doesn't get negative
+				var fragment_mass = this.points[pi].x.toFixed(1);
+				var isotope_mass = (peak.x + delta*i).toFixed(1);
+				if (fragment_mass == isotope_mass){
+					if(this.points[p].fragments[0].peptide === this.pep1)
+						this.points[pi].colour = this.spectrumViewer.p1color_cluster;
+					if(this.points[p].fragments[0].peptide === this.pep2)
+						this.points[pi].colour = this.spectrumViewer.p2color_cluster;
+				}
+			}
+		}
+	}
+	this.colourPeaks();
+
 /*
 	//~ this.xmax = d3.max(this.points, function(d){return d.x;}) + 10;
 	//~ this.xmin = d3.min(this.points, function(d){return d.x;}) - 10;
@@ -314,14 +336,14 @@ Graph.prototype.showLabels = function(){
 Graph.prototype.greyPeaks = function(){
 	var peakCount = this.points.length;
 	for (var p = 0; p < peakCount; p++) {
-		this.points[p].line.attr("stroke", this.spectrumViewer.model.lossFragBarColour);
+		this.points[p].line.attr("stroke", this.spectrumViewer.lossFragBarColour);
 	}
 }
 Graph.prototype.colourPeaks = function(){
 	var peakCount = this.points.length;
 	for (var p = 0; p < peakCount; p++) {
 		var peak = this.points[p];
-		peak.line.attr("stroke", peak.colour);
+		peak.line.attr("stroke", peak.colour);	
 	}
 }
 /*

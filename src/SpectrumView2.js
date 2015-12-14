@@ -14,7 +14,7 @@ var SpectrumView = Backbone.View.extend({
 
 
 		//create graph
-		this.graph = new Graph (this.svg, this, {xlabel:"m/z", ylabel:"Intensity"});
+		this.graph = new Graph (this.svg, this.model, {xlabel:"m/z", ylabel:"Intensity"});
 
 		this.listenTo(this.model, 'change', this.render);
 		//this.listenTo(this.model, 'destroy', this.remove);
