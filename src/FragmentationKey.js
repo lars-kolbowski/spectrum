@@ -24,7 +24,7 @@
 
 function PeptideFragmentationKey (targetSvg, spectrumViewer, options){
 	this.highlightChanged = new signals.Signal();
-	this.spectrumViewer = spectrumViewer;
+	this.spectrumViewer = spectrumViewer.model;
 	
 	this.options = options || {};
 	this.margin = {
@@ -42,11 +42,11 @@ function PeptideFragmentationKey (targetSvg, spectrumViewer, options){
 PeptideFragmentationKey.prototype.setData = function(){
 	var self = this;
 	this.clear();
-	var annotatedPeaks = self.spectrumViewer.model.annotatedPeaks;
-	this.pepSeq1 = self.spectrumViewer.model.pep1; //contains modification info in lower case
-	this.pepSeq2 = self.spectrumViewer.model.pep2; // contains modification info in lower case
-	var linkPos1 = self.spectrumViewer.model.linkPos1;
-	var linkPos2 = self.spectrumViewer.model.linkPos2;
+	var annotatedPeaks = self.spectrumViewer.annotatedPeaks;
+	this.pepSeq1 = self.spectrumViewer.pep1; //contains modification info in lower case
+	this.pepSeq2 = self.spectrumViewer.pep2; // contains modification info in lower case
+	var linkPos1 = self.spectrumViewer.linkPos1;
+	var linkPos2 = self.spectrumViewer.linkPos2;
 	
 	// def plot_spectrum(cl_pep, XiDB, removeisotopes=False, ppmmean=0, ppmstds=0,
     //               annotate_verbose=True):
@@ -165,8 +165,8 @@ PeptideFragmentationKey.prototype.setData = function(){
     // the letters
     this.pep1letters = [];
     this.pep2letters = [];
-    drawPeptide( pep1, 20, this.spectrumViewer.model.p1color, this.pep1letters);
-    drawPeptide( pep2, 60, this.spectrumViewer.model.p2color, this.pep2letters);
+    drawPeptide( pep1, 20, this.spectrumViewer.p1color, this.pep1letters);
+    drawPeptide( pep2, 60, this.spectrumViewer.p2color, this.pep2letters);
     function drawPeptide( pep, y, colour, pepLetters) {
 		var l = pep.length;
 		for (var i = 0; i < l; i++){
@@ -190,8 +190,8 @@ PeptideFragmentationKey.prototype.setData = function(){
 		.attr("stroke", "black")
 		.attr("stroke-width", 1.5);
 
-    drawFragmentationEvents(alpha_annotation, 25, self.spectrumViewer.model.pep1);	//self.pepSeq1 same?
-    drawFragmentationEvents(beta_annotation, 65, self.spectrumViewer.model.pep2);	//self.pepSeq2 same?
+    drawFragmentationEvents(alpha_annotation, 25, self.spectrumViewer.pep1);	//self.pepSeq1 same?
+    drawFragmentationEvents(beta_annotation, 65, self.spectrumViewer.pep2);	//self.pepSeq2 same?
 
 	function drawFragmentationEvents( fragAnno, y, peptide) {
 		var l = pep1.length; // shouldn't matter which pep you use
@@ -213,8 +213,8 @@ PeptideFragmentationKey.prototype.setData = function(){
 						
 					var bHighlight = self.highlights.append("path")
 						.attr("d", highlightPath)
-						.attr("stroke", self.spectrumViewer.model.highlightColour)
-						.attr("stroke-width", self.spectrumViewer.model.highlightWidth)
+						.attr("stroke", self.spectrumViewer.highlightColour)
+						.attr("stroke-width", self.spectrumViewer.highlightWidth)
 						.attr("opacity", 0)						
 						.attr("peptide", peptide)
 						.attr("fragKeyIndex", i);
@@ -233,7 +233,7 @@ PeptideFragmentationKey.prototype.setData = function(){
 						highlight();
 					};
 								
-					if (peptide === self.spectrumViewer.model.pep1) {
+					if (peptide === self.spectrumViewer.pep1) {
 						self.pep1bFragHighlights[i] = bHighlight;	
 					} else {
 						self.pep2bFragHighlights[i] = bHighlight;	
@@ -278,8 +278,8 @@ PeptideFragmentationKey.prototype.setData = function(){
 						
 					var yHighlight = self.highlights.append("path")
 						.attr("d", highlightPath)
-						.attr("stroke",self.spectrumViewer.model.highlightColour)
-						.attr("stroke-width", self.spectrumViewer.model.highlightWidth)
+						.attr("stroke",self.spectrumViewer.highlightColour)
+						.attr("stroke-width", self.spectrumViewer.highlightWidth)
 						.attr("opacity", 0)
 						.attr("peptide", peptide)
 						.attr("fragKeyIndex", i);
@@ -298,7 +298,7 @@ PeptideFragmentationKey.prototype.setData = function(){
 						highlight();
 					};
 								
-					if (peptide === self.spectrumViewer.model.pep1) {
+					if (peptide === self.spectrumViewer.pep1) {
 						self.pep1yFragHighlights[i] = yHighlight;	
 					} else {
 						self.pep2yFragHighlights[i] = yHighlight;	
@@ -371,7 +371,7 @@ PeptideFragmentationKey.prototype.setData = function(){
 	function highlight(peptide, i){
 		self.clearHighlights();
 		var pepI;
-		if (peptide === self.spectrumViewer.model.pep1){
+		if (peptide === self.spectrumViewer.pep1){
 			if (self.pep1bFragHighlights[i]) self.pep1bFragHighlights[i].attr("opacity",1);
 			if (self.pep1yFragHighlights[i]) self.pep1yFragHighlights[i].attr("opacity",1);
 			pepI = i - self.pep1offset;
@@ -473,14 +473,14 @@ PeptideFragmentationKey.prototype.setHighlights = function(fragments){
 					offset = this.pep1offset;
 					pepLength = this.pepSeq1.length
 					pepLetters = this.pep1letters;
-					pepColour = this.spectrumViewer.model.p1color;
+					pepColour = this.spectrumViewer.p1color;
 				}
 				else{
 					fragHighlightsArrayName = "pep2";
 					offset = this.pep2offset;
 					pepLength = this.pepSeq2.length
 					pepLetters = this.pep2letters;
-					pepColour = this.spectrumViewer.model.p2color;
+					pepColour = this.spectrumViewer.p2color;
 				}
 				var ionType = frag.ionType;
 				fragHighlightsArrayName += ionType + "FragHighlights";
@@ -521,8 +521,8 @@ PeptideFragmentationKey.prototype.clearHighlights = function(){
 	clear(this.pep2bFragHighlights);
 	clear(this.pep2yFragHighlights);
 	
-	colour(this.pep1letters, this.spectrumViewer.model.p1color);
-	colour(this.pep2letters, this.spectrumViewer.model.p2color);
+	colour(this.pep1letters, this.spectrumViewer.p1color);
+	colour(this.pep2letters, this.spectrumViewer.p2color);
 	
 	function clear(hightlightArray){
 		var pLength = hightlightArray.length;
