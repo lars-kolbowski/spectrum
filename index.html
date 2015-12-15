@@ -1,18 +1,24 @@
-<!DOCTYPE html>
-<html><head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>Spectrum</title>
-    <script type="text/javascript" src="./vendor/d3.js"></script>
-	<script type="text/javascript" src="./vendor/colorbrewer.js"></script>
-	<script type="text/javascript" src="./vendor/signals.js"></script>
-<!--
-    <script type="text/javascript" src="./build/spectrum.js"></script>
--->
-    <script type="text/javascript" src="./src/SpectrumViewer.js"></script>
-    <script type="text/javascript" src="./src/FragmentationKey.js"></script>
-    <script type="text/javascript" src="./src/graph/Graph.js"></script>
-    <script type="text/javascript" src="./src/graph/Peak.js"></script>
-    <script type="text/javascript" src="./src/graph/Fragment.js"></script>
+<!doctype html>
+<html>
+
+<head>
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.js"></script>
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore.js"></script>
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.0.0/backbone.js"></script>
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/d3/3.3.3/d3.js"></script>
+	<!-- <script type="text/javascript" src="vendor/d3.js"></script> -->
+	<script type="text/javascript" src="vendor/colorbrewer.js"></script>
+	<script type="text/javascript" src="vendor/signals.js"></script>
+
+	<script type="text/javascript" src="src/model.js"></script>
+	<script type="text/javascript" src="src/SpectrumView2.js"></script>
+	<script type="text/javascript" src="src/FragmentationKeyView.js"></script>
+	<script type="text/javascript" src="src/FragmentationKey.js"></script>
+	<script type="text/javascript" src="src/graph/Graph.js"></script>		
+	<script type="text/javascript" src="src/graph/Peak.js"></script>	
+	<script type="text/javascript" src="src/graph/Fragment.js"></script>	
+
+
     <style type="text/css">
 		html, body{
 <!--
@@ -33,42 +39,71 @@
 <!--
 		
 		#spectrumDiv {
-			height:100%;
+			height:70%;
 			width:100%;
 		}
 
 -->
 		
 	</style>
-  </head>
-  <body>
-	  
-	<label>lossy labels
-		<input id="lossyChkBx" 
-		onclick="spectrumViewer.showLossy(document.getElementById('lossyChkBx').checked)" 
-				type="checkbox">
-	</label>
-					
-	<button onclick="spectrumViewer.resize();">reset zoom</button>
-	
-	
-	
-	<div id='spectrumDiv'>
-	</div>
-	
-	<script type="text/javascript">		
-		var spectrumViewer = new SpectrumViewer(document.getElementById('spectrumDiv'));
-				
-		window.addEventListener("load", function() {
-			d3.text("./test.csv", function(csv) {
-				spectrumViewer.setData("VGQQYSSAPLR", 3, "EKELESIDVLLEQTTGGNNKDLK", 5, csv); // not the real link positions
-				window.addEventListener("resize", function() {
-					spectrumViewer.resize();
-				});
-			});
+
+	<script>
+
+
+	var SpectrumViewer = new SpectrumViewer();
+
+
+	$(function() {
+		var FragmentationKey = new FragmentationKeyView({model: SpectrumViewer});
+		var Graph = new SpectrumView({model: SpectrumViewer});
+
+		var gBinding = FragmentationKey.peptideFragKey.highlightChanged.add(Graph.graph.setHighlights);
+		gBinding.context = Graph.graph;
+		var pfBinding = Graph.graph.highlightChanged.add(FragmentationKey.peptideFragKey.setHighlights);
+		pfBinding.context = FragmentationKey.peptideFragKey;
+
+		d3.text("test.csv", function(csv) {
+			SpectrumViewer.set({annotatedPeaksCSV: csv});
+			//console.log(SpectrumViewer.get("annotatedPeaksCSV"));
+			//console.log(SpectrumViewer.get("xMax"));
 		});
-		
+
+
+		//SpectrumViewer.set({test: "test"});		
+
+/*		d3.csv("test.csv", function(error, data) {
+			data.forEach(function(d) {
+				d.expmz = +d.expmz;
+				d.absolute_intensity = +d.absolute_intensity;
+			});
+			//console.log(data);
+			json = JSON.stringify(data);
+			//console.log(json);
+			
+			specView.set({
+				annotatedPeaksjson: json,
+				annotatedPeaks: data,
+			});
+			//console.log(specView.get("annotatedPeaks"));
+			console.log(specView.get("pep1"));
+		});*/
+
+
+});
 	</script>
-    
-	</body>
+</head>
+
+<body>
+
+		<div id='fragKeyDiv'></div>
+		<div id='spectrumDiv'>
+			<label>lossy labels
+				<input id="lossyChkBx" type="checkbox">
+			</label>
+			<button id="resize">reset zoom</button>
+		</div>
+
+
+</body>
+
 </html>

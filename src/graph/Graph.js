@@ -131,27 +131,65 @@ Graph = function(targetSvg, spectrumViewer, options) {
 };
 
 
-Graph.prototype.setData = function(annotatedPeaks){
-	this.clear();
+Graph.prototype.setData = function(model){
+/*	this.clear();
+	//get Max m/z value of primarymatches
  	this.xmaxPrimary = d3.max(annotatedPeaks,
 			function(d){
 				return ((d.isprimarymatch == 1)? d.expmz - 0 : 0);
 			}
 		) + 50;
+ 	//get Min m/z value of primarymatches
 	this.xminPrimary = d3.min(annotatedPeaks, 
 			function(d){
 				return ((d.isprimarymatch == 1)?  d.expmz - 0 : this.xmaxPrimary);
 			}
 		) - 50;
-
+	//sort Data by m/z and Int
 	var nested =  d3.nest()
-		.key(function(d) { return d.expmz +'-'+ d.absoluteintensity; })
+		.key(function(d) { return d.expmz + '-' + d.absoluteintensity; })
 		.entries(annotatedPeaks);
+		*/
+	//create points array with Peaks
 	this.points = new Array();
-	for (var i = 0; i < nested.length; i++){
-		this.points.push(new Peak(nested[i].values, this));
+	this.pep1 = model.pep1;
+	this.pep2 = model.pep2;
+	for (var i = 0; i < model.nested.length; i++){
+		this.points.push(new Peak(model.nested[i].values, this));
 	}
 
+	//Isotope cluster
+	var peakCount = this.points.length;
+	for (var p = 0; p < peakCount; p++) {
+		var peak = this.points[p];
+		if (peak.fragments.length > 0){
+			var delta = 1/peak.charge;
+			for (var i = 1; i < 7; i++){
+				var pi = (p - i < 0  ? 0 : p - i); //make sure pi doesn't get negative
+
+/*				var fragment_mass = this.points[pi].x.toFixed(2)*1;
+				var isotope_mass_ll = (peak.x + delta*i).toFixed(2)*1 - 0.01;
+				var isotope_mass_ul = (peak.x + delta*i).toFixed(2)*1 + 0.01;
+				if ( isotope_mass_ll <= fragment_mass <= isotope_mass_ul){
+					*/
+
+				var actual_mass = this.points[pi].x.toFixed(1);
+				var calc_mass = (peak.x + delta*i).toFixed(1);
+				if (actual_mass == calc_mass){
+				
+					if(this.points[p].fragments[0].peptide === this.pep1)
+						this.points[pi].colour = this.spectrumViewer.p1color_cluster;
+					if(this.points[p].fragments[0].peptide === this.pep2)
+						this.points[pi].colour = this.spectrumViewer.p2color_cluster;
+				}
+				else
+					break;
+			}
+		}
+	}
+	this.colourPeaks();
+
+/*
 	//~ this.xmax = d3.max(this.points, function(d){return d.x;}) + 10;
 	//~ this.xmin = d3.min(this.points, function(d){return d.x;}) - 10;
 
@@ -159,12 +197,12 @@ Graph.prototype.setData = function(annotatedPeaks){
 	this.xmin = this.xminPrimary;
 
 	this.ymax = d3.max(this.points, function(d){return d.y;});
-	this.ymin = 0;//d3.min(this.points, function(d){return d.y;});
+	this.ymin = 0;//d3.min(this.points, function(d){return d.y;});*/
 
-	this.resize();
+	this.resize(model);
 }
 
-Graph.prototype.resize = function() {
+Graph.prototype.resize = function(model) {
 	var self = this;
 	
 	//see https://gist.github.com/mbostock/3019563
@@ -174,10 +212,10 @@ Graph.prototype.resize = function() {
 	self.g.attr("width", cx).attr("height", cy);
 	var width = cx - self.margin.left - self.margin.right;
 	var height = cy - self.margin.top  - self.margin.bottom;
-	self.x.domain([self.xmin, self.xmax])
+	self.x.domain([model.xmin, model.xmax])
 		.range([0, width]);
 	// y-scale (inverted domain)
-	self.y.domain([0, self.ymax]).nice()
+	self.y.domain([0, model.ymax]).nice()
 		.range([height, 0]).nice();
 
 	var yTicks = height / 40;
@@ -308,14 +346,14 @@ Graph.prototype.showLabels = function(){
 Graph.prototype.greyPeaks = function(){
 	var peakCount = this.points.length;
 	for (var p = 0; p < peakCount; p++) {
-		this.points[p].line.attr("stroke", SpectrumViewer.lossFragBarColour);
+		this.points[p].line.attr("stroke", this.spectrumViewer.lossFragBarColour);
 	}
 }
 Graph.prototype.colourPeaks = function(){
 	var peakCount = this.points.length;
 	for (var p = 0; p < peakCount; p++) {
 		var peak = this.points[p];
-		peak.line.attr("stroke", peak.colour);
+		peak.line.attr("stroke", peak.colour);	
 	}
 }
 /*
