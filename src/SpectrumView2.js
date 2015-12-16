@@ -1,6 +1,5 @@
 var SpectrumView = Backbone.View.extend({
 
-	el: "#spectrumDiv",
 	events : {
 		'click #resize' : 'resize',
 		'click #lossyChkBx': 'showLossy',
@@ -8,9 +7,8 @@ var SpectrumView = Backbone.View.extend({
 
 	initialize: function() {
 
-		this.svg = d3.select(this.el)
-				//~ .append("div").style("height","100%").style("width","100%")
-				.append("svg").style("width", "100%").style("height", "100%");
+		this.svg = d3.select(this.el);//d3.select(this.el)
+				//~ .append("svg").style("width", "100%").style("height", "100%");
 
 
 		//create graph
@@ -40,6 +38,4 @@ var SpectrumView = Backbone.View.extend({
 		this.graph.showLabels();
 	}
 	
-
-
 });
