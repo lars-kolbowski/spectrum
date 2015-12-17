@@ -21,11 +21,11 @@
 //		see http://bl.ocks.org/stepheneb/1182434
 //		and https://gist.github.com/mbostock/3019563
 
-Graph = function(targetSvg, spectrumViewer, options) {
+Graph = function(targetSvg, model, options) {
 	this.x = d3.scale.linear();
 	this.y = d3.scale.linear();
 	this.highlightChanged = new signals.Signal();
-	this.spectrumViewer = spectrumViewer;
+	this.model = model;
 	
 	this.margin = {
 		"top":    options.title  ? 130 : 110,
@@ -159,10 +159,14 @@ Graph.prototype.setData = function(model){
 	}
 
 	//Isotope cluster
+	this.cluster = new Array();
+
 	var peakCount = this.points.length;
 	for (var p = 0; p < peakCount; p++) {
 		var peak = this.points[p];
 		if (peak.fragments.length > 0){
+
+			//this.cluster.push(new IsotopeCluster(p, this.points))
 			var delta = 1/peak.charge;
 			for (var i = 1; i < 7; i++){
 				var pi = (p - i < 0  ? 0 : p - i); //make sure pi doesn't get negative
@@ -176,11 +180,10 @@ Graph.prototype.setData = function(model){
 				var actual_mass = this.points[pi].x.toFixed(1);
 				var calc_mass = (peak.x + delta*i).toFixed(1);
 				if (actual_mass == calc_mass){
-				
 					if(this.points[p].fragments[0].peptide === this.pep1)
-						this.points[pi].colour = this.spectrumViewer.p1color_cluster;
+						this.points[pi].colour = this.model.p1color_cluster;
 					if(this.points[p].fragments[0].peptide === this.pep2)
-						this.points[pi].colour = this.spectrumViewer.p2color_cluster;
+						this.points[pi].colour = this.model.p2color_cluster;
 				}
 				else
 					break;
@@ -199,12 +202,11 @@ Graph.prototype.setData = function(model){
 	this.ymax = d3.max(this.points, function(d){return d.y;});
 	this.ymin = 0;//d3.min(this.points, function(d){return d.y;});*/
 
-	this.resize(model);
+	this.resize(model.xminPrimary, model.xmaxPrimary, model.ymin, model.ymax);
 }
 
-Graph.prototype.resize = function(model) {
+Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 	var self = this;
-	
 	//see https://gist.github.com/mbostock/3019563
 	var cx = self.g.node().parentNode.parentNode.clientWidth;
 	var cy = self.g.node().parentNode.parentNode.clientHeight;
@@ -212,10 +214,10 @@ Graph.prototype.resize = function(model) {
 	self.g.attr("width", cx).attr("height", cy);
 	var width = cx - self.margin.left - self.margin.right;
 	var height = cy - self.margin.top  - self.margin.bottom;
-	self.x.domain([model.xmin, model.xmax])
+	self.x.domain([xmin, xmax])
 		.range([0, width]);
 	// y-scale (inverted domain)
-	self.y.domain([0, model.ymax]).nice()
+	self.y.domain([0, ymax]).nice()
 		.range([height, 0]).nice();
 
 	var yTicks = height / 40;
@@ -269,6 +271,7 @@ Graph.prototype.redraw = function(){
 		self.xaxis.call( self.xAxis);//d3.behavior.zoom().x(self.x).on("zoom", self.redraw()));
 		self.plot.call( d3.behavior.zoom().x(self.x).on("zoom", self.redraw()));
 		self.innerSVG.call( d3.behavior.zoom().x(self.x).on("zoom", self.redraw()));
+		self.model.setZoom(self.x.domain());
 	};
 }
 
@@ -306,10 +309,11 @@ Graph.prototype.setHighlights = function(peptide, pepI){
 			
 			if (match === true) {
 				this.points[p].highlight(true);
-				this.points[p].showLabels();
+				this.points[p].showLabels(true);
 			}
 		}	
 	} else {
+		this.clearLabels();
 		this.showLabels();
 		this.colourPeaks();
 	}
@@ -346,7 +350,7 @@ Graph.prototype.showLabels = function(){
 Graph.prototype.greyPeaks = function(){
 	var peakCount = this.points.length;
 	for (var p = 0; p < peakCount; p++) {
-		this.points[p].line.attr("stroke", this.spectrumViewer.lossFragBarColour);
+		this.points[p].line.attr("stroke", this.model.lossFragBarColour);
 	}
 }
 Graph.prototype.colourPeaks = function(){

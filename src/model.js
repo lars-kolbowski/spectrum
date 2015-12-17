@@ -1,4 +1,4 @@
-var SpectrumViewer = Backbone.Model.extend({
+var AnnotatedSpectrumModel = Backbone.Model.extend({
 	defaults: {
 		pepSeq1: "VGQQYSSAPLR",
 		linkPos1: 3,
@@ -74,5 +74,11 @@ var SpectrumViewer = Backbone.Model.extend({
 		//this.ymax = d3.max(this.points, function(d){return d.y;});
 		this.ymin = 0;//d3.min(this.points, function(d){return d.y;});
 	},
+
+	setZoom: function(domain){
+		this.xmin = domain[0].toFixed(2);
+		this.xmax = domain[1].toFixed(2);
+		this.trigger("changed:Zoom");
+	}
 
 });

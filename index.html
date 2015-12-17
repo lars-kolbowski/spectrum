@@ -47,26 +47,22 @@
 	<script>
 
 
-	var SpectrumViewer = new SpectrumViewer();
+	var SpectrumModel = new AnnotatedSpectrumModel();
 
 
 	$(function() {
-		var FragmentationKey = new FragmentationKeyView({model: SpectrumViewer, el:"#spectrumSVG"});
-		var Graph = new SpectrumView({model: SpectrumViewer, el:"#spectrumSVG"});
+		var FragmentationKey = new FragmentationKeyView({model: SpectrumModel, el:"#spectrumDiv"});
+		var Spectrum = new SpectrumView({model: SpectrumModel, el:"#spectrumDiv"});
 
-		var gBinding = FragmentationKey.peptideFragKey.highlightChanged.add(Graph.graph.setHighlights);
-		gBinding.context = Graph.graph;
-		var pfBinding = Graph.graph.highlightChanged.add(FragmentationKey.peptideFragKey.setHighlights);
+		var gBinding = FragmentationKey.peptideFragKey.highlightChanged.add(Spectrum.graph.setHighlights);
+		gBinding.context = Spectrum.graph;
+		var pfBinding = Spectrum.graph.highlightChanged.add(FragmentationKey.peptideFragKey.setHighlights);
 		pfBinding.context = FragmentationKey.peptideFragKey;
 
 		d3.text("test.csv", function(csv) {
-			SpectrumViewer.set({annotatedPeaksCSV: csv});
-			//console.log(SpectrumViewer.get("annotatedPeaksCSV"));
-			//console.log(SpectrumViewer.get("xMax"));
+			SpectrumModel.set({annotatedPeaksCSV: csv});
 		});
-
-
-		//SpectrumViewer.set({test: "test"});		
+	
 
 /*		d3.csv("test.csv", function(error, data) {
 			data.forEach(function(d) {
@@ -97,6 +93,13 @@
 				<input id="lossyChkBx" type="checkbox">
 			</label>
 			<button id="resize">reset zoom</button>
+			<form id="setrange">
+				m/z Range:
+				<input type="text" id="xleft" size="5">
+				<input type="text" id="xright" size="5">
+				<input type="submit" value="set range">
+				<span id="range-error"></span>
+			</form>
 			<svg id="spectrumSVG" style="width:100%; height:100%"></svg>
 		</div>
 

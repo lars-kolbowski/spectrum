@@ -21,7 +21,7 @@
 function Fragment (data){
 	this.name = data.fragment_name.trim();
 	
-	this.peptide = data.matchedpeptide.replace(SpectrumViewer.notUpperCase, '');
+	this.peptide = data.matchedpeptide.replace(SpectrumModel.notUpperCase, '');
 	
 	this.sequence = data.sequence;
 	
