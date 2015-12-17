@@ -309,10 +309,11 @@ Graph.prototype.setHighlights = function(peptide, pepI){
 			
 			if (match === true) {
 				this.points[p].highlight(true);
-				this.points[p].showLabels();
+				this.points[p].showLabels(true);
 			}
 		}	
 	} else {
+		this.clearLabels();
 		this.showLabels();
 		this.colourPeaks();
 	}

@@ -52,11 +52,11 @@
 
 	$(function() {
 		var FragmentationKey = new FragmentationKeyView({model: SpectrumModel, el:"#spectrumDiv"});
-		var Graph = new SpectrumView({model: SpectrumModel, el:"#spectrumDiv"});
+		var Spectrum = new SpectrumView({model: SpectrumModel, el:"#spectrumDiv"});
 
-		var gBinding = FragmentationKey.peptideFragKey.highlightChanged.add(Graph.graph.setHighlights);
-		gBinding.context = Graph.graph;
-		var pfBinding = Graph.graph.highlightChanged.add(FragmentationKey.peptideFragKey.setHighlights);
+		var gBinding = FragmentationKey.peptideFragKey.highlightChanged.add(Spectrum.graph.setHighlights);
+		gBinding.context = Spectrum.graph;
+		var pfBinding = Spectrum.graph.highlightChanged.add(FragmentationKey.peptideFragKey.setHighlights);
 		pfBinding.context = FragmentationKey.peptideFragKey;
 
 		d3.text("test.csv", function(csv) {
