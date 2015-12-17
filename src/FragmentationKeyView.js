@@ -3,7 +3,7 @@ var FragmentationKeyView = Backbone.View.extend({
 	//~ el: "#fragKeyDiv",
 
 	initialize: function() {
-		this.svg = d3.select(this.el);//d3.select(this.el).append("svg").style("width", "100%").style("height", "100%");
+		this.svg = d3.select(this.el.getElementsByTagName("svg")[0]);//d3.select(this.el).append("svg").style("width", "100%").style("height", "100%");
 		this.margin = {
 			"top":    20,
 			"right":  20,
@@ -18,7 +18,7 @@ var FragmentationKeyView = Backbone.View.extend({
 		
 
 		//create peptide frag key
-		this.peptideFragKey = new PeptideFragmentationKey(this.svg, this);
+		this.peptideFragKey = new PeptideFragmentationKey(this.svg, this.model);
 
 		this.listenTo(this.model, 'change', this.render);
 		this.listenTo(this.model, 'destroy', this.remove);

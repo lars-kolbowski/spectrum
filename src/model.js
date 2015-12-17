@@ -1,4 +1,4 @@
-var SpectrumViewer = Backbone.Model.extend({
+var AnnotatedSpectrumModel = Backbone.Model.extend({
 	defaults: {
 		pepSeq1: "VGQQYSSAPLR",
 		linkPos1: 3,

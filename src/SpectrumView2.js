@@ -7,7 +7,7 @@ var SpectrumView = Backbone.View.extend({
 
 	initialize: function() {
 
-		this.svg = d3.select(this.el);//d3.select(this.el)
+		this.svg = d3.select(this.el.getElementsByTagName("svg")[0]);//d3.select(this.el)
 				//~ .append("svg").style("width", "100%").style("height", "100%");
 
 

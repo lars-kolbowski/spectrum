@@ -47,12 +47,12 @@
 	<script>
 
 
-	var SpectrumViewer = new SpectrumViewer();
+	var SpectrumModel = new AnnotatedSpectrumModel();
 
 
 	$(function() {
-		var FragmentationKey = new FragmentationKeyView({model: SpectrumViewer, el:"#spectrumSVG"});
-		var Graph = new SpectrumView({model: SpectrumViewer, el:"#spectrumSVG"});
+		var FragmentationKey = new FragmentationKeyView({model: SpectrumModel, el:"#spectrumDiv"});
+		var Graph = new SpectrumView({model: SpectrumModel, el:"#spectrumDiv"});
 
 		var gBinding = FragmentationKey.peptideFragKey.highlightChanged.add(Graph.graph.setHighlights);
 		gBinding.context = Graph.graph;
@@ -60,13 +60,9 @@
 		pfBinding.context = FragmentationKey.peptideFragKey;
 
 		d3.text("test.csv", function(csv) {
-			SpectrumViewer.set({annotatedPeaksCSV: csv});
-			//console.log(SpectrumViewer.get("annotatedPeaksCSV"));
-			//console.log(SpectrumViewer.get("xMax"));
+			SpectrumModel.set({annotatedPeaksCSV: csv});
 		});
-
-
-		//SpectrumViewer.set({test: "test"});		
+	
 
 /*		d3.csv("test.csv", function(error, data) {
 			data.forEach(function(d) {

@@ -21,11 +21,11 @@
 //		see http://bl.ocks.org/stepheneb/1182434
 //		and https://gist.github.com/mbostock/3019563
 
-Graph = function(targetSvg, spectrumViewer, options) {
+Graph = function(targetSvg, model, options) {
 	this.x = d3.scale.linear();
 	this.y = d3.scale.linear();
 	this.highlightChanged = new signals.Signal();
-	this.spectrumViewer = spectrumViewer;
+	this.model = model;
 	
 	this.margin = {
 		"top":    options.title  ? 130 : 110,
@@ -159,10 +159,14 @@ Graph.prototype.setData = function(model){
 	}
 
 	//Isotope cluster
+	this.cluster = new Array();
+
 	var peakCount = this.points.length;
 	for (var p = 0; p < peakCount; p++) {
 		var peak = this.points[p];
 		if (peak.fragments.length > 0){
+
+			//this.cluster.push(new IsotopeCluster(p, this.points))
 			var delta = 1/peak.charge;
 			for (var i = 1; i < 7; i++){
 				var pi = (p - i < 0  ? 0 : p - i); //make sure pi doesn't get negative
@@ -176,11 +180,10 @@ Graph.prototype.setData = function(model){
 				var actual_mass = this.points[pi].x.toFixed(1);
 				var calc_mass = (peak.x + delta*i).toFixed(1);
 				if (actual_mass == calc_mass){
-				
 					if(this.points[p].fragments[0].peptide === this.pep1)
-						this.points[pi].colour = this.spectrumViewer.p1color_cluster;
+						this.points[pi].colour = this.model.p1color_cluster;
 					if(this.points[p].fragments[0].peptide === this.pep2)
-						this.points[pi].colour = this.spectrumViewer.p2color_cluster;
+						this.points[pi].colour = this.model.p2color_cluster;
 				}
 				else
 					break;
@@ -346,7 +349,7 @@ Graph.prototype.showLabels = function(){
 Graph.prototype.greyPeaks = function(){
 	var peakCount = this.points.length;
 	for (var p = 0; p < peakCount; p++) {
-		this.points[p].line.attr("stroke", this.spectrumViewer.lossFragBarColour);
+		this.points[p].line.attr("stroke", this.model.lossFragBarColour);
 	}
 }
 Graph.prototype.colourPeaks = function(){
