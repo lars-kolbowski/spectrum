@@ -19,8 +19,10 @@
 //		graph/Peak.js
 
 function Peak (data, graph){
+	//var this.graph.model = graph.spectrumViewer;
 	this.x = data[0].expmz - 0;
 	this.y = data[0].absolute_intensity - 0;
+	this.charge = data[0].charge - 0;
 	this.graph = graph;
 
 	//make fragments
@@ -28,6 +30,7 @@ function Peak (data, graph){
 	var lossyFragments = [];
 	var fragCount = data.length;
 	for (var f = 0; f < fragCount; f++) {
+		//check if the Peak is a fragment or not and if create a new Fragment
 		if (data[f].fragment_name.trim() != "") {
 			var frag = new Fragment (data[f]);
 			if (frag.lossy === false) {
@@ -37,7 +40,7 @@ function Peak (data, graph){
 			}
 		}
 	}
-	this.fragments = notLossyFragments.concat(lossyFragments);
+	this.fragments = notLossyFragments.concat(lossyFragments); //merge arrays
 
 	//make tooltip
 	var tooltip = "";
@@ -55,8 +58,8 @@ function Peak (data, graph){
 	this.g.append("svg:title").text(this.tooltip);	// easy tooltip
 	if (this.fragments.length > 0) {
 		this.highlightLine = this.g.append('line')
-							.attr("stroke", SpectrumViewer.highlightColour)
-							.attr("stroke-width", SpectrumViewer.highlightWidth)
+							.attr("stroke", this.graph.model.highlightColour)
+							.attr("stroke-width", this.graph.model.highlightWidth)
 							.attr("opacity","0");
 		//this.highlightLine.append("svg:title").text(this.tooltip);	// easy tooltip
 		this.highlightLine.attr("x1", 0);
@@ -110,7 +113,7 @@ function Peak (data, graph){
 					.attr("text-anchor", "middle")
 					.style("stroke-width", "5px")
 					.style("font-size", "0.8em")
-					.attr("stroke", SpectrumViewer.highlightColour);
+					.attr("stroke", this.graph.model.highlightColour);
 			label.text(frag.name)
 					.attr("x", 0)
 					.attr("text-anchor", "middle")
@@ -145,16 +148,16 @@ function Peak (data, graph){
 			var c = "pink";//colour for annotation
 			var matchedPeptide = frag.peptide;
 			var pep;
-			if (this.graph.spectrumViewer.pep1 == matchedPeptide){
+			if (this.graph.pep1 == matchedPeptide){
 				pep = "p1";
 			}
 			else{
 				pep = "p2";
 			}
 			if (frag.name.indexOf("_") == -1){ //is not lossi
-				c = SpectrumViewer[pep + "color"];
+				c = this.graph.model[pep + "color"];
 			} else { // is lossy
-				c = SpectrumViewer[pep + "color_loss"]; //javascript lets you do this...
+				c = this.graph.model[pep + "color_loss"]; //javascript lets you do this...
 			}
 			label.attr("fill", c);
 			this.labels.push(label);
@@ -165,23 +168,23 @@ function Peak (data, graph){
 	this.line = this.g.append('line').attr("stroke-width","1");
 	this.line.attr("x1", 0);
 	this.line.attr("x2", 0);
-	this.colour = SpectrumViewer.lossFragBarColour;
+	this.colour = this.graph.model.lossFragBarColour;
 	if (this.fragments.length > 0){
-		if (this.fragments[0].peptide === this.graph.spectrumViewer.pep1
+		if (this.fragments[0].peptide === this.graph.pep1
 				&& this.fragments[0].lossy === false) {
-			this.colour = SpectrumViewer.p1color;
+			this.colour = this.graph.model.p1color;
 		}
-		else if (this.fragments[0].peptide === this.graph.spectrumViewer.pep2
+		else if (this.fragments[0].peptide === this.graph.pep2
 				&& this.fragments[0].lossy === false) {
-			this.colour = SpectrumViewer.p2color;
+			this.colour = this.graph.model.p2color;
 		}
-		else if (this.fragments[0].peptide === this.graph.spectrumViewer.pep1
+		else if (this.fragments[0].peptide === this.graph.pep1
 				&& this.fragments[0].lossy === true) {
-			this.colour = SpectrumViewer.p1color_loss;
+			this.colour = this.graph.model.p1color_loss;
 		}
-		else if (this.fragments[0].peptide === this.graph.spectrumViewer.pep2
+		else if (this.fragments[0].peptide === this.graph.pep2
 				&& this.fragments[0].lossy === true) {
-			this.colour = SpectrumViewer.p2color_loss;
+			this.colour = this.graph.model.p2color_loss;
 		}
 	}
 	this.line.attr("stroke", this.colour);
@@ -227,7 +230,7 @@ Peak.prototype.updateX = function(){
 			this.labels[a].attr("x", this.graph.x(this.x));
 			this.labelHighlights[a].attr("x", this.graph.x(this.x));
 			if ((this.x > xDomain[0] && this.x < xDomain[1])
-					&& (this.graph.spectrumViewer.lossyShown === true || this.fragments[a].lossy === false)){
+					&& (this.graph.lossyShown === true || this.fragments[a].lossy === false)){
 				this.labels[a].attr("display","inline");
 				this.labelHighlights[a].attr("display","inline");
 			} else {
@@ -266,13 +269,13 @@ Peak.prototype.removeLabels = function(){
 	}
 }
 
-Peak.prototype.showLabels = function(){
+Peak.prototype.showLabels = function(lossyOverride){
 	var xDomain = this.graph.x.domain();
 	if (this.fragments.length > 0) {
 		var labelCount = this.labels.length;
 		for (var a = 0; a < labelCount; a++){
 			if ((this.x > xDomain[0] && this.x < xDomain[1])
-					&& (this.graph.spectrumViewer.lossyShown === true || this.fragments[a].lossy === false)) {
+					&& (this.graph.lossyShown === true || this.fragments[a].lossy === false || lossyOverride == true)) {
 				this.labels[a].attr("display", "inline");
 				this.labelHighlights[a].attr("display", "inline");
 			}

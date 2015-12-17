@@ -1,25 +1,31 @@
-<!DOCTYPE html>
-<html><head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>Spectrum</title>
-    <script type="text/javascript" src="./vendor/d3.js"></script>
-	<script type="text/javascript" src="./vendor/colorbrewer.js"></script>
-	<script type="text/javascript" src="./vendor/signals.js"></script>
-<!--
-    <script type="text/javascript" src="./build/spectrum.js"></script>
--->
-    <script type="text/javascript" src="./src/SpectrumViewer.js"></script>
-    <script type="text/javascript" src="./src/FragmentationKey.js"></script>
-    <script type="text/javascript" src="./src/graph/Graph.js"></script>
-    <script type="text/javascript" src="./src/graph/Peak.js"></script>
-    <script type="text/javascript" src="./src/graph/Fragment.js"></script>
+<!doctype html>
+<html>
+
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF8">
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/zepto/1.1.6/zepto.js"></script>
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore.js"></script>
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.0.0/backbone.js"></script>
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/d3/3.3.3/d3.js"></script>
+	<!-- <script type="text/javascript" src="vendor/d3.js"></script> -->
+	<script type="text/javascript" src="vendor/colorbrewer.js"></script>
+	<script type="text/javascript" src="vendor/signals.js"></script>
+
+	<script type="text/javascript" src="src/model.js"></script>
+	<script type="text/javascript" src="src/SpectrumView2.js"></script>
+	<script type="text/javascript" src="src/FragmentationKeyView.js"></script>
+	<script type="text/javascript" src="src/FragmentationKey.js"></script>
+	<script type="text/javascript" src="src/graph/Graph.js"></script>		
+	<script type="text/javascript" src="src/graph/Peak.js"></script>	
+	<script type="text/javascript" src="src/graph/Fragment.js"></script>	
+
+
     <style type="text/css">
 		html, body{
-<!--
+
 			background-color: white;
 			height:100%;
 			width:100%;
--->
 			-webkit-user-select: none;
 			-khtml-user-select: none;
 			-moz-user-select: -moz-none;
@@ -30,45 +36,74 @@
 			margin:0px;
 			padding:0px;
 		}
-<!--
 		
 		#spectrumDiv {
-			height:100%;
+			height:90%;
 			width:100%;
 		}
-
--->
 		
 	</style>
-  </head>
-  <body>
-	  
-	<label>lossy labels
-		<input id="lossyChkBx" 
-		onclick="spectrumViewer.showLossy(document.getElementById('lossyChkBx').checked)" 
-				type="checkbox">
-	</label>
-					
-	<button onclick="spectrumViewer.resize();">reset zoom</button>
-	
-	
-	
-	<div id='spectrumDiv'>
-	</div>
-	
-	<script type="text/javascript">		
-		var spectrumViewer = new SpectrumViewer(document.getElementById('spectrumDiv'));
-				
-		window.addEventListener("load", function() {
-			d3.text("./test.csv", function(csv) {
-				spectrumViewer.setData("VGQQYSSAPLR", 3, "EKELESIDVLLEQTTGGNNKDLK", 5, csv); // not the real link positions
-				window.addEventListener("resize", function() {
-					spectrumViewer.resize();
-				});
-			});
+
+	<script>
+
+
+	var SpectrumModel = new AnnotatedSpectrumModel();
+
+
+	$(function() {
+		var FragmentationKey = new FragmentationKeyView({model: SpectrumModel, el:"#spectrumDiv"});
+		var Spectrum = new SpectrumView({model: SpectrumModel, el:"#spectrumDiv"});
+
+		var gBinding = FragmentationKey.peptideFragKey.highlightChanged.add(Spectrum.graph.setHighlights);
+		gBinding.context = Spectrum.graph;
+		var pfBinding = Spectrum.graph.highlightChanged.add(FragmentationKey.peptideFragKey.setHighlights);
+		pfBinding.context = FragmentationKey.peptideFragKey;
+
+		d3.text("test.csv", function(csv) {
+			SpectrumModel.set({annotatedPeaksCSV: csv});
 		});
-		
+	
+
+/*		d3.csv("test.csv", function(error, data) {
+			data.forEach(function(d) {
+				d.expmz = +d.expmz;
+				d.absolute_intensity = +d.absolute_intensity;
+			});
+			//console.log(data);
+			json = JSON.stringify(data);
+			//console.log(json);
+			
+			specView.set({
+				annotatedPeaksjson: json,
+				annotatedPeaks: data,
+			});
+			//console.log(specView.get("annotatedPeaks"));
+			console.log(specView.get("pep1"));
+		});*/
+
+
+});
 	</script>
-    
-	</body>
+</head>
+
+<body>
+
+		<div id='spectrumDiv'>
+			<label>lossy labels
+				<input id="lossyChkBx" type="checkbox">
+			</label>
+			<button id="resize">reset zoom</button>
+			<form id="setrange">
+				m/z Range:
+				<input type="text" id="xleft" size="5">
+				<input type="text" id="xright" size="5">
+				<input type="submit" value="set range">
+				<span id="range-error"></span>
+			</form>
+			<svg id="spectrumSVG" style="width:100%; height:100%"></svg>
+		</div>
+
+
+</body>
+
 </html>

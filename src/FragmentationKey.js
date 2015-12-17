@@ -22,9 +22,9 @@
 //
 //		PeptideFragmentationKey.js
 
-function PeptideFragmentationKey (targetSvg, spectrumViewer, options){
+function PeptideFragmentationKey (targetSvg, model, options){
 	this.highlightChanged = new signals.Signal();
-	this.spectrumViewer = spectrumViewer;
+	this.model = model;
 	
 	this.options = options || {};
 	this.margin = {
@@ -39,13 +39,14 @@ function PeptideFragmentationKey (targetSvg, spectrumViewer, options){
 
 }
 
-PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2, linkPos2, annotatedPeaks){
+PeptideFragmentationKey.prototype.setData = function(){
 	var self = this;
 	this.clear();
-	this.pepSeq1 = pepSeq1; //contains modification info in lower case
-	this.linkPos1 = linkPos1;
-	this.pepSeq2 = pepSeq2; // contains modification info in lower case
-	this.linkPos2 = linkPos2;
+	var annotatedPeaks = self.model.annotatedPeaks;
+	this.pepSeq1 = self.model.pep1; //contains modification info in lower case
+	this.pepSeq2 = self.model.pep2; // contains modification info in lower case
+	var linkPos1 = self.model.linkPos1;
+	var linkPos2 = self.model.linkPos2;
 	
 	// def plot_spectrum(cl_pep, XiDB, removeisotopes=False, ppmmean=0, ppmstds=0,
     //               annotate_verbose=True):
@@ -53,8 +54,8 @@ PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2,
 				annotate_verbose = true;
 
 
-	var pep1 = this.pepSeq1.replace(SpectrumViewer.notUpperCase, '');
-    var pep2 = this.pepSeq2.replace(SpectrumViewer.notUpperCase, '');
+	var pep1 = this.pepSeq1.replace(self.model.notUpperCase, '');
+    var pep2 = this.pepSeq2.replace(self.model.notUpperCase, '');
 
     // #get ion data for annotation
     // ions1 = set([i.name if "_" not in i.loss else i.name+"loss" for i in
@@ -77,7 +78,7 @@ PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2,
 			else{
 				ion = regexMatch[0] + "loss"
 			}
-			var matchedPeptide = peak.matchedpeptide.replace(SpectrumViewer.notUpperCase, '');//uncertain about whether this property includes mod info?
+			var matchedPeptide = peak.matchedpeptide.replace(self.model.notUpperCase, '');//uncertain about whether this property includes mod info?
 			if (matchedPeptide == pep1){
 				ions1.add(ion);
 			} else {
@@ -164,8 +165,8 @@ PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2,
     // the letters
     this.pep1letters = [];
     this.pep2letters = [];
-    drawPeptide( pep1, 20, SpectrumViewer.p1color, this.pep1letters);
-    drawPeptide( pep2, 60, SpectrumViewer.p2color, this.pep2letters);
+    drawPeptide( pep1, 20, this.model.p1color, this.pep1letters);
+    drawPeptide( pep2, 60, this.model.p2color, this.pep2letters);
     function drawPeptide( pep, y, colour, pepLetters) {
 		var l = pep.length;
 		for (var i = 0; i < l; i++){
@@ -189,8 +190,8 @@ PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2,
 		.attr("stroke", "black")
 		.attr("stroke-width", 1.5);
 
-    drawFragmentationEvents(alpha_annotation, 25, self.spectrumViewer.pep1);
-    drawFragmentationEvents(beta_annotation, 65, self.spectrumViewer.pep2);
+    drawFragmentationEvents(alpha_annotation, 25, self.model.pep1);	//self.pepSeq1 same?
+    drawFragmentationEvents(beta_annotation, 65, self.model.pep2);	//self.pepSeq2 same?
 
 	function drawFragmentationEvents( fragAnno, y, peptide) {
 		var l = pep1.length; // shouldn't matter which pep you use
@@ -212,8 +213,8 @@ PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2,
 						
 					var bHighlight = self.highlights.append("path")
 						.attr("d", highlightPath)
-						.attr("stroke",SpectrumViewer.highlightColour)
-						.attr("stroke-width", SpectrumViewer.highlightWidth)
+						.attr("stroke", self.model.highlightColour)
+						.attr("stroke-width", self.model.highlightWidth)
 						.attr("opacity", 0)						
 						.attr("peptide", peptide)
 						.attr("fragKeyIndex", i);
@@ -232,7 +233,7 @@ PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2,
 						highlight();
 					};
 								
-					if (peptide === self.spectrumViewer.pep1) {
+					if (peptide === self.model.pep1) {
 						self.pep1bFragHighlights[i] = bHighlight;	
 					} else {
 						self.pep2bFragHighlights[i] = bHighlight;	
@@ -248,7 +249,7 @@ PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2,
 						.attr("class", "fragBar");
 					// if "bloss" in fgm:
 					if (frag.indexOf("bloss") != -1){
-						bTail.attr("stroke", SpectrumViewer.lossFragBarColour);
+						bTail.attr("stroke", self.model.lossFragBarColour);
 					}
 					else {
 						bTail.attr("stroke", "black");
@@ -277,8 +278,8 @@ PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2,
 						
 					var yHighlight = self.highlights.append("path")
 						.attr("d", highlightPath)
-						.attr("stroke",SpectrumViewer.highlightColour)
-						.attr("stroke-width", SpectrumViewer.highlightWidth)
+						.attr("stroke",self.model.highlightColour)
+						.attr("stroke-width", self.model.highlightWidth)
 						.attr("opacity", 0)
 						.attr("peptide", peptide)
 						.attr("fragKeyIndex", i);
@@ -297,7 +298,7 @@ PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2,
 						highlight();
 					};
 								
-					if (peptide === self.spectrumViewer.pep1) {
+					if (peptide === self.model.pep1) {
 						self.pep1yFragHighlights[i] = yHighlight;	
 					} else {
 						self.pep2yFragHighlights[i] = yHighlight;	
@@ -313,7 +314,7 @@ PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2,
 						.attr("class", "fragBar");
 					// if "yloss"
 					if (frag.indexOf("yloss") != -1){
-						yTail.attr("stroke", SpectrumViewer.lossFragBarColour);
+						yTail.attr("stroke", self.model.lossFragBarColour);
 					}
 					else {
 						yTail.attr("stroke", "black");
@@ -344,7 +345,7 @@ PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2,
 					
 				var lossCount = (frag.match(/loss/g) || []).length;
 				if (lossCount == 2 || frag == "-yloss" || frag == "bloss-"){
-					fragBar.attr("stroke", SpectrumViewer.lossFragBarColour);
+					fragBar.attr("stroke", self.model.lossFragBarColour);
 				}
 				else {
 					fragBar.attr("stroke", "black");
@@ -370,7 +371,7 @@ PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2,
 	function highlight(peptide, i){
 		self.clearHighlights();
 		var pepI;
-		if (peptide === self.spectrumViewer.pep1){
+		if (peptide === self.model.pep1){
 			if (self.pep1bFragHighlights[i]) self.pep1bFragHighlights[i].attr("opacity",1);
 			if (self.pep1yFragHighlights[i]) self.pep1yFragHighlights[i].attr("opacity",1);
 			pepI = i - self.pep1offset;
@@ -414,7 +415,7 @@ PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2,
 			else if (ions.indexOf(aIonId + "loss") != -1
 						|| ions.indexOf(bIonId + "loss") != -1
 						|| ions.indexOf(cIonId + "loss") != -1){
-				//~ if (self.spectrumViewer.lossyShown == true) 
+				//~ if (self.model.lossyShown == true) 
 				gotb = "bloss";
 			}
 
@@ -430,7 +431,7 @@ PeptideFragmentationKey.prototype.setData = function(pepSeq1, linkPos1, pepSeq2,
 			else if (ions.indexOf(xIonId + "loss") != -1
 						|| ions.indexOf(yIonId + "loss") != -1
 						|| ions.indexOf(zIonId + "loss") != -1) {
-				//~ if (self.spectrumViewer.lossyShown == true) 
+				//~ if (self.model.lossyShown == true) 
 				goty = "yloss";
 			}
 			annotation.push(gotb + goty);
@@ -463,23 +464,23 @@ PeptideFragmentationKey.prototype.setHighlights = function(fragments){
 		greyLetters(this.pep2letters);
 		for (var f = 0; f < fragCount; f++){
 			var frag = fragments[f];
-			if (this.spectrumViewer.lossyShown === true || frag.lossy === false) {
+			if (this.model.lossyShown === true || frag.lossy === false) {
 				var matchedPeptide = frag.peptide;
 				var fragHighlightsArrayName, offset, pepLength, pepLetters, pepColour;
 					
-				if (this.spectrumViewer.pep1 == matchedPeptide){
+				if (this.model.pep1 == matchedPeptide){
 					fragHighlightsArrayName = "pep1";
 					offset = this.pep1offset;
 					pepLength = this.pepSeq1.length
 					pepLetters = this.pep1letters;
-					pepColour = SpectrumViewer.p1color;
+					pepColour = this.model.p1color;
 				}
 				else{
 					fragHighlightsArrayName = "pep2";
 					offset = this.pep2offset;
 					pepLength = this.pepSeq2.length
 					pepLetters = this.pep2letters;
-					pepColour = SpectrumViewer.p2color;
+					pepColour = this.model.p2color;
 				}
 				var ionType = frag.ionType;
 				fragHighlightsArrayName += ionType + "FragHighlights";
@@ -498,7 +499,7 @@ PeptideFragmentationKey.prototype.setHighlights = function(fragments){
 		var letterCount = pepLetters.length;
 		for (var i = 0; i < letterCount; i++){
 			if (pepLetters[i]){
-				pepLetters[i].attr("fill", SpectrumViewer.lossFragBarColour);
+				pepLetters[i].attr("fill", SpectrumModel.lossFragBarColour);
 			}
 		}
 	}
@@ -520,8 +521,8 @@ PeptideFragmentationKey.prototype.clearHighlights = function(){
 	clear(this.pep2bFragHighlights);
 	clear(this.pep2yFragHighlights);
 	
-	colour(this.pep1letters, SpectrumViewer.p1color);
-	colour(this.pep2letters, SpectrumViewer.p2color);
+	colour(this.pep1letters, this.model.p1color);
+	colour(this.pep2letters, this.model.p2color);
 	
 	function clear(hightlightArray){
 		var pLength = hightlightArray.length;
