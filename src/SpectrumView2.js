@@ -41,7 +41,16 @@ var SpectrumView = Backbone.View.extend({
 
 	setrange: function(e){
 		e.preventDefault();
-		this.graph.resize(xleft.value, xright.value, this.model.ymin, this.model.ymax);
+		var xl = xleft.value-0;
+		var xr = xright.value-0;
+		if (xl > xr){
+			$("#range-error").show();
+			$("#range-error").html("Error: "+xl+" is larger than "+xr);
+		}
+		else{
+			$("#range-error").hide();
+			this.graph.resize(xl, xr, this.model.ymin, this.model.ymax);
+		}
 
 	}
 	
