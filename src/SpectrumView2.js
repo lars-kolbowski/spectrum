@@ -16,6 +16,8 @@ var SpectrumView = Backbone.View.extend({
 		this.graph = new Graph (this.svg, this.model, {xlabel:"m/z", ylabel:"Intensity"});
 
 		this.listenTo(this.model, 'change', this.render);
+		this.listenTo(this.model, "changed:Zoom", this.updateRange);
+		//this.listenTo(this.model, 'change:Zoom', this.updateRange);
 		//this.listenTo(this.model, 'destroy', this.remove);
 	},
 
@@ -28,7 +30,7 @@ var SpectrumView = Backbone.View.extend({
 	},
 
 	resize: function(){
-		this.graph.resize(this.model.xmin, this.model.xmax, this.model.ymin, this.model.ymax);
+		this.graph.resize(this.model.xminPrimary, this.model.xmaxPrimary, this.model.ymin, this.model.ymax);
 	},
 
 	showLossy: function(e){
@@ -52,6 +54,10 @@ var SpectrumView = Backbone.View.extend({
 			this.graph.resize(xl, xr, this.model.ymin, this.model.ymax);
 		}
 
+	},
+	updateRange: function(){
+		$("#xleft").val(this.model.xmin);
+		$("#xright").val(this.model.xmax);
 	}
 	
 });

@@ -202,7 +202,7 @@ Graph.prototype.setData = function(model){
 	this.ymax = d3.max(this.points, function(d){return d.y;});
 	this.ymin = 0;//d3.min(this.points, function(d){return d.y;});*/
 
-	this.resize(model.xmin, model.xmax, model.ymin, model.ymax);
+	this.resize(model.xminPrimary, model.xmaxPrimary, model.ymin, model.ymax);
 }
 
 Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
@@ -271,6 +271,7 @@ Graph.prototype.redraw = function(){
 		self.xaxis.call( self.xAxis);//d3.behavior.zoom().x(self.x).on("zoom", self.redraw()));
 		self.plot.call( d3.behavior.zoom().x(self.x).on("zoom", self.redraw()));
 		self.innerSVG.call( d3.behavior.zoom().x(self.x).on("zoom", self.redraw()));
+		self.model.setZoom(self.x.domain());
 	};
 }
 
