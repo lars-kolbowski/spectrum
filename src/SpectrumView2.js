@@ -3,6 +3,7 @@ var SpectrumView = Backbone.View.extend({
 	events : {
 		'click #resize' : 'resize',
 		'click #lossyChkBx': 'showLossy',
+		'submit #setrange' : 'setrange',
 	},
 
 	initialize: function() {
@@ -27,7 +28,7 @@ var SpectrumView = Backbone.View.extend({
 	},
 
 	resize: function(){
-		this.graph.resize(this.model);
+		this.graph.resize(this.model.xmin, this.model.xmax, this.model.ymin, this.model.ymax);
 	},
 
 	showLossy: function(e){
@@ -36,6 +37,12 @@ var SpectrumView = Backbone.View.extend({
         this.graph.lossyShown = selected;
 		this.graph.clearLabels();
 		this.graph.showLabels();
+	},
+
+	setrange: function(e){
+		e.preventDefault();
+		this.graph.resize(xleft.value, xright.value, this.model.ymin, this.model.ymax);
+
 	}
 	
 });

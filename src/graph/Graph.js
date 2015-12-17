@@ -202,12 +202,11 @@ Graph.prototype.setData = function(model){
 	this.ymax = d3.max(this.points, function(d){return d.y;});
 	this.ymin = 0;//d3.min(this.points, function(d){return d.y;});*/
 
-	this.resize(model);
+	this.resize(model.xmin, model.xmax, model.ymin, model.ymax);
 }
 
-Graph.prototype.resize = function(model) {
+Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 	var self = this;
-	
 	//see https://gist.github.com/mbostock/3019563
 	var cx = self.g.node().parentNode.parentNode.clientWidth;
 	var cy = self.g.node().parentNode.parentNode.clientHeight;
@@ -215,10 +214,10 @@ Graph.prototype.resize = function(model) {
 	self.g.attr("width", cx).attr("height", cy);
 	var width = cx - self.margin.left - self.margin.right;
 	var height = cy - self.margin.top  - self.margin.bottom;
-	self.x.domain([model.xmin, model.xmax])
+	self.x.domain([xmin, xmax])
 		.range([0, width]);
 	// y-scale (inverted domain)
-	self.y.domain([0, model.ymax]).nice()
+	self.y.domain([0, ymax]).nice()
 		.range([height, 0]).nice();
 
 	var yTicks = height / 40;
