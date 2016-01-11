@@ -44,9 +44,8 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 	},
 
 	setGraphData: function(){
-		var annotatedPeaks = this.get("annotatedPeaks");
 		//get Max m/z value of primarymatches
-		this.xmaxPrimary = d3.max(annotatedPeaks,
+		this.xmaxPrimary = d3.max(this.annotatedPeaks,
 			function(d){
 				return ((d.isprimarymatch == 1)? d.expmz - 0 : 0);
 			}
@@ -54,7 +53,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		//this.set("xmaxPrimary", xmaxPrimary);
 
 		 //get Min m/z value of primarymatches
-		 this.xminPrimary = d3.min(annotatedPeaks, 
+		 this.xminPrimary = d3.min(this.annotatedPeaks, 
 		 	function(d){
 		 		return ((d.isprimarymatch == 1)?  d.expmz - 0 : this.xmaxPrimary);
 		 	}
@@ -64,13 +63,13 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		//sort Data by m/z and Int
 		this.nested =  d3.nest()
 		.key(function(d) { return d.expmz + '-' + d.absoluteintensity; })
-		.entries(annotatedPeaks);
+		.entries(this.annotatedPeaks);
 
 
 		this.xmax = this.xmaxPrimary;
 		this.xmin = this.xminPrimary;
 
-		this.ymax = d3.max(annotatedPeaks, function(d){return d.absolute_intensity - 0;});
+		this.ymax = d3.max(this.annotatedPeaks, function(d){return d.absolute_intensity - 0;});
 		//this.ymax = d3.max(this.points, function(d){return d.y;});
 		this.ymin = 0;//d3.min(this.points, function(d){return d.y;});
 	},
