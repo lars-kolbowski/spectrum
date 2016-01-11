@@ -165,31 +165,10 @@ Graph.prototype.setData = function(model){
 	for (var p = 0; p < peakCount; p++) {
 		var peak = this.points[p];
 		if (peak.fragments.length > 0){
-
-			//this.cluster.push(new IsotopeCluster(p, this.points))
-			var delta = 1/peak.charge;
-			for (var i = 1; i < 10; i++){
-				var pi = (p - i < 0  ? 0 : p - i); //make sure pi doesn't get negative
-
-/*				var fragment_mass = this.points[pi].x.toFixed(2)*1;
-				var isotope_mass_ll = (peak.x + delta*i).toFixed(2)*1 - 0.01;
-				var isotope_mass_ul = (peak.x + delta*i).toFixed(2)*1 + 0.01;
-				if ( isotope_mass_ll <= fragment_mass <= isotope_mass_ul){
-					*/
-
-				var actual_mass = this.points[pi].x.toFixed(1);
-				var calc_mass = (peak.x + delta*i).toFixed(1);
-				if (actual_mass == calc_mass){
-					if(this.points[p].fragments[0].peptide === this.pep1)
-						this.points[pi].colour = this.model.p1color_cluster;
-					if(this.points[p].fragments[0].peptide === this.pep2)
-						this.points[pi].colour = this.model.p2color_cluster;
-				}
-				else
-					break;
-			}
+			this.cluster.push(new IsotopeCluster(p, this));
 		}
 	}
+	console.log(this.cluster);
 	this.colourPeaks();
 
 /*
