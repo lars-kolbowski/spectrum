@@ -19,7 +19,7 @@
 //		graph/Peak.js
 
 function Peak (data, graph){
-	//var this.graph.model = graph.spectrumViewer;
+
 	this.x = data[0].expmz - 0;
 	this.y = data[0].absolute_intensity - 0;
 	this.charge = data[0].charge - 0;
@@ -203,6 +203,10 @@ Peak.prototype.highlight = function(show){
 		this.graph.peaks[0][0].appendChild(this.g[0][0]);
 		this.line.attr("stroke", this.colour);
 		this.showLabels();
+		var len = this.IsotopeCluster.points.length;
+		for (var b = 0; b < this.IsotopeCluster.points.length; b++ )
+			this.IsotopeCluster.points[b].line.attr("stroke", this.colour);
+
 	} else {
 		this.highlightLine.attr("opacity",0);
 		for (var a = 0; a < labelCount; a++){
