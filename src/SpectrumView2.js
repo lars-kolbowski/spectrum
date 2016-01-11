@@ -1,7 +1,7 @@
 var SpectrumView = Backbone.View.extend({
 
 	events : {
-		'click #resize' : 'resize',
+		'click #reset' : 'reset',
 		'click #lossyChkBx': 'showLossy',
 		'submit #setrange' : 'setrange',
 	},
@@ -17,7 +17,7 @@ var SpectrumView = Backbone.View.extend({
 
 		this.listenTo(this.model, 'change', this.render);
 		this.listenTo(this.model, "changed:Zoom", this.updateRange);
-		//this.listenTo(this.model, 'change:Zoom', this.updateRange);
+		this.listenTo(window, 'resize', _.debounce(this.resize));
 		//this.listenTo(this.model, 'destroy', this.remove);
 	},
 
@@ -29,8 +29,12 @@ var SpectrumView = Backbone.View.extend({
 
 	},
 
-	resize: function(){
+	reset: function(){
 		this.graph.resize(this.model.xminPrimary, this.model.xmaxPrimary, this.model.ymin, this.model.ymax);
+	},
+
+	resize: function(){
+		this.graph.resize(this.model.xmin, this.model.xmax, this.model.ymin, this.model.ymax);
 	},
 
 	showLossy: function(e){

@@ -51,9 +51,15 @@
 
 
 	$(function() {
+
+
+		_.extend(window, Backbone.Events);
+		window.onresize = function() { window.trigger('resize') };
+
 		var FragmentationKey = new FragmentationKeyView({model: SpectrumModel, el:"#spectrumDiv"});
 		var Spectrum = new SpectrumView({model: SpectrumModel, el:"#spectrumDiv"});
 
+		//Spectrum.resize();
 		var gBinding = FragmentationKey.peptideFragKey.highlightChanged.add(Spectrum.graph.setHighlights);
 		gBinding.context = Spectrum.graph;
 		var pfBinding = Spectrum.graph.highlightChanged.add(FragmentationKey.peptideFragKey.setHighlights);
@@ -92,7 +98,7 @@
 			<label>lossy labels
 				<input id="lossyChkBx" type="checkbox">
 			</label>
-			<button id="resize">reset zoom</button>
+			<button id="reset">reset zoom</button>
 			<form id="setrange">
 				m/z Range:
 				<input type="text" id="xleft" size="5">

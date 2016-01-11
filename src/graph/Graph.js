@@ -168,7 +168,7 @@ Graph.prototype.setData = function(model){
 
 			//this.cluster.push(new IsotopeCluster(p, this.points))
 			var delta = 1/peak.charge;
-			for (var i = 1; i < 7; i++){
+			for (var i = 1; i < 10; i++){
 				var pi = (p - i < 0  ? 0 : p - i); //make sure pi doesn't get negative
 
 /*				var fragment_mass = this.points[pi].x.toFixed(2)*1;
