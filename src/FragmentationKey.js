@@ -558,15 +558,12 @@ PeptideFragmentationKey.prototype.clearHighlights = function(){
 }
 
 PeptideFragmentationKey.prototype.setStickyHighlights = function(fragments){
-	//this.clearHighlights();
 	
 	var fragCount = fragments.length;
     if (fragCount > 0){
-		//greyLetters(this.pep1letters);
-		//greyLetters(this.pep2letters);
+
 		for (var f = 0; f < fragCount; f++){
 			var frag = fragments[f];
-			//if (this.model.lossyShown === true || frag.lossy === false) {
 				var matchedPeptide = frag.peptide;
 				var fragHighlightsArrayName, offset, pepLength, pepLetters, pepColour;
 					
@@ -574,26 +571,19 @@ PeptideFragmentationKey.prototype.setStickyHighlights = function(fragments){
 					fragHighlightsArrayName = "pep1";
 					offset = this.pep1offset;
 					pepLength = this.pepSeq1.length
-					//pepLetters = this.pep1letters;
-					//pepColour = this.model.p1color;
 				}
 				else{
 					fragHighlightsArrayName = "pep2";
 					offset = this.pep2offset;
 					pepLength = this.pepSeq2.length
-					//pepLetters = this.pep2letters;
-					//pepColour = this.model.p2color;
 				}
 				var ionType = frag.ionType;
 				fragHighlightsArrayName += ionType + "FragHighlights";
 				if (ionType == "b") { // or a or c
 					this[fragHighlightsArrayName][frag.ionNumber + offset - 1].sticky = true;
-					//colourLetters(pepLetters, pepColour, 0, (frag.ionNumber + offset));
 				} else {
 					this[fragHighlightsArrayName][pepLength - frag.ionNumber + offset - 1].sticky = true;
-					//colourLetters(pepLetters, pepColour, (pepLength - frag.ionNumber + offset), pepLetters.length);
 				}
-			//}
 		}
 	}
 }

@@ -17,9 +17,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		this.set("annotatedPeaks", d3.csv.parse(annotatedPeaksCSV.trim()));
 		this.annotatedPeaks = this.get("annotatedPeaks");
 		this.pep1 = this.get("pepSeq1").replace(this.get("notUpperCase"), '');
-		//this.set("pep1", this.get("pepSeq1").replace(this.get("notUpperCase"), ''));
 		this.pep2 = this.get("pepSeq2").replace(this.get("notUpperCase"), '');
-		//this.set("pep2", this.get("pepSeq2").replace(this.get("notUpperCase"), ''));
 		this.linkPos1 = this.get("linkPos1");
 		this.linkPos2 = this.get("linkPos2");
 		this.notUpperCase = this.get("notUpperCase"),
@@ -32,6 +30,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		this.p2color_loss = this.cmap[6];
 		this.lossFragBarColour = "#cccccc";
 		this.highlightColour = "yellow";
+		this.highlightColourSticky = colorbrewer.Oranges[9];
 		this.highlightWidth = 11;
 		this.setGraphData();
 		this.sticky = Array();
@@ -83,6 +82,8 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 
 	updateSticky: function(peak){
 		this.sticky.push(peak);
+		//var len = this.sticky.length;
+		//this.highlightColour = this.highlightColourSticky[len];
 		this.trigger("changed:Sticky");
 	},
 
