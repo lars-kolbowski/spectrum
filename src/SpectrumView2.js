@@ -4,6 +4,7 @@ var SpectrumView = Backbone.View.extend({
 		'click #reset' : 'reset',
 		'click #lossyChkBx': 'showLossy',
 		'submit #setrange' : 'setrange',
+		'click #clearHighlights' : 'clearHighlights',
 	},
 
 	initialize: function() {
@@ -60,9 +61,19 @@ var SpectrumView = Backbone.View.extend({
 		}
 
 	},
+
 	updateRange: function(){
 		$("#xleft").val(this.model.xmin);
 		$("#xright").val(this.model.xmax);
+	},
+
+	clearHighlights: function(){
+		this.model.sticky.length = 0;
+		this.graph.clearHighlights();
+		this.graph.highlightChanged.dispatch([]);
+		this.graph.colourPeaks();
+		this.graph.clearLabels();
+		this.graph.showLabels();
 	}
 	
 });

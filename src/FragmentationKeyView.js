@@ -1,6 +1,8 @@
 var FragmentationKeyView = Backbone.View.extend({
 
-	//~ el: "#fragKeyDiv",
+	events : {
+		'click #clearHighlights' : 'clearHighlights',
+	},
 
 	initialize: function() {
 		this.svg = d3.select(this.el.getElementsByTagName("svg")[0]);//d3.select(this.el).append("svg").style("width", "100%").style("height", "100%");
@@ -22,10 +24,20 @@ var FragmentationKeyView = Backbone.View.extend({
 
 		this.listenTo(this.model, 'change', this.render);
 		this.listenTo(this.model, 'destroy', this.remove);
+		this.listenTo(this.model, 'changed:Sticky', this.updateSticky)
 	},
 
 	render: function() {
 		this.peptideFragKey.setData();
 	},
+
+	clearHighlights: function(){
+		this.peptideFragKey.clearStickyHighlights();
+	},
+
+	updateSticky: function(){
+		console.log(this.model.sticky);
+		this.peptideFragKey.setStickyHighlights(this.model.sticky[0].fragments);
+	}
 
 });

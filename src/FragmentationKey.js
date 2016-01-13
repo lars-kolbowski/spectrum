@@ -363,6 +363,20 @@ PeptideFragmentationKey.prototype.setData = function(){
 					line.ontouchend = function(evt) {
 						highlight();
 					};
+					line.onclick = function(evt) {
+						var index = this.getAttribute("fragKeyIndex");
+						var pep = this.getAttribute("peptide");
+						if (pep === self.pepSeq1){
+							self.pep1bFragHighlights[index].sticky = true;
+							self.pep1yFragHighlights[index].sticky = true;
+						}
+						else if(pep === self.pepSeq2){
+							self.pep2bFragHighlights[index].sticky = true;
+							self.pep2yFragHighlights[index].sticky = true;	
+						}
+						self.highlightChanged.dispatch(this.getAttribute("peptide"), this.getAttribute("fragKeyIndex"), true); 
+
+					};					
 					
 			}
 		}
@@ -464,7 +478,7 @@ PeptideFragmentationKey.prototype.setHighlights = function(fragments){
 		greyLetters(this.pep2letters);
 		for (var f = 0; f < fragCount; f++){
 			var frag = fragments[f];
-			if (this.model.lossyShown === true || frag.lossy === false) {
+			//if (this.model.lossyShown === true || frag.lossy === false) {
 				var matchedPeptide = frag.peptide;
 				var fragHighlightsArrayName, offset, pepLength, pepLetters, pepColour;
 					
@@ -491,7 +505,7 @@ PeptideFragmentationKey.prototype.setHighlights = function(fragments){
 					this[fragHighlightsArrayName][pepLength - frag.ionNumber + offset - 1].attr("opacity",1);
 					colourLetters(pepLetters, pepColour, (pepLength - frag.ionNumber + offset), pepLetters.length);
 				}
-			}
+			//}
 		}
 	}
 
@@ -527,7 +541,7 @@ PeptideFragmentationKey.prototype.clearHighlights = function(){
 	function clear(hightlightArray){
 		var pLength = hightlightArray.length;
 		for (var p = 0; p < pLength; p++){
-			if (hightlightArray[p]){
+			if (hightlightArray[p] && !hightlightArray[p].sticky){
 				hightlightArray[p].attr("opacity",0);
 			}
 		}	
@@ -538,6 +552,63 @@ PeptideFragmentationKey.prototype.clearHighlights = function(){
 		for (var p = 0; p < pLength; p++){
 			if (pepLetters[p]){
 				pepLetters[p].attr("fill", colour);
+			}
+		}	
+	}
+}
+
+PeptideFragmentationKey.prototype.setStickyHighlights = function(fragments){
+	//this.clearHighlights();
+	
+	var fragCount = fragments.length;
+    if (fragCount > 0){
+		//greyLetters(this.pep1letters);
+		//greyLetters(this.pep2letters);
+		for (var f = 0; f < fragCount; f++){
+			var frag = fragments[f];
+			//if (this.model.lossyShown === true || frag.lossy === false) {
+				var matchedPeptide = frag.peptide;
+				var fragHighlightsArrayName, offset, pepLength, pepLetters, pepColour;
+					
+				if (this.model.pep1 == matchedPeptide){
+					fragHighlightsArrayName = "pep1";
+					offset = this.pep1offset;
+					pepLength = this.pepSeq1.length
+					//pepLetters = this.pep1letters;
+					//pepColour = this.model.p1color;
+				}
+				else{
+					fragHighlightsArrayName = "pep2";
+					offset = this.pep2offset;
+					pepLength = this.pepSeq2.length
+					//pepLetters = this.pep2letters;
+					//pepColour = this.model.p2color;
+				}
+				var ionType = frag.ionType;
+				fragHighlightsArrayName += ionType + "FragHighlights";
+				if (ionType == "b") { // or a or c
+					this[fragHighlightsArrayName][frag.ionNumber + offset - 1].sticky = true;
+					//colourLetters(pepLetters, pepColour, 0, (frag.ionNumber + offset));
+				} else {
+					this[fragHighlightsArrayName][pepLength - frag.ionNumber + offset - 1].sticky = true;
+					//colourLetters(pepLetters, pepColour, (pepLength - frag.ionNumber + offset), pepLetters.length);
+				}
+			//}
+		}
+	}
+}
+
+PeptideFragmentationKey.prototype.clearStickyHighlights = function(){
+	clear(this.pep1bFragHighlights);
+	clear(this.pep1yFragHighlights);
+	clear(this.pep2bFragHighlights);
+	clear(this.pep2yFragHighlights);
+
+	function clear(hightlightArray){
+		var pLength = hightlightArray.length;
+		for (var p = 0; p < pLength; p++){
+			if (hightlightArray[p]){
+				hightlightArray[p].sticky = false;
 			}
 		}	
 	}

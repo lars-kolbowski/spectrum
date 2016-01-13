@@ -80,6 +80,10 @@ function Peak (data, graph){
 		group.ontouchend = function(evt) {
 			endHighlight();
 		};
+		group.onclick = function(evt){
+			if (!_.contains(self.graph.model.sticky, self))
+				self.graph.model.updateSticky(self);
+		}
 
 		function startHighlight(){
 			self.graph.greyPeaks();
@@ -88,10 +92,14 @@ function Peak (data, graph){
 			self.graph.highlightChanged.dispatch(self.fragments);
 		}
 		function endHighlight(){
-			self.highlight(false);
-			self.graph.highlightChanged.dispatch([]);
-			self.graph.colourPeaks();
-			self.graph.showLabels();
+			if (!_.contains(self.graph.model.sticky, self)){
+				self.highlight(false);
+				self.graph.highlightChanged.dispatch([]);
+				self.graph.greyPeaks();
+				self.graph.colourPeaks();
+				self.graph.clearLabels();
+				self.graph.showLabels();
+			}
 		}
 
 	  	//create frag labels
@@ -202,7 +210,7 @@ Peak.prototype.highlight = function(show){
 		}
 		this.graph.peaks[0][0].appendChild(this.g[0][0]);
 		this.line.attr("stroke", this.colour);
-		this.showLabels();
+		this.showLabels(true);
 		for (var b = 0; b < this.IsotopeCluster.points.length; b++ )
 			this.IsotopeCluster.points[b].line.attr("stroke", this.colour);
 

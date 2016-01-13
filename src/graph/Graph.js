@@ -26,7 +26,7 @@ Graph = function(targetSvg, model, options) {
 	this.y = d3.scale.linear();
 	this.highlightChanged = new signals.Signal();
 	this.model = model;
-	
+
 	this.margin = {
 		"top":    options.title  ? 130 : 110,
 		"right":  10,
@@ -132,24 +132,6 @@ Graph = function(targetSvg, model, options) {
 
 
 Graph.prototype.setData = function(model){
-/*	this.clear();
-	//get Max m/z value of primarymatches
- 	this.xmaxPrimary = d3.max(annotatedPeaks,
-			function(d){
-				return ((d.isprimarymatch == 1)? d.expmz - 0 : 0);
-			}
-		) + 50;
- 	//get Min m/z value of primarymatches
-	this.xminPrimary = d3.min(annotatedPeaks, 
-			function(d){
-				return ((d.isprimarymatch == 1)?  d.expmz - 0 : this.xmaxPrimary);
-			}
-		) - 50;
-	//sort Data by m/z and Int
-	var nested =  d3.nest()
-		.key(function(d) { return d.expmz + '-' + d.absoluteintensity; })
-		.entries(annotatedPeaks);
-		*/
 	//create points array with Peaks
 	this.points = new Array();
 	this.pep1 = model.pep1;
@@ -263,7 +245,7 @@ Graph.prototype.clear = function(){
 }
 
 
-Graph.prototype.setHighlights = function(peptide, pepI){
+Graph.prototype.setHighlights = function(peptide, pepI, sticky){
 	this.clearHighlights();
 	if (peptide) {
 		this.clearLabels();
@@ -289,11 +271,17 @@ Graph.prototype.setHighlights = function(peptide, pepI){
 			if (match === true) {
 				this.points[p].highlight(true);
 				this.points[p].showLabels(true);
+
+				if (sticky === true){
+					if (!_.contains(this.model.sticky, this.points[p]))
+						this.model.sticky.push(this.points[p]);
+				}
 			}
 		}	
 	} else {
 		this.clearLabels();
 		this.showLabels();
+		this.greyPeaks();
 		this.colourPeaks();
 	}
 }
@@ -301,7 +289,7 @@ Graph.prototype.setHighlights = function(peptide, pepI){
 Graph.prototype.clearHighlights = function(peptide, pepI){
 	var peakCount = this.points.length;
 	for (var p = 0; p < peakCount; p++) {
-		if (this.points[p].fragments.length > 0) {
+		if (this.points[p].fragments.length > 0 && !_.contains(this.model.sticky, this.points[p])) {
 			this.points[p].highlight(false);
 		}
 	}
@@ -310,17 +298,19 @@ Graph.prototype.clearHighlights = function(peptide, pepI){
 Graph.prototype.clearLabels = function(){
 	var peakCount = this.points.length;
 	for (var p = 0; p < peakCount; p++) {
-		if (this.points[p].fragments.length > 0) {
+		if (this.points[p].fragments.length > 0 && !_.contains(this.model.sticky, this.points[p])) {
 			this.points[p].removeLabels();
 		}
 	}
 }
 
 Graph.prototype.showLabels = function(){
-	var peakCount = this.points.length;
-	for (var p = 0; p < peakCount; p++) {
-		if (this.points[p].fragments.length > 0) {
-			this.points[p].showLabels();
+	if(this.model.sticky.length == 0){
+		var peakCount = this.points.length;
+		for (var p = 0; p < peakCount; p++) {
+			if (this.points[p].fragments.length > 0) {
+				this.points[p].showLabels();
+			}
 		}
 	}
 }
@@ -329,14 +319,17 @@ Graph.prototype.showLabels = function(){
 Graph.prototype.greyPeaks = function(){
 	var peakCount = this.points.length;
 	for (var p = 0; p < peakCount; p++) {
-		this.points[p].line.attr("stroke", this.model.lossFragBarColour);
+		if (!_.contains(this.model.sticky, this.points[p]))
+			this.points[p].line.attr("stroke", this.model.lossFragBarColour);
 	}
 }
 Graph.prototype.colourPeaks = function(){
-	var peakCount = this.points.length;
-	for (var p = 0; p < peakCount; p++) {
-		var peak = this.points[p];
-		peak.line.attr("stroke", peak.colour);	
+	if(this.model.sticky.length == 0){
+		var peakCount = this.points.length;
+		for (var p = 0; p < peakCount; p++) {
+			var peak = this.points[p];
+			peak.line.attr("stroke", peak.colour);	
+		}
 	}
 }
 /*

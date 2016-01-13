@@ -34,6 +34,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		this.highlightColour = "yellow";
 		this.highlightWidth = 11;
 		this.setGraphData();
+		this.sticky = Array();
 	},
 
 	clear: function(){
@@ -78,6 +79,11 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		this.xmin = domain[0].toFixed(2);
 		this.xmax = domain[1].toFixed(2);
 		this.trigger("changed:Zoom");
+	},
+
+	updateSticky: function(peak){
+		this.sticky.push(peak);
+		this.trigger("changed:Sticky");
 	}
 
 });
