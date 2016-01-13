@@ -239,8 +239,7 @@ Peak.prototype.updateX = function(){
 		for (var a = 0; a < labelCount; a++){
 			this.labels[a].attr("x", this.graph.x(this.x));
 			this.labelHighlights[a].attr("x", this.graph.x(this.x));
-			if ((this.x > xDomain[0] && this.x < xDomain[1])
-					&& (this.graph.lossyShown === true || this.fragments[a].lossy === false)){
+			if ((this.x > xDomain[0] && this.x < xDomain[1]) && (this.graph.lossyShown === true || this.fragments[a].lossy === false) && (_.contains(this.graph.model.sticky, this) || this.graph.model.sticky.length == 0)){
 				this.labels[a].attr("display","inline");
 				this.labelHighlights[a].attr("display","inline");
 			} else {
