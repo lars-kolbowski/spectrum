@@ -315,7 +315,6 @@ Graph.prototype.showLabels = function(){
 	}
 }
 
-
 Graph.prototype.greyPeaks = function(){
 	var peakCount = this.points.length;
 	for (var p = 0; p < peakCount; p++) {
@@ -323,6 +322,7 @@ Graph.prototype.greyPeaks = function(){
 			this.points[p].line.attr("stroke", this.model.lossFragBarColour);
 	}
 }
+
 Graph.prototype.colourPeaks = function(){
 	if(this.model.sticky.length == 0){
 		var peakCount = this.points.length;
@@ -331,6 +331,45 @@ Graph.prototype.colourPeaks = function(){
 			peak.line.attr("stroke", peak.colour);	
 		}
 	}
+}
+
+Graph.prototype.updateColors = function(){
+	var peakCount = this.points.length;
+		for (var p = 0; p < peakCount; p++) {
+			var peak = this.points[p];
+			//Peaks
+			var colour = this.model.lossFragBarColour;
+			if (peak.fragments.length > 0){
+				if (peak.fragments[0].peptide === this.pep1 && peak.fragments[0].lossy === false) {
+					peak.colour = this.model.p1color;
+					for (var i = 0; i < peak.labels.length; i++)
+						peak.labels[i].attr("fill", this.model.p1color);
+				}
+				else if (peak.fragments[0].peptide === this.pep2 && peak.fragments[0].lossy === false) {
+					peak.colour = this.model.p2color;
+					for (var i = 0; i < peak.labels.length; i++)
+						peak.labels[i].attr("fill", this.model.p2color);
+				}
+				else if (peak.fragments[0].peptide === this.pep1 && peak.fragments[0].lossy === true) {
+					peak.colour = this.model.p1color_loss;
+					for (var i = 0; i < peak.labels.length; i++)
+						peak.labels[i].attr("fill", this.model.p1color_loss);
+				}
+				else if (peak.fragments[0].peptide === this.pep2 && peak.fragments[0].lossy === true) {
+					peak.colour = this.model.p2color_loss;
+					for (var i = 0; i < peak.labels.length; i++)
+						peak.labels[i].attr("fill", this.model.p2color_loss);
+				}
+			}
+			else if (peak.IsotopeCluster){
+				if (peak.IsotopeCluster.pep == this.pep1)
+					peak.colour = this.model.p1color_cluster;
+				if (peak.IsotopeCluster.pep == this.pep2)
+					peak.colour = this.model.p2color_cluster;
+			}
+			
+			this.colourPeaks();
+		}
 }
 /*
 Graph.prototype.showLabels = function(){

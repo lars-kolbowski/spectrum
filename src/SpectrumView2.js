@@ -5,6 +5,7 @@ var SpectrumView = Backbone.View.extend({
 		'click #lossyChkBx': 'showLossy',
 		'submit #setrange' : 'setrange',
 		'click #clearHighlights' : 'clearHighlights',
+		'change #colorSelector': 'changeColorScheme',
 	},
 
 	initialize: function() {
@@ -19,6 +20,7 @@ var SpectrumView = Backbone.View.extend({
 		this.listenTo(this.model, 'change', this.render);
 		this.listenTo(this.model, "changed:Zoom", this.updateRange);
 		this.listenTo(window, 'resize', _.debounce(this.resize));
+		this.listenTo(this.model, 'changed:ColorScheme', this.updateColors);
 		//this.listenTo(this.model, 'destroy', this.remove);
 	},
 
@@ -74,6 +76,14 @@ var SpectrumView = Backbone.View.extend({
 		this.graph.colourPeaks();
 		this.graph.clearLabels();
 		this.graph.showLabels();
-	}
+	},
+
+	changeColorScheme: function(e){
+		this.model.changeColorScheme(e.target.value);
+	},
+
+	updateColors: function(){
+		this.graph.updateColors();
+	},
 	
 });

@@ -24,7 +24,6 @@ function Peak (data, graph){
 	this.y = data[0].absolute_intensity - 0;
 	this.charge = data[0].charge - 0;
 	this.graph = graph;
-
 	//make fragments
 	var notLossyFragments = [];
 	var lossyFragments = [];

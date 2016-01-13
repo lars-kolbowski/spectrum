@@ -24,7 +24,8 @@ var FragmentationKeyView = Backbone.View.extend({
 
 		this.listenTo(this.model, 'change', this.render);
 		this.listenTo(this.model, 'destroy', this.remove);
-		this.listenTo(this.model, 'changed:Sticky', this.updateSticky)
+		this.listenTo(this.model, 'changed:Sticky', this.updateSticky);
+		this.listenTo(this.model, 'changed:ColorScheme', this.updateColors);
 	},
 
 	render: function() {
@@ -38,6 +39,10 @@ var FragmentationKeyView = Backbone.View.extend({
 	updateSticky: function(){
 		console.log(this.model.sticky);
 		this.peptideFragKey.setStickyHighlights(this.model.sticky[0].fragments);
+	},
+
+	updateColors: function(){
+		this.peptideFragKey.clearHighlights();
 	}
 
 });

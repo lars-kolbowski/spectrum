@@ -24,12 +24,12 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		this.linkPos2 = this.get("linkPos2");
 		this.notUpperCase = this.get("notUpperCase"),
 		this.cmap = colorbrewer.RdBu[8];
-		this.p1color = this.cmap[7];
-		this.p1color_cluster = this.cmap[5];
-		this.p1color_loss = this.cmap[6];
-		this.p2color = this.cmap[0];
-		this.p2color_cluster = this.cmap[2];
-		this.p2color_loss = this.cmap[1];
+		this.p1color = this.cmap[0];
+		this.p1color_cluster = this.cmap[2];
+		this.p1color_loss = this.cmap[1];
+		this.p2color = this.cmap[7];
+		this.p2color_cluster = this.cmap[5];
+		this.p2color_loss = this.cmap[6];
 		this.lossFragBarColour = "#cccccc";
 		this.highlightColour = "yellow";
 		this.highlightWidth = 11;
@@ -84,6 +84,33 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 	updateSticky: function(peak){
 		this.sticky.push(peak);
 		this.trigger("changed:Sticky");
+	},
+
+	changeColorScheme: function(scheme){
+		switch(scheme) {
+			case "RdBu": 
+				this.cmap = colorbrewer.RdBu[8];
+				break;
+			case "BrBG": 
+				this.cmap = colorbrewer.BrBG[8];
+				break;
+			case "PiYG": 
+				this.cmap = colorbrewer.PiYG[8];
+				break;
+			case "PRGn": 
+				this.cmap = colorbrewer.PRGn[8];
+				break;
+			case "PuOr": 
+				this.cmap = colorbrewer.PuOr[8];
+				break;			
+		}
+		this.p1color = this.cmap[0];
+		this.p1color_cluster = this.cmap[2];
+		this.p1color_loss = this.cmap[1];
+		this.p2color = this.cmap[7];
+		this.p2color_cluster = this.cmap[5];
+		this.p2color_loss = this.cmap[6];
+		this.trigger("changed:ColorScheme");
 	}
 
 });
