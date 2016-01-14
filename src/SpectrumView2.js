@@ -6,6 +6,7 @@ var SpectrumView = Backbone.View.extend({
 		'submit #setrange' : 'setrange',
 		'click #clearHighlights' : 'clearHighlights',
 		'change #colorSelector': 'changeColorScheme',
+		'click #measuringTool': 'measuringTool',
 	},
 
 	initialize: function() {
@@ -28,8 +29,6 @@ var SpectrumView = Backbone.View.extend({
 
 		this.graph.setData(this.model);
 
-		//this.lossyShown = false;
-
 	},
 
 	reset: function(){
@@ -43,7 +42,7 @@ var SpectrumView = Backbone.View.extend({
 	showLossy: function(e){
 		var $target = $(e.target);
         var selected = $target .is(':checked');
-        this.model.lossyShown = selected;
+        //this.model.lossyShown = selected;
 		this.graph.lossyShown = selected;
 		this.graph.clearLabels();
 		this.graph.showLabels();
@@ -86,4 +85,9 @@ var SpectrumView = Backbone.View.extend({
 		this.graph.updateColors();
 	},
 	
+	measuringTool: function(e){
+		var $target = $(e.target);
+        var selected = $target .is(':checked');
+		this.graph.changePanning(selected);
+	}
 });

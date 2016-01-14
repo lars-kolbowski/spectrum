@@ -211,7 +211,7 @@ Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 	self.dragZoomHighlight.attr("height", height);
 				
 	self.zoom = d3.behavior.zoom().x(self.x).on("zoom", self.redraw());
-	self.plot.call( d3.behavior.zoom().x(self.x).on("zoom", self.redraw()));
+	self.plot.call(self.zoom);
 	self.innerSVG.call(self.zoom);
 
 	if (this.title) {
@@ -223,6 +223,31 @@ Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 	self.redraw()();
 }
 
+Graph.prototype.changePanning = function(on){
+	if (on === true){
+		this.plot.call(this.zoom)
+			.on("mousedown.zoom", null)
+			.on("touchstart.zoom", null)
+			.on("touchmove.zoom", null)
+			.on("touchend.zoom", null);
+		this.innerSVG.call(this.zoom)
+			.on("mousedown.zoom", null)
+			.on("touchstart.zoom", null)
+			.on("touchmove.zoom", null)
+			.on("touchend.zoom", null);
+
+		this.plot.on("click", function() {
+          var coords = d3.mouse(this);
+          alert(coords);
+      	});
+	}
+	else{
+		this.plot.on("click", null)
+		this.plot.call(this.zoom);
+		this.innerSVG.call(this.zoom);
+	}
+}
+
 Graph.prototype.redraw = function(){
 	var self = this;
 	return function (){
@@ -230,8 +255,8 @@ Graph.prototype.redraw = function(){
 		  self.points[i].update();
 		}
 		self.xaxis.call( self.xAxis);//d3.behavior.zoom().x(self.x).on("zoom", self.redraw()));
-		self.plot.call( d3.behavior.zoom().x(self.x).on("zoom", self.redraw()));
-		self.innerSVG.call( d3.behavior.zoom().x(self.x).on("zoom", self.redraw()));
+		//self.plot.call( d3.behavior.zoom().x(self.x).on("zoom", self.redraw()));
+		//self.innerSVG.call( d3.behavior.zoom().x(self.x).on("zoom", self.redraw()));
 		self.model.setZoom(self.x.domain());
 	};
 }

@@ -30,7 +30,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		this.p2color_loss = this.cmap[6];
 		this.lossFragBarColour = "#cccccc";
 		this.highlightColour = "yellow";
-		this.highlightColourSticky = colorbrewer.Oranges[9];
+		//this.highlightColourSticky = colorbrewer.Oranges[9];
 		this.highlightWidth = 11;
 		this.setGraphData();
 		this.sticky = Array();
