@@ -119,13 +119,6 @@ Graph = function(targetSvg, model, options) {
 			.attr("x2", coords[0])
 			.attr("y1", self.y(0))
 			.attr("y2", 0);
-		var distance = Math.abs(self.x(closestPeak.x) - coords[0]);
-		if (self.x(closestPeak.x) < coords[0])
-			var labelX = self.x(closestPeak.x) + distance;
-		else
-			var labelX = coords[0] + distance;	
-		self.measureLabel.attr("x", labelX )
-			.text(Math.round(distance, 2)+" Th");
 		//self.measuringToolLine.attr("display","inline");
 	}
 
@@ -140,14 +133,17 @@ Graph = function(targetSvg, model, options) {
 			.attr("x2", coords[0])
 			.attr("y1", self.y(0))
 			.attr("y2", 0);
-		var measureStartX = self.measuringToolVLineStart.attr("x1")
-		var distance = Math.abs(measureStartX - coords[0]);
+		var measureStartX = parseInt(self.measuringToolVLineStart.attr("x1"));
+		var deltaX = Math.abs(measureStartX - coords[0]);
+		var distance = Math.abs(self.x.invert(measureStartX) - self.x.invert(coords[0]));
 		if (measureStartX  < coords[0])
-			var labelX = measureStartX  + distance;
+			var labelX = measureStartX  + deltaX/2;
 		else
-			var labelX = coords[0] + distance;	
-		self.measureLabel.attr("x", labelX )
-			.text(Math.round(distance, 2)+" Th");		  
+			var labelX = coords[0] + deltaX/2;	
+		self.measureLabel
+			.attr("x", labelX )
+			.attr("y", coords[1]-10)
+			.text(distance.toFixed(2)+" Th");		  
 	}
 
 	function measureEnd() {
@@ -322,11 +318,12 @@ Graph.prototype.changePanning = function(on){
 			.on("touchstart.zoom", null)
 			.on("touchmove.zoom", null)
 			.on("touchend.zoom", null);
-		this.plot.call(this.measureBrush);
+		this.plot.call(this.measureBrush).on("click");
 	}
 	else{
 		this.plot.call(this.zoom);
 		this.innerSVG.call(this.zoom);
+		this.plot.call();
 	}
 }
 
