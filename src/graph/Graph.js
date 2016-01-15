@@ -72,86 +72,22 @@ Graph = function(targetSvg, model, options) {
 	this.dragZoomHighlight = this.innerSVG.append("rect").attr("y", 0).attr("fill","#addd8e");	
 	
 	//MeasuringTool
-	this.measuringToolVLineStart = this.innerSVG.append("line")
+	this.measuringTool = this.innerSVG.append("g")
+	this.measuringToolVLineStart = this.measuringTool.append("line")
 		.attr("stroke-width", 1)
 		.attr("stroke", "Black");
-	this.measuringToolVLineEnd = this.innerSVG.append("line")
+	this.measuringToolVLineEnd = this.measuringTool.append("line")
 		.attr("stroke-width", 1)
 		.attr("stroke", "Black");
-	this.measuringToolLine = this.innerSVG.append("line")
+	this.measuringToolLine = this.measuringTool.append("line")
 		.attr("y1", 50)
 		.attr("y2", 50)
 		.attr("stroke-width", 1)
 		.attr("stroke", "Red");
-	this.measureLabel = this.innerSVG.append("text")
+	this.measureLabel = this.measuringTool.append("text")
 		.attr("text-anchor", "middle")
 		.style("font-size", "0.8em");
-	this.measureBrush = d3.svg.brush()
-		.x(this.x)
-		.on("brushstart", measureStart)
-		.on("brush", measureMove)
-		.on("brushend", measureEnd);
 
-	function measureStart() {
-		var coords = d3.mouse(this);
-		var mouseX = self.x.invert(coords[0]);
-		var distance = 10000;
-		var peakCount = self.points.length;
-		for (var p = 0; p < peakCount; p++) {
-			var peak = self.points[p];
-			if (Math.abs(peak.x - mouseX)  < distance){
-				distance = Math.abs(peak.x - mouseX);
-				var closestPeak = peak;	
-			}
-		}
-		self.measuringToolVLineStart
-			.attr("x1", self.x(closestPeak.x))
-			.attr("x2", self.x(closestPeak.x))
-			.attr("y1", self.y(closestPeak.y))
-			.attr("y2", 0);
-		self.measuringToolLine
-			.attr("x1", self.x(closestPeak.x))
-			.attr("x2", coords[0])
-			.attr("y1", coords[1])
-			.attr("y2", coords[1]);
-		self.measuringToolVLineEnd
-			.attr("x1", coords[0])
-			.attr("x2", coords[0])
-			.attr("y1", self.y(0))
-			.attr("y2", 0);
-		//self.measuringToolLine.attr("display","inline");
-	}
-
-	function measureMove() {
-		var coords = d3.mouse(this);
-		self.measuringToolLine
-			.attr("x2", coords[0])
-			.attr("y1", coords[1])
-			.attr("y2", coords[1]);	
-		self.measuringToolVLineEnd
-			.attr("x1", coords[0])
-			.attr("x2", coords[0])
-			.attr("y1", self.y(0))
-			.attr("y2", 0);
-		var measureStartX = parseInt(self.measuringToolVLineStart.attr("x1"));
-		var deltaX = Math.abs(measureStartX - coords[0]);
-		var distance = Math.abs(self.x.invert(measureStartX) - self.x.invert(coords[0]));
-		if (measureStartX  < coords[0])
-			var labelX = measureStartX  + deltaX/2;
-		else
-			var labelX = coords[0] + deltaX/2;	
-		self.measureLabel
-			.attr("x", labelX )
-			.attr("y", coords[1]-10)
-			.text(distance.toFixed(2)+" Th");		  
-	}
-
-	function measureEnd() {
-	  //self.measuringToolLine.attr("display","none");
-	  //var s = self.measureBrush.extent();
-	  //self.x.domain(s);
-	  //self.measureBrush.x(self.x)
-	}
 	//------------------------------------
 
 
@@ -308,6 +244,7 @@ Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 
 Graph.prototype.changePanning = function(on){
 	if (on === true){
+		this.measuringTool.attr("display","inline");
 		this.plot.call(this.zoom)
 			.on("mousedown.zoom", null)
 			.on("touchstart.zoom", null)
@@ -318,12 +255,88 @@ Graph.prototype.changePanning = function(on){
 			.on("touchstart.zoom", null)
 			.on("touchmove.zoom", null)
 			.on("touchend.zoom", null);
-		this.plot.call(this.measureBrush).on("click");
+		
+		var self = this;
+		function measureStart() {
+			var coords = d3.mouse(this);
+			var mouseX = self.x.invert(coords[0]);
+			var distance = 10000;
+			var peakCount = self.points.length;
+			for (var p = 0; p < peakCount; p++) {
+				var peak = self.points[p];
+				if (Math.abs(peak.x - mouseX)  < distance){
+					distance = Math.abs(peak.x - mouseX);
+					var closestPeak = peak;	
+				}
+			}
+			self.measuringToolVLineStart
+				.attr("x1", self.x(closestPeak.x))
+				.attr("x2", self.x(closestPeak.x))
+				.attr("y1", self.y(closestPeak.y))
+				.attr("y2", 0);
+			self.measuringToolLine
+				.attr("x1", self.x(closestPeak.x))
+				.attr("x2", coords[0])
+				.attr("y1", coords[1])
+				.attr("y2", coords[1]);
+			self.measuringToolVLineEnd
+				.attr("x1", coords[0])
+				.attr("x2", coords[0])
+				.attr("y1", self.y(0))
+				.attr("y2", 0);
+			//self.measuringToolLine.attr("display","inline");
+		}
+
+		function measureMove() {
+			var coords = d3.mouse(this);
+			self.measuringToolLine
+				.attr("x2", coords[0])
+				.attr("y1", coords[1])
+				.attr("y2", coords[1]);	
+			self.measuringToolVLineEnd
+				.attr("x1", coords[0])
+				.attr("x2", coords[0])
+				.attr("y1", self.y(0))
+				.attr("y2", 0);
+			var measureStartX = parseInt(self.measuringToolVLineStart.attr("x1"));
+			var deltaX = Math.abs(measureStartX - coords[0]);
+			var distance = Math.abs(self.x.invert(measureStartX) - self.x.invert(coords[0]));
+			if (measureStartX  < coords[0])
+				var labelX = measureStartX  + deltaX/2;
+			else
+				var labelX = coords[0] + deltaX/2;	
+			self.measureLabel
+				.attr("x", labelX )
+				.attr("y", coords[1]-10)
+				.text(distance.toFixed(2)+" Th");		  
+		}
+
+		function measureEnd() {
+		  //self.measuringToolLine.attr("display","none");
+		  //var s = self.measureBrush.extent();
+		  //self.x.domain(s);
+		  //self.measureBrush.x(self.x)
+		}
+
+		this.measureBrush = d3.svg.brush()
+			.x(this.x)
+			.on("brushstart", measureStart)
+			.on("brush", measureMove)
+			.on("brushend", measureEnd);
+
+		this.plot.call(this.measureBrush);
+
+
 	}
 	else{
+		this.measuringTool.attr("display","none");
 		this.plot.call(this.zoom);
 		this.innerSVG.call(this.zoom);
-		this.plot.call();
+		this.measureBrush = d3.svg.brush()
+			.on("brushstart", null)
+			.on("brush", null)
+			.on("brushend", null);
+		this.plot.call(this.measureBrush);
 	}
 }
 
