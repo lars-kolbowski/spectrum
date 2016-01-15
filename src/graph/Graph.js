@@ -71,7 +71,94 @@ Graph = function(targetSvg, model, options) {
 	
 	this.dragZoomHighlight = this.innerSVG.append("rect").attr("y", 0).attr("fill","#addd8e");	
 	
-	
+	//MeasuringTool
+	this.measuringToolVLineStart = this.innerSVG.append("line")
+		.attr("stroke-width", 1)
+		.attr("stroke", "Black");
+	this.measuringToolVLineEnd = this.innerSVG.append("line")
+		.attr("stroke-width", 1)
+		.attr("stroke", "Black");
+	this.measuringToolLine = this.innerSVG.append("line")
+		.attr("y1", 50)
+		.attr("y2", 50)
+		.attr("stroke-width", 1)
+		.attr("stroke", "Red");
+	this.measureLabel = this.innerSVG.append("text")
+		.attr("text-anchor", "middle")
+		.style("font-size", "0.8em");
+	this.measureBrush = d3.svg.brush()
+		.x(this.x)
+		.on("brushstart", measureStart)
+		.on("brush", measureMove)
+		.on("brushend", measureEnd);
+
+	function measureStart() {
+		var coords = d3.mouse(this);
+		var mouseX = self.x.invert(coords[0]);
+		var distance = 10000;
+		var peakCount = self.points.length;
+		for (var p = 0; p < peakCount; p++) {
+			var peak = self.points[p];
+			if (Math.abs(peak.x - mouseX)  < distance){
+				distance = Math.abs(peak.x - mouseX);
+				var closestPeak = peak;	
+			}
+		}
+		self.measuringToolVLineStart
+			.attr("x1", self.x(closestPeak.x))
+			.attr("x2", self.x(closestPeak.x))
+			.attr("y1", self.y(closestPeak.y))
+			.attr("y2", 0);
+		self.measuringToolLine
+			.attr("x1", self.x(closestPeak.x))
+			.attr("x2", coords[0])
+			.attr("y1", coords[1])
+			.attr("y2", coords[1]);
+		self.measuringToolVLineEnd
+			.attr("x1", coords[0])
+			.attr("x2", coords[0])
+			.attr("y1", self.y(0))
+			.attr("y2", 0);
+		var distance = Math.abs(self.x(closestPeak.x) - coords[0]);
+		if (self.x(closestPeak.x) < coords[0])
+			var labelX = self.x(closestPeak.x) + distance;
+		else
+			var labelX = coords[0] + distance;	
+		self.measureLabel.attr("x", labelX )
+			.text(Math.round(distance, 2)+" Th");
+		//self.measuringToolLine.attr("display","inline");
+	}
+
+	function measureMove() {
+		var coords = d3.mouse(this);
+		self.measuringToolLine
+			.attr("x2", coords[0])
+			.attr("y1", coords[1])
+			.attr("y2", coords[1]);	
+		self.measuringToolVLineEnd
+			.attr("x1", coords[0])
+			.attr("x2", coords[0])
+			.attr("y1", self.y(0))
+			.attr("y2", 0);
+		var measureStartX = self.measuringToolVLineStart.attr("x1")
+		var distance = Math.abs(measureStartX - coords[0]);
+		if (measureStartX  < coords[0])
+			var labelX = measureStartX  + distance;
+		else
+			var labelX = coords[0] + distance;	
+		self.measureLabel.attr("x", labelX )
+			.text(Math.round(distance, 2)+" Th");		  
+	}
+
+	function measureEnd() {
+	  //self.measuringToolLine.attr("display","none");
+	  //var s = self.measureBrush.extent();
+	  //self.x.domain(s);
+	  //self.measureBrush.x(self.x)
+	}
+	//------------------------------------
+
+
 	this.highlights = this.innerSVG.append("g");
 	this.peaks = this.innerSVG.append("g");
 	this.lossyAnnotations = this.innerSVG.append("g");
@@ -235,14 +322,9 @@ Graph.prototype.changePanning = function(on){
 			.on("touchstart.zoom", null)
 			.on("touchmove.zoom", null)
 			.on("touchend.zoom", null);
-
-		this.plot.on("click", function() {
-          var coords = d3.mouse(this);
-          alert(coords);
-      	});
+		this.plot.call(this.measureBrush);
 	}
 	else{
-		this.plot.on("click", null)
 		this.plot.call(this.zoom);
 		this.innerSVG.call(this.zoom);
 	}
