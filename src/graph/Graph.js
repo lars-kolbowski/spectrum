@@ -289,22 +289,47 @@ Graph.prototype.measure = function(on){
 
 		function measureMove() {
 			var coords = d3.mouse(this);
-			self.measuringToolLine
-				.attr("x2", coords[0])
-				.attr("y1", coords[1])
-				.attr("y2", coords[1]);	
-			self.measuringToolVLineEnd
-				.attr("x1", coords[0])
-				.attr("x2", coords[0])
-				.attr("y1", self.y(0))
+			var mouseX = self.x.invert(coords[0]);
+
+			var distance = 10000;
+			var triggerdistance = 2;
+			var peakCount = self.points.length;
+			for (var p = 0; p < peakCount; p++) {
+				var peak = self.points[p];
+				if (Math.abs(peak.x - mouseX)  < distance && Math.abs(peak.x - mouseX) < triggerdistance){
+					distance = Math.abs(peak.x - mouseX);
+					var endPeak = peak;	
+				}
+			}
+			
+			if(endPeak){
+				self.measuringToolVLineEnd
+				.attr("x1", self.x(endPeak.x))
+				.attr("x2", self.x(endPeak.x))
+				.attr("y1", self.y(endPeak.y))
 				.attr("y2", 0);
-			var measureStartX = parseInt(self.measuringToolVLineStart.attr("x1"));
-			var deltaX = Math.abs(measureStartX - coords[0]);
-			var distance = Math.abs(self.x.invert(measureStartX) - self.x.invert(coords[0]));
-			if (measureStartX  < coords[0])
+			}
+			else{
+				self.measuringToolVLineEnd
+					.attr("x1", coords[0])
+					.attr("x2", coords[0])
+					.attr("y1", self.y(0))
+					.attr("y2", 0);
+			}
+			var measureStartX = parseFloat(self.measuringToolVLineStart.attr("x1"));
+			var measureEndX = parseFloat(self.measuringToolVLineEnd.attr("x1"));
+			
+			self.measuringToolLine
+				.attr("x2", measureEndX)
+				.attr("y1", coords[1])
+				.attr("y2", coords[1]);
+
+			var deltaX = Math.abs(measureStartX - measureEndX);
+			var distance = Math.abs(self.x.invert(measureStartX) - self.x.invert(measureEndX));
+			if (measureStartX  < measureEndX)
 				var labelX = measureStartX  + deltaX/2;
 			else
-				var labelX = coords[0] + deltaX/2;	
+				var labelX = measureEndX + deltaX/2;	
 			self.measureLabel
 				.attr("x", labelX )
 				.attr("y", coords[1]-10)
