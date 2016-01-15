@@ -242,7 +242,7 @@ Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 	self.redraw()();
 }
 
-Graph.prototype.changePanning = function(on){
+Graph.prototype.measure = function(on){
 	if (on === true){
 		this.measuringTool.attr("display","inline");
 		this.plot.call(this.zoom)
@@ -311,20 +311,13 @@ Graph.prototype.changePanning = function(on){
 				.text(distance.toFixed(2)+" Th");		  
 		}
 
-		function measureEnd() {
-		  //self.measuringToolLine.attr("display","none");
-		  //var s = self.measureBrush.extent();
-		  //self.x.domain(s);
-		  //self.measureBrush.x(self.x)
-		}
-
 		this.measureBrush = d3.svg.brush()
 			.x(this.x)
 			.on("brushstart", measureStart)
 			.on("brush", measureMove)
-			.on("brushend", measureEnd);
 
 		this.plot.call(this.measureBrush);
+		this.innerSVG.call(this.measureBrush);
 
 
 	}
@@ -337,6 +330,7 @@ Graph.prototype.changePanning = function(on){
 			.on("brush", null)
 			.on("brushend", null);
 		this.plot.call(this.measureBrush);
+		this.innerSVG.call(this.measureBrush);
 	}
 }
 

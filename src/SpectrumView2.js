@@ -88,6 +88,6 @@ var SpectrumView = Backbone.View.extend({
 	measuringTool: function(e){
 		var $target = $(e.target);
         var selected = $target .is(':checked');
-		this.graph.changePanning(selected);
+		this.graph.measure(selected);
 	}
 });
