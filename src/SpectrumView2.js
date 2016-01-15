@@ -1,9 +1,12 @@
 var SpectrumView = Backbone.View.extend({
 
 	events : {
-		'click #resize' : 'resize',
+		'click #reset' : 'reset',
 		'click #lossyChkBx': 'showLossy',
 		'submit #setrange' : 'setrange',
+		'click #clearHighlights' : 'clearHighlights',
+		'change #colorSelector': 'changeColorScheme',
+		'click #measuringTool': 'measuringTool',
 	},
 
 	initialize: function() {
@@ -17,7 +20,8 @@ var SpectrumView = Backbone.View.extend({
 
 		this.listenTo(this.model, 'change', this.render);
 		this.listenTo(this.model, "changed:Zoom", this.updateRange);
-		//this.listenTo(this.model, 'change:Zoom', this.updateRange);
+		this.listenTo(window, 'resize', _.debounce(this.resize));
+		this.listenTo(this.model, 'changed:ColorScheme', this.updateColors);
 		//this.listenTo(this.model, 'destroy', this.remove);
 	},
 
@@ -25,18 +29,20 @@ var SpectrumView = Backbone.View.extend({
 
 		this.graph.setData(this.model);
 
-		//this.lossyShown = false;
+	},
 
+	reset: function(){
+		this.graph.resize(this.model.xminPrimary, this.model.xmaxPrimary, this.model.ymin, this.model.ymax);
 	},
 
 	resize: function(){
-		this.graph.resize(this.model.xminPrimary, this.model.xmaxPrimary, this.model.ymin, this.model.ymax);
+		this.graph.resize(this.model.xmin, this.model.xmax, this.model.ymin, this.model.ymax);
 	},
 
 	showLossy: function(e){
 		var $target = $(e.target);
         var selected = $target .is(':checked');
-        this.model.lossyShown = selected;
+        //this.model.lossyShown = selected;
 		this.graph.lossyShown = selected;
 		this.graph.clearLabels();
 		this.graph.showLabels();
@@ -56,9 +62,32 @@ var SpectrumView = Backbone.View.extend({
 		}
 
 	},
+
 	updateRange: function(){
 		$("#xleft").val(this.model.xmin);
 		$("#xright").val(this.model.xmax);
-	}
+	},
+
+	clearHighlights: function(){
+		this.model.sticky.length = 0;
+		this.graph.clearHighlights();
+		this.graph.highlightChanged.dispatch([]);
+		this.graph.colourPeaks();
+		this.graph.clearLabels();
+		this.graph.showLabels();
+	},
+
+	changeColorScheme: function(e){
+		this.model.changeColorScheme(e.target.value);
+	},
+
+	updateColors: function(){
+		this.graph.updateColors();
+	},
 	
+	measuringTool: function(e){
+		var $target = $(e.target);
+        var selected = $target .is(':checked');
+		this.graph.changePanning(selected);
+	}
 });

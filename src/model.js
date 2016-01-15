@@ -17,23 +17,23 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		this.set("annotatedPeaks", d3.csv.parse(annotatedPeaksCSV.trim()));
 		this.annotatedPeaks = this.get("annotatedPeaks");
 		this.pep1 = this.get("pepSeq1").replace(this.get("notUpperCase"), '');
-		//this.set("pep1", this.get("pepSeq1").replace(this.get("notUpperCase"), ''));
 		this.pep2 = this.get("pepSeq2").replace(this.get("notUpperCase"), '');
-		//this.set("pep2", this.get("pepSeq2").replace(this.get("notUpperCase"), ''));
 		this.linkPos1 = this.get("linkPos1");
 		this.linkPos2 = this.get("linkPos2");
 		this.notUpperCase = this.get("notUpperCase"),
 		this.cmap = colorbrewer.RdBu[8];
-		this.p1color = this.cmap[7];
-		this.p1color_cluster = this.cmap[5];
-		this.p1color_loss = this.cmap[6];
-		this.p2color = this.cmap[0];
-		this.p2color_cluster = this.cmap[2];
-		this.p2color_loss = this.cmap[1];
+		this.p1color = this.cmap[0];
+		this.p1color_cluster = this.cmap[2];
+		this.p1color_loss = this.cmap[1];
+		this.p2color = this.cmap[7];
+		this.p2color_cluster = this.cmap[5];
+		this.p2color_loss = this.cmap[6];
 		this.lossFragBarColour = "#cccccc";
 		this.highlightColour = "yellow";
+		//this.highlightColourSticky = colorbrewer.Oranges[9];
 		this.highlightWidth = 11;
 		this.setGraphData();
+		this.sticky = Array();
 	},
 
 	clear: function(){
@@ -44,9 +44,8 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 	},
 
 	setGraphData: function(){
-		var annotatedPeaks = this.get("annotatedPeaks");
 		//get Max m/z value of primarymatches
-		this.xmaxPrimary = d3.max(annotatedPeaks,
+		this.xmaxPrimary = d3.max(this.annotatedPeaks,
 			function(d){
 				return ((d.isprimarymatch == 1)? d.expmz - 0 : 0);
 			}
@@ -54,7 +53,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		//this.set("xmaxPrimary", xmaxPrimary);
 
 		 //get Min m/z value of primarymatches
-		 this.xminPrimary = d3.min(annotatedPeaks, 
+		 this.xminPrimary = d3.min(this.annotatedPeaks, 
 		 	function(d){
 		 		return ((d.isprimarymatch == 1)?  d.expmz - 0 : this.xmaxPrimary);
 		 	}
@@ -64,13 +63,13 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		//sort Data by m/z and Int
 		this.nested =  d3.nest()
 		.key(function(d) { return d.expmz + '-' + d.absoluteintensity; })
-		.entries(annotatedPeaks);
+		.entries(this.annotatedPeaks);
 
 
 		this.xmax = this.xmaxPrimary;
 		this.xmin = this.xminPrimary;
 
-		this.ymax = d3.max(annotatedPeaks, function(d){return d.absolute_intensity - 0;});
+		this.ymax = d3.max(this.annotatedPeaks, function(d){return d.absolute_intensity - 0;});
 		//this.ymax = d3.max(this.points, function(d){return d.y;});
 		this.ymin = 0;//d3.min(this.points, function(d){return d.y;});
 	},
@@ -79,6 +78,40 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		this.xmin = domain[0].toFixed(2);
 		this.xmax = domain[1].toFixed(2);
 		this.trigger("changed:Zoom");
+	},
+
+	updateSticky: function(peak){
+		this.sticky.push(peak);
+		//var len = this.sticky.length;
+		//this.highlightColour = this.highlightColourSticky[len];
+		this.trigger("changed:Sticky");
+	},
+
+	changeColorScheme: function(scheme){
+		switch(scheme) {
+			case "RdBu": 
+				this.cmap = colorbrewer.RdBu[8];
+				break;
+			case "BrBG": 
+				this.cmap = colorbrewer.BrBG[8];
+				break;
+			case "PiYG": 
+				this.cmap = colorbrewer.PiYG[8];
+				break;
+			case "PRGn": 
+				this.cmap = colorbrewer.PRGn[8];
+				break;
+			case "PuOr": 
+				this.cmap = colorbrewer.PuOr[8];
+				break;			
+		}
+		this.p1color = this.cmap[0];
+		this.p1color_cluster = this.cmap[2];
+		this.p1color_loss = this.cmap[1];
+		this.p2color = this.cmap[7];
+		this.p2color_cluster = this.cmap[5];
+		this.p2color_loss = this.cmap[6];
+		this.trigger("changed:ColorScheme");
 	}
 
 });

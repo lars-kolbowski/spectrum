@@ -26,7 +26,7 @@ Graph = function(targetSvg, model, options) {
 	this.y = d3.scale.linear();
 	this.highlightChanged = new signals.Signal();
 	this.model = model;
-	
+
 	this.margin = {
 		"top":    options.title  ? 130 : 110,
 		"right":  10,
@@ -71,7 +71,94 @@ Graph = function(targetSvg, model, options) {
 	
 	this.dragZoomHighlight = this.innerSVG.append("rect").attr("y", 0).attr("fill","#addd8e");	
 	
-	
+	//MeasuringTool
+	this.measuringToolVLineStart = this.innerSVG.append("line")
+		.attr("stroke-width", 1)
+		.attr("stroke", "Black");
+	this.measuringToolVLineEnd = this.innerSVG.append("line")
+		.attr("stroke-width", 1)
+		.attr("stroke", "Black");
+	this.measuringToolLine = this.innerSVG.append("line")
+		.attr("y1", 50)
+		.attr("y2", 50)
+		.attr("stroke-width", 1)
+		.attr("stroke", "Red");
+	this.measureLabel = this.innerSVG.append("text")
+		.attr("text-anchor", "middle")
+		.style("font-size", "0.8em");
+	this.measureBrush = d3.svg.brush()
+		.x(this.x)
+		.on("brushstart", measureStart)
+		.on("brush", measureMove)
+		.on("brushend", measureEnd);
+
+	function measureStart() {
+		var coords = d3.mouse(this);
+		var mouseX = self.x.invert(coords[0]);
+		var distance = 10000;
+		var peakCount = self.points.length;
+		for (var p = 0; p < peakCount; p++) {
+			var peak = self.points[p];
+			if (Math.abs(peak.x - mouseX)  < distance){
+				distance = Math.abs(peak.x - mouseX);
+				var closestPeak = peak;	
+			}
+		}
+		self.measuringToolVLineStart
+			.attr("x1", self.x(closestPeak.x))
+			.attr("x2", self.x(closestPeak.x))
+			.attr("y1", self.y(closestPeak.y))
+			.attr("y2", 0);
+		self.measuringToolLine
+			.attr("x1", self.x(closestPeak.x))
+			.attr("x2", coords[0])
+			.attr("y1", coords[1])
+			.attr("y2", coords[1]);
+		self.measuringToolVLineEnd
+			.attr("x1", coords[0])
+			.attr("x2", coords[0])
+			.attr("y1", self.y(0))
+			.attr("y2", 0);
+		var distance = Math.abs(self.x(closestPeak.x) - coords[0]);
+		if (self.x(closestPeak.x) < coords[0])
+			var labelX = self.x(closestPeak.x) + distance;
+		else
+			var labelX = coords[0] + distance;	
+		self.measureLabel.attr("x", labelX )
+			.text(Math.round(distance, 2)+" Th");
+		//self.measuringToolLine.attr("display","inline");
+	}
+
+	function measureMove() {
+		var coords = d3.mouse(this);
+		self.measuringToolLine
+			.attr("x2", coords[0])
+			.attr("y1", coords[1])
+			.attr("y2", coords[1]);	
+		self.measuringToolVLineEnd
+			.attr("x1", coords[0])
+			.attr("x2", coords[0])
+			.attr("y1", self.y(0))
+			.attr("y2", 0);
+		var measureStartX = self.measuringToolVLineStart.attr("x1")
+		var distance = Math.abs(measureStartX - coords[0]);
+		if (measureStartX  < coords[0])
+			var labelX = measureStartX  + distance;
+		else
+			var labelX = coords[0] + distance;	
+		self.measureLabel.attr("x", labelX )
+			.text(Math.round(distance, 2)+" Th");		  
+	}
+
+	function measureEnd() {
+	  //self.measuringToolLine.attr("display","none");
+	  //var s = self.measureBrush.extent();
+	  //self.x.domain(s);
+	  //self.measureBrush.x(self.x)
+	}
+	//------------------------------------
+
+
 	this.highlights = this.innerSVG.append("g");
 	this.peaks = this.innerSVG.append("g");
 	this.lossyAnnotations = this.innerSVG.append("g");
@@ -132,24 +219,6 @@ Graph = function(targetSvg, model, options) {
 
 
 Graph.prototype.setData = function(model){
-/*	this.clear();
-	//get Max m/z value of primarymatches
- 	this.xmaxPrimary = d3.max(annotatedPeaks,
-			function(d){
-				return ((d.isprimarymatch == 1)? d.expmz - 0 : 0);
-			}
-		) + 50;
- 	//get Min m/z value of primarymatches
-	this.xminPrimary = d3.min(annotatedPeaks, 
-			function(d){
-				return ((d.isprimarymatch == 1)?  d.expmz - 0 : this.xmaxPrimary);
-			}
-		) - 50;
-	//sort Data by m/z and Int
-	var nested =  d3.nest()
-		.key(function(d) { return d.expmz + '-' + d.absoluteintensity; })
-		.entries(annotatedPeaks);
-		*/
 	//create points array with Peaks
 	this.points = new Array();
 	this.pep1 = model.pep1;
@@ -165,31 +234,10 @@ Graph.prototype.setData = function(model){
 	for (var p = 0; p < peakCount; p++) {
 		var peak = this.points[p];
 		if (peak.fragments.length > 0){
-
-			//this.cluster.push(new IsotopeCluster(p, this.points))
-			var delta = 1/peak.charge;
-			for (var i = 1; i < 7; i++){
-				var pi = (p - i < 0  ? 0 : p - i); //make sure pi doesn't get negative
-
-/*				var fragment_mass = this.points[pi].x.toFixed(2)*1;
-				var isotope_mass_ll = (peak.x + delta*i).toFixed(2)*1 - 0.01;
-				var isotope_mass_ul = (peak.x + delta*i).toFixed(2)*1 + 0.01;
-				if ( isotope_mass_ll <= fragment_mass <= isotope_mass_ul){
-					*/
-
-				var actual_mass = this.points[pi].x.toFixed(1);
-				var calc_mass = (peak.x + delta*i).toFixed(1);
-				if (actual_mass == calc_mass){
-					if(this.points[p].fragments[0].peptide === this.pep1)
-						this.points[pi].colour = this.model.p1color_cluster;
-					if(this.points[p].fragments[0].peptide === this.pep2)
-						this.points[pi].colour = this.model.p2color_cluster;
-				}
-				else
-					break;
-			}
+			this.cluster.push(new IsotopeCluster(p, this));
 		}
 	}
+	console.log(this.cluster);
 	this.colourPeaks();
 
 /*
@@ -250,7 +298,7 @@ Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 	self.dragZoomHighlight.attr("height", height);
 				
 	self.zoom = d3.behavior.zoom().x(self.x).on("zoom", self.redraw());
-	self.plot.call( d3.behavior.zoom().x(self.x).on("zoom", self.redraw()));
+	self.plot.call(self.zoom);
 	self.innerSVG.call(self.zoom);
 
 	if (this.title) {
@@ -262,6 +310,26 @@ Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 	self.redraw()();
 }
 
+Graph.prototype.changePanning = function(on){
+	if (on === true){
+		this.plot.call(this.zoom)
+			.on("mousedown.zoom", null)
+			.on("touchstart.zoom", null)
+			.on("touchmove.zoom", null)
+			.on("touchend.zoom", null);
+		this.innerSVG.call(this.zoom)
+			.on("mousedown.zoom", null)
+			.on("touchstart.zoom", null)
+			.on("touchmove.zoom", null)
+			.on("touchend.zoom", null);
+		this.plot.call(this.measureBrush);
+	}
+	else{
+		this.plot.call(this.zoom);
+		this.innerSVG.call(this.zoom);
+	}
+}
+
 Graph.prototype.redraw = function(){
 	var self = this;
 	return function (){
@@ -269,8 +337,8 @@ Graph.prototype.redraw = function(){
 		  self.points[i].update();
 		}
 		self.xaxis.call( self.xAxis);//d3.behavior.zoom().x(self.x).on("zoom", self.redraw()));
-		self.plot.call( d3.behavior.zoom().x(self.x).on("zoom", self.redraw()));
-		self.innerSVG.call( d3.behavior.zoom().x(self.x).on("zoom", self.redraw()));
+		//self.plot.call( d3.behavior.zoom().x(self.x).on("zoom", self.redraw()));
+		//self.innerSVG.call( d3.behavior.zoom().x(self.x).on("zoom", self.redraw()));
 		self.model.setZoom(self.x.domain());
 	};
 }
@@ -284,7 +352,7 @@ Graph.prototype.clear = function(){
 }
 
 
-Graph.prototype.setHighlights = function(peptide, pepI){
+Graph.prototype.setHighlights = function(peptide, pepI, sticky){
 	this.clearHighlights();
 	if (peptide) {
 		this.clearLabels();
@@ -310,11 +378,17 @@ Graph.prototype.setHighlights = function(peptide, pepI){
 			if (match === true) {
 				this.points[p].highlight(true);
 				this.points[p].showLabels(true);
+
+				if (sticky === true){
+					if (!_.contains(this.model.sticky, this.points[p]))
+						this.model.sticky.push(this.points[p]);
+				}
 			}
 		}	
 	} else {
 		this.clearLabels();
 		this.showLabels();
+		this.greyPeaks();
 		this.colourPeaks();
 	}
 }
@@ -322,7 +396,7 @@ Graph.prototype.setHighlights = function(peptide, pepI){
 Graph.prototype.clearHighlights = function(peptide, pepI){
 	var peakCount = this.points.length;
 	for (var p = 0; p < peakCount; p++) {
-		if (this.points[p].fragments.length > 0) {
+		if (this.points[p].fragments.length > 0 && !_.contains(this.model.sticky, this.points[p])) {
 			this.points[p].highlight(false);
 		}
 	}
@@ -331,34 +405,78 @@ Graph.prototype.clearHighlights = function(peptide, pepI){
 Graph.prototype.clearLabels = function(){
 	var peakCount = this.points.length;
 	for (var p = 0; p < peakCount; p++) {
-		if (this.points[p].fragments.length > 0) {
+		if (this.points[p].fragments.length > 0 && !_.contains(this.model.sticky, this.points[p])) {
 			this.points[p].removeLabels();
 		}
 	}
 }
 
 Graph.prototype.showLabels = function(){
-	var peakCount = this.points.length;
-	for (var p = 0; p < peakCount; p++) {
-		if (this.points[p].fragments.length > 0) {
-			this.points[p].showLabels();
+	if(this.model.sticky.length == 0){
+		var peakCount = this.points.length;
+		for (var p = 0; p < peakCount; p++) {
+			if (this.points[p].fragments.length > 0) {
+				this.points[p].showLabels();
+			}
 		}
 	}
 }
 
-
 Graph.prototype.greyPeaks = function(){
 	var peakCount = this.points.length;
 	for (var p = 0; p < peakCount; p++) {
-		this.points[p].line.attr("stroke", this.model.lossFragBarColour);
+		if (!_.contains(this.model.sticky, this.points[p]))
+			this.points[p].line.attr("stroke", this.model.lossFragBarColour);
 	}
 }
+
 Graph.prototype.colourPeaks = function(){
-	var peakCount = this.points.length;
-	for (var p = 0; p < peakCount; p++) {
-		var peak = this.points[p];
-		peak.line.attr("stroke", peak.colour);	
+	if(this.model.sticky.length == 0){
+		var peakCount = this.points.length;
+		for (var p = 0; p < peakCount; p++) {
+			var peak = this.points[p];
+			peak.line.attr("stroke", peak.colour);	
+		}
 	}
+}
+
+Graph.prototype.updateColors = function(){
+	var peakCount = this.points.length;
+		for (var p = 0; p < peakCount; p++) {
+			var peak = this.points[p];
+			//Peaks
+			var colour = this.model.lossFragBarColour;
+			if (peak.fragments.length > 0){
+				if (peak.fragments[0].peptide === this.pep1 && peak.fragments[0].lossy === false) {
+					peak.colour = this.model.p1color;
+					for (var i = 0; i < peak.labels.length; i++)
+						peak.labels[i].attr("fill", this.model.p1color);
+				}
+				else if (peak.fragments[0].peptide === this.pep2 && peak.fragments[0].lossy === false) {
+					peak.colour = this.model.p2color;
+					for (var i = 0; i < peak.labels.length; i++)
+						peak.labels[i].attr("fill", this.model.p2color);
+				}
+				else if (peak.fragments[0].peptide === this.pep1 && peak.fragments[0].lossy === true) {
+					peak.colour = this.model.p1color_loss;
+					for (var i = 0; i < peak.labels.length; i++)
+						peak.labels[i].attr("fill", this.model.p1color_loss);
+				}
+				else if (peak.fragments[0].peptide === this.pep2 && peak.fragments[0].lossy === true) {
+					peak.colour = this.model.p2color_loss;
+					for (var i = 0; i < peak.labels.length; i++)
+						peak.labels[i].attr("fill", this.model.p2color_loss);
+				}
+			}
+			else if (peak.IsotopeCluster){
+				if (peak.IsotopeCluster.pep == this.pep1)
+					peak.colour = this.model.p1color_cluster;
+				if (peak.IsotopeCluster.pep == this.pep2)
+					peak.colour = this.model.p2color_cluster;
+			}
+			
+			this.colourPeaks();
+		}
 }
 /*
 Graph.prototype.showLabels = function(){

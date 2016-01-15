@@ -17,7 +17,8 @@
 	<script type="text/javascript" src="src/FragmentationKey.js"></script>
 	<script type="text/javascript" src="src/graph/Graph.js"></script>		
 	<script type="text/javascript" src="src/graph/Peak.js"></script>	
-	<script type="text/javascript" src="src/graph/Fragment.js"></script>	
+	<script type="text/javascript" src="src/graph/Fragment.js"></script>
+	<script type="text/javascript" src="src/graph/IsotopeCluster.js"></script>	
 
 
     <style type="text/css">
@@ -51,9 +52,15 @@
 
 
 	$(function() {
+
+
+		_.extend(window, Backbone.Events);
+		window.onresize = function() { window.trigger('resize') };
+
 		var FragmentationKey = new FragmentationKeyView({model: SpectrumModel, el:"#spectrumDiv"});
 		var Spectrum = new SpectrumView({model: SpectrumModel, el:"#spectrumDiv"});
 
+		//Spectrum.resize();
 		var gBinding = FragmentationKey.peptideFragKey.highlightChanged.add(Spectrum.graph.setHighlights);
 		gBinding.context = Spectrum.graph;
 		var pfBinding = Spectrum.graph.highlightChanged.add(FragmentationKey.peptideFragKey.setHighlights);
@@ -92,7 +99,20 @@
 			<label>lossy labels
 				<input id="lossyChkBx" type="checkbox">
 			</label>
-			<button id="resize">reset zoom</button>
+			<button id="reset">reset zoom</button>
+			<button id="clearHighlights">clear highlights</button>
+			<label>measure
+				<input id="measuringTool" type="checkbox">
+			</label>
+			</br>
+			<label for="colorSelector">Change color scheme:</label>
+			<select id="colorSelector">
+				<option value="RdBu">Red&Blue</option>
+				<option value="BrBG">Brown&Teal</option>
+				<option value="PiYG">Pink&Green</option>
+				<option value="PRGn">Purple&Green</option>
+				<option value="PuOr">Orange&Purple</option>
+			</select> 
 			<form id="setrange">
 				m/z Range:
 				<input type="text" id="xleft" size="5">

@@ -19,12 +19,11 @@
 //		graph/Peak.js
 
 function Peak (data, graph){
-	//var this.graph.model = graph.spectrumViewer;
+
 	this.x = data[0].expmz - 0;
 	this.y = data[0].absolute_intensity - 0;
 	this.charge = data[0].charge - 0;
 	this.graph = graph;
-
 	//make fragments
 	var notLossyFragments = [];
 	var lossyFragments = [];
@@ -80,6 +79,10 @@ function Peak (data, graph){
 		group.ontouchend = function(evt) {
 			endHighlight();
 		};
+		group.onclick = function(evt){
+			if (!_.contains(self.graph.model.sticky, self))
+				self.graph.model.updateSticky(self);
+		}
 
 		function startHighlight(){
 			self.graph.greyPeaks();
@@ -88,10 +91,14 @@ function Peak (data, graph){
 			self.graph.highlightChanged.dispatch(self.fragments);
 		}
 		function endHighlight(){
-			self.highlight(false);
-			self.graph.highlightChanged.dispatch([]);
-			self.graph.colourPeaks();
-			self.graph.showLabels();
+			if (!_.contains(self.graph.model.sticky, self)){
+				self.highlight(false);
+				self.graph.highlightChanged.dispatch([]);
+				self.graph.greyPeaks();
+				self.graph.colourPeaks();
+				self.graph.clearLabels();
+				self.graph.showLabels();
+			}
 		}
 
 	  	//create frag labels
@@ -202,7 +209,10 @@ Peak.prototype.highlight = function(show){
 		}
 		this.graph.peaks[0][0].appendChild(this.g[0][0]);
 		this.line.attr("stroke", this.colour);
-		this.showLabels();
+		this.showLabels(true);
+		for (var b = 0; b < this.IsotopeCluster.points.length; b++ )
+			this.IsotopeCluster.points[b].line.attr("stroke", this.colour);
+
 	} else {
 		this.highlightLine.attr("opacity",0);
 		for (var a = 0; a < labelCount; a++){
@@ -229,8 +239,7 @@ Peak.prototype.updateX = function(){
 		for (var a = 0; a < labelCount; a++){
 			this.labels[a].attr("x", this.graph.x(this.x));
 			this.labelHighlights[a].attr("x", this.graph.x(this.x));
-			if ((this.x > xDomain[0] && this.x < xDomain[1])
-					&& (this.graph.lossyShown === true || this.fragments[a].lossy === false)){
+			if ((this.x > xDomain[0] && this.x < xDomain[1]) && (this.graph.lossyShown === true || this.fragments[a].lossy === false) && (_.contains(this.graph.model.sticky, this) || this.graph.model.sticky.length == 0)){
 				this.labels[a].attr("display","inline");
 				this.labelHighlights[a].attr("display","inline");
 			} else {
