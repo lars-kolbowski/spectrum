@@ -80,8 +80,14 @@ function Peak (data, graph){
 			endHighlight();
 		};
 		group.onclick = function(evt){
-			if (!_.contains(self.graph.model.sticky, self))
-				self.graph.model.updateSticky(self);
+			if (!_.contains(self.graph.model.sticky, self)){}
+				if (evt.ctrlKey)
+					self.graph.model.updateStickyHighlights(self, true);
+				else
+					self.graph.model.updateStickyHighlights(self);
+			self.graph.greyPeaks();
+			self.graph.clearLabels();
+			self.graph.clearHighlights();
 		}
 
 		function startHighlight(){

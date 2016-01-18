@@ -8,6 +8,8 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 	},
 
 	initialize: function(){
+		this.sticky = Array();
+		this.highlights = Array();
 		this.on("change:annotatedPeaksCSV", function(model){
 			this.setData();
 		});
@@ -33,7 +35,6 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		//this.highlightColourSticky = colorbrewer.Oranges[9];
 		this.highlightWidth = 11;
 		this.setGraphData();
-		this.sticky = Array();
 	},
 
 	clear: function(){
@@ -80,11 +81,23 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		this.trigger("changed:Zoom");
 	},
 
-	updateSticky: function(peak){
-		this.sticky.push(peak);
-		//var len = this.sticky.length;
-		//this.highlightColour = this.highlightColourSticky[len];
-		this.trigger("changed:Sticky");
+	clearStickyHighlights: function(){
+		this.sticky.length = 0;
+		this.trigger("changed:Highlights");
+	},
+
+	updateStickyHighlights: function(peak, sticky){
+		if (sticky)
+			this.sticky.push(peak);
+		else{
+			this.sticky.length = 0;
+			this.sticky.push(peak);
+		}
+		this.trigger("changed:Highlights");
+	},
+
+	updateHighlights: function(peak){
+		this.trigger("changed:Highlights");
 	},
 
 	changeColorScheme: function(scheme){

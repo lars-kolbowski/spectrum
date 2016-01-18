@@ -121,8 +121,8 @@ Graph = function(targetSvg, model, options) {
 		.style("text-anchor","middle").style("pointer-events","none");
 	}
 	
-	
-		var self = this;
+
+	var self = this;
 	
 	//~ brushstart();
 
@@ -169,7 +169,7 @@ Graph.prototype.setData = function(model){
 			this.cluster.push(new IsotopeCluster(p, this));
 		}
 	}
-	console.log(this.cluster);
+	//console.log(this.cluster);
 	this.colourPeaks();
 
 /*
@@ -410,7 +410,7 @@ Graph.prototype.setHighlights = function(peptide, pepI, sticky){
 
 				if (sticky === true){
 					if (!_.contains(this.model.sticky, this.points[p]))
-						this.model.sticky.push(this.points[p]);
+						this.graph.model.updateStickyHighlights(this.points[p]);
 				}
 			}
 		}	
@@ -460,7 +460,7 @@ Graph.prototype.greyPeaks = function(){
 }
 
 Graph.prototype.colourPeaks = function(){
-	if(this.model.sticky.length == 0){
+	if(this.model.highlights.length == 0){
 		var peakCount = this.points.length;
 		for (var p = 0; p < peakCount; p++) {
 			var peak = this.points[p];
