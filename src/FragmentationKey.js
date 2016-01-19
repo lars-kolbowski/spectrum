@@ -232,6 +232,10 @@ PeptideFragmentationKey.prototype.setData = function(){
 					line.ontouchend = function(evt) {
 						highlight();
 					};
+					line.onclick = function(evt) {
+						stickyHighlight(this.getAttribute("peptide"), this.getAttribute("fragKeyIndex"), evt.ctrlKey);
+						highlight();
+					};		
 								
 					if (peptide === self.model.pep1) {
 						self.pep1bFragHighlights[i] = bHighlight;	
@@ -267,7 +271,11 @@ PeptideFragmentationKey.prototype.setData = function(){
 					};
 					line.ontouchend = function(evt) {
 						highlight();
-					};	
+					};
+					line.onclick = function(evt) {
+						stickyHighlight(this.getAttribute("peptide"), this.getAttribute("fragKeyIndex"), evt.ctrlKey);
+						highlight();
+					};			
 				}
 
 				// # yions; either normal or lossy; have different colors
@@ -297,6 +305,10 @@ PeptideFragmentationKey.prototype.setData = function(){
 					line.ontouchend = function(evt) {
 						highlight();
 					};
+					line.onclick = function(evt) {
+						stickyHighlight(this.getAttribute("peptide"), this.getAttribute("fragKeyIndex"), evt.ctrlKey);
+						highlight();
+					};		
 								
 					if (peptide === self.model.pep1) {
 						self.pep1yFragHighlights[i] = yHighlight;	
@@ -332,6 +344,10 @@ PeptideFragmentationKey.prototype.setData = function(){
 					line.ontouchend = function(evt) {
 						highlight();
 					};
+					line.onclick = function(evt) {
+						stickyHighlight(this.getAttribute("peptide"), this.getAttribute("fragKeyIndex"), evt.ctrlKey);
+						highlight();
+					};		
 				}
 
 				var fragBar = self.g.append("line")
@@ -364,22 +380,32 @@ PeptideFragmentationKey.prototype.setData = function(){
 						highlight();
 					};
 					line.onclick = function(evt) {
-						var index = this.getAttribute("fragKeyIndex");
-						var pep = this.getAttribute("peptide");
-						if (pep === self.pepSeq1){
-							self.pep1bFragHighlights[index].sticky = true;
-							self.pep1yFragHighlights[index].sticky = true;
-						}
-						else if(pep === self.pepSeq2){
-							self.pep2bFragHighlights[index].sticky = true;
-							self.pep2yFragHighlights[index].sticky = true;	
-						}
-						self.highlightChanged.dispatch(this.getAttribute("peptide"), this.getAttribute("fragKeyIndex"), true); 
-
+						stickyHighlight(this.getAttribute("peptide"), this.getAttribute("fragKeyIndex"), evt.ctrlKey);
+						highlight();
 					};					
 					
 			}
 		}
+	}
+
+	function stickyHighlight(peptide, i, add){
+		var pepI;
+		if (!add)
+			self.clearStickyHighlights();
+
+		if (peptide === self.model.pep1){
+			self.pep1bFragHighlights[i].sticky = true;
+			self.pep1yFragHighlights[i].sticky = true;
+			pepI = i - self.pep1offset;
+		}
+		else if(peptide === self.model.pep2){
+			if(self.pep2bFragHighlights[i])
+				self.pep2bFragHighlights[i].sticky = true;
+			if(self.pep2yFragHighlights[i])
+				self.pep2yFragHighlights[i].sticky = true;
+			pepI = i - self.pep2offset;	
+		}
+		self.highlightChanged.dispatch(peptide, pepI, true, add);
 	}
 
 	function highlight(peptide, i){
@@ -593,7 +619,6 @@ PeptideFragmentationKey.prototype.clearStickyHighlights = function(){
 	clear(this.pep1yFragHighlights);
 	clear(this.pep2bFragHighlights);
 	clear(this.pep2yFragHighlights);
-
 	function clear(hightlightArray){
 		var pLength = hightlightArray.length;
 		for (var p = 0; p < pLength; p++){

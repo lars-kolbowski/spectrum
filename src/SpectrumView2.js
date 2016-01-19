@@ -22,6 +22,7 @@ var SpectrumView = Backbone.View.extend({
 		this.listenTo(this.model, "changed:Zoom", this.updateRange);
 		this.listenTo(window, 'resize', _.debounce(this.resize));
 		this.listenTo(this.model, 'changed:ColorScheme', this.updateColors);
+		this.listenTo(this.model, 'changed:Highlights', this.updateHighlights);
 		//this.listenTo(this.model, 'destroy', this.remove);
 	},
 
@@ -83,6 +84,15 @@ var SpectrumView = Backbone.View.extend({
 
 	updateColors: function(){
 		this.graph.updateColors();
+	},
+
+	updateHighlights: function(){
+		console.log(this.model.sticky);
+		this.graph.clearHighlights();
+		this.graph.clearLabels();
+		this.graph.showLabels();
+		this.graph.greyPeaks();
+		this.graph.colourPeaks();
 	},
 	
 	measuringTool: function(e){

@@ -37,10 +37,11 @@ var FragmentationKeyView = Backbone.View.extend({
 	},
 
 	updateHighlights: function(){
-		console.log(this.model.highlights);
-		for (var i = 0; i < this.model.highlights.length; i++){
-			this.peptideFragKey.setHighlights(this.model.highlights[i].fragments);
-			this.peptideFragKey.setStickyHighlights(this.model.highlights[i].fragments);
+		console.log(this.model.sticky);
+		this.peptideFragKey.clearStickyHighlights();
+		for (var i = 0; i < this.model.sticky.length; i++){
+			this.peptideFragKey.setHighlights(this.model.sticky[i].fragments);
+			this.peptideFragKey.setStickyHighlights(this.model.sticky[i].fragments);
 		}
 	},
 

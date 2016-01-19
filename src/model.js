@@ -86,8 +86,8 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		this.trigger("changed:Highlights");
 	},
 
-	updateStickyHighlights: function(peak, sticky){
-		if (sticky)
+	updateStickyHighlights: function(peak, add){
+		if (add === true)
 			this.sticky.push(peak);
 		else{
 			this.sticky.length = 0;

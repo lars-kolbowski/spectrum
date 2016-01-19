@@ -381,14 +381,14 @@ Graph.prototype.clear = function(){
 }
 
 
-Graph.prototype.setHighlights = function(peptide, pepI, sticky){
+Graph.prototype.setHighlights = function(peptide, pepI, sticky, add){
 	this.clearHighlights();
 	if (peptide) {
 		this.clearLabels();
 		this.greyPeaks();
+		var matches = Array();
 		var peakCount = this.points.length;
 		for (var p = 0; p < peakCount; p++) {
-			var match = false;
 			var peak = this.points[p];
 			var fragCount = peak.fragments.length;
 			for (var pf = 0; pf < fragCount; pf++) {
@@ -399,19 +399,20 @@ Graph.prototype.setHighlights = function(peptide, pepI, sticky){
 						||(frag.ionType == 'b' && frag.ionNumber == (pepI - 0 + 1))
 						)
 					) {
-					match = true;
+					matches.push(this.points[p]);
 				}
 			}
-			
-			
-			if (match === true) {
-				this.points[p].highlight(true);
-				this.points[p].showLabels(true);
+		}	
+		for (var i = 0; i < matches.length; i++){
+			if (i > 0)
+				add = true;
 
-				if (sticky === true){
-					if (!_.contains(this.model.sticky, this.points[p]))
-						this.graph.model.updateStickyHighlights(this.points[p]);
-				}
+			matches[i].highlight(true);
+			matches[i].showLabels(true);
+
+			if (sticky === true){
+				if (!_.contains(this.model.sticky, matches[i]))
+					this.model.updateStickyHighlights(matches[i], add);
 			}
 		}	
 	} else {
@@ -460,7 +461,7 @@ Graph.prototype.greyPeaks = function(){
 }
 
 Graph.prototype.colourPeaks = function(){
-	if(this.model.highlights.length == 0){
+	if(this.model.sticky.length == 0){
 		var peakCount = this.points.length;
 		for (var p = 0; p < peakCount; p++) {
 			var peak = this.points[p];
