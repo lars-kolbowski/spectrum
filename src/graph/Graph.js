@@ -87,6 +87,9 @@ Graph = function(targetSvg, model, options) {
 	this.measureLabel = this.measuringTool.append("text")
 		.attr("text-anchor", "middle")
 		.style("font-size", "0.8em");
+	this.measureInfo = this.measuringTool.append("text")
+		.attr("text-anchor", "middle")
+		.style("font-size", "0.8em");
 
 	//------------------------------------
 
@@ -266,16 +269,16 @@ Graph.prototype.measure = function(on){
 				var peak = self.points[p];
 				if (Math.abs(peak.x - mouseX)  < distance){
 					distance = Math.abs(peak.x - mouseX);
-					var closestPeak = peak;	
+					self.measureStartPeak = peak;	
 				}
 			}
 			self.measuringToolVLineStart
-				.attr("x1", self.x(closestPeak.x))
-				.attr("x2", self.x(closestPeak.x))
-				.attr("y1", self.y(closestPeak.y))
+				.attr("x1", self.x(self.measureStartPeak.x))
+				.attr("x2", self.x(self.measureStartPeak.x))
+				.attr("y1", self.y(self.measureStartPeak.y))
 				.attr("y2", 0);
 			self.measuringToolLine
-				.attr("x1", self.x(closestPeak.x))
+				.attr("x1", self.x(self.measureStartPeak.x))
 				.attr("x2", coords[0])
 				.attr("y1", coords[1])
 				.attr("y2", coords[1]);
@@ -290,7 +293,7 @@ Graph.prototype.measure = function(on){
 		function measureMove() {
 			var coords = d3.mouse(this);
 			var mouseX = self.x.invert(coords[0]);
-
+			//find start and endPeak
 			var distance = 10000;
 			var triggerdistance = 2;
 			var peakCount = self.points.length;
@@ -302,12 +305,13 @@ Graph.prototype.measure = function(on){
 				}
 			}
 			
+			//draw vertical end Line
 			if(endPeak){
 				self.measuringToolVLineEnd
-				.attr("x1", self.x(endPeak.x))
-				.attr("x2", self.x(endPeak.x))
-				.attr("y1", self.y(endPeak.y))
-				.attr("y2", 0);
+					.attr("x1", self.x(endPeak.x))
+					.attr("x2", self.x(endPeak.x))
+					.attr("y1", self.y(endPeak.y))
+					.attr("y2", 0);
 			}
 			else{
 				self.measuringToolVLineEnd
@@ -316,14 +320,16 @@ Graph.prototype.measure = function(on){
 					.attr("y1", self.y(0))
 					.attr("y2", 0);
 			}
+
+			//draw horizontal line
 			var measureStartX = parseFloat(self.measuringToolVLineStart.attr("x1"));
-			var measureEndX = parseFloat(self.measuringToolVLineEnd.attr("x1"));
-			
+			var measureEndX = coords[0];
 			self.measuringToolLine
 				.attr("x2", measureEndX)
 				.attr("y1", coords[1])
 				.attr("y2", coords[1]);
 
+			//draw distance label
 			var deltaX = Math.abs(measureStartX - measureEndX);
 			var distance = Math.abs(self.x.invert(measureStartX) - self.x.invert(measureEndX));
 			if (measureStartX  < measureEndX)
@@ -331,9 +337,25 @@ Graph.prototype.measure = function(on){
 			else
 				var labelX = measureEndX + deltaX/2;	
 			self.measureLabel
-				.attr("x", labelX )
-				.attr("y", coords[1]-10)
-				.text(distance.toFixed(2)+" Th");		  
+				.attr("x", labelX)
+				.attr("y", coords[1]-9)
+				.text(distance.toFixed(2)+" Th");
+
+			//draw peak info
+			if(self.measureStartPeak.fragments.length > 0)
+				var PeakInfo = "From: Fragment " + self.measureStartPeak.fragments[0].name;
+			else
+				var PeakInfo = "From: Unidentified Peak " + self.measureStartPeak.x + "m/z"; 
+			if(endPeak){
+				if(endPeak.fragments.length > 0)
+					PeakInfo += "<br/>To: Fragment: " + endPeak.fragments[0].name;
+				else
+					PeakInfo += "<br/>To: Unidentified Peak: " + endPeak.x + "m/z"; 
+			}
+			self.measureInfo
+				.attr("x", labelX)
+				.attr("y", coords[1]+12)
+				.html(PeakInfo);		  
 		}
 
 		this.measureBrush = d3.svg.brush()
