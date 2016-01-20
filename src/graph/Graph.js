@@ -87,8 +87,8 @@ Graph = function(targetSvg, model, options) {
 	this.measureLabel = this.measuringTool.append("text")
 		.attr("text-anchor", "middle")
 		.style("font-size", "0.8em");
-	this.measureInfo = this.measuringTool.append("text")
-		.attr("text-anchor", "middle")
+
+	this.measureInfo =  d3.select("div#measureTooltip")
 		.style("font-size", "0.8em");
 
 	//------------------------------------
@@ -323,7 +323,7 @@ Graph.prototype.measure = function(on){
 
 			//draw horizontal line
 			var measureStartX = parseFloat(self.measuringToolVLineStart.attr("x1"));
-			var measureEndX = coords[0];
+			var measureEndX = parseFloat(self.measuringToolVLineEnd.attr("x1"));
 			self.measuringToolLine
 				.attr("x2", measureEndX)
 				.attr("y1", coords[1])
@@ -345,17 +345,27 @@ Graph.prototype.measure = function(on){
 			if(self.measureStartPeak.fragments.length > 0)
 				var PeakInfo = "From: Fragment " + self.measureStartPeak.fragments[0].name;
 			else
-				var PeakInfo = "From: Unidentified Peak " + self.measureStartPeak.x + "m/z"; 
+				var PeakInfo = "From: Unidentified Peak " + self.measureStartPeak.x + " m/z"; 
 			if(endPeak){
 				if(endPeak.fragments.length > 0)
 					PeakInfo += "<br/>To: Fragment: " + endPeak.fragments[0].name;
 				else
-					PeakInfo += "<br/>To: Unidentified Peak: " + endPeak.x + "m/z"; 
+					PeakInfo += "<br/>To: Unidentified Peak: " + endPeak.x + " m/z"; 
 			}
+
+
+			var matrix = this.getScreenCTM()
+                .translate(+this.getAttribute("cx"),
+                         +this.getAttribute("cy"));
+
 			self.measureInfo
 				.attr("x", labelX)
 				.attr("y", coords[1]+12)
-				.html(PeakInfo);		  
+				.html(PeakInfo)
+            	.style("left", 
+                   (window.pageXOffset + matrix.e + labelX - 50) + "px")
+            	.style("top",
+                   (window.pageYOffset + matrix.f + coords[1] + 12) + "px");		  
 		}
 
 		this.measureBrush = d3.svg.brush()
