@@ -10,6 +10,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 	initialize: function(){
 		this.sticky = Array();
 		this.highlights = Array();
+		this.measureMode = false;
 		this.on("change:annotatedPeaksCSV", function(model){
 			this.setData();
 		});

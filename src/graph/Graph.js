@@ -245,31 +245,34 @@ Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 	self.redraw()();
 }
 
-Graph.prototype.measure = function(on){
-	if (on === true){
-		this.measuringTool.attr("display","inline");
+Graph.prototype.disablePanning = function(){
 		this.plot.call(this.zoom)
 			.on("mousedown.zoom", null)
 			.on("touchstart.zoom", null)
 			.on("touchmove.zoom", null)
 			.on("touchend.zoom", null);
-		this.innerSVG.call(this.zoom)
-			.on("mousedown.zoom", null)
-			.on("touchstart.zoom", null)
-			.on("touchmove.zoom", null)
-			.on("touchend.zoom", null);
-		
+}
+
+Graph.prototype.measure = function(on){
+	if (on === true){
+		this.disablePanning();
 		var self = this;
+
 		function measureStart() {
+			self.measuringTool.attr("display","inline");
+			//self.measureInfo.style("display", "inline");
 			var coords = d3.mouse(this);
 			var mouseX = self.x.invert(coords[0]);
-			var distance = 10000;
+			var distance = 100;
 			var peakCount = self.points.length;
+			var highlightedPeak = false;
 			for (var p = 0; p < peakCount; p++) {
 				var peak = self.points[p];
 				if (Math.abs(peak.x - mouseX)  < distance){
 					distance = Math.abs(peak.x - mouseX);
-					self.measureStartPeak = peak;	
+					self.measureStartPeak = peak;
+					if (_.contains(self.model.sticky, peak))
+						highlightedPeak = true;	
 				}
 			}
 			self.measuringToolVLineStart
@@ -294,16 +297,26 @@ Graph.prototype.measure = function(on){
 			var coords = d3.mouse(this);
 			var mouseX = self.x.invert(coords[0]);
 			//find start and endPeak
-			var distance = 10000;
-			var triggerdistance = 2;
+			var distance = 2;
+			var highlightdistance = 5;
+			var triggerdistance = 5;
 			var peakCount = self.points.length;
+			var highlightedPeak = false;
 			for (var p = 0; p < peakCount; p++) {
 				var peak = self.points[p];
-				if (Math.abs(peak.x - mouseX)  < distance && Math.abs(peak.x - mouseX) < triggerdistance){
-					distance = Math.abs(peak.x - mouseX);
-					var endPeak = peak;	
+				if (mouseX - triggerdistance < peak.x < mouseX + triggerdistance){
+					if (_.contains(self.model.sticky, peak) && Math.abs(peak.x - mouseX)  < highlightdistance){
+						var highlightedPeak = peak;
+						highlightdistance = Math.abs(peak.x - mouseX);
+					}else if(Math.abs(peak.x - mouseX)  < distance){
+						var endPeak = peak
+						distance = Math.abs(peak.x - mouseX);
+					}
 				}
 			}
+
+			if(highlightedPeak)
+				endPeak = highlightedPeak;
 			
 			//draw vertical end Line
 			if(endPeak){
@@ -344,13 +357,15 @@ Graph.prototype.measure = function(on){
 			//draw peak info
 			if(self.measureStartPeak.fragments.length > 0)
 				var PeakInfo = "From: Fragment " + self.measureStartPeak.fragments[0].name;
+			else if (self.measureStartPeak.IsotopeCluster)
+				var PeakInfo = "From: IsotopeCluster " + self.measureStartPeak.IsotopeCluster.points[0].fragments[0].name;
 			else
-				var PeakInfo = "From: Unidentified Peak " + self.measureStartPeak.x + " m/z"; 
+				var PeakInfo = "From: Peak " + self.measureStartPeak.x + " m/z"; 
 			if(endPeak){
 				if(endPeak.fragments.length > 0)
 					PeakInfo += "<br/>To: Fragment: " + endPeak.fragments[0].name;
 				else
-					PeakInfo += "<br/>To: Unidentified Peak: " + endPeak.x + " m/z"; 
+					PeakInfo += "<br/>To: Peak: " + endPeak.x + " m/z"; 
 			}
 
 
@@ -359,8 +374,9 @@ Graph.prototype.measure = function(on){
                          +this.getAttribute("cy"));
 
 			self.measureInfo
-				.attr("x", labelX)
-				.attr("y", coords[1]+12)
+				//.attr("x", labelX)
+				//.attr("y", coords[1]+12)
+				.style("display", "inline")
 				.html(PeakInfo)
             	.style("left", 
                    (window.pageXOffset + matrix.e + labelX - 50) + "px")
@@ -374,12 +390,12 @@ Graph.prototype.measure = function(on){
 			.on("brush", measureMove)
 
 		this.plot.call(this.measureBrush);
-		this.innerSVG.call(this.measureBrush);
+		//this.innerSVG.call(this.measureBrush);
 
 
 	}
 	else{
-		this.measuringTool.attr("display","none");
+		this.measureClear();
 		this.plot.call(this.zoom);
 		this.innerSVG.call(this.zoom);
 		this.measureBrush = d3.svg.brush()
@@ -387,17 +403,27 @@ Graph.prototype.measure = function(on){
 			.on("brush", null)
 			.on("brushend", null);
 		this.plot.call(this.measureBrush);
-		this.innerSVG.call(this.measureBrush);
+		//this.innerSVG.call(this.measureBrush);
 	}
+}
+
+Graph.prototype.measureClear = function(){
+		this.measuringTool.attr("display","none");
+		this.measureInfo.style("display","none");	
 }
 
 Graph.prototype.redraw = function(){
 	var self = this;
+	//self.measure();
 	return function (){
+		self.measureClear();
 		for (var i = 0; i < self.points.length; i++){
 		  self.points[i].update();
 		}
-		self.xaxis.call( self.xAxis);//d3.behavior.zoom().x(self.x).on("zoom", self.redraw()));
+		self.xaxis.call( self.xAxis);
+		if (self.model.measureMode)
+			self.disablePanning();
+		//d3.behavior.zoom().x(self.x).on("zoom", self.redraw()));
 		//self.plot.call( d3.behavior.zoom().x(self.x).on("zoom", self.redraw()));
 		//self.innerSVG.call( d3.behavior.zoom().x(self.x).on("zoom", self.redraw()));
 		self.model.setZoom(self.x.domain());

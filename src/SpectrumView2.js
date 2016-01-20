@@ -1,7 +1,7 @@
 var SpectrumView = Backbone.View.extend({
 
 	events : {
-		'click #reset' : 'reset',
+		'click #reset' : 'resetZoom',
 		'click #lossyChkBx': 'showLossy',
 		'submit #setrange' : 'setrange',
 		'click #clearHighlights' : 'clearHighlights',
@@ -32,7 +32,7 @@ var SpectrumView = Backbone.View.extend({
 
 	},
 
-	reset: function(){
+	resetZoom: function(){
 		this.graph.resize(this.model.xminPrimary, this.model.xmaxPrimary, this.model.ymin, this.model.ymax);
 	},
 
@@ -98,6 +98,7 @@ var SpectrumView = Backbone.View.extend({
 	measuringTool: function(e){
 		var $target = $(e.target);
         var selected = $target .is(':checked');
+        this.model.measureMode = selected;
 		this.graph.measure(selected);
 	}
 });
