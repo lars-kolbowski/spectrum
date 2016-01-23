@@ -18,12 +18,14 @@
 //		
 //		graph/Fragment.js
 
-function Fragment (data){
-	this.name = data.fragment_name.trim();
+function Fragment (name, pep, sequence){
+	//this.name = data.fragment_name.trim();
+	this.name = name.trim();
+
+	//this.peptide = data.matchedpeptide.replace(/[^A-Z]/g, '');
+	this.peptide = pep.replace(/[^A-Z]/g, '');
 	
-	this.peptide = data.matchedpeptide.replace(/[^A-Z]/g, '');
-	
-	this.sequence = data.sequence;
+	this.sequence = sequence;
 	
 	var ion = this.name.split('')[0];
 	if (ion == 'a' || ion == 'b' || ion == 'c') {

@@ -14,7 +14,7 @@
 //   	See the License for the specific language governing permissions and
 //   	limitations under the License.
 //
-//		author: Colin Combe
+//		authors: Colin Combe, Lars Kolbowski
 //
 //		graph/Peak.js
 
@@ -31,7 +31,7 @@ function Peak (data, graph){
 	for (var f = 0; f < fragCount; f++) {
 		//check if the Peak is a fragment or not and if create a new Fragment
 		if (data[f].fragment_name.trim() != "") {
-			var frag = new Fragment (data[f]);
+			var frag = new Fragment (data[f].fragment_name, data[f].matchedpeptide, data[f].sequence);
 			if (frag.lossy === false) {
 				notLossyFragments.push(frag);
 			} else {
@@ -80,31 +80,14 @@ function Peak (data, graph){
 			endHighlight();
 		};
 		group.onclick = function(evt){
-			if (!_.contains(self.graph.model.sticky, self)){}
-				if (evt.ctrlKey)
-					self.graph.model.updateStickyHighlights(self, true);
-				else
-					self.graph.model.updateStickyHighlights(self);
-			self.graph.greyPeaks();
-			self.graph.clearLabels();
-			self.graph.clearHighlights();
+			self.graph.model.updateStickyHighlight(self.fragments, evt.ctrlKey);
 		}
 
 		function startHighlight(){
-			self.graph.greyPeaks();
-			self.graph.clearLabels();
-			self.highlight(true);
-			self.graph.highlightChanged.dispatch(self.fragments);
+			self.graph.model.addHighlight(self.fragments);	
 		}
 		function endHighlight(){
-			if (!_.contains(self.graph.model.sticky, self)){
-				self.highlight(false);
-				self.graph.highlightChanged.dispatch([]);
-				self.graph.greyPeaks();
-				self.graph.colourPeaks();
-				self.graph.clearLabels();
-				self.graph.showLabels();
-			}
+			self.graph.model.clearHighlight(self.fragments);	
 		}
 
 	  	//create frag labels
@@ -201,27 +184,26 @@ function Peak (data, graph){
 		}
 	}
 	this.line.attr("stroke", this.colour);
-	
-	this.removeLabels();
-	this.showLabels();
 }
 
-Peak.prototype.highlight = function(show){
-	var labelCount = this.labels.length;
+Peak.prototype.highlight = function(show, fragments){
 	if (show == true) {
 		this.highlightLine.attr("opacity","1");
-		for (var a = 0; a < labelCount; a++){
-			this.labelHighlights[a].attr("opacity", 1);
+		for (var f = 0; f < this.fragments.length; f++){
+			if ( _.contains(fragments, this.fragments[f]) ){
+				this.labelHighlights[f].attr("opacity", 1);
+				this.labels[f].attr("display", "inline");
+				this.labelHighlights[f].attr("display", "inline");
+			}
 		}
 		this.graph.peaks[0][0].appendChild(this.g[0][0]);
 		this.line.attr("stroke", this.colour);
-		this.showLabels(true);
 		for (var b = 0; b < this.IsotopeCluster.points.length; b++ )
 			this.IsotopeCluster.points[b].line.attr("stroke", this.colour);
-
 	} else {
+
 		this.highlightLine.attr("opacity",0);
-		for (var a = 0; a < labelCount; a++){
+		for (var a = 0; a < this.labels.length; a++){
 			this.labelHighlights[a].attr("opacity", 0);
 		}
 	}
@@ -245,7 +227,10 @@ Peak.prototype.updateX = function(){
 		for (var a = 0; a < labelCount; a++){
 			this.labels[a].attr("x", this.graph.x(this.x));
 			this.labelHighlights[a].attr("x", this.graph.x(this.x));
-			if ((this.x > xDomain[0] && this.x < xDomain[1]) && (this.graph.lossyShown === true || this.fragments[a].lossy === false || _.contains(this.graph.model.sticky, this)) && (_.contains(this.graph.model.sticky, this) || this.graph.model.sticky.length == 0)){
+			if (	(this.x > xDomain[0] && this.x < xDomain[1])	//in current range
+				 && (this.graph.lossyShown === true || this.fragments[a].lossy === false || _.intersection(this.graph.model.sticky, this.fragments).length != 0)	//lossy enabled OR not lossy OR isStickyFrag
+				 && (_.intersection(this.graph.model.sticky, this.fragments).length != 0 || this.graph.model.sticky.length == 0))	//isStickyFrag OR no StickyFrags
+			{
 				this.labels[a].attr("display","inline");
 				this.labelHighlights[a].attr("display","inline");
 			} else {

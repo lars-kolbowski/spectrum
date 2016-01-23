@@ -9,17 +9,16 @@
 	<script src="http://cdnjs.cloudflare.com/ajax/libs/d3/3.3.3/d3.js"></script>
 	<!-- <script type="text/javascript" src="vendor/d3.js"></script> -->
 	<script type="text/javascript" src="vendor/colorbrewer.js"></script>
-	<script type="text/javascript" src="vendor/signals.js"></script>
 
 	<script type="text/javascript" src="src/model.js"></script>
 	<script type="text/javascript" src="src/SpectrumView2.js"></script>
 	<script type="text/javascript" src="src/FragmentationKeyView.js"></script>
 	<script type="text/javascript" src="src/FragmentationKey.js"></script>
+	<script type="text/javascript" src="src/FragKey/KeyFragment.js"></script>
 	<script type="text/javascript" src="src/graph/Graph.js"></script>		
 	<script type="text/javascript" src="src/graph/Peak.js"></script>	
 	<script type="text/javascript" src="src/graph/Fragment.js"></script>
-	<script type="text/javascript" src="src/graph/IsotopeCluster.js"></script>	
-
+	<script type="text/javascript" src="src/graph/IsotopeCluster.js"></script>		
 
     <style type="text/css">
 		html, body{
@@ -65,14 +64,10 @@
 		_.extend(window, Backbone.Events);
 		window.onresize = function() { window.trigger('resize') };
 
-		var FragmentationKey = new FragmentationKeyView({model: SpectrumModel, el:"#spectrumDiv"});
-		var Spectrum = new SpectrumView({model: SpectrumModel, el:"#spectrumDiv"});
 
-		//Spectrum.resize();
-		var gBinding = FragmentationKey.peptideFragKey.highlightChanged.add(Spectrum.graph.setHighlights);
-		gBinding.context = Spectrum.graph;
-		var pfBinding = Spectrum.graph.highlightChanged.add(FragmentationKey.peptideFragKey.setHighlights);
-		pfBinding.context = FragmentationKey.peptideFragKey;
+		var Spectrum = new SpectrumView({model: SpectrumModel, el:"#spectrumDiv"});
+		var FragmentationKey = new FragmentationKeyView({model: SpectrumModel, el:"#spectrumDiv"});
+
 
 		d3.text("test.csv", function(csv) {
 			SpectrumModel.set({annotatedPeaksCSV: csv});

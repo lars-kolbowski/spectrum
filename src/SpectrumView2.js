@@ -28,7 +28,7 @@ var SpectrumView = Backbone.View.extend({
 
 	render: function() {
 
-		this.graph.setData(this.model);
+		this.graph.setData();
 
 	},
 
@@ -45,8 +45,7 @@ var SpectrumView = Backbone.View.extend({
         var selected = $target .is(':checked');
         //this.model.lossyShown = selected;
 		this.graph.lossyShown = selected;
-		this.graph.clearLabels();
-		this.graph.showLabels();
+		this.graph.updatePeakLabels();
 	},
 
 	setrange: function(e){
@@ -71,11 +70,8 @@ var SpectrumView = Backbone.View.extend({
 
 	clearHighlights: function(){
 		this.model.sticky.length = 0;
-		this.graph.clearHighlights();
-		this.graph.highlightChanged.dispatch([]);
-		this.graph.colourPeaks();
-		this.graph.clearLabels();
-		this.graph.showLabels();
+		this.model.highlights.length = 0;
+		this.updateHighlights();
 	},
 
 	changeColorScheme: function(e){
@@ -87,12 +83,19 @@ var SpectrumView = Backbone.View.extend({
 	},
 
 	updateHighlights: function(){
-		console.log(this.model.sticky);
-		this.graph.clearHighlights();
-		this.graph.clearLabels();
-		this.graph.showLabels();
-		this.graph.greyPeaks();
-		this.graph.colourPeaks();
+
+		var peaks = this.graph.points;
+
+		for(p = 0; p < peaks.length; p++){
+			var highlightFragments = _.intersection(peaks[p].fragments, this.model.highlights);
+			if(highlightFragments.length != 0){
+				peaks[p].highlight(true, highlightFragments);
+			}
+			else if(peaks[p].fragments.length > 0)
+				peaks[p].highlight(false);
+		}
+		this.graph.updatePeakColors();
+		this.graph.updatePeakLabels();
 	},
 	
 	measuringTool: function(e){

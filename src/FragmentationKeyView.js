@@ -32,16 +32,29 @@ var FragmentationKeyView = Backbone.View.extend({
 	},
 
 	clearHighlights: function(){
-		this.peptideFragKey.clearStickyHighlights();
+		this.peptideFragKey.clearHighlights();
 	},
 
 	updateHighlights: function(){
-		console.log(this.model.sticky);
-		this.peptideFragKey.clearStickyHighlights();
-		for (var i = 0; i < this.model.sticky.length; i++){
-			this.peptideFragKey.setHighlights(this.model.sticky[i].fragments);
-			this.peptideFragKey.setStickyHighlights(this.model.sticky[i].fragments);
+
+		var lines = this.peptideFragKey.fraglines;
+
+		for(l = 0; l < lines.length; l++){
+			var highlightFragments = _.intersection(lines[l].fragments, this.model.highlights);
+			if(highlightFragments.length != 0){
+				lines[l].highlight(true, highlightFragments);
+			}
+			else if(lines[l].fragments.length > 0)
+				lines[l].highlight(false);
 		}
+
+		if(this.model.highlights.length == 1){
+			this.peptideFragKey.greyLetters();
+			this.peptideFragKey.colorLetters(this.model.highlights[0]);
+		}
+		else if(this.model.highlights.length == 0)
+			this.peptideFragKey.colorLetters("all");
+		
 	},
 
 	updateColors: function(){

@@ -82,23 +82,48 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		this.trigger("changed:Zoom");
 	},
 
-	clearStickyHighlights: function(){
-		this.sticky.length = 0;
-		this.trigger("changed:Highlights");
-	},
-
-	updateStickyHighlights: function(peak, add){
-		if (add === true)
-			this.sticky.push(peak);
-		else{
-			this.sticky.length = 0;
-			this.sticky.push(peak);
+	addHighlight: function(fragments){
+		for (f = 0; f < fragments.length; f++){
+			if(this.highlights.indexOf(fragments[f]) == -1)
+				this.highlights.push(fragments[f]);
 		}
 		this.trigger("changed:Highlights");
 	},
 
-	updateHighlights: function(peak){
+	clearHighlight: function(fragments){
+		for (f = 0; f < fragments.length; f++){
+			var index = this.highlights.indexOf(fragments[f])
+			if(index != -1 && !_.contains(this.sticky, fragments[f])){
+				this.highlights.splice(index, 1);
+			}
+		}
 		this.trigger("changed:Highlights");
+	},
+
+	clearStickyHighlights: function(){
+		if(this.sticky.length != 0){
+			var oldsticky = this.sticky;
+			this.sticky = Array();
+			this.clearHighlight(oldsticky);
+		}
+	},
+
+	updateStickyHighlight: function(fragments, add){
+		if (add === true){
+			for(f = 0; f < fragments.length; f++){
+				if (this.sticky.indexOf(fragments[f]) == -1)
+					this.sticky.push(fragments[f]);
+			}
+		}
+		else{
+			if(this.sticky.length != 0){
+				var oldsticky = this.sticky;
+				this.sticky = Array();
+				this.clearHighlight(oldsticky);
+			}
+			for(f = 0; f < fragments.length; f++)
+				this.sticky.push(fragments[f]);
+		}
 	},
 
 	changeColorScheme: function(scheme){

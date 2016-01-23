@@ -14,7 +14,7 @@
 //   	See the License for the specific language governing permissions and
 //   	limitations under the License.
 //
-//		author: Colin Combe
+//		authors: Colin Combe, Lars Kolbowski
 //
 //		graph/Graph.js
 //
@@ -24,7 +24,6 @@
 Graph = function(targetSvg, model, options) {
 	this.x = d3.scale.linear();
 	this.y = d3.scale.linear();
-	this.highlightChanged = new signals.Signal();
 	this.model = model;
 
 	this.margin = {
@@ -68,9 +67,12 @@ Graph = function(targetSvg, model, options) {
 		.attr("top", 0)
 		.attr("left", 0)
 		.attr("class", "line");
-	
 	this.dragZoomHighlight = this.innerSVG.append("rect").attr("y", 0).attr("fill","#addd8e");	
 	
+	this.plot.on("click", function(){
+		this.model.clearStickyHighlights();
+	}.bind(this));
+
 	//MeasuringTool
 	this.measuringTool = this.innerSVG.append("g")
 	this.measuringToolVLineStart = this.measuringTool.append("line")
@@ -153,15 +155,15 @@ Graph = function(targetSvg, model, options) {
 };
 
 
-Graph.prototype.setData = function(model){
+Graph.prototype.setData = function(){
 	//create points array with Peaks
 	this.points = new Array();
-	this.pep1 = model.pep1;
-	this.pep2 = model.pep2;
-	for (var i = 0; i < model.nested.length; i++){
-		this.points.push(new Peak(model.nested[i].values, this));
+	this.pep1 = this.model.pep1;
+	this.pep2 = this.model.pep2;
+	for (var i = 0; i < this.model.nested.length; i++){
+		this.points.push(new Peak(this.model.nested[i].values, this));
 	}
-
+	this.model.points = this.points;
 	//Isotope cluster
 	this.cluster = new Array();
 
@@ -173,19 +175,9 @@ Graph.prototype.setData = function(model){
 		}
 	}
 	//console.log(this.cluster);
-	this.colourPeaks();
+	this.updatePeakColors();
 
-/*
-	//~ this.xmax = d3.max(this.points, function(d){return d.x;}) + 10;
-	//~ this.xmin = d3.min(this.points, function(d){return d.x;}) - 10;
-
-	this.xmax = this.xmaxPrimary;
-	this.xmin = this.xminPrimary;
-
-	this.ymax = d3.max(this.points, function(d){return d.y;});
-	this.ymin = 0;//d3.min(this.points, function(d){return d.y;});*/
-
-	this.resize(model.xminPrimary, model.xmaxPrimary, model.ymin, model.ymax);
+	this.resize(this.model.xminPrimary, this.model.xmaxPrimary, this.model.ymin, this.model.ymax);
 }
 
 Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
@@ -271,7 +263,7 @@ Graph.prototype.measure = function(on){
 				if (Math.abs(peak.x - mouseX)  < distance){
 					distance = Math.abs(peak.x - mouseX);
 					self.measureStartPeak = peak;
-					if (_.contains(self.model.sticky, peak))
+					if (_.contains(self.model.sticky, peak.fragments[0]))
 						highlightedPeak = true;	
 				}
 			}
@@ -305,7 +297,7 @@ Graph.prototype.measure = function(on){
 			for (var p = 0; p < peakCount; p++) {
 				var peak = self.points[p];
 				if (mouseX - triggerdistance < peak.x < mouseX + triggerdistance){
-					if (_.contains(self.model.sticky, peak) && Math.abs(peak.x - mouseX)  < highlightdistance){
+					if (_.contains(self.model.sticky, peak.fragments[0]) && Math.abs(peak.x - mouseX)  < highlightdistance){
 						var highlightedPeak = peak;
 						highlightdistance = Math.abs(peak.x - mouseX);
 					}else if(Math.abs(peak.x - mouseX)  < distance){
@@ -403,6 +395,9 @@ Graph.prototype.measure = function(on){
 			.on("brush", null)
 			.on("brushend", null);
 		this.plot.call(this.measureBrush);
+/*		this.plot.on("click", function(){
+			this.model.clearStickyHighlights();
+		}.bind(this));*/
 		//this.innerSVG.call(this.measureBrush);
 	}
 }
@@ -439,91 +434,52 @@ Graph.prototype.clear = function(){
 }
 
 
-Graph.prototype.setHighlights = function(peptide, pepI, sticky, add){
-	this.clearHighlights();
-	if (peptide) {
-		this.clearLabels();
-		this.greyPeaks();
-		var matches = Array();
-		var peakCount = this.points.length;
-		for (var p = 0; p < peakCount; p++) {
-			var peak = this.points[p];
-			var fragCount = peak.fragments.length;
-			for (var pf = 0; pf < fragCount; pf++) {
-				var frag = peak.fragments[pf];
-				var pepSeq = frag.peptide;
-				if (peptide == frag.peptide
-					&& ((frag.ionType == 'y' && frag.ionNumber == (pepSeq.length - pepI - 1))
-						||(frag.ionType == 'b' && frag.ionNumber == (pepI - 0 + 1))
-						)
-					) {
-					matches.push(this.points[p]);
-				}
-			}
-		}	
-		for (var i = 0; i < matches.length; i++){
-			if (i > 0)
-				add = true;
-
-			matches[i].highlight(true);
-			matches[i].showLabels(true);
-
-			if (sticky === true){
-				if (!_.contains(this.model.sticky, matches[i]))
-					this.model.updateStickyHighlights(matches[i], add);
-			}
-		}	
-	} else {
-		this.clearLabels();
-		this.showLabels();
-		this.greyPeaks();
-		this.colourPeaks();
-	}
-}
-
 Graph.prototype.clearHighlights = function(peptide, pepI){
 	var peakCount = this.points.length;
 	for (var p = 0; p < peakCount; p++) {
-		if (this.points[p].fragments.length > 0 && !_.contains(this.model.sticky, this.points[p])) {
+		if (this.points[p].fragments.length > 0 && !_.contains(this.model.sticky, this.points[p].fragments[0])) {
 			this.points[p].highlight(false);
 		}
 	}
 }
 
-Graph.prototype.clearLabels = function(){
+Graph.prototype.updatePeakColors = function(){
 	var peakCount = this.points.length;
-	for (var p = 0; p < peakCount; p++) {
-		if (this.points[p].fragments.length > 0 && !_.contains(this.model.sticky, this.points[p])) {
-			this.points[p].removeLabels();
+
+	if (this.model.highlights.length == 0){
+		for (var p = 0; p < peakCount; p++) {
+			this.points[p].line.attr("stroke", this.points[p].colour);
+		}
+	}
+	else{
+		for (var p = 0; p < peakCount; p++) {
+			if (_.intersection(this.model.highlights, this.points[p].fragments).length == 0)
+				this.points[p].line.attr("stroke", this.model.lossFragBarColour);
+			else
+				this.points[p].line.attr("stroke", this.points[p].colour);
 		}
 	}
 }
 
-Graph.prototype.showLabels = function(){
-	if(this.model.sticky.length == 0){
-		var peakCount = this.points.length;
+Graph.prototype.updatePeakLabels = function(){
+	var peakCount = this.points.length;
+
+	if (this.model.highlights.length == 0){
 		for (var p = 0; p < peakCount; p++) {
 			if (this.points[p].fragments.length > 0) {
+				this.points[p].removeLabels();
 				this.points[p].showLabels();
 			}
 		}
 	}
-}
-
-Graph.prototype.greyPeaks = function(){
-	var peakCount = this.points.length;
-	for (var p = 0; p < peakCount; p++) {
-		if (!_.contains(this.model.sticky, this.points[p]))
-			this.points[p].line.attr("stroke", this.model.lossFragBarColour);
-	}
-}
-
-Graph.prototype.colourPeaks = function(){
-	if(this.model.sticky.length == 0){
-		var peakCount = this.points.length;
+	else{
 		for (var p = 0; p < peakCount; p++) {
-			var peak = this.points[p];
-			peak.line.attr("stroke", peak.colour);	
+			if (_.intersection(this.model.highlights, this.points[p].fragments).length == 0)
+				this.points[p].removeLabels();
+			else{
+				this.points[p].removeLabels();
+				this.points[p].showLabels(true);
+			}
 		}
 	}
 }
@@ -563,22 +519,10 @@ Graph.prototype.updateColors = function(){
 					peak.colour = this.model.p2color_cluster;
 			}
 			
-			this.colourPeaks();
+			this.updatePeakColors();
 		}
 }
 /*
-Graph.prototype.showLabels = function(){
-	var peakCount = this.points.length;
-	for (var p = 0; p < peakCount; p++) {
-		if (this.points[p].fragments.length > 0) {
-			this.points[p].showLabels();
-		}
-	}
-}
-
-
-
- * 
 
 Graph.prototype.resetScales = function(text) {
 	  this.y = d3.scale.linear()
