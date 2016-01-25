@@ -109,7 +109,7 @@ function KeyFragment (fragments, index, offset, peptide, FragKey) {
 			.attr("fragKeyIndex", index)
 			.attr("class", "fragBar");
 
-		this.btext = this.g.append("text")
+		this.bText = this.g.append("text")
 			.attr("x", this.x - 7)
 			.attr("y", y + 15)			
 			.style("font-size", "0.6em")
@@ -152,7 +152,7 @@ function KeyFragment (fragments, index, offset, peptide, FragKey) {
 			.attr("fragKeyIndex", index)
 			.attr("class", "fragBar");
 
-		this.ytext = this.g.append("text")
+		this.yText = this.g.append("text")
 			.attr("x", this.x - 2)
 			.attr("y", y - barHeight - 7)			
 			.style("font-size", "0.6em")
@@ -193,22 +193,22 @@ KeyFragment.prototype.highlight = function(show, fragments){
 		for(f = 0; f < fragments.length; f++){
 			if(fragments[f].ionType == "b" && this.bHighlight){
 				this.bHighlight.attr("opacity", 1);
-				this.btext.attr("opacity", 1);
+				this.bText.attr("opacity", 1);
 			}
 			if (fragments[f].ionType == "y" && this.yHighlight){
 				this.yHighlight.attr("opacity", 1);
-				this.ytext.attr("opacity", 1);
+				this.yText.attr("opacity", 1);
 			}
 		}
 	}
 	else{
 		if (this.yHighlight){
 			this.yHighlight.attr("opacity", 0);
-			this.ytext.attr("opacity", 0);
+			this.yText.attr("opacity", 0);
 		}
 		if (this.bHighlight){
 			this.bHighlight.attr("opacity", 0);	
-			this.btext.attr("opacity", 0);
+			this.bText.attr("opacity", 0);
 		}	
 	}
 }

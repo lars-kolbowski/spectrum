@@ -58,7 +58,18 @@ var FragmentationKeyView = Backbone.View.extend({
 	},
 
 	updateColors: function(){
-		this.peptideFragKey.clearHighlights();
+		var lines = this.peptideFragKey.fraglines;
+		for(l = 0; l < lines.length; l++){
+			if (lines[l].peptide == this.model.pep1){
+				if (lines[l].bText) lines[l].bText.style("fill", this.model.p1color);
+				if (lines[l].yText) lines[l].yText.style("fill", this.model.p1color);
+			}
+			else{
+				if (lines[l].bText) lines[l].bText.style("fill", this.model.p2color);
+				if (lines[l].yText) lines[l].yText.style("fill", this.model.p2color);
+			}
+		}
+		this.peptideFragKey.colorLetters("all");
 	}
 
 });
