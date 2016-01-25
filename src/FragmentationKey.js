@@ -165,7 +165,7 @@ PeptideFragmentationKey.prototype.setData = function(){
     this.pep1letters = [];
     this.pep2letters = [];
     drawPeptide( pep1, 20, this.model.p1color, this.pep1letters);
-    drawPeptide( pep2, 70, this.model.p2color, this.pep2letters);
+    drawPeptide( pep2, 71, this.model.p2color, this.pep2letters);
     function drawPeptide( pep, y, colour, pepLetters) {
 		var l = pep.length;
 		for (var i = 0; i < l; i++){

@@ -110,7 +110,7 @@ function KeyFragment (fragments, index, offset, peptide, FragKey) {
 			.attr("class", "fragBar");
 
 		this.btext = this.g.append("text")
-			.attr("x", this.x - 2)
+			.attr("x", this.x - 7)
 			.attr("y", y + 15)			
 			.style("font-size", "0.6em")
 			.style("fill", color)
