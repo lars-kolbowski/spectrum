@@ -165,7 +165,7 @@ PeptideFragmentationKey.prototype.setData = function(){
     this.pep1letters = [];
     this.pep2letters = [];
     drawPeptide( pep1, 20, this.model.p1color, this.pep1letters);
-    drawPeptide( pep2, 60, this.model.p2color, this.pep2letters);
+    drawPeptide( pep2, 70, this.model.p2color, this.pep2letters);
     function drawPeptide( pep, y, colour, pepLetters) {
 		var l = pep.length;
 		for (var i = 0; i < l; i++){
@@ -183,9 +183,9 @@ PeptideFragmentationKey.prototype.setData = function(){
 	// the the link line
 	self.g.append("line")
 		.attr("x1", xStep * (linkpos - 1))//the one...
-		.attr("y1", 22)
+		.attr("y1", 25)
 		.attr("x2", xStep * (linkpos - 1))//the one...
-		.attr("y2", 42)
+		.attr("y2", 55)
 		.attr("stroke", "black")
 		.attr("stroke-width", 1.5);
 

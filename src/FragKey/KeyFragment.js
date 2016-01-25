@@ -23,6 +23,13 @@ function KeyFragment (fragments, index, offset, peptide, FragKey) {
 	this.peptide = peptide;
 	this.fragments = Array();
 
+	var yfrag_index = peptide.length - (index + 1 - offset);
+	var bfrag_index = (index + 1 - offset);
+	if (peptide == this.FragKey.model.pep1)
+		var color = this.FragKey.model.p1color;
+	else
+		var color = this.FragKey.model.p2color;
+
 	var peakCount = FragKey.model.points.length;
 	for (var p = 0; p < peakCount; p++) {
 		var peak = FragKey.model.points[p];
@@ -31,7 +38,7 @@ function KeyFragment (fragments, index, offset, peptide, FragKey) {
 			var frag = peak.fragments[pf];
 			var pepSeq = frag.peptide;
 			if (peptide == frag.peptide
-				&& ((frag.ionType == 'y' && frag.ionNumber == (pepSeq.length - (index + 1 - offset))) ||(frag.ionType == 'b' && frag.ionNumber == index - offset + 1))
+				&& ((frag.ionType == 'y' && frag.ionNumber == yfrag_index) ||(frag.ionType == 'b' && frag.ionNumber == bfrag_index))
 				) {
 				if (!_.contains(this.fragments, frag))
 					this.fragments.push(frag);
@@ -45,8 +52,8 @@ function KeyFragment (fragments, index, offset, peptide, FragKey) {
 	if (this.peptide == this.FragKey.model.pep1)
 		var y = 25;
 	else
-		var y = 65;
-	var barHeight = 20, tailX = 5, tailY = 5;
+		var y = 75;
+	var barHeight = 18, tailX = 5, tailY = 5;
 
 	var self = this;
 
@@ -77,7 +84,6 @@ function KeyFragment (fragments, index, offset, peptide, FragKey) {
 	function endHighlight(){
 		self.FragKey.model.clearHighlight(self.fragments);	
 	}
-
 	// # bions; either normal or lossy; have different colors
 	if (fragments.indexOf("b") != -1){ // really a, b, or c , see get_fragment_annotation()
 	
@@ -102,6 +108,16 @@ function KeyFragment (fragments, index, offset, peptide, FragKey) {
 			.attr("peptide", peptide)
 			.attr("fragKeyIndex", index)
 			.attr("class", "fragBar");
+
+		this.btext = this.g.append("text")
+			.attr("x", this.x - 2)
+			.attr("y", y + 15)			
+			.style("font-size", "0.6em")
+			.style("fill", color)
+			//.attr("text-anchor", "middle")
+			.text("b"+bfrag_index)
+			.attr("opacity", 0);	
+
 		// if "bloss" in fgm:
 		if (fragments.indexOf("bloss") != -1){
 			this.bTail.attr("stroke", this.FragKey.model.lossFragBarColour);
@@ -130,11 +146,20 @@ function KeyFragment (fragments, index, offset, peptide, FragKey) {
 		this.yTail = this.g.append("line")
 			.attr("x1", this.x)
 			.attr("y1", y - barHeight)
-			.attr("x2", this.x+ tailX)
+			.attr("x2", this.x + tailX)
 			.attr("y2", y - barHeight - tailY)
 			.attr("peptide", peptide)
 			.attr("fragKeyIndex", index)
 			.attr("class", "fragBar");
+
+		this.ytext = this.g.append("text")
+			.attr("x", this.x - 2)
+			.attr("y", y - barHeight - 7)			
+			.style("font-size", "0.6em")
+			.style("fill", color)
+			//.attr("text-anchor", "end")
+			.text("y"+yfrag_index)
+			.attr("opacity", 0);
 		// if "yloss"
 		if (fragments.indexOf("yloss") != -1){
 			this.yTail.attr("stroke", this.FragKey.model.lossFragBarColour);
@@ -166,14 +191,24 @@ function KeyFragment (fragments, index, offset, peptide, FragKey) {
 KeyFragment.prototype.highlight = function(show, fragments){
 	if(show === true){
 		for(f = 0; f < fragments.length; f++){
-			if(fragments[f].ionType == "b" && this.bHighlight)
+			if(fragments[f].ionType == "b" && this.bHighlight){
 				this.bHighlight.attr("opacity", 1);
-			if (fragments[f].ionType == "y" && this.yHighlight)
-				this.yHighlight.attr("opacity", 1);	
+				this.btext.attr("opacity", 1);
+			}
+			if (fragments[f].ionType == "y" && this.yHighlight){
+				this.yHighlight.attr("opacity", 1);
+				this.ytext.attr("opacity", 1);
+			}
 		}
 	}
 	else{
-		if (this.yHighlight) this.yHighlight.attr("opacity", 0);
-		if (this.bHighlight) this.bHighlight.attr("opacity", 0);		
+		if (this.yHighlight){
+			this.yHighlight.attr("opacity", 0);
+			this.ytext.attr("opacity", 0);
+		}
+		if (this.bHighlight){
+			this.bHighlight.attr("opacity", 0);	
+			this.btext.attr("opacity", 0);
+		}	
 	}
 }
