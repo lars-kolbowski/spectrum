@@ -86,10 +86,6 @@ Graph = function(targetSvg, model, options) {
 		.attr("y2", 50)
 		.attr("stroke-width", 1)
 		.attr("stroke", "Red");
-	this.measureLabel = this.measuringTool.append("text")
-		.attr("text-anchor", "middle")
-		.style("font-size", "0.8em");
-
 	this.measureInfo =  d3.select("div#measureTooltip")
 		.style("font-size", "0.8em");
 
@@ -256,15 +252,18 @@ Graph.prototype.measure = function(on){
 			var coords = d3.mouse(this);
 			var mouseX = self.x.invert(coords[0]);
 			var distance = 100;
+			var highlighttrigger = 10;
 			var peakCount = self.points.length;
-			var highlightedPeak = false;
 			for (var p = 0; p < peakCount; p++) {
 				var peak = self.points[p];
+				if (_.intersection(self.model.highlights, peak.fragments).length != 0 && Math.abs(peak.x - mouseX)  < highlighttrigger){
+					self.measureStartPeak = peak;
+					break;
+				}
+
 				if (Math.abs(peak.x - mouseX)  < distance){
 					distance = Math.abs(peak.x - mouseX);
 					self.measureStartPeak = peak;
-					if (_.contains(self.model.sticky, peak.fragments[0]))
-						highlightedPeak = true;	
 				}
 			}
 			self.measuringToolVLineStart
@@ -290,25 +289,21 @@ Graph.prototype.measure = function(on){
 			var mouseX = self.x.invert(coords[0]);
 			//find start and endPeak
 			var distance = 2;
-			var highlightdistance = 5;
+			var highlighttrigger = 10;
 			var triggerdistance = 5;
 			var peakCount = self.points.length;
-			var highlightedPeak = false;
+			//var highlightedPeak = false;
 			for (var p = 0; p < peakCount; p++) {
 				var peak = self.points[p];
-				if (mouseX - triggerdistance < peak.x < mouseX + triggerdistance){
-					if (_.contains(self.model.sticky, peak.fragments[0]) && Math.abs(peak.x - mouseX)  < highlightdistance){
-						var highlightedPeak = peak;
-						highlightdistance = Math.abs(peak.x - mouseX);
-					}else if(Math.abs(peak.x - mouseX)  < distance){
-						var endPeak = peak
-						distance = Math.abs(peak.x - mouseX);
-					}
+				if (_.intersection(self.model.highlights, peak.fragments).length != 0 && Math.abs(peak.x - mouseX)  < highlighttrigger){
+					var endPeak = peak;
+					break;
+				}
+				if (mouseX - triggerdistance < peak.x < mouseX + triggerdistance && Math.abs(peak.x - mouseX)  < distance){
+					var endPeak = peak
+					distance = Math.abs(peak.x - mouseX);
 				}
 			}
-
-			if(highlightedPeak)
-				endPeak = highlightedPeak;
 			
 			//draw vertical end Line
 			if(endPeak){
@@ -334,31 +329,33 @@ Graph.prototype.measure = function(on){
 				.attr("y1", coords[1])
 				.attr("y2", coords[1]);
 
-			//draw distance label
+			//draw peak info
 			var deltaX = Math.abs(measureStartX - measureEndX);
 			var distance = Math.abs(self.x.invert(measureStartX) - self.x.invert(measureEndX));
 			if (measureStartX  < measureEndX)
 				var labelX = measureStartX  + deltaX/2;
 			else
 				var labelX = measureEndX + deltaX/2;	
-			self.measureLabel
-				.attr("x", labelX)
-				.attr("y", coords[1]-9)
-				.text(distance.toFixed(2)+" Th");
+			var PeakInfo = distance.toFixed(2)+" Th<br/>"
 
-			//draw peak info
 			if(self.measureStartPeak.fragments.length > 0)
-				var PeakInfo = "From: Fragment " + self.measureStartPeak.fragments[0].name;
+				PeakInfo += "From: " + self.measureStartPeak.fragments[0].name + " (" + self.measureStartPeak.x + " m/z)";
 			else if (self.measureStartPeak.IsotopeCluster)
-				var PeakInfo = "From: IsotopeCluster " + self.measureStartPeak.IsotopeCluster.points[0].fragments[0].name;
+				PeakInfo += "From: IsotopeCluster " + self.measureStartPeak.IsotopeCluster.points[0].fragments[0].name;
 			else
-				var PeakInfo = "From: Peak " + self.measureStartPeak.x + " m/z"; 
+				PeakInfo += "From: Peak (" + self.measureStartPeak.x + " m/z)"; 
 			if(endPeak){
 				if(endPeak.fragments.length > 0)
-					PeakInfo += "<br/>To: Fragment: " + endPeak.fragments[0].name;
+					PeakInfo += "<br/>To: " + endPeak.fragments[0].name + " (" + endPeak.x + " m/z)";
 				else
-					PeakInfo += "<br/>To: Peak: " + endPeak.x + " m/z"; 
+					PeakInfo += "<br/>To: Peak (" + endPeak.x + " m/z)"; 
 			}
+			PeakInfo += "<br/><br/><p style='font-size:0.8em'>";
+			for(i=1; i<7; i++){
+			PeakInfo += "z = "+i+": "+(distance/i).toFixed(2)+" Da<br/>";	
+			}
+			PeakInfo += "</p>";
+			
 
 
 			var matrix = this.getScreenCTM()
@@ -366,14 +363,12 @@ Graph.prototype.measure = function(on){
                          +this.getAttribute("cy"));
 
 			self.measureInfo
-				//.attr("x", labelX)
-				//.attr("y", coords[1]+12)
 				.style("display", "inline")
 				.html(PeakInfo)
             	.style("left", 
-                   (window.pageXOffset + matrix.e + labelX - 50) + "px")
+                   (window.pageXOffset + matrix.e + labelX - 60) + "px")
             	.style("top",
-                   (window.pageYOffset + matrix.f + coords[1] + 12) + "px");		  
+                   (window.pageYOffset + matrix.f + coords[1] -16) + "px");		  
 		}
 
 		this.measureBrush = d3.svg.brush()
