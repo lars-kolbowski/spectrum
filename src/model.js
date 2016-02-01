@@ -19,8 +19,8 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		var annotatedPeaksCSV = this.get("annotatedPeaksCSV");
 		this.set("annotatedPeaks", d3.csv.parse(annotatedPeaksCSV.trim()));
 		this.annotatedPeaks = this.get("annotatedPeaks");
-		this.pep1 = this.get("pepSeq1").replace(this.get("notUpperCase"), '');
-		this.pep2 = this.get("pepSeq2").replace(this.get("notUpperCase"), '');
+		this.pep1 = this.get("pepSeq1");
+		this.pep2 = this.get("pepSeq2");
 		this.linkPos1 = this.get("linkPos1");
 		this.linkPos2 = this.get("linkPos2");
 		this.notUpperCase = this.get("notUpperCase"),

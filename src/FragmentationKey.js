@@ -56,6 +56,26 @@ PeptideFragmentationKey.prototype.setData = function(){
 	var pep1 = this.pepSeq1.replace(self.model.notUpperCase, '');
     var pep2 = this.pepSeq2.replace(self.model.notUpperCase, '');
 
+	var pep1Mods = this.pepSeq1.match(/[A-Z]+[a-z]+/g);
+	this.pep1ModsArray = new Array();
+	if(pep1Mods){
+		var modIndex =  0
+		for(i = 0; i < pep1Mods.length; i++){
+			modIndex += pep1Mods[i].replace(/[^A-Z]/g, '').length;
+			this.pep1ModsArray[modIndex-1] = pep1Mods[i].replace(/[A-Z]/g, '');
+		}
+	}
+
+	var pep2Mods = this.pepSeq2.match(/[A-Z]+[a-z]+/g);
+	this.pep2ModsArray = new Array();
+	if(pep2Mods){
+		var modIndex = 0;
+		for(i = 0; i < pep2Mods.length; i++){
+			modIndex += pep2Mods[i].replace(/[^A-Z]/g, '').length;
+			this.pep2ModsArray[modIndex-1] = pep2Mods[i].replace(/[A-Z]/g, '');
+		}
+	}
+
     // #get ion data for annotation
     // ions1 = set([i.name if "_" not in i.loss else i.name+"loss" for i in
     //              cl_pep.fragment_series["pep1"].get_ions()])
@@ -164,18 +184,29 @@ PeptideFragmentationKey.prototype.setData = function(){
     // the letters
     this.pep1letters = [];
     this.pep2letters = [];
-    drawPeptide( pep1, 20, this.model.p1color, this.pep1letters);
-    drawPeptide( pep2, 71, this.model.p2color, this.pep2letters);
-    function drawPeptide( pep, y, colour, pepLetters) {
+    this.pep1ModLetters = [];
+    this.pep2ModLetters = [];
+    drawPeptide( pep1, this.pep1ModsArray, 20, 5, this.model.p1color, this.pep1letters, this.pep1ModLetters);
+    drawPeptide( pep2, this.pep2ModsArray, 71, 86, this.model.p2color, this.pep2letters, this.pep2ModLetters);
+    function drawPeptide( pep, mods, y1, y2, colour, pepLetters, modLetters) {
 		var l = pep.length;
 		for (var i = 0; i < l; i++){
 			if (pep[i] != "#") {
 				pepLetters[i] = self.g.append("text")
 					.attr("x", xStep * i)
-					.attr("y", y)
+					.attr("y", y1)
 					.attr("text-anchor", "middle")
 					.attr("fill", colour)
 					.text(pep[i]);
+				if(mods[i]){
+					modLetters[i] = self.g.append("text")
+						.attr("x", xStep * i)
+						.attr("y", y2)
+						.attr("text-anchor", "middle")
+						.attr("fill", colour)
+						.style("font-size", "0.7em")
+						.text(mods[i]);
+				}
 				}
 		}
 	}
@@ -368,7 +399,7 @@ PeptideFragmentationKey.prototype.colorLetters = function(fragment){
 			}
 			color(this.pep1letters, this.model.p1color, start, end);
 			if (	(fragment.ionNumber >= this.model.linkPos1 && fragment.ionType == "b") 
-					|| (this.pep1letters.length - fragment.ionNumber <= this.model.linkPos1 && fragment.ionType == "y")
+					|| (this.pep1letters.length - fragment.ionNumber < this.model.linkPos1 && fragment.ionType == "y")
 				)
 				color(this.pep2letters, this.model.p2color, 0, this.pep2letters.length)			
 		}
@@ -384,7 +415,7 @@ PeptideFragmentationKey.prototype.colorLetters = function(fragment){
 			color(this.pep2letters, this.model.p2color, start, end);
 
 			if (	(fragment.ionNumber >= this.model.linkPos2 && fragment.ionType == "b") 
-					|| (this.pep2letters.length - fragment.ionNumber <= this.model.linkPos2 && fragment.ionType == "y")
+					|| (this.pep2letters.length - fragment.ionNumber < this.model.linkPos2 && fragment.ionType == "y")
 				)
 				color(this.pep1letters, this.model.p1color, 0, this.pep1letters.length)
 		}
