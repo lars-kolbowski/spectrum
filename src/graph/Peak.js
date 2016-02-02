@@ -53,6 +53,19 @@ function Peak (data, graph){
 	this.tooltip = tooltip + " m/z: " + this.x + ", i: " + this.y
 
 	//svg elements
+	this.labelDrag = d3.behavior.drag();
+	this.labelDrag.on("drag", function() {
+			var coords = d3.mouse(this);
+			var frag = this.innerHTML;
+			for (var f = 0; f < self.fragments.length; f++){
+				if(self.fragments[f].name == frag){
+					self.labelHighlights[f].attr("x", coords[0]);
+					self.labels[f].attr("x", coords[0]);
+					self.labelHighlights[f].attr("y", coords[1]);
+					self.labels[f].attr("y", coords[1]);
+				}
+			}
+		});	
 	this.g = this.graph.peaks.append('g');
 	this.g.append("svg:title").text(this.tooltip);	// easy tooltip
 	if (this.fragments.length > 0) {

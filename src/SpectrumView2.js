@@ -7,6 +7,7 @@ var SpectrumView = Backbone.View.extend({
 		'click #clearHighlights' : 'clearHighlights',
 		'change #colorSelector': 'changeColorScheme',
 		'click #measuringTool': 'measuringTool',
+		'click #moveLabels': 'moveLabels',
 	},
 
 	initialize: function() {
@@ -103,5 +104,39 @@ var SpectrumView = Backbone.View.extend({
         var selected = $target .is(':checked');
         this.model.measureMode = selected;
 		this.graph.measure(selected);
+	},
+
+	moveLabels: function(e){
+
+		var $target = $(e.target);
+        var selected = $target .is(':checked');
+        this.model.moveLabels = selected;
+        //var drag = d3.behavior.drag();
+		
+		var peaks = this.graph.points;
+
+		if (selected){
+			for(p = 0; p < peaks.length; p++){
+				if(peaks[p].labels){
+					for(l = 0; l < peaks[p].labels.length; l++)
+						peaks[p].labels[l].call(peaks[p].labelDrag);
+				}
+			}
+		}
+		else{
+			for(p = 0; p < peaks.length; p++){
+				if(peaks[p].labels){
+					for(l = 0; l < peaks[p].labels.length; l++)
+						peaks[p].labels[l].on(".drag", null);
+				}
+			}			
+		}
+
+/*		drag.on("drag", function() {
+			var coords = d3.mouse(this);
+			this.setAttribute("x", coords[0]);
+			this.setAttribute("y", coords[1]);
+			//alert(coords); 
+		});	*/
 	}
 });

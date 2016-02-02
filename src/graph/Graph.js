@@ -222,7 +222,7 @@ Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 				
 	self.zoom = d3.behavior.zoom().x(self.x).on("zoom", self.redraw());
 	self.plot.call(self.zoom);
-	self.innerSVG.call(self.zoom);
+	//self.innerSVG.call(self.zoom);
 
 	if (this.title) {
 		this.title.attr("x", width/2);
@@ -384,7 +384,7 @@ Graph.prototype.measure = function(on){
 	else{
 		this.measureClear();
 		this.plot.call(this.zoom);
-		this.innerSVG.call(this.zoom);
+		//this.innerSVG.call(this.zoom);
 		this.measureBrush = d3.svg.brush()
 			.on("brushstart", null)
 			.on("brush", null)
