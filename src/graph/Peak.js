@@ -113,13 +113,16 @@ function Peak (data, graph){
 			var startY = self.graph.y(self.y)
 			var mouseX = coords[0]-startX;
 			var mouseY = coords[1];
-
-			if (Math.abs(startX - mouseX) > 10)
+			var r = Math.sqrt((mouseX * mouseX) + ((mouseY-startY) * (mouseY-startY) ))
+			if (r > 15 )
 				curLabelLine
+					.attr("opacity", 1)
 					.attr("x1", 0)
 					.attr("x2", mouseX)
 					.attr("y1", startY)
 					.attr("y2", mouseY);
+			else
+				curLabelLine.attr("opacity", 0);
 		});	
 		this.labels = []; // will be array of d3 selections
 		this.labelHighlights = []; // will be array of d3 selections
