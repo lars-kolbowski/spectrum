@@ -91,16 +91,18 @@ function Peak (data, graph){
 		}
 
 	  	//create frag labels
-	  	this.labelLine = self.g.append("line")
-	  			.attr("stroke-width", 1)
-				.attr("stroke", "Black")
-				.style("stroke-dasharray", ("3, 3"));	
+	  	//labeldrag	
 		this.labelDrag = d3.behavior.drag();
+		this.labelDrag.on("dragstart", function(){
+			for(l=0; l<self.labelLines.length; l++)
+				self.labelLines[l].attr("opacity", 1);
+		});
 		this.labelDrag.on("drag", function() {
 			var coords = d3.mouse(this);
 			var frag = this.innerHTML;
 			for (var f = 0; f < self.fragments.length; f++){
 				if(self.fragments[f].name == frag){
+					var curLabelLine = self.labelLines[f];
 					self.labelHighlights[f].attr("x", coords[0]);
 					self.labels[f].attr("x", coords[0]);
 					self.labelHighlights[f].attr("y", coords[1]);
@@ -112,9 +114,8 @@ function Peak (data, graph){
 			var mouseX = coords[0]-startX;
 			var mouseY = coords[1];
 
-			console.log("self.x:"+self.x+" graph.x():"+startX+" mouseX:"+mouseX);
 			if (Math.abs(startX - mouseX) > 10)
-				self.labelLine
+				curLabelLine
 					.attr("x1", 0)
 					.attr("x2", mouseX)
 					.attr("y1", startY)
@@ -122,6 +123,7 @@ function Peak (data, graph){
 		});	
 		this.labels = []; // will be array of d3 selections
 		this.labelHighlights = []; // will be array of d3 selections
+		this.labelLines = []; // will be array of d3 selections
 		var fragCount = this.fragments.length;
 		for (var f = 0; f < fragCount; f++){
 			var frag = this.fragments[f];
@@ -138,36 +140,50 @@ function Peak (data, graph){
 					.attr("text-anchor", "middle")
 					.style("stroke-width", "5px")
 					.style("font-size", "0.8em")
+					.style("cursor", "default")
 					.attr("stroke", this.graph.model.highlightColour);
 			label.text(frag.name)
 					.attr("x", 0)
 					.attr("text-anchor", "middle")
 					.style("font-size", "0.8em")
+					.style("cursor", "default")
 					.attr("class", "peakAnnot");
+			labelLine = self.g.append("line")
+	  			.attr("stroke-width", 1)
+				.attr("stroke", "Black")
+				.style("stroke-dasharray", ("3, 3"));
 					
 			label[0][0].onmouseover = function(evt) {
-				startHighlight();
+				if(!self.graph.model.moveLabels)
+					startHighlight();
 			};
 			label[0][0].onmouseout = function(evt) {
-				endHighlight();
+				if(!self.graph.model.moveLabels)				
+					endHighlight();
 			};
 			label[0][0].ontouchstart = function(evt) {
-				startHighlight();
+				if(!self.graph.model.moveLabels)
+					startHighlight();
 			};
 			label[0][0].ontouchend = function(evt) {
-				endHighlight();
+				if(!self.graph.model.moveLabels)				
+					endHighlight();
 			};
 			labelHighlight[0][0].onmouseover = function(evt) {
-				startHighlight();
+				if(!self.graph.model.moveLabels)
+					startHighlight();
 			};
 			labelHighlight[0][0].onmouseout = function(evt) {
-				endHighlight();
+				if(!self.graph.model.moveLabels)				
+					endHighlight();
 			};
 			labelHighlight[0][0].ontouchstart = function(evt) {
-				startHighlight();
+				if(!self.graph.model.moveLabels)
+					startHighlight();
 			};
 			labelHighlight[0][0].ontouchend = function(evt) {
-				endHighlight();
+				if(!self.graph.model.moveLabels)				
+					endHighlight();
 			};
 			
 			var c = "pink";//colour for annotation
@@ -187,6 +203,7 @@ function Peak (data, graph){
 			label.attr("fill", c);
 			this.labels.push(label);
 			this.labelHighlights.push(labelHighlight);
+			this.labelLines.push(labelLine);
 		}
 		this.highlight(false);
 	}
@@ -230,7 +247,6 @@ Peak.prototype.highlight = function(show, fragments){
 		for (var b = 0; b < this.IsotopeCluster.points.length; b++ )
 			this.IsotopeCluster.points[b].line.attr("stroke", this.colour);
 	} else {
-
 		this.highlightLine.attr("opacity",0);
 		for (var a = 0; a < this.labels.length; a++){
 			this.labelHighlights[a].attr("opacity", 0);
@@ -239,6 +255,15 @@ Peak.prototype.highlight = function(show, fragments){
 }
 
 Peak.prototype.update = function(){
+	if (this.fragments.length > 0){
+		for(l=0; l<this.labelLines.length; l++)
+			this.labelLines[l]
+				.attr("opacity", 0)
+				.attr("x1", 0)
+				.attr("x2", 0)
+				.attr("y1", 0)
+				.attr("y2", 0)
+		}
 	this.updateX();
 	this.updateY();
 }
@@ -294,6 +319,7 @@ Peak.prototype.removeLabels = function(){
 		for (var a = 0; a < labelCount; a++){
 			this.labels[a].attr("display", "none");
 			this.labelHighlights[a].attr("display", "none");
+			this.labelLines[a].attr("opacity", 0);
 		}
 	}
 }
@@ -307,6 +333,7 @@ Peak.prototype.showLabels = function(lossyOverride){
 					&& (this.graph.lossyShown === true || this.fragments[a].lossy === false || lossyOverride == true)) {
 				this.labels[a].attr("display", "inline");
 				this.labelHighlights[a].attr("display", "inline");
+				this.labelLines[a].attr("opacity", 1);
 			}
 		}
 	}
