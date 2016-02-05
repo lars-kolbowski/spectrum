@@ -156,8 +156,8 @@ Graph.prototype.setData = function(){
 	this.points = new Array();
 	this.pep1 = this.model.pep1;
 	this.pep2 = this.model.pep2;
-	for (var i = 0; i < this.model.nested.length; i++){
-		this.points.push(new Peak(this.model.nested[i].values, this));
+	for (var i = 0; i < this.model.JSONdata.peaks.length; i++){
+		this.points.push(new Peak(i, this));
 	}
 	this.model.points = this.points;
 	//Isotope cluster

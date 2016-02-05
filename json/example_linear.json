@@ -1,0 +1,751 @@
+{
+"Peptides":[
+	[
+		{"aminoAcid":"V"},
+		{"aminoAcid":"H"},
+		{"aminoAcid":"T"},
+		{"aminoAcid":"E"},
+		{"aminoAcid":"C", "Modification":"cm"},
+		{"aminoAcid":"C", "Modification":"cm"},
+		{"aminoAcid":"H"},
+		{"aminoAcid":"G"},
+		{"aminoAcid":"D"},
+		{"aminoAcid":"L"},
+		{"aminoAcid":"L"},
+		{"aminoAcid":"E"},
+		{"aminoAcid":"C", "Modification":"cm"},
+		{"aminoAcid":"A"},
+		{"aminoAcid":"D"},
+		{"aminoAcid":"D"},
+		{"aminoAcid":"R"},
+		{"aminoAcid":"A"},
+		{"aminoAcid":"D"},
+		{"aminoAcid":"L"},
+		{"aminoAcid":"A"},
+		{"aminoAcid":"K"}
+	]
+],
+"LinkSite" : [
+],
+"peaks" :[
+	
+	{"mz":110.07143, "intensity":288898.8, "clusterIds":[]},
+	{"mz":129.10234, "intensity":135412.2, "clusterIds":[110]},
+	{"mz":130.08658, "intensity":202123.3, "clusterIds":[0]},
+	{"mz":131.08975, "intensity":12977.55, "clusterIds":[0]},
+	{"mz":133.04282, "intensity":33405.2, "clusterIds":[]},
+	{"mz":135.11853, "intensity":11834.92, "clusterIds":[]},
+	{"mz":147.11311, "intensity":327658.3, "clusterIds":[111]},
+	{"mz":147.19261, "intensity":32036.67, "clusterIds":[]},
+	{"mz":148.02418, "intensity":13801.92, "clusterIds":[]},
+	{"mz":164.11838, "intensity":61115.45, "clusterIds":[]},
+	{"mz":165.46598, "intensity":26636.77, "clusterIds":[]},
+	{"mz":166.06131, "intensity":510742.1, "clusterIds":[1]},
+	{"mz":167.06436, "intensity":39144.46, "clusterIds":[1]},
+	{"mz":209.13994, "intensity":289267.5, "clusterIds":[2]},
+	{"mz":210.14324, "intensity":13148.58, "clusterIds":[2]},
+	{"mz":217.58099, "intensity":14647.2, "clusterIds":[]},
+	{"mz":218.14974, "intensity":250094.3, "clusterIds":[3]},
+	{"mz":219.15277, "intensity":13942.32, "clusterIds":[3]},
+	{"mz":220.10829, "intensity":468441.0, "clusterIds":[112]},
+	{"mz":224.45131, "intensity":24025.57, "clusterIds":[]},
+	{"mz":237.13476, "intensity":1736696.0, "clusterIds":[4]},
+	{"mz":238.13917, "intensity":154449.1, "clusterIds":[4]},
+	{"mz":239.11402, "intensity":164163.7, "clusterIds":[]},
+	{"mz":245.93294, "intensity":14635.18, "clusterIds":[]},
+	{"mz":257.57061, "intensity":21265.99, "clusterIds":[]},
+	{"mz":265.71972, "intensity":19416.65, "clusterIds":[]},
+	{"mz":276.14508, "intensity":30564.62, "clusterIds":[]},
+	{"mz":280.2397, "intensity":19563.56, "clusterIds":[]},
+	{"mz":294.15632, "intensity":41918.9, "clusterIds":[]},
+	{"mz":310.1152, "intensity":28697.2, "clusterIds":[]},
+	{"mz":320.17171, "intensity":55881.52, "clusterIds":[113,114]},
+	{"mz":323.90962, "intensity":13836.38, "clusterIds":[]},
+	{"mz":323.93192, "intensity":27716.85, "clusterIds":[]},
+	{"mz":331.23414, "intensity":265341.9, "clusterIds":[115]},
+	{"mz":337.20435, "intensity":54723.35, "clusterIds":[116]},
+	{"mz":338.18277, "intensity":214216.7, "clusterIds":[117]},
+	{"mz":343.10638, "intensity":21171.17, "clusterIds":[]},
+	{"mz":343.17252, "intensity":32706.2, "clusterIds":[]},
+	{"mz":374.44076, "intensity":21439.3, "clusterIds":[]},
+	{"mz":394.71795, "intensity":53166.42, "clusterIds":[5]},
+	{"mz":395.21844, "intensity":35651.04, "clusterIds":[5]},
+	{"mz":413.1441, "intensity":24953.35, "clusterIds":[]},
+	{"mz":421.22217, "intensity":23859.64, "clusterIds":[]},
+	{"mz":423.202, "intensity":26526.6, "clusterIds":[]},
+	{"mz":439.67573, "intensity":27103.09, "clusterIds":[]},
+	{"mz":458.2011, "intensity":64098.19, "clusterIds":[]},
+	{"mz":463.17643, "intensity":22573.85, "clusterIds":[118]},
+	{"mz":467.22778, "intensity":73376.93, "clusterIds":[119]},
+	{"mz":470.14487, "intensity":46219.73, "clusterIds":[]},
+	{"mz":482.14479, "intensity":28392.09, "clusterIds":[]},
+	{"mz":485.93119, "intensity":23196.06, "clusterIds":[]},
+	{"mz":490.16265, "intensity":171689.3, "clusterIds":[]},
+	{"mz":499.16632, "intensity":295010.9, "clusterIds":[6,7]},
+	{"mz":499.66988, "intensity":64746.55, "clusterIds":[6]},
+	{"mz":500.16869, "intensity":44581.64, "clusterIds":[6,7]},
+	{"mz":513.72597, "intensity":22675.88, "clusterIds":[]},
+	{"mz":517.29874, "intensity":40370.31, "clusterIds":[120]},
+	{"mz":523.70618, "intensity":23851.93, "clusterIds":[]},
+	{"mz":539.69667, "intensity":241892.6, "clusterIds":[8,9]},
+	{"mz":540.19768, "intensity":132524.6, "clusterIds":[8]},
+	{"mz":540.70033, "intensity":28455.98, "clusterIds":[8,9]},
+	{"mz":545.30746, "intensity":25758.13, "clusterIds":[]},
+	{"mz":548.70164, "intensity":374800.3, "clusterIds":[10,11]},
+	{"mz":549.20149, "intensity":170032.9, "clusterIds":[10]},
+	{"mz":549.70388, "intensity":95604.59, "clusterIds":[10,11]},
+	{"mz":555.70939, "intensity":179677.3, "clusterIds":[]},
+	{"mz":567.76514, "intensity":101481.3, "clusterIds":[12]},
+	{"mz":568.26603, "intensity":97527.3, "clusterIds":[12]},
+	{"mz":573.23099, "intensity":24323.36, "clusterIds":[]},
+	{"mz":582.24393, "intensity":32945.59, "clusterIds":[13,14]},
+	{"mz":582.69312, "intensity":22259.68, "clusterIds":[]},
+	{"mz":582.74457, "intensity":42070.58, "clusterIds":[13]},
+	{"mz":583.23713, "intensity":39588.77, "clusterIds":[13,14]},
+	{"mz":591.24952, "intensity":85088.8, "clusterIds":[]},
+	{"mz":596.23931, "intensity":103086.7, "clusterIds":[15,16]},
+	{"mz":596.74039, "intensity":65258.77, "clusterIds":[15]},
+	{"mz":597.24685, "intensity":23002.34, "clusterIds":[15,16]},
+	{"mz":603.75945, "intensity":26886.52, "clusterIds":[]},
+	{"mz":605.24356, "intensity":274235.3, "clusterIds":[17,18]},
+	{"mz":605.74495, "intensity":125975.1, "clusterIds":[17]},
+	{"mz":606.24543, "intensity":30606.06, "clusterIds":[17,18]},
+	{"mz":606.75421, "intensity":22127.47, "clusterIds":[17]},
+	{"mz":630.17783, "intensity":57043.6, "clusterIds":[]},
+	{"mz":632.29108, "intensity":62293.76, "clusterIds":[121]},
+	{"mz":642.32438, "intensity":47830.51, "clusterIds":[]},
+	{"mz":644.26796, "intensity":49374.47, "clusterIds":[122]},
+	{"mz":647.7878, "intensity":36880.43, "clusterIds":[]},
+	{"mz":652.78266, "intensity":27085.32, "clusterIds":[123]},
+	{"mz":660.22889, "intensity":96595.17, "clusterIds":[19]},
+	{"mz":660.33206, "intensity":63621.54, "clusterIds":[]},
+	{"mz":661.22866, "intensity":35597.09, "clusterIds":[19]},
+	{"mz":661.79043, "intensity":65436.29, "clusterIds":[20]},
+	{"mz":662.28981, "intensity":52345.17, "clusterIds":[20]},
+	{"mz":673.3992, "intensity":185151.0, "clusterIds":[21]},
+	{"mz":674.40652, "intensity":38548.83, "clusterIds":[21]},
+	{"mz":688.2199, "intensity":103474.5, "clusterIds":[]},
+	{"mz":688.82858, "intensity":36508.55, "clusterIds":[22,23]},
+	{"mz":689.33298, "intensity":36528.25, "clusterIds":[22]},
+	{"mz":689.82695, "intensity":22892.51, "clusterIds":[22,23]},
+	{"mz":713.94989, "intensity":30569.47, "clusterIds":[124]},
+	{"mz":719.61593, "intensity":30320.07, "clusterIds":[]},
+	{"mz":726.31255, "intensity":65573.45, "clusterIds":[125]},
+	{"mz":741.20982, "intensity":24536.68, "clusterIds":[]},
+	{"mz":745.24207, "intensity":53841.49, "clusterIds":[]},
+	{"mz":745.37147, "intensity":48164.99, "clusterIds":[126]},
+	{"mz":746.97159, "intensity":28412.0, "clusterIds":[24]},
+	{"mz":747.30451, "intensity":25679.94, "clusterIds":[24]},
+	{"mz":747.79843, "intensity":25678.89, "clusterIds":[]},
+	{"mz":759.22362, "intensity":64039.26, "clusterIds":[]},
+	{"mz":775.36402, "intensity":44146.38, "clusterIds":[]},
+	{"mz":784.00477, "intensity":82706.59, "clusterIds":[25]},
+	{"mz":784.34105, "intensity":43643.88, "clusterIds":[25]},
+	{"mz":787.28785, "intensity":59152.42, "clusterIds":[127]},
+	{"mz":788.42808, "intensity":445111.4, "clusterIds":[26]},
+	{"mz":789.43265, "intensity":112236.1, "clusterIds":[26]},
+	{"mz":804.30006, "intensity":77747.48, "clusterIds":[]},
+	{"mz":818.02428, "intensity":38029.63, "clusterIds":[27]},
+	{"mz":818.35461, "intensity":24415.75, "clusterIds":[27]},
+	{"mz":823.35667, "intensity":105499.2, "clusterIds":[28,29]},
+	{"mz":823.68954, "intensity":144658.9, "clusterIds":[28]},
+	{"mz":824.02088, "intensity":53444.34, "clusterIds":[28]},
+	{"mz":824.35868, "intensity":51551.45, "clusterIds":[28,29]},
+	{"mz":829.35395, "intensity":142209.8, "clusterIds":[30,31]},
+	{"mz":829.68918, "intensity":258009.0, "clusterIds":[30]},
+	{"mz":830.02492, "intensity":136531.1, "clusterIds":[30]},
+	{"mz":830.36431, "intensity":103101.8, "clusterIds":[30,31]},
+	{"mz":830.69614, "intensity":41218.08, "clusterIds":[30]},
+	{"mz":831.39537, "intensity":43453.74, "clusterIds":[32]},
+	{"mz":831.90098, "intensity":34022.64, "clusterIds":[32]},
+	{"mz":835.88207, "intensity":22659.84, "clusterIds":[]},
+	{"mz":842.25698, "intensity":40288.49, "clusterIds":[]},
+	{"mz":851.69962, "intensity":32542.46, "clusterIds":[]},
+	{"mz":856.37884, "intensity":132178.6, "clusterIds":[33,34]},
+	{"mz":856.71321, "intensity":123530.4, "clusterIds":[33]},
+	{"mz":857.04912, "intensity":70433.39, "clusterIds":[33]},
+	{"mz":857.37952, "intensity":112185.1, "clusterIds":[33,34]},
+	{"mz":860.26976, "intensity":255162.9, "clusterIds":[35]},
+	{"mz":861.27668, "intensity":78205.95, "clusterIds":[35]},
+	{"mz":862.27231, "intensity":57199.5, "clusterIds":[35]},
+	{"mz":862.38237, "intensity":172994.1, "clusterIds":[36,37]},
+	{"mz":862.71647, "intensity":193619.0, "clusterIds":[36]},
+	{"mz":863.0527, "intensity":115777.2, "clusterIds":[36]},
+	{"mz":863.38907, "intensity":78953.98, "clusterIds":[36,37]},
+	{"mz":873.31338, "intensity":30262.72, "clusterIds":[]},
+	{"mz":886.42496, "intensity":27143.49, "clusterIds":[38]},
+	{"mz":887.43159, "intensity":28836.75, "clusterIds":[38]},
+	{"mz":895.34965, "intensity":49638.32, "clusterIds":[39]},
+	{"mz":896.34558, "intensity":38181.89, "clusterIds":[39]},
+	{"mz":899.92542, "intensity":124066.4, "clusterIds":[40,41]},
+	{"mz":900.43138, "intensity":79771.12, "clusterIds":[40]},
+	{"mz":900.92931, "intensity":45341.89, "clusterIds":[40,41]},
+	{"mz":903.45335, "intensity":218472.5, "clusterIds":[42]},
+	{"mz":904.46132, "intensity":81739.44, "clusterIds":[42]},
+	{"mz":917.38355, "intensity":62894.18, "clusterIds":[]},
+	{"mz":924.34346, "intensity":40529.35, "clusterIds":[128]},
+	{"mz":933.34201, "intensity":115017.9, "clusterIds":[43]},
+	{"mz":934.33998, "intensity":33992.54, "clusterIds":[43]},
+	{"mz":945.35989, "intensity":75981.97, "clusterIds":[129]},
+	{"mz":951.89797, "intensity":23649.88, "clusterIds":[]},
+	{"mz":973.34643, "intensity":141628.6, "clusterIds":[44]},
+	{"mz":974.37188, "intensity":60888.81, "clusterIds":[44]},
+	{"mz":974.49794, "intensity":245805.8, "clusterIds":[45]},
+	{"mz":975.36533, "intensity":29611.03, "clusterIds":[44]},
+	{"mz":975.49806, "intensity":78127.77, "clusterIds":[45]},
+	{"mz":979.94739, "intensity":52009.32, "clusterIds":[46,47]},
+	{"mz":980.44542, "intensity":62311.33, "clusterIds":[46]},
+	{"mz":980.93784, "intensity":24668.31, "clusterIds":[46,47]},
+	{"mz":988.41521, "intensity":33327.22, "clusterIds":[]},
+	{"mz":988.58889, "intensity":23884.87, "clusterIds":[]},
+	{"mz":997.33646, "intensity":49983.32, "clusterIds":[]},
+	{"mz":1001.3891, "intensity":28578.74, "clusterIds":[48]},
+	{"mz":1001.8894, "intensity":25488.74, "clusterIds":[48]},
+	{"mz":1006.4276, "intensity":53448.43, "clusterIds":[49]},
+	{"mz":1007.4411, "intensity":23054.59, "clusterIds":[49]},
+	{"mz":1009.8909, "intensity":148662.4, "clusterIds":[50,51]},
+	{"mz":1010.3894, "intensity":151338.9, "clusterIds":[50]},
+	{"mz":1010.8944, "intensity":85790.44, "clusterIds":[50,51]},
+	{"mz":1015.9086, "intensity":27616.62, "clusterIds":[]},
+	{"mz":1022.471, "intensity":21437.39, "clusterIds":[]},
+	{"mz":1035.9255, "intensity":24610.25, "clusterIds":[]},
+	{"mz":1046.4239, "intensity":141281.7, "clusterIds":[]},
+	{"mz":1051.4348, "intensity":47434.26, "clusterIds":[52,53]},
+	{"mz":1051.9442, "intensity":42044.88, "clusterIds":[52]},
+	{"mz":1052.4376, "intensity":38251.27, "clusterIds":[52,53]},
+	{"mz":1052.9414, "intensity":41847.55, "clusterIds":[52]},
+	{"mz":1058.4425, "intensity":47299.59, "clusterIds":[]},
+	{"mz":1059.9604, "intensity":97340.1, "clusterIds":[54,55]},
+	{"mz":1060.4576, "intensity":180586.3, "clusterIds":[54]},
+	{"mz":1060.9587, "intensity":143986.0, "clusterIds":[54,55]},
+	{"mz":1066.4387, "intensity":49540.13, "clusterIds":[56,57]},
+	{"mz":1066.9338, "intensity":86447.03, "clusterIds":[56]},
+	{"mz":1067.4361, "intensity":60973.61, "clusterIds":[56,57]},
+	{"mz":1069.4171, "intensity":88575.41, "clusterIds":[58]},
+	{"mz":1069.9097, "intensity":29214.15, "clusterIds":[58]},
+	{"mz":1078.4165, "intensity":109585.4, "clusterIds":[59,60]},
+	{"mz":1078.9187, "intensity":136336.9, "clusterIds":[59]},
+	{"mz":1079.4328, "intensity":59623.76, "clusterIds":[59,60]},
+	{"mz":1079.9229, "intensity":27872.99, "clusterIds":[59]},
+	{"mz":1086.4455, "intensity":60546.96, "clusterIds":[61]},
+	{"mz":1087.4468, "intensity":26329.36, "clusterIds":[61]},
+	{"mz":1089.4477, "intensity":46834.97, "clusterIds":[]},
+	{"mz":1092.942, "intensity":22284.43, "clusterIds":[]},
+	{"mz":1096.3971, "intensity":145587.9, "clusterIds":[62]},
+	{"mz":1097.4023, "intensity":46092.99, "clusterIds":[62]},
+	{"mz":1101.9539, "intensity":76989.77, "clusterIds":[63,64]},
+	{"mz":1102.4546, "intensity":86915.3, "clusterIds":[63]},
+	{"mz":1102.9519, "intensity":82780.23, "clusterIds":[63,64]},
+	{"mz":1103.4592, "intensity":25225.46, "clusterIds":[63]},
+	{"mz":1107.2186, "intensity":22450.14, "clusterIds":[]},
+	{"mz":1110.9517, "intensity":62386.3, "clusterIds":[65,66]},
+	{"mz":1111.4614, "intensity":39931.45, "clusterIds":[65]},
+	{"mz":1111.9563, "intensity":35555.33, "clusterIds":[65,66]},
+	{"mz":1115.4705, "intensity":82247.26, "clusterIds":[67,68]},
+	{"mz":1115.9762, "intensity":23775.27, "clusterIds":[68,69]},
+	{"mz":1116.5, "intensity":89810.9, "clusterIds":[67,68,69]},
+	{"mz":1116.974, "intensity":30961.69, "clusterIds":[68,69]},
+	{"mz":1117.4753, "intensity":210986.7, "clusterIds":[67,68,69]},
+	{"mz":1118.4907, "intensity":43288.19, "clusterIds":[67,70,71]},
+	{"mz":1118.9529, "intensity":51935.93, "clusterIds":[71,72,73]},
+	{"mz":1119.4415, "intensity":149604.2, "clusterIds":[67,71,72,74]},
+	{"mz":1119.9552, "intensity":33320.4, "clusterIds":[71,72,73]},
+	{"mz":1120.454, "intensity":38674.39, "clusterIds":[67,71,72,74]},
+	{"mz":1124.4805, "intensity":100555.7, "clusterIds":[75,76]},
+	{"mz":1124.976, "intensity":169781.6, "clusterIds":[75]},
+	{"mz":1125.4822, "intensity":71772.63, "clusterIds":[75,76]},
+	{"mz":1125.9782, "intensity":61194.22, "clusterIds":[75]},
+	{"mz":1126.476, "intensity":40704.67, "clusterIds":[75,76]},
+	{"mz":1127.9514, "intensity":236536.8, "clusterIds":[77,78]},
+	{"mz":1128.4518, "intensity":195819.0, "clusterIds":[77]},
+	{"mz":1128.957, "intensity":152104.7, "clusterIds":[77,78]},
+	{"mz":1129.4624, "intensity":80801.6, "clusterIds":[77]},
+	{"mz":1130.0009, "intensity":37234.3, "clusterIds":[77,78]},
+	{"mz":1134.5242, "intensity":504863.3, "clusterIds":[79]},
+	{"mz":1134.9721, "intensity":40949.68, "clusterIds":[]},
+	{"mz":1135.5287, "intensity":374116.2, "clusterIds":[79]},
+	{"mz":1136.5297, "intensity":109822.3, "clusterIds":[79]},
+	{"mz":1136.9805, "intensity":23728.99, "clusterIds":[]},
+	{"mz":1148.47, "intensity":23534.23, "clusterIds":[130]},
+	{"mz":1153.9962, "intensity":22976.09, "clusterIds":[]},
+	{"mz":1156.4765, "intensity":39785.73, "clusterIds":[80]},
+	{"mz":1157.4955, "intensity":35780.39, "clusterIds":[80]},
+	{"mz":1157.9989, "intensity":38956.47, "clusterIds":[131]},
+	{"mz":1159.5102, "intensity":89840.34, "clusterIds":[]},
+	{"mz":1161.4947, "intensity":39005.08, "clusterIds":[]},
+	{"mz":1162.9966, "intensity":59355.21, "clusterIds":[]},
+	{"mz":1165.9963, "intensity":168262.2, "clusterIds":[81,82]},
+	{"mz":1166.4918, "intensity":199675.5, "clusterIds":[81]},
+	{"mz":1166.9962, "intensity":226170.3, "clusterIds":[81,82]},
+	{"mz":1167.4972, "intensity":85860.42, "clusterIds":[81]},
+	{"mz":1168.0094, "intensity":24305.23, "clusterIds":[81,82]},
+	{"mz":1170.4907, "intensity":35269.14, "clusterIds":[83,84]},
+	{"mz":1170.9912, "intensity":95953.88, "clusterIds":[83]},
+	{"mz":1171.4784, "intensity":23933.54, "clusterIds":[83,84]},
+	{"mz":1175.0004, "intensity":647325.0, "clusterIds":[85,86]},
+	{"mz":1175.5011, "intensity":720655.9, "clusterIds":[85]},
+	{"mz":1176.0025, "intensity":479670.6, "clusterIds":[85,86]},
+	{"mz":1176.5037, "intensity":305508.3, "clusterIds":[85]},
+	{"mz":1176.9947, "intensity":125373.9, "clusterIds":[85,86]},
+	{"mz":1179.9853, "intensity":27496.23, "clusterIds":[]},
+	{"mz":1184.5081, "intensity":81906.34, "clusterIds":[87,88]},
+	{"mz":1184.9966, "intensity":86835.82, "clusterIds":[87]},
+	{"mz":1185.5048, "intensity":51493.0, "clusterIds":[87,88]},
+	{"mz":1191.4683, "intensity":29546.1, "clusterIds":[132]},
+	{"mz":1197.5006, "intensity":24924.88, "clusterIds":[89]},
+	{"mz":1198.4907, "intensity":35624.32, "clusterIds":[89]},
+	{"mz":1206.0187, "intensity":25236.06, "clusterIds":[90,91]},
+	{"mz":1206.5221, "intensity":43832.39, "clusterIds":[90]},
+	{"mz":1207.0015, "intensity":22547.71, "clusterIds":[90,91]},
+	{"mz":1209.4866, "intensity":91785.48, "clusterIds":[92]},
+	{"mz":1210.4853, "intensity":28007.49, "clusterIds":[92]},
+	{"mz":1211.5036, "intensity":68622.68, "clusterIds":[92,93]},
+	{"mz":1212.0062, "intensity":26922.49, "clusterIds":[93,94]},
+	{"mz":1212.5055, "intensity":25457.22, "clusterIds":[92,93,94]},
+	{"mz":1215.4866, "intensity":95269.09, "clusterIds":[95]},
+	{"mz":1216.4855, "intensity":59205.39, "clusterIds":[95]},
+	{"mz":1217.4961, "intensity":30927.4, "clusterIds":[95]},
+	{"mz":1220.0144, "intensity":87018.99, "clusterIds":[96,97]},
+	{"mz":1220.5185, "intensity":136806.7, "clusterIds":[96]},
+	{"mz":1221.0276, "intensity":54952.31, "clusterIds":[96,97]},
+	{"mz":1228.3355, "intensity":26421.27, "clusterIds":[]},
+	{"mz":1228.5293, "intensity":33249.25, "clusterIds":[98]},
+	{"mz":1229.5321, "intensity":52481.72, "clusterIds":[98]},
+	{"mz":1231.5608, "intensity":26109.85, "clusterIds":[]},
+	{"mz":1245.5502, "intensity":188807.2, "clusterIds":[99]},
+	{"mz":1246.5602, "intensity":82311.73, "clusterIds":[99]},
+	{"mz":1247.5664, "intensity":35024.77, "clusterIds":[99]},
+	{"mz":1248.5465, "intensity":30837.19, "clusterIds":[99]},
+	{"mz":1263.566, "intensity":567247.5, "clusterIds":[100]},
+	{"mz":1264.5675, "intensity":319363.2, "clusterIds":[100]},
+	{"mz":1265.5742, "intensity":105361.9, "clusterIds":[100]},
+	{"mz":1266.5757, "intensity":53125.42, "clusterIds":[100]},
+	{"mz":1272.5981, "intensity":22152.86, "clusterIds":[]},
+	{"mz":1285.6383, "intensity":23145.51, "clusterIds":[]},
+	{"mz":1295.5231, "intensity":22209.75, "clusterIds":[]},
+	{"mz":1322.5644, "intensity":47834.86, "clusterIds":[101]},
+	{"mz":1323.5686, "intensity":60041.74, "clusterIds":[101]},
+	{"mz":1331.5634, "intensity":69178.03, "clusterIds":[102]},
+	{"mz":1332.5667, "intensity":24758.2, "clusterIds":[102]},
+	{"mz":1358.6496, "intensity":24032.69, "clusterIds":[133]},
+	{"mz":1360.6259, "intensity":25722.97, "clusterIds":[134]},
+	{"mz":1375.5293, "intensity":30448.38, "clusterIds":[]},
+	{"mz":1376.6491, "intensity":330744.0, "clusterIds":[103]},
+	{"mz":1377.6559, "intensity":165360.6, "clusterIds":[103]},
+	{"mz":1378.6629, "intensity":97371.52, "clusterIds":[103]},
+	{"mz":1446.5186, "intensity":26534.84, "clusterIds":[]},
+	{"mz":1451.6118, "intensity":40582.39, "clusterIds":[104]},
+	{"mz":1452.6203, "intensity":40574.93, "clusterIds":[104]},
+	{"mz":1468.6287, "intensity":27500.32, "clusterIds":[]},
+	{"mz":1472.4957, "intensity":24542.3, "clusterIds":[]},
+	{"mz":1489.7311, "intensity":180781.9, "clusterIds":[105]},
+	{"mz":1490.7349, "intensity":138131.4, "clusterIds":[105]},
+	{"mz":1491.7543, "intensity":37319.93, "clusterIds":[105]},
+	{"mz":1531.0244, "intensity":31816.67, "clusterIds":[]},
+	{"mz":1533.6984, "intensity":64967.75, "clusterIds":[106]},
+	{"mz":1534.7126, "intensity":47366.45, "clusterIds":[106]},
+	{"mz":1561.5863, "intensity":42260.98, "clusterIds":[107]},
+	{"mz":1562.585, "intensity":60403.81, "clusterIds":[107]},
+	{"mz":1567.4943, "intensity":32710.73, "clusterIds":[]},
+	{"mz":1587.9774, "intensity":27975.35, "clusterIds":[]},
+	{"mz":1604.7705, "intensity":79669.91, "clusterIds":[108]},
+	{"mz":1605.7818, "intensity":57579.97, "clusterIds":[108]},
+	{"mz":1661.7823, "intensity":253651.9, "clusterIds":[109]},
+	{"mz":1662.7813, "intensity":179287.2, "clusterIds":[109]},
+	{"mz":1663.3796, "intensity":24766.28, "clusterIds":[]},
+	{"mz":1663.8053, "intensity":65423.98, "clusterIds":[109]},
+	{"mz":1671.7998, "intensity":23697.78, "clusterIds":[]},
+	{"mz":1676.6219, "intensity":26810.71, "clusterIds":[]},
+	{"mz":1700.6478, "intensity":25045.46, "clusterIds":[]},
+	{"mz":1766.9659, "intensity":22108.56, "clusterIds":[]},
+	{"mz":1797.7089, "intensity":29570.41, "clusterIds":[135]},
+	{"mz":1811.5153, "intensity":22257.41, "clusterIds":[]},
+	{"mz":1917.2195, "intensity":24147.44, "clusterIds":[]},
+	{"mz":1968.615, "intensity":22851.62, "clusterIds":[]},
+	{"mz":1984.4601, "intensity":26211.21, "clusterIds":[]}
+],
+"clusters": [
+	{"id":0, "charge":1},
+	{"id":1, "charge":1},
+	{"id":2, "charge":1},
+	{"id":3, "charge":1},
+	{"id":4, "charge":1},
+	{"id":5, "charge":2},
+	{"id":6, "charge":2},
+	{"id":7, "charge":1},
+	{"id":8, "charge":2},
+	{"id":9, "charge":1},
+	{"id":10, "charge":2},
+	{"id":11, "charge":1},
+	{"id":12, "charge":2},
+	{"id":13, "charge":2},
+	{"id":14, "charge":1},
+	{"id":15, "charge":2},
+	{"id":16, "charge":1},
+	{"id":17, "charge":2},
+	{"id":18, "charge":1},
+	{"id":19, "charge":1},
+	{"id":20, "charge":2},
+	{"id":21, "charge":1},
+	{"id":22, "charge":2},
+	{"id":23, "charge":1},
+	{"id":24, "charge":3},
+	{"id":25, "charge":3},
+	{"id":26, "charge":1},
+	{"id":27, "charge":3},
+	{"id":28, "charge":3},
+	{"id":29, "charge":1},
+	{"id":30, "charge":3},
+	{"id":31, "charge":1},
+	{"id":32, "charge":2},
+	{"id":33, "charge":3},
+	{"id":34, "charge":1},
+	{"id":35, "charge":1},
+	{"id":36, "charge":3},
+	{"id":37, "charge":1},
+	{"id":38, "charge":1},
+	{"id":39, "charge":1},
+	{"id":40, "charge":2},
+	{"id":41, "charge":1},
+	{"id":42, "charge":1},
+	{"id":43, "charge":1},
+	{"id":44, "charge":1},
+	{"id":45, "charge":1},
+	{"id":46, "charge":2},
+	{"id":47, "charge":1},
+	{"id":48, "charge":2},
+	{"id":49, "charge":1},
+	{"id":50, "charge":2},
+	{"id":51, "charge":1},
+	{"id":52, "charge":2},
+	{"id":53, "charge":1},
+	{"id":54, "charge":2},
+	{"id":55, "charge":1},
+	{"id":56, "charge":2},
+	{"id":57, "charge":1},
+	{"id":58, "charge":2},
+	{"id":59, "charge":2},
+	{"id":60, "charge":1},
+	{"id":61, "charge":1},
+	{"id":62, "charge":1},
+	{"id":63, "charge":2},
+	{"id":64, "charge":1},
+	{"id":65, "charge":2},
+	{"id":66, "charge":1},
+	{"id":67, "charge":1},
+	{"id":68, "charge":2},
+	{"id":69, "charge":2},
+	{"id":70, "charge":2},
+	{"id":71, "charge":2},
+	{"id":72, "charge":2},
+	{"id":73, "charge":1},
+	{"id":74, "charge":2},
+	{"id":75, "charge":2},
+	{"id":76, "charge":1},
+	{"id":77, "charge":2},
+	{"id":78, "charge":1},
+	{"id":79, "charge":1},
+	{"id":80, "charge":1},
+	{"id":81, "charge":2},
+	{"id":82, "charge":1},
+	{"id":83, "charge":2},
+	{"id":84, "charge":1},
+	{"id":85, "charge":2},
+	{"id":86, "charge":1},
+	{"id":87, "charge":2},
+	{"id":88, "charge":1},
+	{"id":89, "charge":1},
+	{"id":90, "charge":2},
+	{"id":91, "charge":1},
+	{"id":92, "charge":1},
+	{"id":93, "charge":2},
+	{"id":94, "charge":2},
+	{"id":95, "charge":1},
+	{"id":96, "charge":2},
+	{"id":97, "charge":1},
+	{"id":98, "charge":1},
+	{"id":99, "charge":1},
+	{"id":100, "charge":1},
+	{"id":101, "charge":1},
+	{"id":102, "charge":1},
+	{"id":103, "charge":1},
+	{"id":104, "charge":1},
+	{"id":105, "charge":1},
+	{"id":106, "charge":1},
+	{"id":107, "charge":1},
+	{"id":108, "charge":1},
+	{"id":109, "charge":1},
+	{"id":110, "charge":1},
+	{"id":111, "charge":1},
+	{"id":112, "charge":1},
+	{"id":113, "charge":2},
+	{"id":114, "charge":1},
+	{"id":115, "charge":1},
+	{"id":116, "charge":2},
+	{"id":117, "charge":1},
+	{"id":118, "charge":2},
+	{"id":119, "charge":1},
+	{"id":120, "charge":1},
+	{"id":121, "charge":2},
+	{"id":122, "charge":2},
+	{"id":123, "charge":2},
+	{"id":124, "charge":3},
+	{"id":125, "charge":2},
+	{"id":126, "charge":2},
+	{"id":127, "charge":1},
+	{"id":128, "charge":1},
+	{"id":129, "charge":1},
+	{"id":130, "charge":2},
+	{"id":131, "charge":2},
+	{"id":132, "charge":1},
+	{"id":133, "charge":1},
+	{"id":134, "charge":1},
+	{"id":135, "charge":1}],
+"fragments": [
+	{"id":0,"name": "b11_H20x2", "sequence":"VHTECcmCcmHGDLL", "mass":1286.54049992677, "clusterIds":[122],"class":"lossy","range":[
+		{"peptideId":0, "from":0,"to":10}
+		] 
+	},
+	{"id":1,"name": "y6", "sequence":"RADLAK", "mass":673.3991457367702, "clusterIds":[21,116],"class":"non-lossy","range":[
+		{"peptideId":0, "from":16,"to":21}
+		] 
+	},
+	{"id":2,"name": "y11", "sequence":"ECcmADDRADLAK", "mass":1263.56338873677, "clusterIds":[100,121],"class":"non-lossy","range":[
+		{"peptideId":0, "from":11,"to":21}
+		] 
+	},
+	{"id":3,"name": "b2_NH3x1", "sequence":"VH", "mass":220.10805753677, "clusterIds":[112],"class":"lossy","range":[
+		{"peptideId":0, "from":0,"to":1}
+		] 
+	},
+	{"id":4,"name": "y9", "sequence":"ADDRADLAK", "mass":974.49014573677, "clusterIds":[45],"class":"non-lossy","range":[
+		{"peptideId":0, "from":13,"to":21}
+		] 
+	},
+	{"id":5,"name": "y15", "sequence":"GDLLECcmADDRADLAK", "mass":1661.77992373677, "clusterIds":[32,109],"class":"non-lossy","range":[
+		{"peptideId":0, "from":7,"to":21}
+		] 
+	},
+	{"id":6,"name": "b18", "sequence":"VHTECcmCcmHGDLLECcmADDRA", "mass":2139.8640884667693, "clusterIds":[124],"class":"non-lossy","range":[
+		{"peptideId":0, "from":0,"to":17}
+		] 
+	},
+	{"id":7,"name": "y10", "sequence":"CcmADDRADLAK", "mass":1134.52079573677, "clusterIds":[12,79],"class":"non-lossy","range":[
+		{"peptideId":0, "from":12,"to":21}
+		] 
+	},
+	{"id":8,"name": "y11_H20x1", "sequence":"ECcmADDRADLAK", "mass":1245.55282846677, "clusterIds":[99],"class":"lossy","range":[
+		{"peptideId":0, "from":11,"to":21}
+		] 
+	},
+	{"id":9,"name": "y12", "sequence":"LECcmADDRADLAK", "mass":1376.64745273677, "clusterIds":[22,103],"class":"non-lossy","range":[
+		{"peptideId":0, "from":10,"to":21}
+		] 
+	},
+	{"id":10,"name": "b10_H20x1", "sequence":"VHTECcmCcmHGDL", "mass":1191.4669961967702, "clusterIds":[15,132],"class":"lossy","range":[
+		{"peptideId":0, "from":0,"to":9}
+		] 
+	},
+	{"id":11,"name": "y11_H20x2", "sequence":"ECcmADDRADLAK", "mass":1227.54226819677, "clusterIds":[98],"class":"lossy","range":[
+		{"peptideId":0, "from":11,"to":21}
+		] 
+	},
+	{"id":12,"name": "b11", "sequence":"VHTECcmCcmHGDLL", "mass":1322.5616204667701, "clusterIds":[20,101],"class":"non-lossy","range":[
+		{"peptideId":0, "from":0,"to":10}
+		] 
+	},
+	{"id":13,"name": "b21", "sequence":"VHTECcmCcmHGDLLECcmADDRADLA", "mass":2439.012209466769, "clusterIds":[96],"class":"non-lossy","range":[
+		{"peptideId":0, "from":0,"to":20}
+		] 
+	},
+	{"id":14,"name": "y14", "sequence":"DLLECcmADDRADLAK", "mass":1604.75845973677, "clusterIds":[108],"class":"non-lossy","range":[
+		{"peptideId":0, "from":8,"to":21}
+		] 
+	},
+	{"id":15,"name": "y21_H20x1", "sequence":"HTECcmCcmHGDLLECcmADDRADLAK", "mass":2468.0387584667697, "clusterIds":[28],"class":"lossy","range":[
+		{"peptideId":0, "from":1,"to":21}
+		] 
+	},
+	{"id":16,"name": "b9_H20x1", "sequence":"VHTECcmCcmHGD", "mass":1078.38293219677, "clusterIds":[8],"class":"lossy","range":[
+		{"peptideId":0, "from":0,"to":8}
+		] 
+	},
+	{"id":17,"name": "y7", "sequence":"DRADLAK", "mass":788.4260887367701, "clusterIds":[5,26],"class":"non-lossy","range":[
+		{"peptideId":0, "from":15,"to":21}
+		] 
+	},
+	{"id":18,"name": "y14_H20x4", "sequence":"DLLECcmADDRADLAK", "mass":1532.71621865677, "clusterIds":[106],"class":"lossy","range":[
+		{"peptideId":0, "from":8,"to":21}
+		] 
+	},
+	{"id":19,"name": "y8_NH3x1", "sequence":"DDRADLAK", "mass":886.4264868067701, "clusterIds":[38],"class":"lossy","range":[
+		{"peptideId":0, "from":14,"to":21}
+		] 
+	},
+	{"id":20,"name": "y2", "sequence":"AK", "mass":218.14991373677003, "clusterIds":[3],"class":"non-lossy","range":[
+		{"peptideId":0, "from":20,"to":21}
+		] 
+	},
+	{"id":21,"name": "b3_H20x1", "sequence":"VHT", "mass":320.17172019677, "clusterIds":[114],"class":"lossy","range":[
+		{"peptideId":0, "from":0,"to":2}
+		] 
+	},
+	{"id":22,"name": "y18", "sequence":"CcmCcmHGDLLECcmADDRADLAK", "mass":2118.9001357367697, "clusterIds":[54],"class":"non-lossy","range":[
+		{"peptideId":0, "from":4,"to":21}
+		] 
+	},
+	{"id":23,"name": "y13", "sequence":"LLECcmADDRADLAK", "mass":1489.73151673677, "clusterIds":[105,126],"class":"non-lossy","range":[
+		{"peptideId":0, "from":9,"to":21}
+		] 
+	},
+	{"id":24,"name": "P", "sequence":"VHTECcmCcmHGDLLECcmADDRADLAK", "mass":2585.1177327367695, "clusterIds":[36],"class":"non-lossy","range":[
+		{"peptideId":0, "from":0,"to":21}
+		] 
+	},
+	{"id":25,"name": "b8_H20x2", "sequence":"VHTECcmCcmHG", "mass":945.3454289267701, "clusterIds":[129],"class":"lossy","range":[
+		{"peptideId":0, "from":0,"to":7}
+		] 
+	},
+	{"id":26,"name": "b19", "sequence":"VHTECcmCcmHGDLLECcmADDRAD", "mass":2254.891031466769, "clusterIds":[77],"class":"non-lossy","range":[
+		{"peptideId":0, "from":0,"to":18}
+		] 
+	},
+	{"id":27,"name": "y16", "sequence":"HGDLLECcmADDRADLAK", "mass":1798.8388357367699, "clusterIds":[40],"class":"non-lossy","range":[
+		{"peptideId":0, "from":6,"to":21}
+		] 
+	},
+	{"id":28,"name": "y20_H20x1", "sequence":"TECcmCcmHGDLLECcmADDRADLAK", "mass":2330.9798464667697, "clusterIds":[81],"class":"lossy","range":[
+		{"peptideId":0, "from":2,"to":21}
+		] 
+	},
+	{"id":29,"name": "b6", "sequence":"VHTECcmCcm", "mass":787.2861734667699, "clusterIds":[127],"class":"non-lossy","range":[
+		{"peptideId":0, "from":0,"to":5}
+		] 
+	},
+	{"id":30,"name": "y21", "sequence":"HTECcmCcmHGDLLECcmADDRADLAK", "mass":2486.0493187367697, "clusterIds":[30],"class":"non-lossy","range":[
+		{"peptideId":0, "from":1,"to":21}
+		] 
+	},
+	{"id":31,"name": "b11_H20x1", "sequence":"VHTECcmCcmHGDLL", "mass":1304.55106019677, "clusterIds":[123],"class":"lossy","range":[
+		{"peptideId":0, "from":0,"to":10}
+		] 
+	},
+	{"id":32,"name": "b15", "sequence":"VHTECcmCcmHGDLLECcmAD", "mass":1797.6989204667698, "clusterIds":[135],"class":"non-lossy","range":[
+		{"peptideId":0, "from":0,"to":14}
+		] 
+	},
+	{"id":33,"name": "y1_NH3x1", "sequence":"K", "mass":130.08625480677, "clusterIds":[0],"class":"lossy","range":[
+		{"peptideId":0, "from":21,"to":21}
+		] 
+	},
+	{"id":34,"name": "b2", "sequence":"VH", "mass":237.13460246677, "clusterIds":[4],"class":"non-lossy","range":[
+		{"peptideId":0, "from":0,"to":1}
+		] 
+	},
+	{"id":35,"name": "y1", "sequence":"K", "mass":147.11279973677, "clusterIds":[111],"class":"non-lossy","range":[
+		{"peptideId":0, "from":21,"to":21}
+		] 
+	},
+	{"id":36,"name": "y17", "sequence":"CcmHGDLLECcmADDRADLAK", "mass":1958.8694857367698, "clusterIds":[46],"class":"non-lossy","range":[
+		{"peptideId":0, "from":5,"to":21}
+		] 
+	},
+	{"id":37,"name": "b20", "sequence":"VHTECcmCcmHGDLLECcmADDRADL", "mass":2367.975095466769, "clusterIds":[87],"class":"non-lossy","range":[
+		{"peptideId":0, "from":0,"to":19}
+		] 
+	},
+	{"id":38,"name": "y12_H20x1", "sequence":"LECcmADDRADLAK", "mass":1358.63689246677, "clusterIds":[133],"class":"lossy","range":[
+		{"peptideId":0, "from":10,"to":21}
+		] 
+	},
+	{"id":39,"name": "y18_NH3x1", "sequence":"CcmCcmHGDLLECcmADDRADLAK", "mass":2101.8735908067697, "clusterIds":[52],"class":"lossy","range":[
+		{"peptideId":0, "from":4,"to":21}
+		] 
+	},
+	{"id":40,"name": "y19_NH3x1", "sequence":"ECcmCcmHGDLLECcmADDRADLAK", "mass":2230.91618380677, "clusterIds":[69],"class":"lossy","range":[
+		{"peptideId":0, "from":3,"to":21}
+		] 
+	},
+	{"id":41,"name": "b20_H20x4", "sequence":"VHTECcmCcmHGDLLECcmADDRADL", "mass":2295.9328543867687, "clusterIds":[130],"class":"lossy","range":[
+		{"peptideId":0, "from":0,"to":19}
+		] 
+	},
+	{"id":42,"name": "y1_H20x1", "sequence":"K", "mass":129.10223946677002, "clusterIds":[110],"class":"lossy","range":[
+		{"peptideId":0, "from":21,"to":21}
+		] 
+	},
+	{"id":43,"name": "b20_H20x3", "sequence":"VHTECcmCcmHGDLLECcmADDRADL", "mass":2313.9434146567687, "clusterIds":[131],"class":"lossy","range":[
+		{"peptideId":0, "from":0,"to":19}
+		] 
+	},
+	{"id":44,"name": "y6_NH3x2", "sequence":"RADLAK", "mass":639.3460558767702, "clusterIds":[113],"class":"lossy","range":[
+		{"peptideId":0, "from":16,"to":21}
+		] 
+	},
+	{"id":45,"name": "y3", "sequence":"LAK", "mass":331.23397773677, "clusterIds":[115],"class":"non-lossy","range":[
+		{"peptideId":0, "from":19,"to":21}
+		] 
+	},
+	{"id":46,"name": "y12_NH3x1", "sequence":"LECcmADDRADLAK", "mass":1359.62090780677, "clusterIds":[134],"class":"lossy","range":[
+		{"peptideId":0, "from":10,"to":21}
+		] 
+	},
+	{"id":47,"name": "y8", "sequence":"DDRADLAK", "mass":903.4530317367701, "clusterIds":[42],"class":"non-lossy","range":[
+		{"peptideId":0, "from":14,"to":21}
+		] 
+	},
+	{"id":48,"name": "b12", "sequence":"VHTECcmCcmHGDLLE", "mass":1451.60421346677, "clusterIds":[104,125],"class":"non-lossy","range":[
+		{"peptideId":0, "from":0,"to":11}
+		] 
+	},
+	{"id":49,"name": "b7", "sequence":"VHTECcmCcmH", "mass":924.34508546677, "clusterIds":[118,128],"class":"non-lossy","range":[
+		{"peptideId":0, "from":0,"to":6}
+		] 
+	},
+	{"id":50,"name": "y19_H20x1", "sequence":"ECcmCcmHGDLLECcmADDRADLAK", "mass":2229.93216846677, "clusterIds":[68],"class":"lossy","range":[
+		{"peptideId":0, "from":3,"to":21}
+		] 
+	},
+	{"id":51,"name": "y5", "sequence":"ADLAK", "mass":517.2980347367701, "clusterIds":[120],"class":"non-lossy","range":[
+		{"peptideId":0, "from":17,"to":21}
+		] 
+	},
+	{"id":52,"name": "y20", "sequence":"TECcmCcmHGDLLECcmADDRADLAK", "mass":2348.9904067367697, "clusterIds":[85],"class":"non-lossy","range":[
+		{"peptideId":0, "from":2,"to":21}
+		] 
+	},
+	{"id":53,"name": "b4", "sequence":"VHTE", "mass":467.22487346677, "clusterIds":[119],"class":"non-lossy","range":[
+		{"peptideId":0, "from":0,"to":3}
+		] 
+	},
+	{"id":54,"name": "b9", "sequence":"VHTECcmCcmHGD", "mass":1096.39349246677, "clusterIds":[10,62],"class":"non-lossy","range":[
+		{"peptideId":0, "from":0,"to":8}
+		] 
+	},
+	{"id":55,"name": "y19", "sequence":"ECcmCcmHGDLLECcmADDRADLAK", "mass":2247.94272873677, "clusterIds":[75],"class":"non-lossy","range":[
+		{"peptideId":0, "from":3,"to":21}
+		] 
+	},
+	{"id":56,"name": "b19_NH3x1", "sequence":"VHTECcmCcmHGDLLECcmADDRAD", "mass":2237.864486536769, "clusterIds":[24,74],"class":"lossy","range":[
+		{"peptideId":0, "from":0,"to":18}
+		] 
+	},
+	{"id":57,"name": "b19_H20x1", "sequence":"VHTECcmCcmHGDLLECcmADDRAD", "mass":2236.880471196769, "clusterIds":[71,72],"class":"lossy","range":[
+		{"peptideId":0, "from":0,"to":18}
+		] 
+	},
+	{"id":58,"name": "b20_H20x1", "sequence":"VHTECcmCcmHGDLLECcmADDRADL", "mass":2349.964535196769, "clusterIds":[25],"class":"lossy","range":[
+		{"peptideId":0, "from":0,"to":19}
+		] 
+	},
+	{"id":59,"name": "b3", "sequence":"VHT", "mass":338.18228046677, "clusterIds":[117],"class":"non-lossy","range":[
+		{"peptideId":0, "from":0,"to":2}
+		] 
+	},
+	{"id":60,"name": "b10", "sequence":"VHTECcmCcmHGDL", "mass":1209.4775564667702, "clusterIds":[17,92],"class":"non-lossy","range":[
+		{"peptideId":0, "from":0,"to":9}
+		] 
+	}
+]
+}
+

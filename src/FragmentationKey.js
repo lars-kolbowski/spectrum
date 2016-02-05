@@ -41,39 +41,30 @@ function PeptideFragmentationKey (targetSvg, model, options){
 PeptideFragmentationKey.prototype.setData = function(){
 	var self = this;
 	this.clear();
-	var annotatedPeaks = self.model.annotatedPeaks;
-	this.pepSeq1 = self.model.pep1; //contains modification info in lower case
-	this.pepSeq2 = self.model.pep2; // contains modification info in lower case
+	var pep1 = "";
+	var pep2 = "";
+	//var annotatedPeaks = self.model.annotatedPeaks;
+	for(i = 0; i < self.model.pep1.length; i++){
+		pep1 += self.model.pep1[i].aminoAcid;
+	}
+	for(i = 0; i < self.model.pep2.length; i++){
+		pep2 += self.model.pep2[i].aminoAcid;
+	}
 	var linkPos1 = self.model.linkPos1;
 	var linkPos2 = self.model.linkPos2;
 	
-	// def plot_spectrum(cl_pep, XiDB, removeisotopes=False, ppmmean=0, ppmstds=0,
-    //               annotate_verbose=True):
-	var removeisotopes = false, ppmmean = 0, ppmstds = 0,
-				annotate_verbose = true;
+	this.pep1ModsArray = [];
+	this.pep2ModsArray = [];
 
-
-	var pep1 = this.pepSeq1.replace(self.model.notUpperCase, '');
-    var pep2 = this.pepSeq2.replace(self.model.notUpperCase, '');
-
-	var pep1Mods = this.pepSeq1.match(/[A-Z]+[a-z]+/g);
-	this.pep1ModsArray = new Array();
-	if(pep1Mods){
-		var modIndex =  0
-		for(i = 0; i < pep1Mods.length; i++){
-			modIndex += pep1Mods[i].replace(/[^A-Z]/g, '').length;
-			this.pep1ModsArray[modIndex-1] = pep1Mods[i].replace(/[A-Z]/g, '');
-		}
+	for(i = 0; i < self.model.pep1.length; i++){
+		if (self.model.pep1[i].Modification)
+			pep1ModsArray[i] = self.model.pep1[i].aminoAcid;
 	}
 
-	var pep2Mods = this.pepSeq2.match(/[A-Z]+[a-z]+/g);
-	this.pep2ModsArray = new Array();
-	if(pep2Mods){
-		var modIndex = 0;
-		for(i = 0; i < pep2Mods.length; i++){
-			modIndex += pep2Mods[i].replace(/[^A-Z]/g, '').length;
-			this.pep2ModsArray[modIndex-1] = pep2Mods[i].replace(/[A-Z]/g, '');
-		}
+	for(i = 0; i < self.model.pep2.length; i++){
+		if (self.model.pep2[i].Modification)
+			pep2ModsArray[i] = self.model.pep1[i].aminoAcid;
+
 	}
 
     // #get ion data for annotation
@@ -81,7 +72,7 @@ PeptideFragmentationKey.prototype.setData = function(){
     //              cl_pep.fragment_series["pep1"].get_ions()])
     // ions2 = set([i.name if "_" not in i.loss else i.name+"loss" for i in
     //              cl_pep.fragment_series["pep2"].get_ions()])
-    var fragRegex = /(.\d*)/g;
+/*    var fragRegex = /(.\d*)/g;
     var ions1 = d3.set(), ions2 = d3.set(); //replaced with plain arrays at end
     var pLength = annotatedPeaks.length;
     for (var p = 0; p < pLength; p++){
@@ -108,11 +99,21 @@ PeptideFragmentationKey.prototype.setData = function(){
     ions1 = ions1.values(); // get rid of d3 map, have plain array
     ions2 = ions2.values(); // get rid of d3 map, have plain array
     console.log(ions1);
-    console.log(ions2);
+    console.log(ions2);*/
+    var fragments = self.model.JSONdata.fragments;
+    var ions1 = [];
+    var ions2 = [];
+    for (i=0; i < fragments.length; i++){
+    	if(fragments[i].peptide == 1)	//still missing in JSON
+    		ions1.push(fragments[i]);
+    	if(fragments[i].peptide == 2)	//still missing in JSON
+    		ions2.push(fragments[i]);
+    }
 
     // #get the indicator array for observed fragments
     var alpha_annotation = get_fragment_annotation(ions1, pep1);
 	var beta_annotation = get_fragment_annotation(ions2, pep2);
+
 
 
     // #==========================================================================
@@ -120,7 +121,7 @@ PeptideFragmentationKey.prototype.setData = function(){
     // #    this alings the peptide sequences at the cross-link site
     // #==========================================================================
     // shift = cl_pep.linkpos1 - cl_pep.linkpos2
-    var shift = linkPos1 - linkPos2;
+    var shift = linkPos1.linkSite - linkPos2.linkSite;
     var spaceArray = arrayOfHashes(Math.abs(shift));
     var linkpos;
     this.pep1offset = 0;
@@ -131,7 +132,7 @@ PeptideFragmentationKey.prototype.setData = function(){
         // alpha_annotation = ["#"] * np.abs(shift) + list(alpha_annotation)
         alpha_annotation = spaceArray.concat(alpha_annotation);
         // linkpos = cl_pep.linkpos2
-        linkpos = linkPos2;
+        linkpos = linkPos2.linkSite;
         this.pep1offset = Math.abs(shift) - 0;
     }
     // else:
@@ -141,7 +142,7 @@ PeptideFragmentationKey.prototype.setData = function(){
         // beta_annotation = ["#"] * np.abs(shift) + list(beta_annotation)
         beta_annotation = spaceArray.concat(beta_annotation);
         // linkpos = cl_pep.linkpos1
-        linkpos = linkPos1;
+        linkpos = linkPos1.linkSite;
         this.pep2offset = shift - 0;
 	}
 
@@ -242,7 +243,7 @@ PeptideFragmentationKey.prototype.setData = function(){
 	}
 
 	
-	// def get_fragment_annotation(ions, pep):
+/*	// def get_fragment_annotation(ions, pep):
 	function get_fragment_annotation(ions, pep){
 		// """
 		// Creates an indicator array for the peptide that contains the information
@@ -296,7 +297,7 @@ PeptideFragmentationKey.prototype.setData = function(){
 			annotation.push(gotb + goty);
 		}
 		return annotation;
-	}
+	}*/
 
 }
 

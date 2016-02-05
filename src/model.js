@@ -11,19 +11,42 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		this.sticky = Array();
 		this.highlights = Array();
 		this.measureMode = false;
-		this.on("change:annotatedPeaksCSV", function(model){
+		this.on("change:JSONdata", function(model){
 			this.setData();
 		});
 	},
 	setData: function(){
-		var annotatedPeaksCSV = this.get("annotatedPeaksCSV");
-		this.set("annotatedPeaks", d3.csv.parse(annotatedPeaksCSV.trim()));
-		this.annotatedPeaks = this.get("annotatedPeaks");
+		//var annotatedPeaksCSV = this.get("annotatedPeaksCSV");
+		//this.set("annotatedPeaks", d3.csv.parse(annotatedPeaksCSV.trim()));
+
+		this.JSONdata = this.get("JSONdata");
+		console.log(this.JSONdata);
+		this.pep1 = this.JSONdata.Peptides[0];
+		if(this.JSONdata.Peptides[1])
+			this.pep2 = this.JSONdata.Peptides[1];
+		else
+			this.pep2 = "";		
+		this.linkPos1 = this.JSONdata.LinkSite[0];
+		this.linkPos2 = this.JSONdata.LinkSite[1];
+		this.notUpperCase = this.get("notUpperCase"); //change to global var
+		this.cmap = colorbrewer.RdBu[8];
+		this.p1color = this.cmap[0];
+		this.p1color_cluster = this.cmap[2];
+		this.p1color_loss = this.cmap[1];
+		this.p2color = this.cmap[7];
+		this.p2color_cluster = this.cmap[5];
+		this.p2color_loss = this.cmap[6];
+		this.lossFragBarColour = "#cccccc";
+		this.highlightColour = "yellow";
+		this.highlightWidth = 11;
+		this.setGraphData();
+
+/*		this.annotatedPeaks = this.get("annotatedPeaks");
 		this.pep1 = this.get("pepSeq1");
 		this.pep2 = this.get("pepSeq2");
 		this.linkPos1 = this.get("linkPos1");
 		this.linkPos2 = this.get("linkPos2");
-		this.notUpperCase = this.get("notUpperCase"),
+		this.notUpperCase = this.get("notUpperCase");
 		this.cmap = colorbrewer.RdBu[8];
 		this.p1color = this.cmap[0];
 		this.p1color_cluster = this.cmap[2];
@@ -35,7 +58,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		this.highlightColour = "yellow";
 		//this.highlightColourSticky = colorbrewer.Oranges[9];
 		this.highlightWidth = 11;
-		this.setGraphData();
+		this.setGraphData();*/
 	},
 
 	clear: function(){
@@ -46,32 +69,32 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 	},
 
 	setGraphData: function(){
-		//get Max m/z value of primarymatches
-		this.xmaxPrimary = d3.max(this.annotatedPeaks,
-			function(d){
-				return ((d.isprimarymatch == 1)? d.expmz - 0 : 0);
-			}
-			) + 50;
-		//this.set("xmaxPrimary", xmaxPrimary);
 
-		 //get Min m/z value of primarymatches
-		 this.xminPrimary = d3.min(this.annotatedPeaks, 
-		 	function(d){
-		 		return ((d.isprimarymatch == 1)?  d.expmz - 0 : this.xmaxPrimary);
-		 	}
-		 	) - 50;
-		 //this.set("xminPrimary", xminPrimary);
+		var xmin = Number.POSITIVE_INFINITY;
+		var xmax = Number.NEGATIVE_INFINITY;
+		var tmp;
+		var peaks = this.JSONdata.peaks;
+		for (var i=peaks.length-1; i>=0; i--) {
+		    tmp = peaks[i].mz;
+		    if (tmp < xmin) xmin = tmp;
+		    if (tmp > xmax) xmax = tmp;
+		}
 
-		//sort Data by m/z and Int
-		this.nested =  d3.nest()
-		.key(function(d) { return d.expmz + '-' + d.absoluteintensity; })
-		.entries(this.annotatedPeaks);
-
+		this.xmaxPrimary = xmax + 50;
+		this.xminPrimary = xmin - 50;
 
 		this.xmax = this.xmaxPrimary;
 		this.xmin = this.xminPrimary;
 
-		this.ymax = d3.max(this.annotatedPeaks, function(d){return d.absolute_intensity - 0;});
+		var ymax = Number.NEGATIVE_INFINITY;
+		var tmp;
+		var peaks = this.JSONdata.peaks;
+		for (var i=peaks.length-1; i>=0; i--) {
+		    tmp = peaks[i].intensity;
+		    if (tmp > ymax) ymax = tmp;
+		}
+
+		this.ymax = ymax;
 		//this.ymax = d3.max(this.points, function(d){return d.y;});
 		this.ymin = 0;//d3.min(this.points, function(d){return d.y;});
 	},

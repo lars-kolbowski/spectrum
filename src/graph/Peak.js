@@ -18,13 +18,40 @@
 //
 //		graph/Peak.js
 
-function Peak (data, graph){
+function Peak (id, graph){
+	var peak = graph.model.JSONdata.peaks[id];
 
-	this.x = data[0].expmz - 0;
-	this.y = data[0].absolute_intensity - 0;
-	this.charge = data[0].charge - 0;
+
+
+	this.x = peak.mz;
+	this.y = peak.intensity;
+	this.IsotopeClusters = [];
+	for (i=0; i<peak.clusterIds.length; i++)
+		this.IsotopeClusters.push(graph.model.JSONdata.clusters[peak.clusterIds[i]]);
+	if (this.IsotopeClusters.length > 0)
+		this.charge = this.IsotopeClusters[0].charge;	//TODO charge multiple clusters?
 	this.graph = graph;
+
+
 	//make fragments
+	var notLossyFragments = [];
+	var lossyFragments = [];
+	if (this.IsotopeClusters.length > 0){
+		var fragments = graph.model.JSONdata.fragments;
+		for(i=0; i<fragments.length; i++){
+			for(j=0; j<this.IsotopeClusters.length; j++){
+				if(_.contains(fragments[i].clusterIds, this.IsotopeClusters[j].id)){
+					//var frag = new Fragment (fragments[i].name, "peptide", fragments[i].sequence);
+					if(fragments[i].class == "lossy")
+						lossyFragments.push(fragments[i]);
+					else
+						notLossyFragments.push(fragments[i]);
+				}
+			}
+		}
+	}
+
+/*	//make fragments
 	var notLossyFragments = [];
 	var lossyFragments = [];
 	var fragCount = data.length;
@@ -38,7 +65,7 @@ function Peak (data, graph){
 				lossyFragments.push(frag);
 			}
 		}
-	}
+	}*/
 	this.fragments = notLossyFragments.concat(lossyFragments); //merge arrays
 
 	//make tooltip

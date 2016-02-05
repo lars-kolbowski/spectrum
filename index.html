@@ -69,27 +69,14 @@
 		var FragmentationKey = new FragmentationKeyView({model: SpectrumModel, el:"#spectrumDiv"});
 
 
-		d3.text("test.csv", function(csv) {
+/*		d3.text("test.csv", function(csv) {
 			SpectrumModel.set({annotatedPeaksCSV: csv});
-		});
-	
-
-/*		d3.csv("test.csv", function(error, data) {
-			data.forEach(function(d) {
-				d.expmz = +d.expmz;
-				d.absolute_intensity = +d.absolute_intensity;
-			});
-			//console.log(data);
-			json = JSON.stringify(data);
-			//console.log(json);
-			
-			specView.set({
-				annotatedPeaksjson: json,
-				annotatedPeaks: data,
-			});
-			//console.log(specView.get("annotatedPeaks"));
-			console.log(specView.get("pep1"));
 		});*/
+	
+		$.getJSON("json/example1.json", function(json) {
+			SpectrumModel.set({JSONdata: json});
+			console.log(json); // this will show the info it in firebug console
+		});
 
 
 });
