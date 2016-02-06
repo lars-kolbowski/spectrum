@@ -25,7 +25,7 @@ function KeyFragment (fragments, index, offset, peptide, FragKey) {
 
 	var yfrag_index = peptide.length - (index + 1 - offset);
 	var bfrag_index = (index + 1 - offset);
-	if (peptide == this.FragKey.model.pep1)
+	if (peptide == this.FragKey.model.pep1Str)
 		var color = this.FragKey.model.p1color;
 	else
 		var color = this.FragKey.model.p2color;
@@ -49,9 +49,9 @@ function KeyFragment (fragments, index, offset, peptide, FragKey) {
 	var xStep = 20;
 
 	this.x = (xStep * index) + (xStep / 2);
-	if (this.peptide == this.FragKey.model.pep1)
+	if (this.peptide == this.FragKey.model.pepStrs[0])
 		var y = 25;
-	else
+	if (this.peptide == this.FragKey.model.pepStrs[1])
 		var y = 75;
 	var barHeight = 18, tailX = 5, tailY = 5;
 

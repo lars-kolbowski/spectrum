@@ -41,138 +41,95 @@ function PeptideFragmentationKey (targetSvg, model, options){
 PeptideFragmentationKey.prototype.setData = function(){
 	var self = this;
 	this.clear();
-	var pep1 = "";
-	var pep2 = "";
-	//var annotatedPeaks = self.model.annotatedPeaks;
-	for(i = 0; i < self.model.pep1.length; i++){
-		pep1 += self.model.pep1[i].aminoAcid;
-	}
-	for(i = 0; i < self.model.pep2.length; i++){
-		pep2 += self.model.pep2[i].aminoAcid;
-	}
-	var linkPos1 = self.model.linkPos1;
-	var linkPos2 = self.model.linkPos2;
+	var pepCount = self.model.peptides.length;
+	var	linkPos = self.model.JSONdata.LinkSite;
 	
-	this.pep1ModsArray = [];
-	this.pep2ModsArray = [];
-
-	for(i = 0; i < self.model.pep1.length; i++){
-		if (self.model.pep1[i].Modification)
-			pep1ModsArray[i] = self.model.pep1[i].aminoAcid;
-	}
-
-	for(i = 0; i < self.model.pep2.length; i++){
-		if (self.model.pep2[i].Modification)
-			pep2ModsArray[i] = self.model.pep1[i].aminoAcid;
-
-	}
-
-    // #get ion data for annotation
-    // ions1 = set([i.name if "_" not in i.loss else i.name+"loss" for i in
-    //              cl_pep.fragment_series["pep1"].get_ions()])
-    // ions2 = set([i.name if "_" not in i.loss else i.name+"loss" for i in
-    //              cl_pep.fragment_series["pep2"].get_ions()])
-/*    var fragRegex = /(.\d*)/g;
-    var ions1 = d3.set(), ions2 = d3.set(); //replaced with plain arrays at end
-    var pLength = annotatedPeaks.length;
-    for (var p = 0; p < pLength; p++){
-		var peak = annotatedPeaks[p];
-		fragRegex.lastIndex = 0;
-		//~ console.log(peak.fragment_name.trim());
-		var regexMatch = fragRegex.exec(peak.fragment_name.trim());
-		if (peak.fragment_name.trim() != ""){
-			//~ console.log(regexMatch[0]);
-			if (peak.fragment_name.indexOf("_") == -1){
-				ion = regexMatch[0];
-			}
-			else{
-				ion = regexMatch[0] + "loss"
-			}
-			var matchedPeptide = peak.matchedpeptide.replace(self.model.notUpperCase, '');//uncertain about whether this property includes mod info?
-			if (matchedPeptide == pep1){
-				ions1.add(ion);
-			} else {
-				ions2.add(ion);
-			}
+	var pepModsArray = [];
+	this.peptides = self.model.pepStrs;
+	var fragments = self.model.JSONdata.fragments;
+	var ions = [];
+	var annotations = [];
+    this.pepLetters = [];
+	this.pepModLetters = [];
+	this.pepoffset = [0,0];
+	for(p=0; p < pepCount; p++){
+		ions[p] = [];
+		this.pepLetters[p] = [];
+		this.pepModLetters[p] = [];
+		pepModsArray[p] = [];
+		for(i = 0; i < self.model.peptides[p].length; i++){
+			if (self.model.peptides[p][i].Modification)
+				pepModsArray[p][i] = self.model.peptides[p][i].Modification;
 		}
 	}
-    ions1 = ions1.values(); // get rid of d3 map, have plain array
-    ions2 = ions2.values(); // get rid of d3 map, have plain array
-    console.log(ions1);
-    console.log(ions2);*/
-    var fragments = self.model.JSONdata.fragments;
-    var ions1 = [];
-    var ions2 = [];
-    for (i=0; i < fragments.length; i++){
-    	if(fragments[i].peptide == 1)	//still missing in JSON
-    		ions1.push(fragments[i]);
-    	if(fragments[i].peptide == 2)	//still missing in JSON
-    		ions2.push(fragments[i]);
-    }
 
-    // #get the indicator array for observed fragments
-    var alpha_annotation = get_fragment_annotation(ions1, pep1);
-	var beta_annotation = get_fragment_annotation(ions2, pep2);
-
-
-
-    // #==========================================================================
-    // #    account for crosslink shift
-    // #    this alings the peptide sequences at the cross-link site
-    // #==========================================================================
-    // shift = cl_pep.linkpos1 - cl_pep.linkpos2
-    var shift = linkPos1.linkSite - linkPos2.linkSite;
-    var spaceArray = arrayOfHashes(Math.abs(shift));
-    var linkpos;
-    this.pep1offset = 0;
-    this.pep2offset = 0;
-    if  (shift <= 0) {
-        // pep1 = "".join(["#"] * np.abs(shift) + list(pep1))
-        pep1 = Array(Math.abs(shift) + 1).join("#") + pep1;
-        // alpha_annotation = ["#"] * np.abs(shift) + list(alpha_annotation)
-        alpha_annotation = spaceArray.concat(alpha_annotation);
-        // linkpos = cl_pep.linkpos2
-        linkpos = linkPos2.linkSite;
-        this.pep1offset = Math.abs(shift) - 0;
-    }
-    // else:
-    else {
-        //~ pep2 = "".join(["#"] * np.abs(shift) + list(pep2))
-        pep2 = Array(shift + 1).join("#") + pep2;
-        // beta_annotation = ["#"] * np.abs(shift) + list(beta_annotation)
-        beta_annotation = spaceArray.concat(beta_annotation);
-        // linkpos = cl_pep.linkpos1
-        linkpos = linkPos1.linkSite;
-        this.pep2offset = shift - 0;
+	for (i=0; i < fragments.length; i++){
+		if(typeof fragments[i].peptideId !== 'undefined')
+			ions[fragments[i].peptideId].push(fragments[i].name);
 	}
 
-	console.log("linkpos: "+linkpos);
+	// #get the indicator array for observed fragments
+	for(p=0; p < pepCount; p++){
+		annotations[p] = get_fragment_annotation(ions[p], this.peptides[p]);
+	}
 
-    // diff = len(pep1) - len(pep2)
-    var diff = pep1.length - pep2.length;
-    spaceArray = arrayOfHashes(Math.abs(diff));
-    // if diff <= 0:
-    if (diff <= 0) {
-        // pep1 = "".join(list(pep1) + ["#"] * np.abs(diff))
-        pep1 = pep1 + Array(Math.abs(diff) + 1).join("#");
-        // alpha_annotation = list(alpha_annotation) + ["#"] * np.abs(diff)
-		alpha_annotation = alpha_annotation.concat(spaceArray);
-		//~ this.pep1offset += Math.abs(diff);
-	}
-    // else:
-    else {
-        // pep2 = "".join(list(pep2) + ["#"] * np.abs(diff))
-        pep2 = pep2 + Array(diff + 1).join("#");
-        // beta_annotation = list(beta_annotation) + ["#"] * np.abs(diff)
-		beta_annotation = beta_annotation.concat(spaceArray);
-		//~ this.pep2offset += diff;
-	}
-    console.log(alpha_annotation);
-    console.log(beta_annotation);
-    function arrayOfHashes(n){
-		var arr = [];
-		for (var a = 0; a < n; a++) {arr.push("#")}
-		return arr;
+	if (pepCount > 1){
+		function arrayOfHashes(n){
+			var arr = [];
+			for (var a = 0; a < n; a++) {arr.push("#")}
+			return arr;
+		}
+	    // #==========================================================================
+	    // #    account for crosslink shift
+	    // #    this alings the peptide sequences at the cross-link site
+	    // #==========================================================================
+	    // shift = cl_pep.linkpos1 - cl_pep.linkpos2
+	    var shift = linkPos[0].linkSite - linkPos[1].linkSite;
+	    var spaceArray = arrayOfHashes(Math.abs(shift));
+	    var linkpos;
+	    if  (shift <= 0) {
+	        // pep1 = "".join(["#"] * np.abs(shift) + list(pep1))
+	        this.peptides[0] = Array(Math.abs(shift) + 1).join("#") + this.peptides[0];
+	        // alpha_annotation = ["#"] * np.abs(shift) + list(alpha_annotation)
+	        annotations[0] = spaceArray.concat(annotations[0]);
+	        // linkpos = cl_pep.linkpos2
+	        linkpos = linkPos[1].linkSite+1;
+	        this.pepoffset[0] = Math.abs(shift) - 0;
+	    }
+	    // else:
+	    else {
+	        //~ pep2 = "".join(["#"] * np.abs(shift) + list(pep2))
+	        this.peptides[1] = Array(shift + 1).join("#") + this.peptides[1];
+	        // beta_annotation = ["#"] * np.abs(shift) + list(beta_annotation)
+	        annotations[1] = spaceArray.concat(annotations[1]);
+	        // linkpos = cl_pep.linkpos1
+	        linkpos = linkPos[0].linkSite+1;
+	        this.pepoffset[1] = shift - 0;
+		}
+
+		console.log("linkpos: "+linkpos);
+
+	    // diff = len(pep1) - len(pep2)
+	    var diff = this.peptides[0].length - this.peptides[1].length;
+	    spaceArray = arrayOfHashes(Math.abs(diff));
+	    // if diff <= 0:
+	    if (diff <= 0) {
+	        // pep1 = "".join(list(pep1) + ["#"] * np.abs(diff))
+	        this.peptides[0] = this.peptides[0] + Array(Math.abs(diff) + 1).join("#");
+	        // alpha_annotation = list(alpha_annotation) + ["#"] * np.abs(diff)
+			annotations[0] = annotations[0].concat(spaceArray);
+			//~ this.pep1offset += Math.abs(diff);
+		}
+	    // else:
+	    else {
+	        // pep2 = "".join(list(pep2) + ["#"] * np.abs(diff))
+	        this.peptides[1] = this.peptides[1] + Array(diff + 1).join("#");
+	        // beta_annotation = list(beta_annotation) + ["#"] * np.abs(diff)
+			annotations[1] = annotations[1].concat(spaceArray);
+			//~ this.pep2offset += diff;
+		}
+	    console.log(annotations[0]);
+	    console.log(annotations[1]);
 	}
 
 	/*
@@ -183,14 +140,12 @@ PeptideFragmentationKey.prototype.setData = function(){
 
     var xStep = 20;
     // the letters
-    this.pep1letters = [];
-    this.pep2letters = [];
-    this.pep1ModLetters = [];
-    this.pep2ModLetters = [];
-    drawPeptide( pep1, this.pep1ModsArray, 20, 5, this.model.p1color, this.pep1letters, this.pep1ModLetters);
-    drawPeptide( pep2, this.pep2ModsArray, 71, 86, this.model.p2color, this.pep2letters, this.pep2ModLetters);
-    function drawPeptide( pep, mods, y1, y2, colour, pepLetters, modLetters) {
+	drawPeptide( this.peptides[0], pepModsArray[0], 20, 5, this.model.p1color, this.pepLetters[0], this.pepModLetters[0]);
+	if(this.peptides[1])
+    	drawPeptide( this.peptides[1], pepModsArray[1], 71, 83, this.model.p2color, this.pepLetters[1], this.pepModLetters[1]);
+	function drawPeptide( pep, mods, y1, y2, colour, pepLetters, modLetters) {
 		var l = pep.length;
+		var shift = 0;
 		for (var i = 0; i < l; i++){
 			if (pep[i] != "#") {
 				pepLetters[i] = self.g.append("text")
@@ -199,27 +154,30 @@ PeptideFragmentationKey.prototype.setData = function(){
 					.attr("text-anchor", "middle")
 					.attr("fill", colour)
 					.text(pep[i]);
-				if(mods[i]){
+				if(mods[i-shift]){
 					modLetters[i] = self.g.append("text")
 						.attr("x", xStep * i)
 						.attr("y", y2)
 						.attr("text-anchor", "middle")
 						.attr("fill", colour)
 						.style("font-size", "0.7em")
-						.text(mods[i]);
+						.text(mods[i-shift]);
 				}
-				}
+			}
+			else
+				shift++;
 		}
 	}
-
-	// the the link line
-	self.g.append("line")
-		.attr("x1", xStep * (linkpos - 1))//the one...
-		.attr("y1", 25)
-		.attr("x2", xStep * (linkpos - 1))//the one...
-		.attr("y2", 55)
-		.attr("stroke", "black")
-		.attr("stroke-width", 1.5);
+	if(this.peptides[1]){
+		// the the link line
+		self.g.append("line")
+			.attr("x1", xStep * (linkpos - 1))//the one...
+			.attr("y1", 25)
+			.attr("x2", xStep * (linkpos - 1))//the one...
+			.attr("y2", 55)
+			.attr("stroke", "black")
+			.attr("stroke-width", 1.5);
+	}
 
 	this.fraglines = new Array();
 	var self = this;
@@ -227,11 +185,12 @@ PeptideFragmentationKey.prototype.setData = function(){
 
 
 
-    drawFragmentationEvents(alpha_annotation, self.pep1offset, self.model.pep1);	
-    drawFragmentationEvents(beta_annotation, self.pep2offset, self.model.pep2);	
+    drawFragmentationEvents(annotations[0], self.pepoffset[0], self.model.pepStrs[0]);
+	if(this.peptides[1])	
+		drawFragmentationEvents(annotations[1], self.pepoffset[1], self.model.pepStrs[1]);	
 
 	function drawFragmentationEvents( fragAnno, offset, peptide) {
-		var l = pep1.length; // shouldn't matter which pep you use
+		var l = self.peptides[0].length; // shouldn't matter which pep you use
 		for (var i = offset; i < l; i++){
 			var frag = fragAnno[i];
 			if (frag != "#" && frag != "--") {
@@ -243,7 +202,7 @@ PeptideFragmentationKey.prototype.setData = function(){
 	}
 
 	
-/*	// def get_fragment_annotation(ions, pep):
+	// def get_fragment_annotation(ions, pep):
 	function get_fragment_annotation(ions, pep){
 		// """
 		// Creates an indicator array for the peptide that contains the information
@@ -297,141 +256,56 @@ PeptideFragmentationKey.prototype.setData = function(){
 			annotation.push(gotb + goty);
 		}
 		return annotation;
-	}*/
+	}
 
 }
 
 PeptideFragmentationKey.prototype.clear = function(){
-	this.pepSeq1 = null;
-	this.pep1offset = null;
-	this.linkPos1 = null;
-	this.pepSeq2 = null;
-	this.pep2offset = null;
-	this.linkPos2 = null;
+	this.pepoffset = [];
+	this.linkPos = [];
 	this.g.selectAll("*").remove();
 }
 
-/*PeptideFragmentationKey.prototype.setHighlights = function(fragments){
-	this.clearHighlights();
-	
-	var fragCount = fragments.length;
-    if (fragCount > 0){
-		greyLetters(this.pep1letters);
-		greyLetters(this.pep2letters);
-		for (var f = 0; f < fragCount; f++){
-			var frag = fragments[f];
-			//if (this.model.lossyShown === true || frag.lossy === false) {
-				var matchedPeptide = frag.peptide;
-				var fragHighlightsArrayName, offset, pepLength, pepLetters, pepColour;
-					
-				if (this.model.pep1 == matchedPeptide){
-					fragHighlightsArrayName = "pep1";
-					offset = this.pep1offset;
-					pepLength = this.pepSeq1.length
-					pepLetters = this.pep1letters;
-					pepColour = this.model.p1color;
-				}
-				else{
-					fragHighlightsArrayName = "pep2";
-					offset = this.pep2offset;
-					pepLength = this.pepSeq2.length
-					pepLetters = this.pep2letters;
-					pepColour = this.model.p2color;
-				}
-				var ionType = frag.ionType;
-				fragHighlightsArrayName += ionType + "FragHighlights";
-				if (ionType == "b") { // or a or c
-					this[fragHighlightsArrayName][frag.ionNumber + offset - 1].attr("opacity",1);
-					colourLetters(pepLetters, pepColour, 0, (frag.ionNumber + offset));
-				} else {
-					this[fragHighlightsArrayName][pepLength - frag.ionNumber + offset - 1].attr("opacity",1);
-					colourLetters(pepLetters, pepColour, (pepLength - frag.ionNumber + offset), pepLetters.length);
-				}
-			//}
-		}
-	}
-
-	function greyLetters (pepLetters){
-		var letterCount = pepLetters.length;
-		for (var i = 0; i < letterCount; i++){
-			if (pepLetters[i]){
-				pepLetters[i].attr("fill", SpectrumModel.lossFragBarColour);
-			}
-		}
-	}
-	function colourLetters(pepLetters, colour, start, end){
-		for (var i = start; i < end; i++){
-			if (pepLetters[i]){
-				pepLetters[i].attr("fill", colour);
-			}
-		}
-	}	
-	
-}*/
-
 PeptideFragmentationKey.prototype.greyLetters = function(){
-		var self = this;
-		grey(this.pep1letters);
-		grey(this.pep2letters);
-		function grey(pepLetters){ 
-			var letterCount = pepLetters.length;
-			for (var i = 0; i < letterCount; i++){
-				if (pepLetters[i]){
-					pepLetters[i].attr("fill", self.model.lossFragBarColour);
-				}
-			}
+	for (i=0; i < this.pepLetters.length; i++){
+		var letterCount = this.pepLetters[i].length;
+		for (j = 0; j < letterCount; j++){
+			if (this.pepLetters[i][j])
+				this.pepLetters[i][j].attr("fill", this.model.lossFragBarColour);
+			if (this.pepModLetters[i][j])
+				this.pepModLetters[i][j].attr("fill", this.model.lossFragBarColour);				
 		}
 	}
-PeptideFragmentationKey.prototype.colorLetters = function(fragment){
+}
 
+PeptideFragmentationKey.prototype.colorLetters = function(fragment){
+	var self = this;
 	if (fragment == "all"){
-		color(this.pep1letters, this.model.p1color, 0, this.pep1letters.length);
-		color(this.pep2letters, this.model.p2color, 0, this.pep2letters.length);			
+		color(0, this.model.p1color, 0, this.pepLetters[0].length);
+		if(this.peptides[1])
+			color(1, this.model.p2color, 0, this.pepLetters[1].length);			
 	}
 	else{
-		if (fragment.peptide == this.model.pep1){
-			if (fragment.ionType == "b"){
-				start = 0;
-				end = fragment.ionNumber + this.pep1offset;
-			}
-			if (fragment.ionType == "y"){
-				start = this.pep1letters.length - fragment.ionNumber;
-				end = this.pep1letters.length;
-			}
-			color(this.pep1letters, this.model.p1color, start, end);
-			if (	(fragment.ionNumber >= this.model.linkPos1 && fragment.ionType == "b") 
-					|| (this.pep1letters.length - fragment.ionNumber < this.model.linkPos1 && fragment.ionType == "y")
-				)
-				color(this.pep2letters, this.model.p2color, 0, this.pep2letters.length)			
-		}
-		else{
-			if (fragment.ionType == "b"){
-				start = 0;
-				end = fragment.ionNumber + this.pep2offset;
-			}
-			if (fragment.ionType == "y"){
-				start = this.pep2letters.length - fragment.ionNumber;
-				end = this.pep2letters.length;
-			}
-			color(this.pep2letters, this.model.p2color, start, end);
-
-			if (	(fragment.ionNumber >= this.model.linkPos2 && fragment.ionType == "b") 
-					|| (this.pep2letters.length - fragment.ionNumber < this.model.linkPos2 && fragment.ionType == "y")
-				)
-				color(this.pep1letters, this.model.p1color, 0, this.pep1letters.length)
+		for (i=0; i < fragment.range.length; i++){
+			if (fragment.range[i].peptideId == 0)
+				color(0, this.model.p1color, fragment.range[i].from, fragment.range[i].to+1);
+			if (fragment.range[i].peptideId == 1)
+				color(1, this.model.p2color, fragment.range[i].from, fragment.range[i].to+1);
 		}
 	}	
 
-	function color(pepLetters, pepColor, start, end){
+	function color(pep, pepColor, start, end){
+		start += self.pepoffset[pep];
+		end += self.pepoffset[pep];
 		for (var i = start; i < end; i++){
-			if (pepLetters[i]){
-				pepLetters[i].attr("fill", pepColor);
-			}
+			if (self.pepLetters[pep][i])
+				self.pepLetters[pep][i].attr("fill", pepColor);
+			if (self.pepModLetters[pep][i])
+				self.pepModLetters[pep][i].attr("fill", pepColor);
 		}	
 	}
 }	
 
-	
 PeptideFragmentationKey.prototype.clearHighlights = function(){
 
 	for (var f = 0; f < this.fraglines.length; f++) {

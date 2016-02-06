@@ -172,7 +172,7 @@
 	{"id":38, "charge":2},
 	{"id":39, "charge":2}],
 "fragments": [
-	{"id":0,"name": "b6+P_H20x4", "sequence":"TVTAMD + TLYGFGG", "mass":1240.5997126567697, "clusterIds":[34],"class":"lossy","range":[
+	{"peptideId":0,"id":0,"name": "b6+P_H20x4", "sequence":"TVTAMD + TLYGFGG", "mass":1240.5997126567697, "clusterIds":[34],"class":"lossy","range":[
 		{"peptideId":0, "from":0,"to":5}
 		]
 	},

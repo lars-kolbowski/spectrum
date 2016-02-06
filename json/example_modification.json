@@ -745,11 +745,11 @@
 	{"id":183, "charge":1},
 	{"id":184, "charge":2}],
 "fragments": [
-	{"id":0,"name": "b18", "sequence":"LVRPEVDVMCcmTAFHDNEE", "mass":2142.95830246677, "clusterIds":[112],"class":"non-lossy","range":[
+	{"peptideId":0, "id":0,"name": "b18", "sequence":"LVRPEVDVMCcmTAFHDNEE", "mass":2142.95830246677, "clusterIds":[112],"class":"non-lossy","range":[
 		{"peptideId":0, "from":0,"to":17}
 		] 
 	},
-	{"id":1,"name": "b5", "sequence":"LVRPE", "mass":595.35622246677, "clusterIds":[20,162],"class":"non-lossy","range":[
+	{"peptideId":0, "id":1,"name": "b5", "sequence":"LVRPE", "mass":595.35622246677, "clusterIds":[20,162],"class":"non-lossy","range":[
 		{"peptideId":0, "from":0,"to":4}
 		] 
 	},

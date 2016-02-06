@@ -21,13 +21,14 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 
 		this.JSONdata = this.get("JSONdata");
 		console.log(this.JSONdata);
-		this.pep1 = this.JSONdata.Peptides[0];
-		if(this.JSONdata.Peptides[1])
-			this.pep2 = this.JSONdata.Peptides[1];
-		else
-			this.pep2 = "";		
-		this.linkPos1 = this.JSONdata.LinkSite[0];
-		this.linkPos2 = this.JSONdata.LinkSite[1];
+		this.peptides = this.JSONdata.Peptides;
+		this.pepStrs = [];
+		for(i=0; i < this.peptides.length; i++){
+			this.pepStrs[i] = "";
+			for(j = 0; j < this.peptides[i].length; j++)
+				this.pepStrs[i] += this.peptides[i][j].aminoAcid;
+
+		}
 		this.notUpperCase = this.get("notUpperCase"); //change to global var
 		this.cmap = colorbrewer.RdBu[8];
 		this.p1color = this.cmap[0];
