@@ -19,12 +19,8 @@
 //		graph/Fragment.js
 
 function Fragment (name, pep, sequence){
-	//this.name = data.fragment_name.trim();
 	this.name = name.trim();
-
-	//this.peptide = data.matchedpeptide.replace(/[^A-Z]/g, '');
-	this.peptide = pep.replace(/[^A-Z]/g, '');
-	
+	this.peptide = pep;
 	this.sequence = sequence;
 	
 	var ion = this.name.split('')[0];

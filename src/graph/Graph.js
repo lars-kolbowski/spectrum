@@ -486,22 +486,22 @@ Graph.prototype.updateColors = function(){
 			//Peaks
 			var colour = this.model.lossFragBarColour;
 			if (peak.fragments.length > 0){
-				if (peak.fragments[0].peptide === this.pep1 && peak.fragments[0].lossy === false) {
+				if (peak.fragments[0].peptide === this.pep1 && peak.fragments[0].class == "non-lossy") {
 					peak.colour = this.model.p1color;
 					for (var i = 0; i < peak.labels.length; i++)
 						peak.labels[i].attr("fill", this.model.p1color);
 				}
-				else if (peak.fragments[0].peptide === this.pep2 && peak.fragments[0].lossy === false) {
+				else if (peak.fragments[0].peptide === this.pep2 && peak.fragments[0].class == "non-lossy") {
 					peak.colour = this.model.p2color;
 					for (var i = 0; i < peak.labels.length; i++)
 						peak.labels[i].attr("fill", this.model.p2color);
 				}
-				else if (peak.fragments[0].peptide === this.pep1 && peak.fragments[0].lossy === true) {
+				else if (peak.fragments[0].peptide === this.pep1 && peak.fragments[0].class == "lossy") {
 					peak.colour = this.model.p1color_loss;
 					for (var i = 0; i < peak.labels.length; i++)
 						peak.labels[i].attr("fill", this.model.p1color_loss);
 				}
-				else if (peak.fragments[0].peptide === this.pep2 && peak.fragments[0].lossy === true) {
+				else if (peak.fragments[0].peptide === this.pep2 && peak.fragments[0].class == "lossy") {
 					peak.colour = this.model.p2color_loss;
 					for (var i = 0; i < peak.labels.length; i++)
 						peak.labels[i].attr("fill", this.model.p2color_loss);

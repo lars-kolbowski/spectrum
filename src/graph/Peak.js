@@ -21,8 +21,6 @@
 function Peak (id, graph){
 	var peak = graph.model.JSONdata.peaks[id];
 
-
-
 	this.x = peak.mz;
 	this.y = peak.intensity;
 	this.IsotopeClusters = [];
@@ -41,7 +39,8 @@ function Peak (id, graph){
 		for(i=0; i<fragments.length; i++){
 			for(j=0; j<this.IsotopeClusters.length; j++){
 				if(_.contains(fragments[i].clusterIds, this.IsotopeClusters[j].id)){
-					//var frag = new Fragment (fragments[i].name, "peptide", fragments[i].sequence);
+					//var pep = this.graph.model.pepStrs[fragments[i].peptideId];
+					//var frag = new Fragment (fragments[i].name, pep, fragments[i].sequence);
 					if(fragments[i].class == "lossy")
 						lossyFragments.push(fragments[i]);
 					else
@@ -158,7 +157,7 @@ function Peak (id, graph){
 		for (var f = 0; f < fragCount; f++){
 			var frag = this.fragments[f];
 			var labelHighlight, label;
-			if (frag.lossy === false){
+			if (frag.class != "lossy"){
 				labelHighlight  = this.graph.annotations.append('text');
 				label = this.graph.annotations.append('text');
 			} else {
@@ -217,18 +216,11 @@ function Peak (id, graph){
 			};
 			
 			var c = "pink";//colour for annotation
-			var matchedPeptide = frag.peptide;
-			var pep;
-			if (this.graph.pep1 == matchedPeptide){
-				pep = "p1";
-			}
-			else{
-				pep = "p2";
-			}
-			if (frag.name.indexOf("_") == -1){ //is not lossi
-				c = this.graph.model[pep + "color"];
+			var pepIndex = frag.peptideId+1;
+			if (frag.class == "non-lossy"){
+				c = this.graph.model["p" + pepIndex + "color"];
 			} else { // is lossy
-				c = this.graph.model[pep + "color_loss"]; //javascript lets you do this...
+				c = this.graph.model["p" + pepIndex + "color_loss"]; //javascript lets you do this...
 			}
 			label.attr("fill", c);
 			this.labels.push(label);
@@ -242,21 +234,17 @@ function Peak (id, graph){
 	this.line.attr("x2", 0);
 	this.colour = this.graph.model.lossFragBarColour;
 	if (this.fragments.length > 0){
-		if (this.fragments[0].peptide === this.graph.pep1
-				&& this.fragments[0].lossy === false) {
-			this.colour = this.graph.model.p1color;
+		if (this.fragments[0].peptideId == 0) {
+			if (this.fragments[0].class == "non-lossy")
+				this.colour = this.graph.model.p1color;
+			else if (this.fragments[0].class == "lossy")
+				this.colour = this.graph.model.p1color_loss;	
 		}
-		else if (this.fragments[0].peptide === this.graph.pep2
-				&& this.fragments[0].lossy === false) {
-			this.colour = this.graph.model.p2color;
-		}
-		else if (this.fragments[0].peptide === this.graph.pep1
-				&& this.fragments[0].lossy === true) {
-			this.colour = this.graph.model.p1color_loss;
-		}
-		else if (this.fragments[0].peptide === this.graph.pep2
-				&& this.fragments[0].lossy === true) {
-			this.colour = this.graph.model.p2color_loss;
+		else if (this.fragments[0].peptideId == 1) {
+			if (this.fragments[0].class == "non-lossy")
+				this.colour = this.graph.model.p2color;
+			else if (this.fragments[0].class == "lossy")
+				this.colour = this.graph.model.p2color_loss;			
 		}
 	}
 	this.line.attr("stroke", this.colour);
@@ -312,7 +300,7 @@ Peak.prototype.updateX = function(){
 			this.labels[a].attr("x", this.graph.x(this.x));
 			this.labelHighlights[a].attr("x", this.graph.x(this.x));
 			if (	(this.x > xDomain[0] && this.x < xDomain[1])	//in current range
-				 && (this.graph.lossyShown === true || this.fragments[a].lossy === false || _.intersection(this.graph.model.sticky, this.fragments).length != 0)	//lossy enabled OR not lossy OR isStickyFrag
+				 && (this.graph.lossyShown === true || this.fragments[a].class == "non-lossy" || _.intersection(this.graph.model.sticky, this.fragments).length != 0)	//lossy enabled OR not lossy OR isStickyFrag
 				 && (_.intersection(this.graph.model.sticky, this.fragments).length != 0 || this.graph.model.sticky.length == 0))	//isStickyFrag OR no StickyFrags
 			{
 				this.labels[a].attr("display","inline");
@@ -360,7 +348,7 @@ Peak.prototype.showLabels = function(lossyOverride){
 		var labelCount = this.labels.length;
 		for (var a = 0; a < labelCount; a++){
 			if ((this.x > xDomain[0] && this.x < xDomain[1])
-					&& (this.graph.lossyShown === true || this.fragments[a].lossy === false || lossyOverride == true)) {
+					&& (this.graph.lossyShown === true || this.fragments[a].class == "non-lossy" || lossyOverride == true)) {
 				this.labels[a].attr("display", "inline");
 				this.labelHighlights[a].attr("display", "inline");
 				this.labelLines[a].attr("opacity", 1);
