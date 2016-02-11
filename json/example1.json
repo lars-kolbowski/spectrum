@@ -27,8 +27,7 @@
 	{"id":0,"peptideId":0,"linkSite":4},
 	{"id":0,"peptideId":1,"linkSite":6}
 ],
-"peaks" :[
-	
+"peaks" :[	
 	{"mz":215.13963, "intensity":247.4677, "clusterIds":[31]},
 	{"mz":220.81946, "intensity":111.6624, "clusterIds":[]},
 	{"mz":232.69991, "intensity":92.18826, "clusterIds":[]},
@@ -176,7 +175,7 @@
 		{"peptideId":0, "from":0,"to":5}
 		]
 	},
-	{"peptideId":0, "id":1,"name": "b4", "sequence":"TLYG", "mass":435.22381146677003, "clusterIds":[32],"class":"non-lossy","range":[
+	{"peptideId":1, "id":1,"name": "b4", "sequence":"TLYG", "mass":435.22381146677003, "clusterIds":[32],"class":"non-lossy","range":[
 		{"peptideId":1, "from":0,"to":3}
 		]
 	},
@@ -190,7 +189,7 @@
 		{"peptideId":1, "from":0,"to":6}
 		]
 	},
-	{"peptideId":0, "id":4,"name": "y3+P", "sequence":"FGG + TVTAMDVVYALK", "mass":1569.8522770067698, "clusterIds":[18],"class":"non-lossy","range":[
+	{"peptideId":1, "id":4,"name": "y3+P", "sequence":"FGG + TVTAMDVVYALK", "mass":1569.8522770067698, "clusterIds":[18],"class":"non-lossy","range":[
 		{"peptideId":1, "from":4,"to":6},
 		{"peptideId":0, "from":0,"to":11}
 		]

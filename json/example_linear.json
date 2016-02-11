@@ -1,29 +1,32 @@
 {
 "Peptides":[
-	[
-		{"aminoAcid":"V"},
-		{"aminoAcid":"H"},
-		{"aminoAcid":"T"},
-		{"aminoAcid":"E"},
-		{"aminoAcid":"C", "Modification":"cm"},
-		{"aminoAcid":"C", "Modification":"cm"},
-		{"aminoAcid":"H"},
-		{"aminoAcid":"G"},
-		{"aminoAcid":"D"},
-		{"aminoAcid":"L"},
-		{"aminoAcid":"L"},
-		{"aminoAcid":"E"},
-		{"aminoAcid":"C", "Modification":"cm"},
-		{"aminoAcid":"A"},
-		{"aminoAcid":"D"},
-		{"aminoAcid":"D"},
-		{"aminoAcid":"R"},
-		{"aminoAcid":"A"},
-		{"aminoAcid":"D"},
-		{"aminoAcid":"L"},
-		{"aminoAcid":"A"},
-		{"aminoAcid":"K"}
-	]
+	{
+		"id":0,
+		"sequence":[
+			{"aminoAcid":"V","Modification":},
+			{"aminoAcid":"H","Modification":},
+			{"aminoAcid":"T","Modification":},
+			{"aminoAcid":"E","Modification":},
+			{"aminoAcid":"C", "Modification":"cm"},
+			{"aminoAcid":"C", "Modification":"cm"},
+			{"aminoAcid":"H","Modification":},
+			{"aminoAcid":"G","Modification":},
+			{"aminoAcid":"D","Modification":},
+			{"aminoAcid":"L","Modification":},
+			{"aminoAcid":"L","Modification":},
+			{"aminoAcid":"E","Modification":},
+			{"aminoAcid":"C", "Modification":"cm"},
+			{"aminoAcid":"A","Modification":},
+			{"aminoAcid":"D","Modification":},
+			{"aminoAcid":"D","Modification":},
+			{"aminoAcid":"R","Modification":},
+			{"aminoAcid":"A","Modification":},
+			{"aminoAcid":"D","Modification":},
+			{"aminoAcid":"L","Modification":},
+			{"aminoAcid":"A","Modification":},
+			{"aminoAcid":"K","Modification":}
+		]
+	}
 ],
 "LinkSite" : [
 ],
@@ -504,248 +507,247 @@
 "fragments": [
 	{"id":0,"name": "b11_H20x2", "sequence":"VHTECcmCcmHGDLL", "mass":1286.54049992677, "clusterIds":[122],"class":"lossy","range":[
 		{"peptideId":0, "from":0,"to":10}
-		] 
+		]
 	},
 	{"id":1,"name": "y6", "sequence":"RADLAK", "mass":673.3991457367702, "clusterIds":[21,116],"class":"non-lossy","range":[
 		{"peptideId":0, "from":16,"to":21}
-		] 
+		]
 	},
 	{"id":2,"name": "y11", "sequence":"ECcmADDRADLAK", "mass":1263.56338873677, "clusterIds":[100,121],"class":"non-lossy","range":[
 		{"peptideId":0, "from":11,"to":21}
-		] 
+		]
 	},
 	{"id":3,"name": "b2_NH3x1", "sequence":"VH", "mass":220.10805753677, "clusterIds":[112],"class":"lossy","range":[
 		{"peptideId":0, "from":0,"to":1}
-		] 
+		]
 	},
 	{"id":4,"name": "y9", "sequence":"ADDRADLAK", "mass":974.49014573677, "clusterIds":[45],"class":"non-lossy","range":[
 		{"peptideId":0, "from":13,"to":21}
-		] 
+		]
 	},
 	{"id":5,"name": "y15", "sequence":"GDLLECcmADDRADLAK", "mass":1661.77992373677, "clusterIds":[32,109],"class":"non-lossy","range":[
 		{"peptideId":0, "from":7,"to":21}
-		] 
+		]
 	},
 	{"id":6,"name": "b18", "sequence":"VHTECcmCcmHGDLLECcmADDRA", "mass":2139.8640884667693, "clusterIds":[124],"class":"non-lossy","range":[
 		{"peptideId":0, "from":0,"to":17}
-		] 
+		]
 	},
 	{"id":7,"name": "y10", "sequence":"CcmADDRADLAK", "mass":1134.52079573677, "clusterIds":[12,79],"class":"non-lossy","range":[
 		{"peptideId":0, "from":12,"to":21}
-		] 
+		]
 	},
 	{"id":8,"name": "y11_H20x1", "sequence":"ECcmADDRADLAK", "mass":1245.55282846677, "clusterIds":[99],"class":"lossy","range":[
 		{"peptideId":0, "from":11,"to":21}
-		] 
+		]
 	},
 	{"id":9,"name": "y12", "sequence":"LECcmADDRADLAK", "mass":1376.64745273677, "clusterIds":[22,103],"class":"non-lossy","range":[
 		{"peptideId":0, "from":10,"to":21}
-		] 
+		]
 	},
 	{"id":10,"name": "b10_H20x1", "sequence":"VHTECcmCcmHGDL", "mass":1191.4669961967702, "clusterIds":[15,132],"class":"lossy","range":[
 		{"peptideId":0, "from":0,"to":9}
-		] 
+		]
 	},
 	{"id":11,"name": "y11_H20x2", "sequence":"ECcmADDRADLAK", "mass":1227.54226819677, "clusterIds":[98],"class":"lossy","range":[
 		{"peptideId":0, "from":11,"to":21}
-		] 
+		]
 	},
 	{"id":12,"name": "b11", "sequence":"VHTECcmCcmHGDLL", "mass":1322.5616204667701, "clusterIds":[20,101],"class":"non-lossy","range":[
 		{"peptideId":0, "from":0,"to":10}
-		] 
+		]
 	},
 	{"id":13,"name": "b21", "sequence":"VHTECcmCcmHGDLLECcmADDRADLA", "mass":2439.012209466769, "clusterIds":[96],"class":"non-lossy","range":[
 		{"peptideId":0, "from":0,"to":20}
-		] 
+		]
 	},
 	{"id":14,"name": "y14", "sequence":"DLLECcmADDRADLAK", "mass":1604.75845973677, "clusterIds":[108],"class":"non-lossy","range":[
 		{"peptideId":0, "from":8,"to":21}
-		] 
+		]
 	},
 	{"id":15,"name": "y21_H20x1", "sequence":"HTECcmCcmHGDLLECcmADDRADLAK", "mass":2468.0387584667697, "clusterIds":[28],"class":"lossy","range":[
 		{"peptideId":0, "from":1,"to":21}
-		] 
+		]
 	},
 	{"id":16,"name": "b9_H20x1", "sequence":"VHTECcmCcmHGD", "mass":1078.38293219677, "clusterIds":[8],"class":"lossy","range":[
 		{"peptideId":0, "from":0,"to":8}
-		] 
+		]
 	},
 	{"id":17,"name": "y7", "sequence":"DRADLAK", "mass":788.4260887367701, "clusterIds":[5,26],"class":"non-lossy","range":[
 		{"peptideId":0, "from":15,"to":21}
-		] 
+		]
 	},
 	{"id":18,"name": "y14_H20x4", "sequence":"DLLECcmADDRADLAK", "mass":1532.71621865677, "clusterIds":[106],"class":"lossy","range":[
 		{"peptideId":0, "from":8,"to":21}
-		] 
+		]
 	},
 	{"id":19,"name": "y8_NH3x1", "sequence":"DDRADLAK", "mass":886.4264868067701, "clusterIds":[38],"class":"lossy","range":[
 		{"peptideId":0, "from":14,"to":21}
-		] 
+		]
 	},
 	{"id":20,"name": "y2", "sequence":"AK", "mass":218.14991373677003, "clusterIds":[3],"class":"non-lossy","range":[
 		{"peptideId":0, "from":20,"to":21}
-		] 
+		]
 	},
 	{"id":21,"name": "b3_H20x1", "sequence":"VHT", "mass":320.17172019677, "clusterIds":[114],"class":"lossy","range":[
 		{"peptideId":0, "from":0,"to":2}
-		] 
+		]
 	},
 	{"id":22,"name": "y18", "sequence":"CcmCcmHGDLLECcmADDRADLAK", "mass":2118.9001357367697, "clusterIds":[54],"class":"non-lossy","range":[
 		{"peptideId":0, "from":4,"to":21}
-		] 
+		]
 	},
 	{"id":23,"name": "y13", "sequence":"LLECcmADDRADLAK", "mass":1489.73151673677, "clusterIds":[105,126],"class":"non-lossy","range":[
 		{"peptideId":0, "from":9,"to":21}
-		] 
+		]
 	},
 	{"id":24,"name": "P", "sequence":"VHTECcmCcmHGDLLECcmADDRADLAK", "mass":2585.1177327367695, "clusterIds":[36],"class":"non-lossy","range":[
 		{"peptideId":0, "from":0,"to":21}
-		] 
+		]
 	},
 	{"id":25,"name": "b8_H20x2", "sequence":"VHTECcmCcmHG", "mass":945.3454289267701, "clusterIds":[129],"class":"lossy","range":[
 		{"peptideId":0, "from":0,"to":7}
-		] 
+		]
 	},
 	{"id":26,"name": "b19", "sequence":"VHTECcmCcmHGDLLECcmADDRAD", "mass":2254.891031466769, "clusterIds":[77],"class":"non-lossy","range":[
 		{"peptideId":0, "from":0,"to":18}
-		] 
+		]
 	},
 	{"id":27,"name": "y16", "sequence":"HGDLLECcmADDRADLAK", "mass":1798.8388357367699, "clusterIds":[40],"class":"non-lossy","range":[
 		{"peptideId":0, "from":6,"to":21}
-		] 
+		]
 	},
 	{"id":28,"name": "y20_H20x1", "sequence":"TECcmCcmHGDLLECcmADDRADLAK", "mass":2330.9798464667697, "clusterIds":[81],"class":"lossy","range":[
 		{"peptideId":0, "from":2,"to":21}
-		] 
+		]
 	},
 	{"id":29,"name": "b6", "sequence":"VHTECcmCcm", "mass":787.2861734667699, "clusterIds":[127],"class":"non-lossy","range":[
 		{"peptideId":0, "from":0,"to":5}
-		] 
+		]
 	},
 	{"id":30,"name": "y21", "sequence":"HTECcmCcmHGDLLECcmADDRADLAK", "mass":2486.0493187367697, "clusterIds":[30],"class":"non-lossy","range":[
 		{"peptideId":0, "from":1,"to":21}
-		] 
+		]
 	},
 	{"id":31,"name": "b11_H20x1", "sequence":"VHTECcmCcmHGDLL", "mass":1304.55106019677, "clusterIds":[123],"class":"lossy","range":[
 		{"peptideId":0, "from":0,"to":10}
-		] 
+		]
 	},
 	{"id":32,"name": "b15", "sequence":"VHTECcmCcmHGDLLECcmAD", "mass":1797.6989204667698, "clusterIds":[135],"class":"non-lossy","range":[
 		{"peptideId":0, "from":0,"to":14}
-		] 
+		]
 	},
 	{"id":33,"name": "y1_NH3x1", "sequence":"K", "mass":130.08625480677, "clusterIds":[0],"class":"lossy","range":[
 		{"peptideId":0, "from":21,"to":21}
-		] 
+		]
 	},
 	{"id":34,"name": "b2", "sequence":"VH", "mass":237.13460246677, "clusterIds":[4],"class":"non-lossy","range":[
 		{"peptideId":0, "from":0,"to":1}
-		] 
+		]
 	},
 	{"id":35,"name": "y1", "sequence":"K", "mass":147.11279973677, "clusterIds":[111],"class":"non-lossy","range":[
 		{"peptideId":0, "from":21,"to":21}
-		] 
+		]
 	},
 	{"id":36,"name": "y17", "sequence":"CcmHGDLLECcmADDRADLAK", "mass":1958.8694857367698, "clusterIds":[46],"class":"non-lossy","range":[
 		{"peptideId":0, "from":5,"to":21}
-		] 
+		]
 	},
 	{"id":37,"name": "b20", "sequence":"VHTECcmCcmHGDLLECcmADDRADL", "mass":2367.975095466769, "clusterIds":[87],"class":"non-lossy","range":[
 		{"peptideId":0, "from":0,"to":19}
-		] 
+		]
 	},
 	{"id":38,"name": "y12_H20x1", "sequence":"LECcmADDRADLAK", "mass":1358.63689246677, "clusterIds":[133],"class":"lossy","range":[
 		{"peptideId":0, "from":10,"to":21}
-		] 
+		]
 	},
 	{"id":39,"name": "y18_NH3x1", "sequence":"CcmCcmHGDLLECcmADDRADLAK", "mass":2101.8735908067697, "clusterIds":[52],"class":"lossy","range":[
 		{"peptideId":0, "from":4,"to":21}
-		] 
+		]
 	},
 	{"id":40,"name": "y19_NH3x1", "sequence":"ECcmCcmHGDLLECcmADDRADLAK", "mass":2230.91618380677, "clusterIds":[69],"class":"lossy","range":[
 		{"peptideId":0, "from":3,"to":21}
-		] 
+		]
 	},
 	{"id":41,"name": "b20_H20x4", "sequence":"VHTECcmCcmHGDLLECcmADDRADL", "mass":2295.9328543867687, "clusterIds":[130],"class":"lossy","range":[
 		{"peptideId":0, "from":0,"to":19}
-		] 
+		]
 	},
 	{"id":42,"name": "y1_H20x1", "sequence":"K", "mass":129.10223946677002, "clusterIds":[110],"class":"lossy","range":[
 		{"peptideId":0, "from":21,"to":21}
-		] 
+		]
 	},
 	{"id":43,"name": "b20_H20x3", "sequence":"VHTECcmCcmHGDLLECcmADDRADL", "mass":2313.9434146567687, "clusterIds":[131],"class":"lossy","range":[
 		{"peptideId":0, "from":0,"to":19}
-		] 
+		]
 	},
 	{"id":44,"name": "y6_NH3x2", "sequence":"RADLAK", "mass":639.3460558767702, "clusterIds":[113],"class":"lossy","range":[
 		{"peptideId":0, "from":16,"to":21}
-		] 
+		]
 	},
 	{"id":45,"name": "y3", "sequence":"LAK", "mass":331.23397773677, "clusterIds":[115],"class":"non-lossy","range":[
 		{"peptideId":0, "from":19,"to":21}
-		] 
+		]
 	},
 	{"id":46,"name": "y12_NH3x1", "sequence":"LECcmADDRADLAK", "mass":1359.62090780677, "clusterIds":[134],"class":"lossy","range":[
 		{"peptideId":0, "from":10,"to":21}
-		] 
+		]
 	},
 	{"id":47,"name": "y8", "sequence":"DDRADLAK", "mass":903.4530317367701, "clusterIds":[42],"class":"non-lossy","range":[
 		{"peptideId":0, "from":14,"to":21}
-		] 
+		]
 	},
 	{"id":48,"name": "b12", "sequence":"VHTECcmCcmHGDLLE", "mass":1451.60421346677, "clusterIds":[104,125],"class":"non-lossy","range":[
 		{"peptideId":0, "from":0,"to":11}
-		] 
+		]
 	},
 	{"id":49,"name": "b7", "sequence":"VHTECcmCcmH", "mass":924.34508546677, "clusterIds":[118,128],"class":"non-lossy","range":[
 		{"peptideId":0, "from":0,"to":6}
-		] 
+		]
 	},
 	{"id":50,"name": "y19_H20x1", "sequence":"ECcmCcmHGDLLECcmADDRADLAK", "mass":2229.93216846677, "clusterIds":[68],"class":"lossy","range":[
 		{"peptideId":0, "from":3,"to":21}
-		] 
+		]
 	},
 	{"id":51,"name": "y5", "sequence":"ADLAK", "mass":517.2980347367701, "clusterIds":[120],"class":"non-lossy","range":[
 		{"peptideId":0, "from":17,"to":21}
-		] 
+		]
 	},
 	{"id":52,"name": "y20", "sequence":"TECcmCcmHGDLLECcmADDRADLAK", "mass":2348.9904067367697, "clusterIds":[85],"class":"non-lossy","range":[
 		{"peptideId":0, "from":2,"to":21}
-		] 
+		]
 	},
 	{"id":53,"name": "b4", "sequence":"VHTE", "mass":467.22487346677, "clusterIds":[119],"class":"non-lossy","range":[
 		{"peptideId":0, "from":0,"to":3}
-		] 
+		]
 	},
 	{"id":54,"name": "b9", "sequence":"VHTECcmCcmHGD", "mass":1096.39349246677, "clusterIds":[10,62],"class":"non-lossy","range":[
 		{"peptideId":0, "from":0,"to":8}
-		] 
+		]
 	},
 	{"id":55,"name": "y19", "sequence":"ECcmCcmHGDLLECcmADDRADLAK", "mass":2247.94272873677, "clusterIds":[75],"class":"non-lossy","range":[
 		{"peptideId":0, "from":3,"to":21}
-		] 
+		]
 	},
 	{"id":56,"name": "b19_NH3x1", "sequence":"VHTECcmCcmHGDLLECcmADDRAD", "mass":2237.864486536769, "clusterIds":[24,74],"class":"lossy","range":[
 		{"peptideId":0, "from":0,"to":18}
-		] 
+		]
 	},
 	{"id":57,"name": "b19_H20x1", "sequence":"VHTECcmCcmHGDLLECcmADDRAD", "mass":2236.880471196769, "clusterIds":[71,72],"class":"lossy","range":[
 		{"peptideId":0, "from":0,"to":18}
-		] 
+		]
 	},
 	{"id":58,"name": "b20_H20x1", "sequence":"VHTECcmCcmHGDLLECcmADDRADL", "mass":2349.964535196769, "clusterIds":[25],"class":"lossy","range":[
 		{"peptideId":0, "from":0,"to":19}
-		] 
+		]
 	},
 	{"id":59,"name": "b3", "sequence":"VHT", "mass":338.18228046677, "clusterIds":[117],"class":"non-lossy","range":[
 		{"peptideId":0, "from":0,"to":2}
-		] 
+		]
 	},
 	{"id":60,"name": "b10", "sequence":"VHTECcmCcmHGDL", "mass":1209.4775564667702, "clusterIds":[17,92],"class":"non-lossy","range":[
 		{"peptideId":0, "from":0,"to":9}
-		] 
+		]
 	}
 ]
 }
-

@@ -18,10 +18,12 @@
 //		
 //		graph/Fragment.js
 
-function Fragment (name, pep, sequence){
-	this.name = name.trim();
-	this.peptide = pep;
-	this.sequence = sequence;
+function Fragment (fragment){
+	this.name = fragment.name.trim();
+	this.peptideId = fragment.peptideId;
+	this.sequence = fragment.sequence;
+	this.range = fragment.range;
+	this.class = fragment.class;
 	
 	var ion = this.name.split('')[0];
 	if (ion == 'a' || ion == 'b' || ion == 'c') {

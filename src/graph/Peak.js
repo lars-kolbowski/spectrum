@@ -39,8 +39,7 @@ function Peak (id, graph){
 		for(i=0; i<fragments.length; i++){
 			for(j=0; j<this.IsotopeClusters.length; j++){
 				if(_.contains(fragments[i].clusterIds, this.IsotopeClusters[j].id)){
-					//var pep = this.graph.model.pepStrs[fragments[i].peptideId];
-					//var frag = new Fragment (fragments[i].name, pep, fragments[i].sequence);
+					//var frag = new Fragment (fragments[i]);
 					if(fragments[i].class == "lossy")
 						lossyFragments.push(fragments[i]);
 					else
