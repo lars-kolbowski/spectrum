@@ -24,17 +24,19 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 	this.peptide = FragKey.model.peptides[peptideId];
 	
 	this.fragments = [];
+	this.b = [];
+	this.y = [];
 	if (fragments.b){
 		this.b = fragments.b;
-		this.fragments.push(fragments.b);
+		this.fragments = this.fragments.concat(fragments.b);
 	}
 	if (fragments.y){
 		this.y = fragments.y;
-		this.fragments.push(fragments.y);
+		this.fragments = this.fragments.concat(fragments.y);
 	}
 
-	var yfrag_index = this.peptide.length - (index + 1 - offset);
-	var bfrag_index = (index + 1 - offset);
+	var yfrag_index = this.peptide.length - (index + 1);
+	var bfrag_index = (index + 1);
 	if (this.peptideId == 0)
 		var color = this.FragKey.model.p1color;
 	else if (this.peptideId == 1)
@@ -44,7 +46,7 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 
 	var xStep = 20;
 
-	this.x = (xStep * index) + (xStep / 2);
+	this.x = (xStep * (index+offset)) + (xStep / 2);
 	if (this.peptideId == 0)
 		var y = 25;
 	if (this.peptideId == 1)
@@ -81,7 +83,7 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 		self.FragKey.model.clearHighlight(self.fragments);	
 	}
 	// # bions; either normal or lossy; have different colors
-	if (fragments.b){ // really a, b, or c , see get_fragment_annotation()
+	if (fragments.b.length != 0){ // really a, b, or c , see get_fragment_annotation()
 	
 		var highlightPath = "M" + this.x+ "," + (y - barHeight) 
 							+" L" + this.x+ "," +  y 
@@ -125,14 +127,14 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 	}
 
 	// # yions; either normal or lossy; have different colors
-	if (fragments.y){
-		var highlightPath = "M" + this.x+ "," + y 
-							+" L" + this.x+ "," +  (y - barHeight) 
-							+ " L" + (this.x+ tailX) + "," + (y  - barHeight - tailY);
+	if (fragments.y.length != 0){
+		var highlightPath = "M" + this.x + "," + y 
+							+" L" + this.x + "," +  (y - barHeight) 
+							+ " L" + (this.x + tailX) + "," + (y  - barHeight - tailY);
 			
 		this.yHighlight = this.g.append("path")
 			.attr("d", highlightPath)
-			.attr("stroke",this.FragKey.model.highlightColour)
+			.attr("stroke", this.FragKey.model.highlightColour)
 			.attr("stroke-width", this.FragKey.model.highlightWidth)
 			.attr("opacity", 0)
 			.attr("peptide", this.peptide)
@@ -186,11 +188,11 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 KeyFragment.prototype.highlight = function(show, fragments){
 	if(show === true){
 		for(f = 0; f < fragments.length; f++){
-			if(fragments[f] == this.b && this.bHighlight){
+			if( this.b.indexOf(fragments[f]) != -1 && this.bHighlight){
 				this.bHighlight.attr("opacity", 1);
 				this.bText.attr("opacity", 1);
 			}
-			if (fragments[f] == this.y && this.yHighlight){
+			if (this.y.indexOf(fragments[f]) != -1 && this.yHighlight){
 				this.yHighlight.attr("opacity", 1);
 				this.yText.attr("opacity", 1);
 			}

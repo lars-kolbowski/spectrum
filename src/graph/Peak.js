@@ -30,10 +30,28 @@ function Peak (id, graph){
 		this.charge = this.IsotopeClusters[0].charge;	//TODO charge multiple clusters?
 	this.graph = graph;
 
-
 	//make fragments
 	var notLossyFragments = [];
 	var lossyFragments = [];
+	var isMonoisotopicPeak = false;
+	for (var i = 0; i < this.IsotopeClusters.length; i++) {
+		if (this.IsotopeClusters[i].monoisotopicPeak == id)
+			isMonoisotopicPeak = true;
+	};
+
+	var fragments = graph.model.JSONdata.fragments;
+
+	for (var f = 0; f < fragments.length; f++) {
+		if(_.intersection(fragments[f].clusterIds, peak.clusterIds).length != 0){
+			if(fragments[f].class == "lossy")
+				lossyFragments.push(fragments[f]);
+			else
+				notLossyFragments.push(fragments[f]);
+		}				
+	};
+
+	this.fragments = notLossyFragments.concat(lossyFragments); //merge arrays
+/*
 	if (this.IsotopeClusters.length > 0){
 		var fragments = graph.model.JSONdata.fragments;
 		for(i=0; i<fragments.length; i++){
@@ -47,24 +65,9 @@ function Peak (id, graph){
 				}
 			}
 		}
-	}
+	};
 
-/*	//make fragments
-	var notLossyFragments = [];
-	var lossyFragments = [];
-	var fragCount = data.length;
-	for (var f = 0; f < fragCount; f++) {
-		//check if the Peak is a fragment or not and if create a new Fragment
-		if (data[f].fragment_name.trim() != "") {
-			var frag = new Fragment (data[f].fragment_name, data[f].matchedpeptide, data[f].sequence);
-			if (frag.lossy === false) {
-				notLossyFragments.push(frag);
-			} else {
-				lossyFragments.push(frag);
-			}
-		}
-	}*/
-	this.fragments = notLossyFragments.concat(lossyFragments); //merge arrays
+	this.fragments = notLossyFragments.concat(lossyFragments); //merge arrays*/
 
 	//make tooltip
 	var tooltip = "";
@@ -72,9 +75,9 @@ function Peak (id, graph){
 	for (var f = 0; f < fragCount; f++){
 		if (f > 0) {
 			tooltip += ", ";
-		}
+		};
 		tooltip += this.fragments[f].sequence;
-	}
+	};
 	this.tooltip = tooltip + " m/z: " + this.x + ", i: " + this.y
 
 	//svg elements
@@ -85,7 +88,6 @@ function Peak (id, graph){
 							.attr("stroke", this.graph.model.highlightColour)
 							.attr("stroke-width", this.graph.model.highlightWidth)
 							.attr("opacity","0");
-		//this.highlightLine.append("svg:title").text(this.tooltip);	// easy tooltip
 		this.highlightLine.attr("x1", 0);
 		this.highlightLine.attr("x2", 0);
 				
@@ -115,135 +117,146 @@ function Peak (id, graph){
 			self.graph.model.clearHighlight(self.fragments);	
 		}
 
-	  	//create frag labels
-	  	//labeldrag	
-		this.labelDrag = d3.behavior.drag();
-		this.labelDrag.on("dragstart", function(){
-			for(l=0; l<self.labelLines.length; l++)
-				self.labelLines[l].attr("opacity", 1);
-		});
-		this.labelDrag.on("drag", function() {
-			var coords = d3.mouse(this);
-			var frag = this.innerHTML;
-			for (var f = 0; f < self.fragments.length; f++){
-				if(self.fragments[f].name == frag){
-					var curLabelLine = self.labelLines[f];
-					self.labelHighlights[f].attr("x", coords[0]);
-					self.labels[f].attr("x", coords[0]);
-					self.labelHighlights[f].attr("y", coords[1]);
-					self.labels[f].attr("y", coords[1]);
+		if (isMonoisotopicPeak){
+		  	//create frag labels
+		  	//labeldrag	
+			this.labelDrag = d3.behavior.drag();
+			this.labelDrag.on("dragstart", function(){
+				for(l=0; l<self.labelLines.length; l++)
+					self.labelLines[l].attr("opacity", 1);
+			});
+			this.labelDrag.on("drag", function() {
+				var coords = d3.mouse(this);
+				var frag = this.innerHTML;
+				for (var f = 0; f < self.fragments.length; f++){
+					if(self.fragments[f].name == frag){
+						var curLabelLine = self.labelLines[f];
+						self.labelHighlights[f].attr("x", coords[0]);
+						self.labels[f].attr("x", coords[0]);
+						self.labelHighlights[f].attr("y", coords[1]);
+						self.labels[f].attr("y", coords[1]);
+					}
 				}
+				var startX = self.graph.x(self.x);
+				var startY = self.graph.y(self.y)
+				var mouseX = coords[0]-startX;
+				var mouseY = coords[1];
+				var r = Math.sqrt((mouseX * mouseX) + ((mouseY-startY) * (mouseY-startY) ))
+				if (r > 15 )
+					curLabelLine
+						.attr("opacity", 1)
+						.attr("x1", 0)
+						.attr("x2", mouseX)
+						.attr("y1", startY)
+						.attr("y2", mouseY);
+				else
+					curLabelLine.attr("opacity", 0);
+			});	
+			this.labels = []; // will be array of d3 selections
+			this.labelHighlights = []; // will be array of d3 selections
+			this.labelLines = []; // will be array of d3 selections
+			var fragCount = this.fragments.length;
+			for (var f = 0; f < fragCount; f++){
+				var frag = this.fragments[f];
+				var labelHighlight, label;
+				if (frag.class != "lossy"){
+					labelHighlight  = this.graph.annotations.append('text');
+					label = this.graph.annotations.append('text');
+				} else {
+					labelHighlight  = this.graph.lossyAnnotations.append('text');
+					label = this.graph.lossyAnnotations.append('text');
+				}
+				labelHighlight.text(frag.name)
+						.attr("x", 0)
+						.attr("text-anchor", "middle")
+						.style("stroke-width", "5px")
+						.style("font-size", "0.8em")
+						.style("cursor", "default")
+						.attr("stroke", this.graph.model.highlightColour);
+				label.text(frag.name)
+						.attr("x", 0)
+						.attr("text-anchor", "middle")
+						.style("font-size", "0.8em")
+						.style("cursor", "default")
+						.attr("class", "peakAnnot");
+				labelLine = self.g.append("line")
+		  			.attr("stroke-width", 1)
+					.attr("stroke", "Black")
+					.style("stroke-dasharray", ("3, 3"));
+						
+				label[0][0].onmouseover = function(evt) {
+					if(!self.graph.model.moveLabels)
+						startHighlight();
+				};
+				label[0][0].onmouseout = function(evt) {
+					if(!self.graph.model.moveLabels)				
+						endHighlight();
+				};
+				label[0][0].ontouchstart = function(evt) {
+					if(!self.graph.model.moveLabels)
+						startHighlight();
+				};
+				label[0][0].ontouchend = function(evt) {
+					if(!self.graph.model.moveLabels)				
+						endHighlight();
+				};
+				labelHighlight[0][0].onmouseover = function(evt) {
+					if(!self.graph.model.moveLabels)
+						startHighlight();
+				};
+				labelHighlight[0][0].onmouseout = function(evt) {
+					if(!self.graph.model.moveLabels)				
+						endHighlight();
+				};
+				labelHighlight[0][0].ontouchstart = function(evt) {
+					if(!self.graph.model.moveLabels)
+						startHighlight();
+				};
+				labelHighlight[0][0].ontouchend = function(evt) {
+					if(!self.graph.model.moveLabels)				
+						endHighlight();
+				};
+				
+				var c = "pink";//colour for annotation
+				var pepIndex = frag.peptideId+1;
+				if (frag.class == "non-lossy"){
+					c = this.graph.model["p" + pepIndex + "color"];
+				} else { // is lossy
+					c = this.graph.model["p" + pepIndex + "color_loss"]; //javascript lets you do this...
+				}
+				label.attr("fill", c);
+				this.labels.push(label);
+				this.labelHighlights.push(labelHighlight);
+				this.labelLines.push(labelLine);
 			}
-			var startX = self.graph.x(self.x);
-			var startY = self.graph.y(self.y)
-			var mouseX = coords[0]-startX;
-			var mouseY = coords[1];
-			var r = Math.sqrt((mouseX * mouseX) + ((mouseY-startY) * (mouseY-startY) ))
-			if (r > 15 )
-				curLabelLine
-					.attr("opacity", 1)
-					.attr("x1", 0)
-					.attr("x2", mouseX)
-					.attr("y1", startY)
-					.attr("y2", mouseY);
-			else
-				curLabelLine.attr("opacity", 0);
-		});	
-		this.labels = []; // will be array of d3 selections
-		this.labelHighlights = []; // will be array of d3 selections
-		this.labelLines = []; // will be array of d3 selections
-		var fragCount = this.fragments.length;
-		for (var f = 0; f < fragCount; f++){
-			var frag = this.fragments[f];
-			var labelHighlight, label;
-			if (frag.class != "lossy"){
-				labelHighlight  = this.graph.annotations.append('text');
-				label = this.graph.annotations.append('text');
-			} else {
-				labelHighlight  = this.graph.lossyAnnotations.append('text');
-				label = this.graph.lossyAnnotations.append('text');
-			}
-			labelHighlight.text(frag.name)
-					.attr("x", 0)
-					.attr("text-anchor", "middle")
-					.style("stroke-width", "5px")
-					.style("font-size", "0.8em")
-					.style("cursor", "default")
-					.attr("stroke", this.graph.model.highlightColour);
-			label.text(frag.name)
-					.attr("x", 0)
-					.attr("text-anchor", "middle")
-					.style("font-size", "0.8em")
-					.style("cursor", "default")
-					.attr("class", "peakAnnot");
-			labelLine = self.g.append("line")
-	  			.attr("stroke-width", 1)
-				.attr("stroke", "Black")
-				.style("stroke-dasharray", ("3, 3"));
-					
-			label[0][0].onmouseover = function(evt) {
-				if(!self.graph.model.moveLabels)
-					startHighlight();
-			};
-			label[0][0].onmouseout = function(evt) {
-				if(!self.graph.model.moveLabels)				
-					endHighlight();
-			};
-			label[0][0].ontouchstart = function(evt) {
-				if(!self.graph.model.moveLabels)
-					startHighlight();
-			};
-			label[0][0].ontouchend = function(evt) {
-				if(!self.graph.model.moveLabels)				
-					endHighlight();
-			};
-			labelHighlight[0][0].onmouseover = function(evt) {
-				if(!self.graph.model.moveLabels)
-					startHighlight();
-			};
-			labelHighlight[0][0].onmouseout = function(evt) {
-				if(!self.graph.model.moveLabels)				
-					endHighlight();
-			};
-			labelHighlight[0][0].ontouchstart = function(evt) {
-				if(!self.graph.model.moveLabels)
-					startHighlight();
-			};
-			labelHighlight[0][0].ontouchend = function(evt) {
-				if(!self.graph.model.moveLabels)				
-					endHighlight();
-			};
-			
-			var c = "pink";//colour for annotation
-			var pepIndex = frag.peptideId+1;
-			if (frag.class == "non-lossy"){
-				c = this.graph.model["p" + pepIndex + "color"];
-			} else { // is lossy
-				c = this.graph.model["p" + pepIndex + "color_loss"]; //javascript lets you do this...
-			}
-			label.attr("fill", c);
-			this.labels.push(label);
-			this.labelHighlights.push(labelHighlight);
-			this.labelLines.push(labelLine);
 		}
 		this.highlight(false);
 	}
 	this.line = this.g.append('line').attr("stroke-width","1");
 	this.line.attr("x1", 0);
 	this.line.attr("x2", 0);
+
 	this.colour = this.graph.model.lossFragBarColour;
 	if (this.fragments.length > 0){
-		if (this.fragments[0].peptideId == 0) {
-			if (this.fragments[0].class == "non-lossy")
-				this.colour = this.graph.model.p1color;
-			else if (this.fragments[0].class == "lossy")
-				this.colour = this.graph.model.p1color_loss;	
+		if (isMonoisotopicPeak){
+			if (this.fragments[0].peptideId == 0) {
+				if (this.fragments[0].class == "non-lossy")
+					this.colour = this.graph.model.p1color;
+				else if (this.fragments[0].class == "lossy")
+					this.colour = this.graph.model.p1color_loss;	
+			}
+			else if (this.fragments[0].peptideId == 1) {
+				if (this.fragments[0].class == "non-lossy")
+					this.colour = this.graph.model.p2color;
+				else if (this.fragments[0].class == "lossy")
+					this.colour = this.graph.model.p2color_loss;			
+			}
 		}
-		else if (this.fragments[0].peptideId == 1) {
-			if (this.fragments[0].class == "non-lossy")
-				this.colour = this.graph.model.p2color;
-			else if (this.fragments[0].class == "lossy")
-				this.colour = this.graph.model.p2color_loss;			
+		else {
+			if(this.fragments[0].peptideId == 0)
+				this.colour = graph.model.p1color_cluster;
+			if(this.fragments[0].peptideId == 1)
+				this.colour = graph.model.p2color_cluster;
 		}
 	}
 	this.line.attr("stroke", this.colour);
@@ -252,27 +265,31 @@ function Peak (id, graph){
 Peak.prototype.highlight = function(show, fragments){
 	if (show == true) {
 		this.highlightLine.attr("opacity","1");
-		for (var f = 0; f < this.fragments.length; f++){
-			if ( _.contains(fragments, this.fragments[f]) ){
-				this.labelHighlights[f].attr("opacity", 1);
-				this.labels[f].attr("display", "inline");
-				this.labelHighlights[f].attr("display", "inline");
+		if (this.labels){
+			for (var f = 0; f < this.fragments.length; f++){
+				if ( _.contains(fragments, this.fragments[f]) ){
+					this.labelHighlights[f].attr("opacity", 1);
+					this.labels[f].attr("display", "inline");
+					this.labelHighlights[f].attr("display", "inline");
+				}
 			}
 		}
 		this.graph.peaks[0][0].appendChild(this.g[0][0]);
 		this.line.attr("stroke", this.colour);
-		for (var b = 0; b < this.IsotopeCluster.points.length; b++ )
-			this.IsotopeCluster.points[b].line.attr("stroke", this.colour);
+/*		for (var b = 0; b < this.IsotopeCluster.points.length; b++ )
+			this.IsotopeCluster.points[b].line.attr("stroke", this.colour);*/
 	} else {
 		this.highlightLine.attr("opacity",0);
-		for (var a = 0; a < this.labels.length; a++){
-			this.labelHighlights[a].attr("opacity", 0);
+		if(this.labels){
+			for (var a = 0; a < this.labels.length; a++){
+				this.labelHighlights[a].attr("opacity", 0);
+			}
 		}
 	}
 }
 
 Peak.prototype.update = function(){
-	if (this.fragments.length > 0){
+	if (this.labels){
 		for(l=0; l<this.labelLines.length; l++)
 			this.labelLines[l]
 				.attr("opacity", 0)
@@ -293,7 +310,7 @@ Peak.prototype.updateX = function(){
 	} else {
 		this.g.attr("display","none");
 	}	
-	if (this.fragments.length > 0) {
+	if (this.labels) {
 		var labelCount = this.labels.length;
 		for (var a = 0; a < labelCount; a++){
 			this.labels[a].attr("x", this.graph.x(this.x));
@@ -317,7 +334,7 @@ Peak.prototype.updateY = function(){
 	this.line.attr("y1", this.graph.y(this.y));
 	this.line.attr("y2", this.graph.y(0));
 
-	if (this.fragments.length > 0) {
+	if (this.labels) {
 		this.highlightLine.attr("y1", this.graph.y(this.y));
 		this.highlightLine.attr("y2", this.graph.y(0));
 		var yStep = 15;
@@ -331,7 +348,7 @@ Peak.prototype.updateY = function(){
 }
 
 Peak.prototype.removeLabels = function(){
-	if (this.fragments.length > 0) {
+	if (this.labels) {
 		var labelCount = this.labels.length;
 		for (var a = 0; a < labelCount; a++){
 			this.labels[a].attr("display", "none");
@@ -343,7 +360,7 @@ Peak.prototype.removeLabels = function(){
 
 Peak.prototype.showLabels = function(lossyOverride){
 	var xDomain = this.graph.x.domain();
-	if (this.fragments.length > 0) {
+	if (this.labels) {
 		var labelCount = this.labels.length;
 		for (var a = 0; a < labelCount; a++){
 			if ((this.x > xDomain[0] && this.x < xDomain[1])

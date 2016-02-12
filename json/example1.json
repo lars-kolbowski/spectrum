@@ -130,13 +130,13 @@
 	{"mz":1644.8347, "intensity":129.4256, "clusterIds":[]}
 ],
 "clusters": [
-	{"id":0, "charge":1},
-	{"id":1, "charge":1},
-	{"id":2, "charge":1},
-	{"id":3, "charge":1},
-	{"id":4, "charge":2},
-	{"id":5, "charge":1},
-	{"id":6, "charge":1},
+	{"id":0, "charge":1, "monoisotopicPeak":8},
+	{"id":1, "charge":1, "monoisotopicPeak":13},
+	{"id":2, "charge":1, "monoisotopicPeak":19},
+	{"id":3, "charge":1, "monoisotopicPeak":21},
+	{"id":4, "charge":2, "monoisotopicPeak":23},
+	{"id":5, "charge":1, "monoisotopicPeak":23},
+	{"id":6, "charge":1, "monoisotopicPeak":27},
 	{"id":7, "charge":3},
 	{"id":8, "charge":3},
 	{"id":9, "charge":2},
@@ -161,9 +161,9 @@
 	{"id":28, "charge":2},
 	{"id":29, "charge":1},
 	{"id":30, "charge":2},
-	{"id":31, "charge":1},
-	{"id":32, "charge":1},
-	{"id":33, "charge":3},
+	{"id":31, "charge":1, "monoisotopicPeak":0},
+	{"id":32, "charge":1, "monoisotopicPeak":12},
+	{"id":33, "charge":3, "monoisotopicPeak":26},
 	{"id":34, "charge":2},
 	{"id":35, "charge":1},
 	{"id":36, "charge":2},
@@ -199,18 +199,19 @@
 		{"peptideId":1, "from":0,"to":6}
 		]
 	},
-	{"peptideId":0, "id":6,"name": "y1+P", "sequence":"G + TVTAMDVVYALK", "mass":1365.7623990067698, "clusterIds":[10],"class":"non-lossy","range":[
+	{"peptideId":1, "id":6,"name": "y1+P", "sequence":"G + TVTAMDVVYALK", "mass":1365.7623990067698, "clusterIds":[10],"class":"non-lossy","range":[
 		{"peptideId":1, "from":6,"to":6},
 		{"peptideId":0, "from":0,"to":11}
 		]
 	},
-	{"peptideId":0, "id":7,"name": "y2+P", "sequence":"GG + TVTAMDVVYALK", "mass":1422.7838630067697, "clusterIds":[15],"class":"non-lossy","range":[
+	{"peptideId":1, "id":7,"name": "y2+P", "sequence":"GG + TVTAMDVVYALK", "mass":1422.7838630067697, "clusterIds":[15],"class":"non-lossy","range":[
 		{"peptideId":1, "from":5,"to":6},
 		{"peptideId":0, "from":0,"to":11}
 		]
 	},
 	{"peptideId":1, "id":8,"name": "y4+P_H20x1", "sequence":"GFGG + TVTAMDVVYALK", "mass":1608.86318073677, "clusterIds":[20],"class":"lossy","range":[
-		{"peptideId":1, "from":3,"to":6}
+		{"peptideId":1, "from":3,"to":6},
+		{"peptideId":0, "from":0,"to":11}
 		]
 	},
 	{"peptideId":0, "id":9,"name": "b7+P_H20x2", "sequence":"TVTAMDV + TLYGFGG", "mass":1375.68924719677, "clusterIds":[38],"class":"lossy","range":[
@@ -285,7 +286,7 @@
 		{"peptideId":0, "from":8,"to":11}
 		]
 	},
-	{"peptideId":0, "id":26,"name": "y5+P", "sequence":"YGFGG + TVTAMDVVYALK", "mass":1789.9370700067698, "clusterIds":[7,28],"class":"non-lossy","range":[
+	{"peptideId":1, "id":26,"name": "y5+P", "sequence":"YGFGG + TVTAMDVVYALK", "mass":1789.9370700067698, "clusterIds":[7,28],"class":"non-lossy","range":[
 		{"peptideId":1, "from":2,"to":6},
 		{"peptideId":0, "from":0,"to":11}
 		]
@@ -302,7 +303,7 @@
 		{"peptideId":1, "from":0,"to":4}
 		]
 	},
-	{"peptideId":0, "id":30,"name": "y4+P", "sequence":"GFGG + TVTAMDVVYALK", "mass":1626.8737410067697, "clusterIds":[22],"class":"non-lossy","range":[
+	{"peptideId":1, "id":30,"name": "y4+P", "sequence":"GFGG + TVTAMDVVYALK", "mass":1626.8737410067697, "clusterIds":[22],"class":"non-lossy","range":[
 		{"peptideId":1, "from":3,"to":6},
 		{"peptideId":0, "from":0,"to":11}
 		]

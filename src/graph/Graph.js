@@ -160,6 +160,7 @@ Graph.prototype.setData = function(){
 		this.points.push(new Peak(i, this));
 	}
 	this.model.points = this.points;
+	console.log(this.points);
 	//Isotope cluster
 	this.cluster = new Array();
 

@@ -56,8 +56,8 @@ PeptideFragmentationKey.prototype.setData = function(){
 		annotations[p] = [];
 		for (var i = 0; i < self.model.peptides[p].length; i++) {
 		var ions = {
-			b : false,
-			y : false
+			b : [],
+			y : []
 		};
 			annotations[p].push(ions);
 		};
@@ -164,11 +164,11 @@ PeptideFragmentationKey.prototype.setData = function(){
 			if(fragments[i].range[r].peptideId == fragments[i].peptideId){
 				if (fragments[i].range[r].from == 0){	//a,b,c-ion
 					var index = fragments[i].range[r].to;
-					annotations[fragments[i].peptideId][index].b = fragments[i];
+					annotations[fragments[i].peptideId][index].b.push(fragments[i]);
 				}
 				else{	//x,y,z-ion
-					var index = fragments[i].range[r].from+1;
-					annotations[fragments[i].peptideId][index].y = fragments[i];
+					var index = fragments[i].range[r].from - 1;
+					annotations[fragments[i].peptideId][index].y.push(fragments[i]);
 				}
 			}
 		}
@@ -182,10 +182,10 @@ PeptideFragmentationKey.prototype.setData = function(){
 		drawFragmentationEvents(annotations[1], self.pepoffset[1], 1);	
 
 	function drawFragmentationEvents(fragAnno, offset, peptideId) {
-		var l = self.peptides[0].length; // shouldn't matter which pep you use
-		for (var i = 0; i < l-offset; i++){
+		//var l = self.peptides[0].length; // shouldn't matter which pep you use
+		for (var i = 0; i < fragAnno.length; i++){
 			var frag = fragAnno[i];
-			if (frag.b || frag.y) {
+			if (frag.b.length != 0 || frag.y.length != 0) {
 				//var x = (xStep * i) + (xStep / 2);
 				self.fraglines.push(new KeyFragment(frag, i, offset, peptideId, self));
 			}
