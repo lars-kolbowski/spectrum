@@ -352,8 +352,12 @@ Graph.prototype.measure = function(on){
 			else
 				PeakInfo += "From: Peak (" + self.measureStartPeak.x + " m/z)"; 
 			if(endPeak){
-				if(endPeak.fragments.length > 0 && endPeak.id == endPeak.IsotopeClusters[0].monoisotopicPeak){
-					PeakInfo += "<br/>To: " + endPeak.fragments[0].name + " (" + endPeak.x + " m/z)";
+				if(endPeak.fragments.length > 0){
+					if (endPeak.isMonoisotopic)
+						PeakInfo += "<br/>To: " + endPeak.fragments[0].name + " (" + endPeak.x + " m/z)";
+					else{
+						PeakInfo += "<br/>To: " + endPeak.fragments[0].name +"+"+endPeak.isotope+ " (" + endPeak.x + " m/z)";
+					}
 				}
 				else{
 					PeakInfo += "<br/>To: Peak (" + endPeak.x + " m/z)";
