@@ -111,7 +111,6 @@ var SpectrumView = Backbone.View.extend({
 		var $target = $(e.target);
         var selected = $target .is(':checked');
         this.model.moveLabels = selected;
-        //var drag = d3.behavior.drag();
 		
 		var peaks = this.graph.points;
 
@@ -135,12 +134,5 @@ var SpectrumView = Backbone.View.extend({
 				}
 			}			
 		}
-
-/*		drag.on("drag", function() {
-			var coords = d3.mouse(this);
-			this.setAttribute("x", coords[0]);
-			this.setAttribute("y", coords[1]);
-			//alert(coords); 
-		});	*/
 	}
 });

@@ -160,9 +160,8 @@ Graph.prototype.setData = function(){
 		this.points.push(new Peak(i, this));
 	}
 	this.model.points = this.points;
-	console.log(this.points);
 	//Isotope cluster
-	this.cluster = new Array();
+/*	this.cluster = new Array();
 
 	var peakCount = this.points.length;
 	for (var p = 0; p < peakCount; p++) {
@@ -170,7 +169,7 @@ Graph.prototype.setData = function(){
 		if (peak.fragments.length > 0){
 			this.cluster.push(new IsotopeCluster(p, this));
 		}
-	}
+	}*/
 	//console.log(this.cluster);
 	this.updatePeakColors();
 
@@ -290,10 +289,9 @@ Graph.prototype.measure = function(on){
 			var mouseX = self.x.invert(coords[0]);
 			//find start and endPeak
 			var distance = 2;
-			var highlighttrigger = 10;
-			var triggerdistance = 5;
+			var highlighttrigger = 10;	//triggerdistance to prioritize highlighted peaks as endpoint
+			var triggerdistance = 5;	//triggerdistance to use peak as endpoint
 			var peakCount = self.points.length;
-			//var highlightedPeak = false;
 			for (var p = 0; p < peakCount; p++) {
 				var peak = self.points[p];
 				if (_.intersection(self.model.highlights, peak.fragments).length != 0 && Math.abs(peak.x - mouseX)  < highlighttrigger){
@@ -325,10 +323,18 @@ Graph.prototype.measure = function(on){
 			//draw horizontal line
 			var measureStartX = parseFloat(self.measuringToolVLineStart.attr("x1"));
 			var measureEndX = parseFloat(self.measuringToolVLineEnd.attr("x1"));
+			if (coords[1] < 0)
+				var y = 0;
+			else if (coords[1] > self.y(0))
+				var y  = self.y(0);
+			else
+				var y = coords[1];
+
+
 			self.measuringToolLine
 				.attr("x2", measureEndX)
-				.attr("y1", coords[1])
-				.attr("y2", coords[1]);
+				.attr("y1", y)
+				.attr("y2", y);
 
 			//draw peak info
 			var deltaX = Math.abs(measureStartX - measureEndX);
@@ -346,10 +352,12 @@ Graph.prototype.measure = function(on){
 			else
 				PeakInfo += "From: Peak (" + self.measureStartPeak.x + " m/z)"; 
 			if(endPeak){
-				if(endPeak.fragments.length > 0)
+				if(endPeak.fragments.length > 0 && endPeak.id == endPeak.IsotopeClusters[0].monoisotopicPeak){
 					PeakInfo += "<br/>To: " + endPeak.fragments[0].name + " (" + endPeak.x + " m/z)";
-				else
-					PeakInfo += "<br/>To: Peak (" + endPeak.x + " m/z)"; 
+				}
+				else{
+					PeakInfo += "<br/>To: Peak (" + endPeak.x + " m/z)";
+					} 
 			}
 			PeakInfo += "<br/><br/><p style='font-size:0.8em'>";
 			for(i=1; i<7; i++){
@@ -369,7 +377,7 @@ Graph.prototype.measure = function(on){
             	.style("left", 
                    (window.pageXOffset + matrix.e + labelX - 60) + "px")
             	.style("top",
-                   (window.pageYOffset + matrix.f + coords[1] -16) + "px");		  
+                   (window.pageYOffset + matrix.f + y -16) + "px");		  
 		}
 
 		this.measureBrush = d3.svg.brush()
@@ -483,39 +491,7 @@ Graph.prototype.updatePeakLabels = function(){
 Graph.prototype.updateColors = function(){
 	var peakCount = this.points.length;
 		for (var p = 0; p < peakCount; p++) {
-			var peak = this.points[p];
-			//Peaks
-			var colour = this.model.lossFragBarColour;
-			if (peak.fragments.length > 0){
-				if (peak.fragments[0].peptide === this.pep1 && peak.fragments[0].class == "non-lossy") {
-					peak.colour = this.model.p1color;
-					for (var i = 0; i < peak.labels.length; i++)
-						peak.labels[i].attr("fill", this.model.p1color);
-				}
-				else if (peak.fragments[0].peptide === this.pep2 && peak.fragments[0].class == "non-lossy") {
-					peak.colour = this.model.p2color;
-					for (var i = 0; i < peak.labels.length; i++)
-						peak.labels[i].attr("fill", this.model.p2color);
-				}
-				else if (peak.fragments[0].peptide === this.pep1 && peak.fragments[0].class == "lossy") {
-					peak.colour = this.model.p1color_loss;
-					for (var i = 0; i < peak.labels.length; i++)
-						peak.labels[i].attr("fill", this.model.p1color_loss);
-				}
-				else if (peak.fragments[0].peptide === this.pep2 && peak.fragments[0].class == "lossy") {
-					peak.colour = this.model.p2color_loss;
-					for (var i = 0; i < peak.labels.length; i++)
-						peak.labels[i].attr("fill", this.model.p2color_loss);
-				}
-			}
-			else if (peak.IsotopeCluster){
-				if (peak.IsotopeCluster.pep == this.pep1)
-					peak.colour = this.model.p1color_cluster;
-				if (peak.IsotopeCluster.pep == this.pep2)
-					peak.colour = this.model.p2color_cluster;
-			}
-			
-			this.updatePeakColors();
+			this.points[p].updateColor();
 		}
 }
 /*

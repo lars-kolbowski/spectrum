@@ -24,6 +24,7 @@ function Peak (id, graph){
 	this.x = peak.mz;
 	this.y = peak.intensity;
 	this.IsotopeClusters = [];
+	this.labels = [];
 	for (i=0; i<peak.clusterIds.length; i++)
 		this.IsotopeClusters.push(graph.model.JSONdata.clusters[peak.clusterIds[i]]);
 	if (this.IsotopeClusters.length > 0)
@@ -33,10 +34,10 @@ function Peak (id, graph){
 	//make fragments
 	var notLossyFragments = [];
 	var lossyFragments = [];
-	var isMonoisotopicPeak = false;
+	this.isMonoisotopic = false;
 	for (var i = 0; i < this.IsotopeClusters.length; i++) {
 		if (this.IsotopeClusters[i].monoisotopicPeak == id)
-			isMonoisotopicPeak = true;
+			this.isMonoisotopic = true;
 	};
 
 	var fragments = graph.model.JSONdata.fragments;
@@ -117,7 +118,7 @@ function Peak (id, graph){
 			self.graph.model.clearHighlight(self.fragments);	
 		}
 
-		if (isMonoisotopicPeak){
+		if (this.isMonoisotopic){
 		  	//create frag labels
 		  	//labeldrag	
 			this.labelDrag = d3.behavior.drag();
@@ -238,7 +239,7 @@ function Peak (id, graph){
 
 	this.colour = this.graph.model.lossFragBarColour;
 	if (this.fragments.length > 0){
-		if (isMonoisotopicPeak){
+		if (this.isMonoisotopic){
 			if (this.fragments[0].peptideId == 0) {
 				if (this.fragments[0].class == "non-lossy")
 					this.colour = this.graph.model.p1color;
@@ -254,9 +255,9 @@ function Peak (id, graph){
 		}
 		else {
 			if(this.fragments[0].peptideId == 0)
-				this.colour = graph.model.p1color_cluster;
+				this.colour = this.graph.model.p1color_cluster;
 			if(this.fragments[0].peptideId == 1)
-				this.colour = graph.model.p2color_cluster;
+				this.colour = this.graph.model.p2color_cluster;
 		}
 	}
 	this.line.attr("stroke", this.colour);
@@ -265,13 +266,11 @@ function Peak (id, graph){
 Peak.prototype.highlight = function(show, fragments){
 	if (show == true) {
 		this.highlightLine.attr("opacity","1");
-		if (this.labels){
-			for (var f = 0; f < this.fragments.length; f++){
-				if ( _.contains(fragments, this.fragments[f]) ){
-					this.labelHighlights[f].attr("opacity", 1);
-					this.labels[f].attr("display", "inline");
-					this.labelHighlights[f].attr("display", "inline");
-				}
+		for (var f = 0; f < this.labels.length; f++){
+			if ( _.contains(fragments, this.fragments[f]) ){
+				this.labelHighlights[f].attr("opacity", 1);
+				this.labels[f].attr("display", "inline");
+				this.labelHighlights[f].attr("display", "inline");
 			}
 		}
 		this.graph.peaks[0][0].appendChild(this.g[0][0]);
@@ -280,16 +279,14 @@ Peak.prototype.highlight = function(show, fragments){
 			this.IsotopeCluster.points[b].line.attr("stroke", this.colour);*/
 	} else {
 		this.highlightLine.attr("opacity",0);
-		if(this.labels){
-			for (var a = 0; a < this.labels.length; a++){
-				this.labelHighlights[a].attr("opacity", 0);
-			}
+		for (var a = 0; a < this.labels.length; a++){
+			this.labelHighlights[a].attr("opacity", 0);
 		}
 	}
 }
 
 Peak.prototype.update = function(){
-	if (this.labels){
+	if (this.labels.length > 0){
 		for(l=0; l<this.labelLines.length; l++)
 			this.labelLines[l]
 				.attr("opacity", 0)
@@ -310,22 +307,20 @@ Peak.prototype.updateX = function(){
 	} else {
 		this.g.attr("display","none");
 	}	
-	if (this.labels) {
-		var labelCount = this.labels.length;
-		for (var a = 0; a < labelCount; a++){
-			this.labels[a].attr("x", this.graph.x(this.x));
-			this.labelHighlights[a].attr("x", this.graph.x(this.x));
-			if (	(this.x > xDomain[0] && this.x < xDomain[1])	//in current range
-				 && (this.graph.lossyShown === true || this.fragments[a].class == "non-lossy" || _.intersection(this.graph.model.sticky, this.fragments).length != 0)	//lossy enabled OR not lossy OR isStickyFrag
-				 && (_.intersection(this.graph.model.sticky, this.fragments).length != 0 || this.graph.model.sticky.length == 0))	//isStickyFrag OR no StickyFrags
-			{
-				this.labels[a].attr("display","inline");
-				this.labelHighlights[a].attr("display","inline");
-			} else {
-				this.labels[a].attr("display","none");
-				this.labelHighlights[a].attr("display","none");
-			}	
-		}
+	var labelCount = this.labels.length;
+	for (var a = 0; a < labelCount; a++){
+		this.labels[a].attr("x", this.graph.x(this.x));
+		this.labelHighlights[a].attr("x", this.graph.x(this.x));
+		if (	(this.x > xDomain[0] && this.x < xDomain[1])	//in current range
+			 && (this.graph.lossyShown === true || this.fragments[a].class == "non-lossy" || _.intersection(this.graph.model.sticky, this.fragments).length != 0)	//lossy enabled OR not lossy OR isStickyFrag
+			 && (_.intersection(this.graph.model.sticky, this.fragments).length != 0 || this.graph.model.sticky.length == 0))	//isStickyFrag OR no StickyFrags
+		{
+			this.labels[a].attr("display","inline");
+			this.labelHighlights[a].attr("display","inline");
+		} else {
+			this.labels[a].attr("display","none");
+			this.labelHighlights[a].attr("display","none");
+		}	
 	}
 
 }
@@ -334,7 +329,7 @@ Peak.prototype.updateY = function(){
 	this.line.attr("y1", this.graph.y(this.y));
 	this.line.attr("y2", this.graph.y(0));
 
-	if (this.labels) {
+	if (this.labels.length > 0) {
 		this.highlightLine.attr("y1", this.graph.y(this.y));
 		this.highlightLine.attr("y2", this.graph.y(0));
 		var yStep = 15;
@@ -348,27 +343,53 @@ Peak.prototype.updateY = function(){
 }
 
 Peak.prototype.removeLabels = function(){
-	if (this.labels) {
-		var labelCount = this.labels.length;
-		for (var a = 0; a < labelCount; a++){
-			this.labels[a].attr("display", "none");
-			this.labelHighlights[a].attr("display", "none");
-			this.labelLines[a].attr("opacity", 0);
-		}
+	var labelCount = this.labels.length;
+	for (var a = 0; a < labelCount; a++){
+		this.labels[a].attr("display", "none");
+		this.labelHighlights[a].attr("display", "none");
+		this.labelLines[a].attr("opacity", 0);
 	}
 }
 
 Peak.prototype.showLabels = function(lossyOverride){
 	var xDomain = this.graph.x.domain();
-	if (this.labels) {
-		var labelCount = this.labels.length;
-		for (var a = 0; a < labelCount; a++){
-			if ((this.x > xDomain[0] && this.x < xDomain[1])
-					&& (this.graph.lossyShown === true || this.fragments[a].class == "non-lossy" || lossyOverride == true)) {
-				this.labels[a].attr("display", "inline");
-				this.labelHighlights[a].attr("display", "inline");
-				this.labelLines[a].attr("opacity", 1);
-			}
+	var labelCount = this.labels.length;
+	for (var a = 0; a < labelCount; a++){
+		if ((this.x > xDomain[0] && this.x < xDomain[1])
+				&& (this.graph.lossyShown === true || this.fragments[a].class == "non-lossy" || lossyOverride == true)) {
+			this.labels[a].attr("display", "inline");
+			this.labelHighlights[a].attr("display", "inline");
+			this.labelLines[a].attr("opacity", 1);
 		}
 	}
+}
+
+Peak.prototype.updateColor = function(){
+	this.colour = this.graph.model.lossFragBarColour;
+	if (this.fragments.length > 0){
+		if (this.isMonoisotopic){
+			if (this.fragments[0].peptideId == 0) {
+				if (this.fragments[0].class == "non-lossy")
+					this.colour = this.graph.model.p1color;
+
+				else if (this.fragments[0].class == "lossy")
+					this.colour = this.graph.model.p1color_loss;	
+			}
+			else if (this.fragments[0].peptideId == 1) {
+				if (this.fragments[0].class == "non-lossy")
+					this.colour = this.graph.model.p2color;
+				else if (this.fragments[0].class == "lossy")
+					this.colour = this.graph.model.p2color_loss;			
+			}
+		}
+		else {
+			if(this.fragments[0].peptideId == 0)
+				this.colour = this.graph.model.p1color_cluster;
+			if(this.fragments[0].peptideId == 1)
+				this.colour = this.graph.model.p2color_cluster;
+		}
+	}
+	this.line.attr("stroke", this.colour);
+	for (var i = 0; i < this.labels.length; i++)
+		this.labels[i].attr("fill", this.colour);	
 }
