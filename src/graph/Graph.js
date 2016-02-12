@@ -345,18 +345,20 @@ Graph.prototype.measure = function(on){
 				var labelX = measureEndX + deltaX/2;	
 			var PeakInfo = distance.toFixed(2)+" Th<br/>"
 
-			if(self.measureStartPeak.fragments.length > 0)
-				PeakInfo += "From: " + self.measureStartPeak.fragments[0].name + " (" + self.measureStartPeak.x + " m/z)";
-			else if (self.measureStartPeak.IsotopeCluster)
-				PeakInfo += "From: IsotopeCluster " + self.measureStartPeak.IsotopeCluster.points[0].fragments[0].name;
+			if(self.measureStartPeak.fragments.length > 0){
+				if (self.measureStartPeak.isMonoisotopic)
+					PeakInfo += "From: <span style='color:"+ self.measureStartPeak.colour +"'>" + self.measureStartPeak.fragments[0].name +"</span> (" + self.measureStartPeak.x + " m/z)";
+				else
+					PeakInfo += "From: <span style='color:"+ self.measureStartPeak.colour +"'>" + self.measureStartPeak.fragments[0].name +"</span>+"+self.measureStartPeak.isotope+ " (" + self.measureStartPeak.x + " m/z)";
+			}
 			else
 				PeakInfo += "From: Peak (" + self.measureStartPeak.x + " m/z)"; 
 			if(endPeak){
 				if(endPeak.fragments.length > 0){
 					if (endPeak.isMonoisotopic)
-						PeakInfo += "<br/>To: " + endPeak.fragments[0].name + " (" + endPeak.x + " m/z)";
+						PeakInfo += "<br/>To: <span style='color:"+ endPeak.colour +"'>" + endPeak.fragments[0].name +"</span> (" + endPeak.x + " m/z)";
 					else{
-						PeakInfo += "<br/>To: " + endPeak.fragments[0].name +"+"+endPeak.isotope+ " (" + endPeak.x + " m/z)";
+						PeakInfo += "<br/>To: <span style='color:"+ endPeak.colour +"'>" + endPeak.fragments[0].name +"</span>+"+endPeak.isotope+ " (" + endPeak.x + " m/z)";
 					}
 				}
 				else{
@@ -375,11 +377,20 @@ Graph.prototype.measure = function(on){
                 .translate(+this.getAttribute("cx"),
                          +this.getAttribute("cy"));
 
+/*			if ($("#measureTooltip").width() > Math.abs(measureStartX - measureEndX))
+				var positionX = coords[0] + $("#measureTooltip").width()/2 + "px";
+            else*/
+            	if (measureStartX < measureEndX)
+            		var positionX = coords[0] - Math.abs(measureStartX - measureEndX)/2 - 10 + "px";
+            	else
+            		var positionX = coords[0] + Math.abs(measureStartX - measureEndX)/2 - 10 + "px";
+
+
 			self.measureInfo
 				.style("display", "inline")
 				.html(PeakInfo)
             	.style("left", 
-                   (window.pageXOffset + matrix.e + labelX - 60) + "px")
+                   positionX)
             	.style("top",
                    (window.pageYOffset + matrix.f + y -16) + "px");		  
 		}
