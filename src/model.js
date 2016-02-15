@@ -25,8 +25,8 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		this.pepStrs = [];
 		for(i=0; i < this.peptides.length; i++){
 			this.pepStrs[i] = "";
-			for(j = 0; j < this.peptides[i].length; j++)
-				this.pepStrs[i] += this.peptides[i][j].aminoAcid;
+			for(j = 0; j < this.peptides[i].sequence.length; j++)
+				this.pepStrs[i] += this.peptides[i].sequence[j].aminoAcid;
 		}
 		this.notUpperCase = this.get("notUpperCase"); //change to global var
 		this.cmap = colorbrewer.RdBu[8];

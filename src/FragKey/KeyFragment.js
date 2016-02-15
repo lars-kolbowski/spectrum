@@ -35,7 +35,7 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 		this.fragments = this.fragments.concat(fragments.y);
 	}
 
-	var yfrag_index = this.peptide.length - (index + 1);
+	var yfrag_index = this.peptide.sequence.length - (index + 1);
 	var bfrag_index = (index + 1);
 	if (this.peptideId == 0)
 		var color = this.FragKey.model.p1color;

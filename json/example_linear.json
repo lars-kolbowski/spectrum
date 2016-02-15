@@ -1,30 +1,29 @@
 {
 "Peptides":[
 	{
-		"id":0,
 		"sequence":[
-			{"aminoAcid":"V","Modification":},
-			{"aminoAcid":"H","Modification":},
-			{"aminoAcid":"T","Modification":},
-			{"aminoAcid":"E","Modification":},
+			{"aminoAcid":"V","Modification": ""},
+			{"aminoAcid":"H","Modification": ""},
+			{"aminoAcid":"T","Modification": ""},
+			{"aminoAcid":"E","Modification": ""},
 			{"aminoAcid":"C", "Modification":"cm"},
 			{"aminoAcid":"C", "Modification":"cm"},
-			{"aminoAcid":"H","Modification":},
-			{"aminoAcid":"G","Modification":},
-			{"aminoAcid":"D","Modification":},
-			{"aminoAcid":"L","Modification":},
-			{"aminoAcid":"L","Modification":},
-			{"aminoAcid":"E","Modification":},
+			{"aminoAcid":"H","Modification": ""},
+			{"aminoAcid":"G","Modification": ""},
+			{"aminoAcid":"D","Modification": ""},
+			{"aminoAcid":"L","Modification": ""},
+			{"aminoAcid":"L","Modification": ""},
+			{"aminoAcid":"E","Modification": ""},
 			{"aminoAcid":"C", "Modification":"cm"},
-			{"aminoAcid":"A","Modification":},
-			{"aminoAcid":"D","Modification":},
-			{"aminoAcid":"D","Modification":},
-			{"aminoAcid":"R","Modification":},
-			{"aminoAcid":"A","Modification":},
-			{"aminoAcid":"D","Modification":},
-			{"aminoAcid":"L","Modification":},
-			{"aminoAcid":"A","Modification":},
-			{"aminoAcid":"K","Modification":}
+			{"aminoAcid":"A","Modification": ""},
+			{"aminoAcid":"D","Modification": ""},
+			{"aminoAcid":"D","Modification": ""},
+			{"aminoAcid":"R","Modification": ""},
+			{"aminoAcid":"A","Modification": ""},
+			{"aminoAcid":"D","Modification": ""},
+			{"aminoAcid":"L","Modification": ""},
+			{"aminoAcid":"A","Modification": ""},
+			{"aminoAcid":"K","Modification": ""}
 		]
 	}
 ],
@@ -368,384 +367,384 @@
 	{"mz":1984.4601, "intensity":26211.21, "clusterIds":[]}
 ],
 "clusters": [
-	{"id":0, "charge":1},
-	{"id":1, "charge":1},
-	{"id":2, "charge":1},
-	{"id":3, "charge":1},
-	{"id":4, "charge":1},
-	{"id":5, "charge":2},
-	{"id":6, "charge":2},
-	{"id":7, "charge":1},
-	{"id":8, "charge":2},
-	{"id":9, "charge":1},
-	{"id":10, "charge":2},
-	{"id":11, "charge":1},
-	{"id":12, "charge":2},
-	{"id":13, "charge":2},
-	{"id":14, "charge":1},
-	{"id":15, "charge":2},
-	{"id":16, "charge":1},
-	{"id":17, "charge":2},
-	{"id":18, "charge":1},
-	{"id":19, "charge":1},
-	{"id":20, "charge":2},
-	{"id":21, "charge":1},
-	{"id":22, "charge":2},
-	{"id":23, "charge":1},
-	{"id":24, "charge":3},
-	{"id":25, "charge":3},
-	{"id":26, "charge":1},
-	{"id":27, "charge":3},
-	{"id":28, "charge":3},
-	{"id":29, "charge":1},
-	{"id":30, "charge":3},
-	{"id":31, "charge":1},
-	{"id":32, "charge":2},
-	{"id":33, "charge":3},
-	{"id":34, "charge":1},
-	{"id":35, "charge":1},
-	{"id":36, "charge":3},
-	{"id":37, "charge":1},
-	{"id":38, "charge":1},
-	{"id":39, "charge":1},
-	{"id":40, "charge":2},
-	{"id":41, "charge":1},
-	{"id":42, "charge":1},
-	{"id":43, "charge":1},
-	{"id":44, "charge":1},
-	{"id":45, "charge":1},
-	{"id":46, "charge":2},
-	{"id":47, "charge":1},
-	{"id":48, "charge":2},
-	{"id":49, "charge":1},
-	{"id":50, "charge":2},
-	{"id":51, "charge":1},
-	{"id":52, "charge":2},
-	{"id":53, "charge":1},
-	{"id":54, "charge":2},
-	{"id":55, "charge":1},
-	{"id":56, "charge":2},
-	{"id":57, "charge":1},
-	{"id":58, "charge":2},
-	{"id":59, "charge":2},
-	{"id":60, "charge":1},
-	{"id":61, "charge":1},
-	{"id":62, "charge":1},
-	{"id":63, "charge":2},
-	{"id":64, "charge":1},
-	{"id":65, "charge":2},
-	{"id":66, "charge":1},
-	{"id":67, "charge":1},
-	{"id":68, "charge":2},
-	{"id":69, "charge":2},
-	{"id":70, "charge":2},
-	{"id":71, "charge":2},
-	{"id":72, "charge":2},
-	{"id":73, "charge":1},
-	{"id":74, "charge":2},
-	{"id":75, "charge":2},
-	{"id":76, "charge":1},
-	{"id":77, "charge":2},
-	{"id":78, "charge":1},
-	{"id":79, "charge":1},
-	{"id":80, "charge":1},
-	{"id":81, "charge":2},
-	{"id":82, "charge":1},
-	{"id":83, "charge":2},
-	{"id":84, "charge":1},
-	{"id":85, "charge":2},
-	{"id":86, "charge":1},
-	{"id":87, "charge":2},
-	{"id":88, "charge":1},
-	{"id":89, "charge":1},
-	{"id":90, "charge":2},
-	{"id":91, "charge":1},
-	{"id":92, "charge":1},
-	{"id":93, "charge":2},
-	{"id":94, "charge":2},
-	{"id":95, "charge":1},
-	{"id":96, "charge":2},
-	{"id":97, "charge":1},
-	{"id":98, "charge":1},
-	{"id":99, "charge":1},
-	{"id":100, "charge":1},
-	{"id":101, "charge":1},
-	{"id":102, "charge":1},
-	{"id":103, "charge":1},
-	{"id":104, "charge":1},
-	{"id":105, "charge":1},
-	{"id":106, "charge":1},
-	{"id":107, "charge":1},
-	{"id":108, "charge":1},
-	{"id":109, "charge":1},
-	{"id":110, "charge":1},
-	{"id":111, "charge":1},
-	{"id":112, "charge":1},
-	{"id":113, "charge":2},
-	{"id":114, "charge":1},
-	{"id":115, "charge":1},
-	{"id":116, "charge":2},
-	{"id":117, "charge":1},
-	{"id":118, "charge":2},
-	{"id":119, "charge":1},
-	{"id":120, "charge":1},
-	{"id":121, "charge":2},
-	{"id":122, "charge":2},
-	{"id":123, "charge":2},
-	{"id":124, "charge":3},
-	{"id":125, "charge":2},
-	{"id":126, "charge":2},
-	{"id":127, "charge":1},
-	{"id":128, "charge":1},
-	{"id":129, "charge":1},
-	{"id":130, "charge":2},
-	{"id":131, "charge":2},
-	{"id":132, "charge":1},
-	{"id":133, "charge":1},
-	{"id":134, "charge":1},
-	{"id":135, "charge":1}],
+	{"charge":1,"firstPeakId":2},
+	{"charge":1,"firstPeakId":11},
+	{"charge":1,"firstPeakId":13},
+	{"charge":1,"firstPeakId":16},
+	{"charge":1,"firstPeakId":20},
+	{"charge":2,"firstPeakId":39},
+	{"charge":2,"firstPeakId":52},
+	{"charge":1,"firstPeakId":52},
+	{"charge":2,"firstPeakId":58},
+	{"charge":1,"firstPeakId":58},
+	{"charge":2,"firstPeakId":62},
+	{"charge":1,"firstPeakId":62},
+	{"charge":2,"firstPeakId":66},
+	{"charge":2,"firstPeakId":69},
+	{"charge":1,"firstPeakId":69},
+	{"charge":2,"firstPeakId":74},
+	{"charge":1,"firstPeakId":74},
+	{"charge":2,"firstPeakId":78},
+	{"charge":1,"firstPeakId":78},
+	{"charge":1,"firstPeakId":88},
+	{"charge":2,"firstPeakId":91},
+	{"charge":1,"firstPeakId":93},
+	{"charge":2,"firstPeakId":96},
+	{"charge":1,"firstPeakId":96},
+	{"charge":3,"firstPeakId":105},
+	{"charge":3,"firstPeakId":110},
+	{"charge":1,"firstPeakId":113},
+	{"charge":3,"firstPeakId":116},
+	{"charge":3,"firstPeakId":118},
+	{"charge":1,"firstPeakId":118},
+	{"charge":3,"firstPeakId":122},
+	{"charge":1,"firstPeakId":122},
+	{"charge":2,"firstPeakId":127},
+	{"charge":3,"firstPeakId":132},
+	{"charge":1,"firstPeakId":132},
+	{"charge":1,"firstPeakId":136},
+	{"charge":3,"firstPeakId":139},
+	{"charge":1,"firstPeakId":139},
+	{"charge":1,"firstPeakId":144},
+	{"charge":1,"firstPeakId":146},
+	{"charge":2,"firstPeakId":148},
+	{"charge":1,"firstPeakId":148},
+	{"charge":1,"firstPeakId":151},
+	{"charge":1,"firstPeakId":155},
+	{"charge":1,"firstPeakId":159},
+	{"charge":1,"firstPeakId":161},
+	{"charge":2,"firstPeakId":164},
+	{"charge":1,"firstPeakId":164},
+	{"charge":2,"firstPeakId":170},
+	{"charge":1,"firstPeakId":172},
+	{"charge":2,"firstPeakId":174},
+	{"charge":1,"firstPeakId":174},
+	{"charge":2,"firstPeakId":181},
+	{"charge":1,"firstPeakId":181},
+	{"charge":2,"firstPeakId":186},
+	{"charge":1,"firstPeakId":186},
+	{"charge":2,"firstPeakId":189},
+	{"charge":1,"firstPeakId":189},
+	{"charge":2,"firstPeakId":192},
+	{"charge":2,"firstPeakId":194},
+	{"charge":1,"firstPeakId":194},
+	{"charge":1,"firstPeakId":198},
+	{"charge":1,"firstPeakId":202},
+	{"charge":2,"firstPeakId":204},
+	{"charge":1,"firstPeakId":204},
+	{"charge":2,"firstPeakId":209},
+	{"charge":1,"firstPeakId":209},
+	{"charge":1,"firstPeakId":212},
+	{"charge":2,"firstPeakId":212},
+	{"charge":2,"firstPeakId":213},
+	{"charge":2,"firstPeakId":217},
+	{"charge":2,"firstPeakId":217},
+	{"charge":2,"firstPeakId":218},
+	{"charge":1,"firstPeakId":218},
+	{"charge":2,"firstPeakId":219},
+	{"charge":2,"firstPeakId":222},
+	{"charge":1,"firstPeakId":222},
+	{"charge":2,"firstPeakId":227},
+	{"charge":1,"firstPeakId":227},
+	{"charge":1,"firstPeakId":232},
+	{"charge":1,"firstPeakId":239},
+	{"charge":2,"firstPeakId":245},
+	{"charge":1,"firstPeakId":245},
+	{"charge":2,"firstPeakId":250},
+	{"charge":1,"firstPeakId":250},
+	{"charge":2,"firstPeakId":253},
+	{"charge":1,"firstPeakId":253},
+	{"charge":2,"firstPeakId":259},
+	{"charge":1,"firstPeakId":259},
+	{"charge":1,"firstPeakId":263},
+	{"charge":2,"firstPeakId":265},
+	{"charge":1,"firstPeakId":265},
+	{"charge":1,"firstPeakId":268},
+	{"charge":2,"firstPeakId":270},
+	{"charge":2,"firstPeakId":271},
+	{"charge":1,"firstPeakId":273},
+	{"charge":2,"firstPeakId":276},
+	{"charge":1,"firstPeakId":276},
+	{"charge":1,"firstPeakId":280},
+	{"charge":1,"firstPeakId":283},
+	{"charge":1,"firstPeakId":287},
+	{"charge":1,"firstPeakId":294},
+	{"charge":1,"firstPeakId":296},
+	{"charge":1,"firstPeakId":301},
+	{"charge":1,"firstPeakId":305},
+	{"charge":1,"firstPeakId":309},
+	{"charge":1,"firstPeakId":313},
+	{"charge":1,"firstPeakId":315},
+	{"charge":1,"firstPeakId":319},
+	{"charge":1,"firstPeakId":321},
+	{"charge":1,"firstPeak":1},
+	{"charge":1,"firstPeak":6},
+	{"charge":1,"firstPeak":18},
+	{"charge":2,"firstPeak":30},
+	{"charge":1,"firstPeak":30},
+	{"charge":1,"firstPeak":33},
+	{"charge":2,"firstPeak":34},
+	{"charge":1,"firstPeak":35},
+	{"charge":2,"firstPeak":46},
+	{"charge":1,"firstPeak":47},
+	{"charge":1,"firstPeak":56},
+	{"charge":2,"firstPeak":83},
+	{"charge":2,"firstPeak":85},
+	{"charge":2,"firstPeak":87},
+	{"charge":3,"firstPeak":99},
+	{"charge":2,"firstPeak":101},
+	{"charge":2,"firstPeak":104},
+	{"charge":1,"firstPeak":112},
+	{"charge":1,"firstPeak":154},
+	{"charge":1,"firstPeak":157},
+	{"charge":2,"firstPeak":237},
+	{"charge":2,"firstPeak":241},
+	{"charge":1,"firstPeak":262},
+	{"charge":1,"firstPeak":298},
+	{"charge":1,"firstPeak":299},
+	{"charge":1,"firstPeak":329}],
 "fragments": [
-	{"id":0,"name": "b11_H20x2", "sequence":"VHTECcmCcmHGDLL", "mass":1286.54049992677, "clusterIds":[122],"class":"lossy","range":[
+	{"name": "b11_H20x2", "peptideId":0, "sequence":"VHTECcmCcmHGDLL", "mass":1286.54049992677, "clusterIds":[122],"class":"lossy","range":[
 		{"peptideId":0, "from":0,"to":10}
 		]
 	},
-	{"id":1,"name": "y6", "sequence":"RADLAK", "mass":673.3991457367702, "clusterIds":[21,116],"class":"non-lossy","range":[
+	{"name": "y6", "peptideId":0, "sequence":"RADLAK", "mass":673.3991457367702, "clusterIds":[21,116],"class":"non-lossy","range":[
 		{"peptideId":0, "from":16,"to":21}
 		]
 	},
-	{"id":2,"name": "y11", "sequence":"ECcmADDRADLAK", "mass":1263.56338873677, "clusterIds":[100,121],"class":"non-lossy","range":[
+	{"name": "y11", "peptideId":0, "sequence":"ECcmADDRADLAK", "mass":1263.56338873677, "clusterIds":[100,121],"class":"non-lossy","range":[
 		{"peptideId":0, "from":11,"to":21}
 		]
 	},
-	{"id":3,"name": "b2_NH3x1", "sequence":"VH", "mass":220.10805753677, "clusterIds":[112],"class":"lossy","range":[
+	{"name": "b2_NH3x1", "peptideId":0, "sequence":"VH", "mass":220.10805753677, "clusterIds":[112],"class":"lossy","range":[
 		{"peptideId":0, "from":0,"to":1}
 		]
 	},
-	{"id":4,"name": "y9", "sequence":"ADDRADLAK", "mass":974.49014573677, "clusterIds":[45],"class":"non-lossy","range":[
+	{"name": "y9", "peptideId":0, "sequence":"ADDRADLAK", "mass":974.49014573677, "clusterIds":[45],"class":"non-lossy","range":[
 		{"peptideId":0, "from":13,"to":21}
 		]
 	},
-	{"id":5,"name": "y15", "sequence":"GDLLECcmADDRADLAK", "mass":1661.77992373677, "clusterIds":[32,109],"class":"non-lossy","range":[
+	{"name": "y15", "peptideId":0, "sequence":"GDLLECcmADDRADLAK", "mass":1661.77992373677, "clusterIds":[32,109],"class":"non-lossy","range":[
 		{"peptideId":0, "from":7,"to":21}
 		]
 	},
-	{"id":6,"name": "b18", "sequence":"VHTECcmCcmHGDLLECcmADDRA", "mass":2139.8640884667693, "clusterIds":[124],"class":"non-lossy","range":[
+	{"name": "b18", "peptideId":0, "sequence":"VHTECcmCcmHGDLLECcmADDRA", "mass":2139.8640884667693, "clusterIds":[124],"class":"non-lossy","range":[
 		{"peptideId":0, "from":0,"to":17}
 		]
 	},
-	{"id":7,"name": "y10", "sequence":"CcmADDRADLAK", "mass":1134.52079573677, "clusterIds":[12,79],"class":"non-lossy","range":[
+	{"name": "y10", "peptideId":0, "sequence":"CcmADDRADLAK", "mass":1134.52079573677, "clusterIds":[12,79],"class":"non-lossy","range":[
 		{"peptideId":0, "from":12,"to":21}
 		]
 	},
-	{"id":8,"name": "y11_H20x1", "sequence":"ECcmADDRADLAK", "mass":1245.55282846677, "clusterIds":[99],"class":"lossy","range":[
+	{"name": "y11_H20x1", "peptideId":0, "sequence":"ECcmADDRADLAK", "mass":1245.55282846677, "clusterIds":[99],"class":"lossy","range":[
 		{"peptideId":0, "from":11,"to":21}
 		]
 	},
-	{"id":9,"name": "y12", "sequence":"LECcmADDRADLAK", "mass":1376.64745273677, "clusterIds":[22,103],"class":"non-lossy","range":[
+	{"name": "y12", "peptideId":0, "sequence":"LECcmADDRADLAK", "mass":1376.64745273677, "clusterIds":[22,103],"class":"non-lossy","range":[
 		{"peptideId":0, "from":10,"to":21}
 		]
 	},
-	{"id":10,"name": "b10_H20x1", "sequence":"VHTECcmCcmHGDL", "mass":1191.4669961967702, "clusterIds":[15,132],"class":"lossy","range":[
+	{"name": "b10_H20x1", "peptideId":0, "sequence":"VHTECcmCcmHGDL", "mass":1191.4669961967702, "clusterIds":[15,132],"class":"lossy","range":[
 		{"peptideId":0, "from":0,"to":9}
 		]
 	},
-	{"id":11,"name": "y11_H20x2", "sequence":"ECcmADDRADLAK", "mass":1227.54226819677, "clusterIds":[98],"class":"lossy","range":[
+	{"name": "y11_H20x2", "peptideId":0, "sequence":"ECcmADDRADLAK", "mass":1227.54226819677, "clusterIds":[98],"class":"lossy","range":[
 		{"peptideId":0, "from":11,"to":21}
 		]
 	},
-	{"id":12,"name": "b11", "sequence":"VHTECcmCcmHGDLL", "mass":1322.5616204667701, "clusterIds":[20,101],"class":"non-lossy","range":[
+	{"name": "b11", "peptideId":0, "sequence":"VHTECcmCcmHGDLL", "mass":1322.5616204667701, "clusterIds":[20,101],"class":"non-lossy","range":[
 		{"peptideId":0, "from":0,"to":10}
 		]
 	},
-	{"id":13,"name": "b21", "sequence":"VHTECcmCcmHGDLLECcmADDRADLA", "mass":2439.012209466769, "clusterIds":[96],"class":"non-lossy","range":[
+	{"name": "b21", "peptideId":0, "sequence":"VHTECcmCcmHGDLLECcmADDRADLA", "mass":2439.012209466769, "clusterIds":[96],"class":"non-lossy","range":[
 		{"peptideId":0, "from":0,"to":20}
 		]
 	},
-	{"id":14,"name": "y14", "sequence":"DLLECcmADDRADLAK", "mass":1604.75845973677, "clusterIds":[108],"class":"non-lossy","range":[
+	{"name": "y14", "peptideId":0, "sequence":"DLLECcmADDRADLAK", "mass":1604.75845973677, "clusterIds":[108],"class":"non-lossy","range":[
 		{"peptideId":0, "from":8,"to":21}
 		]
 	},
-	{"id":15,"name": "y21_H20x1", "sequence":"HTECcmCcmHGDLLECcmADDRADLAK", "mass":2468.0387584667697, "clusterIds":[28],"class":"lossy","range":[
+	{"name": "y21_H20x1", "peptideId":0, "sequence":"HTECcmCcmHGDLLECcmADDRADLAK", "mass":2468.0387584667697, "clusterIds":[28],"class":"lossy","range":[
 		{"peptideId":0, "from":1,"to":21}
 		]
 	},
-	{"id":16,"name": "b9_H20x1", "sequence":"VHTECcmCcmHGD", "mass":1078.38293219677, "clusterIds":[8],"class":"lossy","range":[
+	{"name": "b9_H20x1", "peptideId":0, "sequence":"VHTECcmCcmHGD", "mass":1078.38293219677, "clusterIds":[8],"class":"lossy","range":[
 		{"peptideId":0, "from":0,"to":8}
 		]
 	},
-	{"id":17,"name": "y7", "sequence":"DRADLAK", "mass":788.4260887367701, "clusterIds":[5,26],"class":"non-lossy","range":[
+	{"name": "y7", "peptideId":0, "sequence":"DRADLAK", "mass":788.4260887367701, "clusterIds":[5,26],"class":"non-lossy","range":[
 		{"peptideId":0, "from":15,"to":21}
 		]
 	},
-	{"id":18,"name": "y14_H20x4", "sequence":"DLLECcmADDRADLAK", "mass":1532.71621865677, "clusterIds":[106],"class":"lossy","range":[
+	{"name": "y14_H20x4", "peptideId":0, "sequence":"DLLECcmADDRADLAK", "mass":1532.71621865677, "clusterIds":[106],"class":"lossy","range":[
 		{"peptideId":0, "from":8,"to":21}
 		]
 	},
-	{"id":19,"name": "y8_NH3x1", "sequence":"DDRADLAK", "mass":886.4264868067701, "clusterIds":[38],"class":"lossy","range":[
+	{"name": "y8_NH3x1", "peptideId":0, "sequence":"DDRADLAK", "mass":886.4264868067701, "clusterIds":[38],"class":"lossy","range":[
 		{"peptideId":0, "from":14,"to":21}
 		]
 	},
-	{"id":20,"name": "y2", "sequence":"AK", "mass":218.14991373677003, "clusterIds":[3],"class":"non-lossy","range":[
+	{"name": "y2", "peptideId":0, "sequence":"AK", "mass":218.14991373677003, "clusterIds":[3],"class":"non-lossy","range":[
 		{"peptideId":0, "from":20,"to":21}
 		]
 	},
-	{"id":21,"name": "b3_H20x1", "sequence":"VHT", "mass":320.17172019677, "clusterIds":[114],"class":"lossy","range":[
+	{"name": "b3_H20x1", "peptideId":0, "sequence":"VHT", "mass":320.17172019677, "clusterIds":[114],"class":"lossy","range":[
 		{"peptideId":0, "from":0,"to":2}
 		]
 	},
-	{"id":22,"name": "y18", "sequence":"CcmCcmHGDLLECcmADDRADLAK", "mass":2118.9001357367697, "clusterIds":[54],"class":"non-lossy","range":[
+	{"name": "y18", "peptideId":0, "sequence":"CcmCcmHGDLLECcmADDRADLAK", "mass":2118.9001357367697, "clusterIds":[54],"class":"non-lossy","range":[
 		{"peptideId":0, "from":4,"to":21}
 		]
 	},
-	{"id":23,"name": "y13", "sequence":"LLECcmADDRADLAK", "mass":1489.73151673677, "clusterIds":[105,126],"class":"non-lossy","range":[
+	{"name": "y13", "peptideId":0, "sequence":"LLECcmADDRADLAK", "mass":1489.73151673677, "clusterIds":[105,126],"class":"non-lossy","range":[
 		{"peptideId":0, "from":9,"to":21}
 		]
 	},
-	{"id":24,"name": "P", "sequence":"VHTECcmCcmHGDLLECcmADDRADLAK", "mass":2585.1177327367695, "clusterIds":[36],"class":"non-lossy","range":[
+	{"name": "P", "peptideId":0, "sequence":"VHTECcmCcmHGDLLECcmADDRADLAK", "mass":2585.1177327367695, "clusterIds":[36],"class":"non-lossy","range":[
 		{"peptideId":0, "from":0,"to":21}
 		]
 	},
-	{"id":25,"name": "b8_H20x2", "sequence":"VHTECcmCcmHG", "mass":945.3454289267701, "clusterIds":[129],"class":"lossy","range":[
+	{"name": "b8_H20x2", "peptideId":0, "sequence":"VHTECcmCcmHG", "mass":945.3454289267701, "clusterIds":[129],"class":"lossy","range":[
 		{"peptideId":0, "from":0,"to":7}
 		]
 	},
-	{"id":26,"name": "b19", "sequence":"VHTECcmCcmHGDLLECcmADDRAD", "mass":2254.891031466769, "clusterIds":[77],"class":"non-lossy","range":[
+	{"name": "b19", "peptideId":0, "sequence":"VHTECcmCcmHGDLLECcmADDRAD", "mass":2254.891031466769, "clusterIds":[77],"class":"non-lossy","range":[
 		{"peptideId":0, "from":0,"to":18}
 		]
 	},
-	{"id":27,"name": "y16", "sequence":"HGDLLECcmADDRADLAK", "mass":1798.8388357367699, "clusterIds":[40],"class":"non-lossy","range":[
+	{"name": "y16", "peptideId":0, "sequence":"HGDLLECcmADDRADLAK", "mass":1798.8388357367699, "clusterIds":[40],"class":"non-lossy","range":[
 		{"peptideId":0, "from":6,"to":21}
 		]
 	},
-	{"id":28,"name": "y20_H20x1", "sequence":"TECcmCcmHGDLLECcmADDRADLAK", "mass":2330.9798464667697, "clusterIds":[81],"class":"lossy","range":[
+	{"name": "y20_H20x1", "peptideId":0, "sequence":"TECcmCcmHGDLLECcmADDRADLAK", "mass":2330.9798464667697, "clusterIds":[81],"class":"lossy","range":[
 		{"peptideId":0, "from":2,"to":21}
 		]
 	},
-	{"id":29,"name": "b6", "sequence":"VHTECcmCcm", "mass":787.2861734667699, "clusterIds":[127],"class":"non-lossy","range":[
+	{"name": "b6", "peptideId":0, "sequence":"VHTECcmCcm", "mass":787.2861734667699, "clusterIds":[127],"class":"non-lossy","range":[
 		{"peptideId":0, "from":0,"to":5}
 		]
 	},
-	{"id":30,"name": "y21", "sequence":"HTECcmCcmHGDLLECcmADDRADLAK", "mass":2486.0493187367697, "clusterIds":[30],"class":"non-lossy","range":[
+	{"name": "y21", "peptideId":0, "sequence":"HTECcmCcmHGDLLECcmADDRADLAK", "mass":2486.0493187367697, "clusterIds":[30],"class":"non-lossy","range":[
 		{"peptideId":0, "from":1,"to":21}
 		]
 	},
-	{"id":31,"name": "b11_H20x1", "sequence":"VHTECcmCcmHGDLL", "mass":1304.55106019677, "clusterIds":[123],"class":"lossy","range":[
+	{"name": "b11_H20x1", "peptideId":0, "sequence":"VHTECcmCcmHGDLL", "mass":1304.55106019677, "clusterIds":[123],"class":"lossy","range":[
 		{"peptideId":0, "from":0,"to":10}
 		]
 	},
-	{"id":32,"name": "b15", "sequence":"VHTECcmCcmHGDLLECcmAD", "mass":1797.6989204667698, "clusterIds":[135],"class":"non-lossy","range":[
+	{"name": "b15", "peptideId":0, "sequence":"VHTECcmCcmHGDLLECcmAD", "mass":1797.6989204667698, "clusterIds":[135],"class":"non-lossy","range":[
 		{"peptideId":0, "from":0,"to":14}
 		]
 	},
-	{"id":33,"name": "y1_NH3x1", "sequence":"K", "mass":130.08625480677, "clusterIds":[0],"class":"lossy","range":[
+	{"name": "y1_NH3x1", "peptideId":0, "sequence":"K", "mass":130.08625480677, "clusterIds":[0],"class":"lossy","range":[
 		{"peptideId":0, "from":21,"to":21}
 		]
 	},
-	{"id":34,"name": "b2", "sequence":"VH", "mass":237.13460246677, "clusterIds":[4],"class":"non-lossy","range":[
+	{"name": "b2", "peptideId":0, "sequence":"VH", "mass":237.13460246677, "clusterIds":[4],"class":"non-lossy","range":[
 		{"peptideId":0, "from":0,"to":1}
 		]
 	},
-	{"id":35,"name": "y1", "sequence":"K", "mass":147.11279973677, "clusterIds":[111],"class":"non-lossy","range":[
+	{"name": "y1", "peptideId":0, "sequence":"K", "mass":147.11279973677, "clusterIds":[111],"class":"non-lossy","range":[
 		{"peptideId":0, "from":21,"to":21}
 		]
 	},
-	{"id":36,"name": "y17", "sequence":"CcmHGDLLECcmADDRADLAK", "mass":1958.8694857367698, "clusterIds":[46],"class":"non-lossy","range":[
+	{"name": "y17", "peptideId":0, "sequence":"CcmHGDLLECcmADDRADLAK", "mass":1958.8694857367698, "clusterIds":[46],"class":"non-lossy","range":[
 		{"peptideId":0, "from":5,"to":21}
 		]
 	},
-	{"id":37,"name": "b20", "sequence":"VHTECcmCcmHGDLLECcmADDRADL", "mass":2367.975095466769, "clusterIds":[87],"class":"non-lossy","range":[
+	{"name": "b20", "peptideId":0, "sequence":"VHTECcmCcmHGDLLECcmADDRADL", "mass":2367.975095466769, "clusterIds":[87],"class":"non-lossy","range":[
 		{"peptideId":0, "from":0,"to":19}
 		]
 	},
-	{"id":38,"name": "y12_H20x1", "sequence":"LECcmADDRADLAK", "mass":1358.63689246677, "clusterIds":[133],"class":"lossy","range":[
+	{"name": "y12_H20x1", "peptideId":0, "sequence":"LECcmADDRADLAK", "mass":1358.63689246677, "clusterIds":[133],"class":"lossy","range":[
 		{"peptideId":0, "from":10,"to":21}
 		]
 	},
-	{"id":39,"name": "y18_NH3x1", "sequence":"CcmCcmHGDLLECcmADDRADLAK", "mass":2101.8735908067697, "clusterIds":[52],"class":"lossy","range":[
+	{"name": "y18_NH3x1", "peptideId":0, "sequence":"CcmCcmHGDLLECcmADDRADLAK", "mass":2101.8735908067697, "clusterIds":[52],"class":"lossy","range":[
 		{"peptideId":0, "from":4,"to":21}
 		]
 	},
-	{"id":40,"name": "y19_NH3x1", "sequence":"ECcmCcmHGDLLECcmADDRADLAK", "mass":2230.91618380677, "clusterIds":[69],"class":"lossy","range":[
+	{"name": "y19_NH3x1", "peptideId":0, "sequence":"ECcmCcmHGDLLECcmADDRADLAK", "mass":2230.91618380677, "clusterIds":[69],"class":"lossy","range":[
 		{"peptideId":0, "from":3,"to":21}
 		]
 	},
-	{"id":41,"name": "b20_H20x4", "sequence":"VHTECcmCcmHGDLLECcmADDRADL", "mass":2295.9328543867687, "clusterIds":[130],"class":"lossy","range":[
+	{"name": "b20_H20x4", "peptideId":0, "sequence":"VHTECcmCcmHGDLLECcmADDRADL", "mass":2295.9328543867687, "clusterIds":[130],"class":"lossy","range":[
 		{"peptideId":0, "from":0,"to":19}
 		]
 	},
-	{"id":42,"name": "y1_H20x1", "sequence":"K", "mass":129.10223946677002, "clusterIds":[110],"class":"lossy","range":[
+	{"name": "y1_H20x1", "peptideId":0, "sequence":"K", "mass":129.10223946677002, "clusterIds":[110],"class":"lossy","range":[
 		{"peptideId":0, "from":21,"to":21}
 		]
 	},
-	{"id":43,"name": "b20_H20x3", "sequence":"VHTECcmCcmHGDLLECcmADDRADL", "mass":2313.9434146567687, "clusterIds":[131],"class":"lossy","range":[
+	{"name": "b20_H20x3", "peptideId":0, "sequence":"VHTECcmCcmHGDLLECcmADDRADL", "mass":2313.9434146567687, "clusterIds":[131],"class":"lossy","range":[
 		{"peptideId":0, "from":0,"to":19}
 		]
 	},
-	{"id":44,"name": "y6_NH3x2", "sequence":"RADLAK", "mass":639.3460558767702, "clusterIds":[113],"class":"lossy","range":[
+	{"name": "y6_NH3x2", "peptideId":0, "sequence":"RADLAK", "mass":639.3460558767702, "clusterIds":[113],"class":"lossy","range":[
 		{"peptideId":0, "from":16,"to":21}
 		]
 	},
-	{"id":45,"name": "y3", "sequence":"LAK", "mass":331.23397773677, "clusterIds":[115],"class":"non-lossy","range":[
+	{"name": "y3", "peptideId":0, "sequence":"LAK", "mass":331.23397773677, "clusterIds":[115],"class":"non-lossy","range":[
 		{"peptideId":0, "from":19,"to":21}
 		]
 	},
-	{"id":46,"name": "y12_NH3x1", "sequence":"LECcmADDRADLAK", "mass":1359.62090780677, "clusterIds":[134],"class":"lossy","range":[
+	{"name": "y12_NH3x1", "peptideId":0, "sequence":"LECcmADDRADLAK", "mass":1359.62090780677, "clusterIds":[134],"class":"lossy","range":[
 		{"peptideId":0, "from":10,"to":21}
 		]
 	},
-	{"id":47,"name": "y8", "sequence":"DDRADLAK", "mass":903.4530317367701, "clusterIds":[42],"class":"non-lossy","range":[
+	{"name": "y8", "peptideId":0, "sequence":"DDRADLAK", "mass":903.4530317367701, "clusterIds":[42],"class":"non-lossy","range":[
 		{"peptideId":0, "from":14,"to":21}
 		]
 	},
-	{"id":48,"name": "b12", "sequence":"VHTECcmCcmHGDLLE", "mass":1451.60421346677, "clusterIds":[104,125],"class":"non-lossy","range":[
+	{"name": "b12", "peptideId":0, "sequence":"VHTECcmCcmHGDLLE", "mass":1451.60421346677, "clusterIds":[104,125],"class":"non-lossy","range":[
 		{"peptideId":0, "from":0,"to":11}
 		]
 	},
-	{"id":49,"name": "b7", "sequence":"VHTECcmCcmH", "mass":924.34508546677, "clusterIds":[118,128],"class":"non-lossy","range":[
+	{"name": "b7", "peptideId":0, "sequence":"VHTECcmCcmH", "mass":924.34508546677, "clusterIds":[118,128],"class":"non-lossy","range":[
 		{"peptideId":0, "from":0,"to":6}
 		]
 	},
-	{"id":50,"name": "y19_H20x1", "sequence":"ECcmCcmHGDLLECcmADDRADLAK", "mass":2229.93216846677, "clusterIds":[68],"class":"lossy","range":[
+	{"name": "y19_H20x1", "peptideId":0, "sequence":"ECcmCcmHGDLLECcmADDRADLAK", "mass":2229.93216846677, "clusterIds":[68],"class":"lossy","range":[
 		{"peptideId":0, "from":3,"to":21}
 		]
 	},
-	{"id":51,"name": "y5", "sequence":"ADLAK", "mass":517.2980347367701, "clusterIds":[120],"class":"non-lossy","range":[
+	{"name": "y5", "peptideId":0, "sequence":"ADLAK", "mass":517.2980347367701, "clusterIds":[120],"class":"non-lossy","range":[
 		{"peptideId":0, "from":17,"to":21}
 		]
 	},
-	{"id":52,"name": "y20", "sequence":"TECcmCcmHGDLLECcmADDRADLAK", "mass":2348.9904067367697, "clusterIds":[85],"class":"non-lossy","range":[
+	{"name": "y20", "peptideId":0, "sequence":"TECcmCcmHGDLLECcmADDRADLAK", "mass":2348.9904067367697, "clusterIds":[85],"class":"non-lossy","range":[
 		{"peptideId":0, "from":2,"to":21}
 		]
 	},
-	{"id":53,"name": "b4", "sequence":"VHTE", "mass":467.22487346677, "clusterIds":[119],"class":"non-lossy","range":[
+	{"name": "b4", "peptideId":0, "sequence":"VHTE", "mass":467.22487346677, "clusterIds":[119],"class":"non-lossy","range":[
 		{"peptideId":0, "from":0,"to":3}
 		]
 	},
-	{"id":54,"name": "b9", "sequence":"VHTECcmCcmHGD", "mass":1096.39349246677, "clusterIds":[10,62],"class":"non-lossy","range":[
+	{"name": "b9", "peptideId":0, "sequence":"VHTECcmCcmHGD", "mass":1096.39349246677, "clusterIds":[10,62],"class":"non-lossy","range":[
 		{"peptideId":0, "from":0,"to":8}
 		]
 	},
-	{"id":55,"name": "y19", "sequence":"ECcmCcmHGDLLECcmADDRADLAK", "mass":2247.94272873677, "clusterIds":[75],"class":"non-lossy","range":[
+	{"name": "y19", "peptideId":0, "sequence":"ECcmCcmHGDLLECcmADDRADLAK", "mass":2247.94272873677, "clusterIds":[75],"class":"non-lossy","range":[
 		{"peptideId":0, "from":3,"to":21}
 		]
 	},
-	{"id":56,"name": "b19_NH3x1", "sequence":"VHTECcmCcmHGDLLECcmADDRAD", "mass":2237.864486536769, "clusterIds":[24,74],"class":"lossy","range":[
+	{"name": "b19_NH3x1", "peptideId":0, "sequence":"VHTECcmCcmHGDLLECcmADDRAD", "mass":2237.864486536769, "clusterIds":[24,74],"class":"lossy","range":[
 		{"peptideId":0, "from":0,"to":18}
 		]
 	},
-	{"id":57,"name": "b19_H20x1", "sequence":"VHTECcmCcmHGDLLECcmADDRAD", "mass":2236.880471196769, "clusterIds":[71,72],"class":"lossy","range":[
+	{"name": "b19_H20x1", "peptideId":0, "sequence":"VHTECcmCcmHGDLLECcmADDRAD", "mass":2236.880471196769, "clusterIds":[71,72],"class":"lossy","range":[
 		{"peptideId":0, "from":0,"to":18}
 		]
 	},
-	{"id":58,"name": "b20_H20x1", "sequence":"VHTECcmCcmHGDLLECcmADDRADL", "mass":2349.964535196769, "clusterIds":[25],"class":"lossy","range":[
+	{"name": "b20_H20x1", "peptideId":0, "sequence":"VHTECcmCcmHGDLLECcmADDRADL", "mass":2349.964535196769, "clusterIds":[25],"class":"lossy","range":[
 		{"peptideId":0, "from":0,"to":19}
 		]
 	},
-	{"id":59,"name": "b3", "sequence":"VHT", "mass":338.18228046677, "clusterIds":[117],"class":"non-lossy","range":[
+	{"name": "b3", "peptideId":0, "sequence":"VHT", "mass":338.18228046677, "clusterIds":[117],"class":"non-lossy","range":[
 		{"peptideId":0, "from":0,"to":2}
 		]
 	},
-	{"id":60,"name": "b10", "sequence":"VHTECcmCcmHGDL", "mass":1209.4775564667702, "clusterIds":[17,92],"class":"non-lossy","range":[
+	{"name": "b10", "peptideId":0, "sequence":"VHTECcmCcmHGDL", "mass":1209.4775564667702, "clusterIds":[17,92],"class":"non-lossy","range":[
 		{"peptideId":0, "from":0,"to":9}
 		]
 	}

@@ -36,7 +36,7 @@ function Peak (id, graph){
 	var lossyFragments = [];
 	this.isMonoisotopic = false;
 	for (var i = 0; i < this.IsotopeClusters.length; i++) {
-		this.isotope = id - this.IsotopeClusters[i].monoisotopicPeak;
+		this.isotope = id - this.IsotopeClusters[i].firstPeakId;
 		if (this.isotope == 0)
 			this.isMonoisotopic = true;
 	};

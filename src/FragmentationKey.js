@@ -54,7 +54,7 @@ PeptideFragmentationKey.prototype.setData = function(){
 	this.pepoffset = [0,0];
 	for(p=0; p < pepCount; p++){
 		annotations[p] = [];
-		for (var i = 0; i < self.model.peptides[p].length; i++) {
+		for (var i = 0; i < self.model.peptides[p].sequence.length; i++) {
 		var ions = {
 			b : [],
 			y : []
@@ -64,9 +64,9 @@ PeptideFragmentationKey.prototype.setData = function(){
 		this.pepLetters[p] = [];
 		this.pepModLetters[p] = [];
 		pepModsArray[p] = [];
-		for(i = 0; i < self.model.peptides[p].length; i++){
-			if (self.model.peptides[p][i].Modification)
-				pepModsArray[p][i] = self.model.peptides[p][i].Modification;
+		for(i = 0; i < self.model.peptides[p].sequence.length; i++){
+			if (self.model.peptides[p].sequence[i].Modification != "")
+				pepModsArray[p][i] = self.model.peptides[p].sequence[i].Modification;
 		}
 	}
 
@@ -164,7 +164,10 @@ PeptideFragmentationKey.prototype.setData = function(){
 			if(fragments[i].range[r].peptideId == fragments[i].peptideId){
 				if (fragments[i].range[r].from == 0){	//a,b,c-ion
 					var index = fragments[i].range[r].to;
-					annotations[fragments[i].peptideId][index].b.push(fragments[i]);
+					if(annotations[fragments[i].peptideId][index])
+						annotations[fragments[i].peptideId][index].b.push(fragments[i]);
+					else
+						console.log("ann:"+annotations+" pepId:"+fragments[i].peptideId+" index:"+index);
 				}
 				else{	//x,y,z-ion
 					var index = fragments[i].range[r].from - 1;
