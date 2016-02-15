@@ -41,7 +41,7 @@ function Peak (id, graph){
 			this.isMonoisotopic = true;
 	};
 
-	var fragments = graph.model.JSONdata.fragments;
+	var fragments = graph.model.fragments;
 
 	for (var f = 0; f < fragments.length; f++) {
 		if(_.intersection(fragments[f].clusterIds, peak.clusterIds).length != 0){
@@ -80,7 +80,7 @@ function Peak (id, graph){
 		};
 		tooltip += this.fragments[f].sequence;
 	};
-	this.tooltip = tooltip + " m/z: " + this.x + ", i: " + this.y
+	this.tooltip = tooltip + " m/z: " + this.x + ", i: " + this.y + ", charge: " + this.charge;
 
 	//svg elements
 	this.g = this.graph.peaks.append('g');
@@ -109,14 +109,36 @@ function Peak (id, graph){
 			endHighlight();
 		};
 		group.onclick = function(evt){
-			self.graph.model.updateStickyHighlight(self.fragments, evt.ctrlKey);
+			stickyHighlight(evt.ctrlKey);
 		}
 
-		function startHighlight(){
-			self.graph.model.addHighlight(self.fragments);	
+		function startHighlight(fragId){
+			var fragments = [];
+			if(fragId){
+				for (var i = 0; i < self.fragments.length; i++) {
+					if(self.fragments[i].id == parseInt(fragId))
+						fragments.push(self.fragments[i]);	
+				};
+			}
+			else	
+				fragments = self.fragments;
+			self.graph.model.addHighlight(fragments);	
 		}
 		function endHighlight(){
 			self.graph.model.clearHighlight(self.fragments);	
+		}
+		function stickyHighlight(ctrl, fragId){
+
+			var fragments = [];
+			if(fragId){
+				for (var i = 0; i < self.fragments.length; i++) {
+					if(self.fragments[i].id == parseInt(fragId))
+						fragments.push(self.fragments[i]);	
+				};
+			}
+			else	
+				fragments = self.fragments;
+			self.graph.model.updateStickyHighlight(fragments, ctrl);
 		}
 
 		if (this.isMonoisotopic){
@@ -174,12 +196,14 @@ function Peak (id, graph){
 						.style("stroke-width", "5px")
 						.style("font-size", "0.8em")
 						.style("cursor", "default")
+						.attr("fragId", frag.id)
 						.attr("stroke", this.graph.model.highlightColour);
 				label.text(frag.name)
 						.attr("x", 0)
 						.attr("text-anchor", "middle")
 						.style("font-size", "0.8em")
 						.style("cursor", "default")
+						.attr("fragId", frag.id)
 						.attr("class", "peakAnnot");
 				labelLine = self.g.append("line")
 		  			.attr("stroke-width", 1)
@@ -188,7 +212,7 @@ function Peak (id, graph){
 						
 				label[0][0].onmouseover = function(evt) {
 					if(!self.graph.model.moveLabels)
-						startHighlight();
+						startHighlight(this.getAttribute("fragId"));
 				};
 				label[0][0].onmouseout = function(evt) {
 					if(!self.graph.model.moveLabels)				
@@ -196,15 +220,18 @@ function Peak (id, graph){
 				};
 				label[0][0].ontouchstart = function(evt) {
 					if(!self.graph.model.moveLabels)
-						startHighlight();
+						startHighlight(this.getAttribute("fragId"));
 				};
 				label[0][0].ontouchend = function(evt) {
 					if(!self.graph.model.moveLabels)				
 						endHighlight();
 				};
+				label[0][0].onclick = function(evt) {
+					stickyHighlight(evt.ctrlKey, this.getAttribute("fragId"));
+				};
 				labelHighlight[0][0].onmouseover = function(evt) {
 					if(!self.graph.model.moveLabels)
-						startHighlight();
+						startHighlight(this.getAttribute("fragId"));
 				};
 				labelHighlight[0][0].onmouseout = function(evt) {
 					if(!self.graph.model.moveLabels)				
@@ -212,11 +239,14 @@ function Peak (id, graph){
 				};
 				labelHighlight[0][0].ontouchstart = function(evt) {
 					if(!self.graph.model.moveLabels)
-						startHighlight();
+						startHighlight(this.getAttribute("fragId"));
 				};
 				labelHighlight[0][0].ontouchend = function(evt) {
 					if(!self.graph.model.moveLabels)				
 						endHighlight();
+				};
+				labelHighlight[0][0].onclick = function(evt) {
+					stickyHighlight(evt.ctrlKey, this.getAttribute("fragId"));
 				};
 				
 				var c = "pink";//colour for annotation

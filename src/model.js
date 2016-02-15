@@ -28,6 +28,12 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 			for(j = 0; j < this.peptides[i].sequence.length; j++)
 				this.pepStrs[i] += this.peptides[i].sequence[j].aminoAcid;
 		}
+		//maybe put id back in JSON? to make this obsolete
+		this.fragments = [];
+		for (var i = 0; i < this.JSONdata.fragments.length; i++) {
+			this.fragments[i] = this.JSONdata.fragments[i];
+			this.fragments[i].id = i;
+		};
 		this.notUpperCase = this.get("notUpperCase"); //change to global var
 		this.cmap = colorbrewer.RdBu[8];
 		this.p1color = this.cmap[0];
@@ -41,24 +47,6 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		this.highlightWidth = 11;
 		this.setGraphData();
 
-/*		this.annotatedPeaks = this.get("annotatedPeaks");
-		this.pep1 = this.get("pepSeq1");
-		this.pep2 = this.get("pepSeq2");
-		this.linkPos1 = this.get("linkPos1");
-		this.linkPos2 = this.get("linkPos2");
-		this.notUpperCase = this.get("notUpperCase");
-		this.cmap = colorbrewer.RdBu[8];
-		this.p1color = this.cmap[0];
-		this.p1color_cluster = this.cmap[2];
-		this.p1color_loss = this.cmap[1];
-		this.p2color = this.cmap[7];
-		this.p2color_cluster = this.cmap[5];
-		this.p2color_loss = this.cmap[6];
-		this.lossFragBarColour = "#cccccc";
-		this.highlightColour = "yellow";
-		//this.highlightColourSticky = colorbrewer.Oranges[9];
-		this.highlightWidth = 11;
-		this.setGraphData();*/
 	},
 
 	clear: function(){

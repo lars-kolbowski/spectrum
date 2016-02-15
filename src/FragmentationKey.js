@@ -49,6 +49,9 @@ PeptideFragmentationKey.prototype.setData = function(){
 	var fragments = self.model.JSONdata.fragments;
 	var annotations = [];
 	this.peptides = [];
+	for (var i = 0; i < this.peptideStrs.length; i++) {
+		this.peptides[i] = this.peptideStrs[i];
+	};
     this.pepLetters = [];
 	this.pepModLetters = [];
 	this.pepoffset = [0,0];
@@ -158,18 +161,35 @@ PeptideFragmentationKey.prototype.setData = function(){
 	this.fraglines = new Array();
 	var self = this;
 
+
+/*	var NfragsSimple = [];
+	var fragsDouble = [];
 	for (var i = 0; i < fragments.length; i++) {
-		//annotations[fragments[i].peptideId]
+		for (var r = 0; r < fragments[i].range.length; r++) {
+			if (fragments[i].range[r].from != 0){ //N-terminal fragment
+				NfragsSimple.push([fragments[i].range[r].peptideId,fragments[i].range[r].from, fragments[i]]);
+				if (fragments[i].range[r].to != this.peptideStrs[fragments[i].range[r].peptideId].length-1) //C-terminal fragment
+					fragsDouble.push([fragments[i].range[r].peptideId, fragments[i].range[r].to, fragments[i]]);
+			}
+		}
+	}*/
+
+
+	for (var i = 0; i < fragments.length; i++) {
 		for (var r = 0; r < fragments[i].range.length; r++) {
 			if(fragments[i].range[r].peptideId == fragments[i].peptideId){
 				if (fragments[i].range[r].from == 0){	//a,b,c-ion
+					//check for double fragmentation
+					//fragmentation on other peptide could occur check for that
+
+					//End
 					var index = fragments[i].range[r].to;
-					if(annotations[fragments[i].peptideId][index])
-						annotations[fragments[i].peptideId][index].b.push(fragments[i]);
-					else
-						console.log("ann:"+annotations+" pepId:"+fragments[i].peptideId+" index:"+index);
+					annotations[fragments[i].peptideId][index].b.push(fragments[i]);
 				}
 				else{	//x,y,z-ion
+					//check for double fragmentation
+					
+					//End
 					var index = fragments[i].range[r].from - 1;
 					annotations[fragments[i].peptideId][index].y.push(fragments[i]);
 				}

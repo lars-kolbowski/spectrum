@@ -116,8 +116,13 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 			.text("b"+bfrag_index)
 			.attr("opacity", 0);	
 
-		// if "bloss" in fgm:
-		if (fragments.b.class == "lossy"){
+		//check if only lossy fragments
+		var blossy = true;
+		for (var i = 0; i < fragments.b.length; i++) {
+			if(fragments.b[i].class != "lossy")
+				blossy = false;
+		};
+		if (blossy){
 			this.bTail.attr("stroke", this.FragKey.model.lossFragBarColour);
 		}
 		else {
@@ -158,8 +163,14 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 			//.attr("text-anchor", "end")
 			.text("y"+yfrag_index)
 			.attr("opacity", 0);
-		// if "yloss"
-		if (fragments.y.class == "lossy"){
+
+		//check if only lossy fragments
+		var ylossy = true;
+		for (var i = 0; i < fragments.y.length; i++) {
+			if(fragments.y[i].class != "lossy")
+				ylossy = false;
+		};
+		if (ylossy){
 			this.yTail.attr("stroke", this.FragKey.model.lossFragBarColour);
 		}
 		else {
@@ -175,8 +186,9 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 		.attr("peptide", this.peptide)
 		.attr("fragKeyIndex", index)
 		.attr("class", "fragBar");
-		
-	if ((!fragments.y || fragments.y.class == "lossy") && (!fragments.b || fragments.b.class == "lossy")){
+
+	//if all fragments are lossy 	
+	if ((fragments.y.length == 0 || ylossy) && (fragments.b.length == 0 || blossy)){
 		fragBar.attr("stroke", this.FragKey.model.lossFragBarColour);
 	}
 	else {
