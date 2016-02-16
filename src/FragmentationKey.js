@@ -231,20 +231,22 @@ PeptideFragmentationKey.prototype.greyLetters = function(){
 	}
 }
 
-PeptideFragmentationKey.prototype.colorLetters = function(fragment){
+PeptideFragmentationKey.prototype.colorLetters = function(fragments){
 	var self = this;
-	if (fragment == "all"){
+	if (fragments == "all"){
 		color(0, this.model.p1color, 0, this.pepLetters[0].length);
 		if(this.peptides[1])
 			color(1, this.model.p2color, 0, this.pepLetters[1].length);			
 	}
 	else{
-		for (i=0; i < fragment.range.length; i++){
-			if (fragment.range[i].peptideId == 0)
-				color(0, this.model.p1color, fragment.range[i].from, fragment.range[i].to+1);
-			if (fragment.range[i].peptideId == 1)
-				color(1, this.model.p2color, fragment.range[i].from, fragment.range[i].to+1);
-		}
+		for (var f = 0; f < fragments.length; f++) {
+			for (var i = 0; i < fragments[f].range.length; i++){
+				if (fragments[f].range[i].peptideId == 0)
+					color(0, this.model.p1color, fragments[f].range[i].from, fragments[f].range[i].to+1);
+				if (fragments[f].range[i].peptideId == 1)
+					color(1, this.model.p2color, fragments[f].range[i].from, fragments[f].range[i].to+1);
+			};
+		};
 	}	
 
 	function color(pep, pepColor, start, end){

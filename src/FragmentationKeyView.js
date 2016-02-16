@@ -47,28 +47,53 @@ var FragmentationKeyView = Backbone.View.extend({
 			else if(lines[l].fragments.length > 0)
 				lines[l].highlight(false);
 		}
+		if(this.model.highlights.length == 0)
+			this.peptideFragKey.colorLetters("all");
 
 		if(this.model.highlights.length == 1){
 			this.peptideFragKey.greyLetters();
-			this.peptideFragKey.colorLetters(this.model.highlights[0]);
+			this.peptideFragKey.colorLetters(this.model.highlights);
 		}
 
-		else{
-			if(this.model.highlights.length == 0)
-				this.peptideFragKey.colorLetters("all");
-			else{			
-				var color = true;
-				for(i = 1; i < this.model.highlights.length; i++){
-					if(this.model.highlights[i].sequence != this.model.highlights[i-1].sequence)
-						color = false;
-				}
-				if (color){
-					this.peptideFragKey.greyLetters();
-					this.peptideFragKey.colorLetters(this.model.highlights[0]);
-				}
+		else{	
+			var color = true;
+			for(i = 1; i < this.model.highlights.length; i++){
+				if(this.model.highlights[i].range != this.model.highlights[i-1].range)
+					color = false;
 			}
-		}
-		
+
+			//
+			var duplicates = function(a) {
+			    for(var i = 0; i <= a.length; i++) {
+			        for(var j = i; j <= a.length; j++) {
+			            if(i != j && a[i] == a[j]) {
+			                return true;
+			            }
+			        }
+			    }
+			    return false;
+			}
+			//
+
+			//check for overlap
+			var arrays = [[],[]];
+			for (var i = 0; i < this.model.highlights.length; i++) {
+				for (var r = 0; r < this.model.highlights[i].range.length; r++) {
+					var range = [];
+					for (var j = this.model.highlights[i].range[r].from; j <= this.model.highlights[i].range[r].to; j++) {
+						range.push(j);
+					};
+					arrays[this.model.highlights[i].range[r].peptideId] = arrays[this.model.highlights[i].range[r].peptideId].concat(range);
+				};
+			};
+			if(!duplicates(arrays[0]) && !duplicates(arrays[1]))
+				color = true;
+			//
+			if (color){
+				this.peptideFragKey.greyLetters();
+				this.peptideFragKey.colorLetters(this.model.highlights);
+			}
+		}	
 	},
 
 	updateColors: function(){
