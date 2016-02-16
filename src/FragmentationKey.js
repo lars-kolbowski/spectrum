@@ -104,10 +104,10 @@ PeptideFragmentationKey.prototype.setData = function(){
 	    var diff = this.peptideStrs[0].length - this.peptideStrs[1].length;
 	    spaceArray = arrayOfHashes(Math.abs(diff));
 	    if (diff <= 0) {
-	        this.peptides[0] = this.peptideStrs[0] + Array(Math.abs(diff) + 1).join("#");
+	        this.peptides[0] = this.peptides[0] + Array(Math.abs(diff) + 1).join("#");
 		}
 	    else {
-	        this.peptides[1] = this.peptideStrs[1] + Array(diff + 1).join("#");
+	        this.peptides[1] = this.peptides[1] + Array(diff + 1).join("#");
 		}
 	}
 
