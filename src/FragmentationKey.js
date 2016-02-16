@@ -162,25 +162,21 @@ PeptideFragmentationKey.prototype.setData = function(){
 	var self = this;
 
 
-/*	var NfragsSimple = [];
-	var fragsDouble = [];
 	for (var i = 0; i < fragments.length; i++) {
 		for (var r = 0; r < fragments[i].range.length; r++) {
-			if (fragments[i].range[r].from != 0){ //N-terminal fragment
-				NfragsSimple.push([fragments[i].range[r].peptideId,fragments[i].range[r].from, fragments[i]]);
-				if (fragments[i].range[r].to != this.peptideStrs[fragments[i].range[r].peptideId].length-1) //C-terminal fragment
-					fragsDouble.push([fragments[i].range[r].peptideId, fragments[i].range[r].to, fragments[i]]);
-			}
+			var pepId = fragments[i].range[r].peptideId;
+			if (fragments[i].range[r].from != 0) //N-terminal fragment
+				annotations[pepId][fragments[i].range[r].from-1].y.push(fragments[i]);
+			if (fragments[i].range[r].to != this.peptideStrs[pepId].length-1) //C-terminal fragment
+				annotations[pepId][fragments[i].range[r].to].b.push(fragments[i]);
 		}
-	}*/
+	};
 
 
-	for (var i = 0; i < fragments.length; i++) {
+/*	for (var i = 0; i < fragments.length; i++) {
 		for (var r = 0; r < fragments[i].range.length; r++) {
 			if(fragments[i].range[r].peptideId == fragments[i].peptideId){
 				if (fragments[i].range[r].from == 0){	//a,b,c-ion
-					//check for double fragmentation
-					//fragmentation on other peptide could occur check for that
 
 					//End
 					var index = fragments[i].range[r].to;
@@ -195,7 +191,7 @@ PeptideFragmentationKey.prototype.setData = function(){
 				}
 			}
 		}
-	};
+	};*/
 
 	console.log(annotations);
 
