@@ -50,7 +50,7 @@ var FragmentationKeyView = Backbone.View.extend({
 		if(this.model.highlights.length == 0)
 			this.peptideFragKey.colorLetters("all");
 
-		if(this.model.highlights.length == 1){
+		else if(this.model.highlights.length == 1){
 			this.peptideFragKey.greyLetters();
 			this.peptideFragKey.colorLetters(this.model.highlights);
 		}
