@@ -69,11 +69,13 @@
 		var FragmentationKey = new FragmentationKeyView({model: SpectrumModel, el:"#spectrumDiv"});
 
 
-/*		d3.text("test.csv", function(csv) {
+/*		d3.text("test.csv", function(csv) {	
 			SpectrumModel.set({annotatedPeaksCSV: csv});
 		});*/
 	
-		$.getJSON("json/example_XL.json", function(json) {
+		d3.json("http://129.215.14.63/xiAnnotator/annotate/3421/85160-94827-96653-69142/210313888/?peptide=TVTAMDVVYALK&peptide=YKAAFTECcmCcmQAADK&link=21&link=1", function(json) {
+			//~ alert("yo");
+			console.log("json:" + json);
 			SpectrumModel.set({JSONdata: json});
 		});
 
