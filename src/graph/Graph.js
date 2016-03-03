@@ -431,8 +431,10 @@ Graph.prototype.redraw = function(){
 	//self.measure();
 	return function (){
 		self.measureClear();
-		for (var i = 0; i < self.points.length; i++){
-		  self.points[i].update();
+		if (self.points) {
+			for (var i = 0; i < self.points.length; i++){
+			  self.points[i].update();
+			}
 		}
 		self.xaxis.call( self.xAxis);
 		if (self.model.measureMode)
