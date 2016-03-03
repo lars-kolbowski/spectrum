@@ -15,10 +15,10 @@
 	<script type="text/javascript" src="src/FragmentationKeyView.js"></script>
 	<script type="text/javascript" src="src/FragmentationKey.js"></script>
 	<script type="text/javascript" src="src/FragKey/KeyFragment.js"></script>
-	<script type="text/javascript" src="src/graph/Graph.js"></script>		
-	<script type="text/javascript" src="src/graph/Peak.js"></script>	
+	<script type="text/javascript" src="src/graph/Graph.js"></script>
+	<script type="text/javascript" src="src/graph/Peak.js"></script>
 	<script type="text/javascript" src="src/graph/Fragment.js"></script>
-	<script type="text/javascript" src="src/graph/IsotopeCluster.js"></script>		
+	<script type="text/javascript" src="src/graph/IsotopeCluster.js"></script>
 
     <style type="text/css">
 		html, body{
@@ -31,12 +31,12 @@
 			-moz-user-select: -moz-none;
 			-o-user-select: none;
 			user-select: none;
-		}		
+		}
 		*{
 			margin:0px;
 			padding:0px;
 		}
-		
+
 		#spectrumDiv {
 			height:90%;
 			width:100%;
@@ -49,7 +49,7 @@
 		    pointer-events:none; /*let mouse events pass through*/
 		    /*transition: opacity 0.3s;*/
 }
-		
+
 	</style>
 
 	<script>
@@ -69,11 +69,11 @@
 		var FragmentationKey = new FragmentationKeyView({model: SpectrumModel, el:"#spectrumDiv"});
 
 
-/*		d3.text("test.csv", function(csv) {	
+/*		d3.text("test.csv", function(csv) {
 			SpectrumModel.set({annotatedPeaksCSV: csv});
 		});*/
-	
-		$.getJSON("json/example_XL.json", function(json) {	//~ alert("yo");
+
+		$.getJSON("json/example_XL.json", function(json) {
 			console.log("json:" + json);
 			SpectrumModel.set({JSONdata: json});
 		});
@@ -105,7 +105,7 @@
 				<option value="PiYG">Pink&Green</option>
 				<option value="PRGn">Purple&Green</option>
 				<option value="PuOr">Orange&Purple</option>
-			</select> 
+			</select>
 			<form id="setrange">
 				m/z Range:
 				<input type="text" id="xleft" size="5">
