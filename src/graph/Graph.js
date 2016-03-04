@@ -182,7 +182,7 @@ Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 	var cx = self.g.node().parentNode.parentNode.clientWidth;
 	//somewhere around here I think we need to subtract the height of the FragKey?
 	// ...the graph is not fitting entirely within its SVG element
-	var fragKeyHeight = 400;//can tidy this up somehow 
+	var fragKeyHeight = 100;//can tidy this up somehow 
 	var cy = self.g.node().parentNode.parentNode.clientHeight - fragKeyHeight;
 	
 	self.g.attr("width", cx).attr("height", cy);
