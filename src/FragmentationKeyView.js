@@ -28,6 +28,7 @@ var FragmentationKeyView = Backbone.View.extend({
 	},
 
 	render: function() {
+		this.peptideFragKey.clear();
 		this.peptideFragKey.setData();
 	},
 

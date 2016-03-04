@@ -51,9 +51,6 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 
 	clear: function(){
 		this.set({ pep1: "", pep2: "" });
-			//TODO
-			//this.peptideFragKey.clear();
-			//this.graph.clear();
 	},
 
 	setGraphData: function(){
