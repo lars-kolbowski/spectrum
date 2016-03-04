@@ -180,7 +180,10 @@ Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 	var self = this;
 	//see https://gist.github.com/mbostock/3019563
 	var cx = self.g.node().parentNode.parentNode.clientWidth;
-	var cy = self.g.node().parentNode.parentNode.clientHeight;
+	//somewhere around here I think we need to subtract the height of the FragKey?
+	// ...the graph is not fitting entirely within its SVG element
+	var fragKeyHeight = 100;//can tidy this up somehow 
+	var cy = self.g.node().parentNode.parentNode.clientHeight - fragKeyHeight;
 	
 	self.g.attr("width", cx).attr("height", cy);
 	var width = cx - self.margin.left - self.margin.right;
@@ -431,8 +434,10 @@ Graph.prototype.redraw = function(){
 	//self.measure();
 	return function (){
 		self.measureClear();
-		for (var i = 0; i < self.points.length; i++){
-		  self.points[i].update();
+		if (self.points) {
+			for (var i = 0; i < self.points.length; i++){
+			  self.points[i].update();
+			}
 		}
 		self.xaxis.call( self.xAxis);
 		if (self.model.measureMode)
