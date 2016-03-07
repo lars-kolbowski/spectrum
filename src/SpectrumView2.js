@@ -28,7 +28,7 @@ var SpectrumView = Backbone.View.extend({
 	},
 
 	render: function() {
-
+		this.graph.clear();
 		this.graph.setData();
 
 	},

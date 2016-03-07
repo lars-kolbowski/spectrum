@@ -40,7 +40,7 @@ function PeptideFragmentationKey (targetSvg, model, options){
 
 PeptideFragmentationKey.prototype.setData = function(){
 	var self = this;
-	this.clear();
+	//this.clear();
 	var pepCount = self.model.peptides.length;
 	var	linkPos = self.model.JSONdata.LinkSite;
 	
@@ -217,6 +217,7 @@ PeptideFragmentationKey.prototype.clear = function(){
 	this.pepoffset = [];
 	this.linkPos = [];
 	this.g.selectAll("*").remove();
+	this.highlights.selectAll("*").remove();
 }
 
 PeptideFragmentationKey.prototype.greyLetters = function(){
