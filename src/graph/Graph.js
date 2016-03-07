@@ -156,22 +156,24 @@ Graph.prototype.setData = function(){
 	this.points = new Array();
 	this.pep1 = this.model.pep1;
 	this.pep2 = this.model.pep2;
-	for (var i = 0; i < this.model.JSONdata.peaks.length; i++){
-		this.points.push(new Peak(i, this));
-	}
-	this.model.points = this.points;
-	//Isotope cluster
-/*	this.cluster = new Array();
+    if (this.model.JSONdata) {
+        for (var i = 0; i < this.model.JSONdata.peaks.length; i++){
+            this.points.push(new Peak(i, this));
+        }
+        this.model.points = this.points;
+        //Isotope cluster
+    /*	this.cluster = new Array();
 
-	var peakCount = this.points.length;
-	for (var p = 0; p < peakCount; p++) {
-		var peak = this.points[p];
-		if (peak.fragments.length > 0){
-			this.cluster.push(new IsotopeCluster(p, this));
-		}
-	}*/
-	//console.log(this.cluster);
-	this.updatePeakColors();
+        var peakCount = this.points.length;
+        for (var p = 0; p < peakCount; p++) {
+            var peak = this.points[p];
+            if (peak.fragments.length > 0){
+                this.cluster.push(new IsotopeCluster(p, this));
+            }
+        }*/
+        //console.log(this.cluster);
+        this.updatePeakColors();
+    }
 
 	this.resize(this.model.xminPrimary, this.model.xmaxPrimary, this.model.ymin, this.model.ymax);
 }
