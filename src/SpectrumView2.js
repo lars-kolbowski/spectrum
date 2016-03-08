@@ -34,7 +34,7 @@ var SpectrumView = Backbone.View.extend({
 	},
 
 	resetZoom: function(){
-		this.graph.resize(this.model.xminPrimary, this.model.xmaxPrimary, this.model.ymin, this.model.ymax);
+		this.graph.resize(this.model.xminPrimary, this.model.xmaxPrimary, this.model.ymin, this.model.ymaxPrimary);
 	},
 
 	resize: function(){
@@ -65,6 +65,7 @@ var SpectrumView = Backbone.View.extend({
 	},
 
 	updateRange: function(){
+		
 		$("#xleft").val(this.model.xmin);
 		$("#xright").val(this.model.xmax);
 	},

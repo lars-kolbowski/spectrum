@@ -173,7 +173,7 @@ Graph.prototype.setData = function(){
 	//console.log(this.cluster);
 	this.updatePeakColors();
 
-	this.resize(this.model.xminPrimary, this.model.xmaxPrimary, this.model.ymin, this.model.ymax);
+	this.resize(this.model.xminPrimary, this.model.xmaxPrimary, this.model.ymin, this.model.ymaxPrimary);
 }
 
 Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
@@ -197,6 +197,7 @@ Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 	var yTicks = height / 40;
 	var xTicks = width / 100;
 
+	this.yTicks = yTicks;
 	
 	self.yaxis.call(d3.svg.axis().scale(self.y).ticks(yTicks)
 						.orient("left").tickFormat(d3.format("s")));
@@ -433,11 +434,26 @@ Graph.prototype.redraw = function(){
 	var self = this;
 	//self.measure();
 	return function (){
+
+		//get highest intensity from peaks in x range
+		//adjust y scale to new highest intensity
+
+
 		self.measureClear();
 		if (self.points) {
+			var ymax = 0
+			var xDomain = self.x.domain();
 			for (var i = 0; i < self.points.length; i++){
-			  self.points[i].update();
+			  if (self.points[i].y > ymax && (self.points[i].x > xDomain[0] && self.points[i].x < xDomain[1]))
+			  	ymax = self.points[i].y;
 			}
+			//console.log(ymax);
+			self.y.domain([0, ymax*1/0.9]).nice();
+			self.yaxis.call(d3.svg.axis().scale(self.y).ticks(self.yTicks)
+								.orient("left").tickFormat(d3.format("s")));
+			for (var i = 0; i < self.points.length; i++){
+				self.points[i].update();
+			}			
 		}
 		self.xaxis.call( self.xAxis);
 		if (self.model.measureMode)
