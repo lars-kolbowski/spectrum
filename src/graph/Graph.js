@@ -166,22 +166,24 @@ Graph.prototype.setData = function(){
 	this.points = new Array();
 	this.pep1 = this.model.pep1;
 	this.pep2 = this.model.pep2;
-	for (var i = 0; i < this.model.JSONdata.peaks.length; i++){
-		this.points.push(new Peak(i, this));
-	}
-	this.model.points = this.points;
-	//Isotope cluster
-/*	this.cluster = new Array();
+    if (this.model.JSONdata) {
+        for (var i = 0; i < this.model.JSONdata.peaks.length; i++){
+            this.points.push(new Peak(i, this));
+        }
+        this.model.points = this.points;
+        //Isotope cluster
+    /*	this.cluster = new Array();
 
-	var peakCount = this.points.length;
-	for (var p = 0; p < peakCount; p++) {
-		var peak = this.points[p];
-		if (peak.fragments.length > 0){
-			this.cluster.push(new IsotopeCluster(p, this));
-		}
-	}*/
-	//console.log(this.cluster);
-	this.updatePeakColors();
+        var peakCount = this.points.length;
+        for (var p = 0; p < peakCount; p++) {
+            var peak = this.points[p];
+            if (peak.fragments.length > 0){
+                this.cluster.push(new IsotopeCluster(p, this));
+            }
+        }*/
+        //console.log(this.cluster);
+        this.updatePeakColors();
+    }
 
 	this.resize(this.model.xminPrimary, this.model.xmaxPrimary, this.model.ymin, this.model.ymaxPrimary);
 }
@@ -193,7 +195,10 @@ Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 	//somewhere around here I think we need to subtract the height of the FragKey?
 	// ...the graph is not fitting entirely within its SVG element
 	var fragKeyHeight = 100;//can tidy this up somehow 
-	var cy = self.g.node().parentNode.parentNode.clientHeight - fragKeyHeight;
+	var cy = self.g.node().parentNode.parentNode.clientHeight;// - fragKeyHeight;
+    
+    var gg = self.g.node();
+    console.log ("parent chain", gg, gg.parentNode, gg.parentNode.parentNode, self.margin);
 	
 	self.g.attr("width", cx).attr("height", cy);
 	var width = cx - self.margin.left - self.margin.right;
@@ -389,10 +394,12 @@ Graph.prototype.measure = function(on){
 				else{
 					PeakInfo += "<br/>To: Peak (" + endPeak.x + " m/z)";
 					} 
-			}
+			} else {
+                PeakInfo += "<br/>";
+            }
 			PeakInfo += "<br/><br/><p style='font-size:0.8em'>";
 			for(i=1; i<7; i++){
-			PeakInfo += "z = "+i+": "+(distance/i).toFixed(2)+" Da<br/>";	
+			PeakInfo += "z = "+i+": "+(distance/i).toFixed(2)+" Da</br>";	
 			}
 			PeakInfo += "</p>";
 			
@@ -406,19 +413,35 @@ Graph.prototype.measure = function(on){
 				var positionX = coords[0] + $("#measureTooltip").width()/2 + "px";
             else*/
             	if (measureStartX < measureEndX)
-            		var positionX = coords[0] - Math.abs(measureStartX - measureEndX)/2 - 10 + "px";
+            		var positionX = coords[0] - Math.abs(measureStartX - measureEndX)/2 - 10;
             	else
-            		var positionX = coords[0] + Math.abs(measureStartX - measureEndX)/2 - 10 + "px";
+            		var positionX = coords[0] + Math.abs(measureStartX - measureEndX)/2 - 10;
 
 
+            var svgNode = self.g.node().parentNode;
+            var rectBounds = this.getBoundingClientRect();
+            var svgBounds = svgNode.getBoundingClientRect();
+            var rectOffX = 0; //rectBounds.left - svgBounds.left;
+            var rectOffY = rectBounds.top - svgBounds.top;
+            rectOffX += svgNode.offsetLeft; // add on offsets to svg's relative parent
+            rectOffY += svgNode.offsetTop;
+            rectOffX += positionX;
+            rectOffY += y - 16; // the offset of the drag in the rect
+            
 			self.measureInfo
 				.style("display", "inline")
 				.html(PeakInfo)
             	.style("left", 
-                   positionX)
+                    rectOffX +"px"
+                    //positionX +"px"
+                )
             	.style("top",
-                   (window.pageYOffset + matrix.f + y -16) + "px");		  
+                       rectOffY + "px"
+                   //(window.pageYOffset + matrix.f + y -16) + "px"
+                );		  
 		}
+        
+        
 
 		this.measureBrush = d3.svg.brush()
 			.x(this.x)

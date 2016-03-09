@@ -1,14 +1,14 @@
 var SpectrumView = Backbone.View.extend({
 
-	events : {
-		'click #reset' : 'resetZoom',
-		'click #lossyChkBx': 'showLossy',
-		'submit #setrange' : 'setrange',
-		'click #clearHighlights' : 'clearHighlights',
-		'change #colorSelector': 'changeColorScheme',
-		'click #measuringTool': 'measuringTool',
-		'click #moveLabels': 'moveLabels',
-	},
+    events : {
+        'click #reset' : 'resetZoom',
+        'click #lossyChkBx': 'showLossy',
+        'submit #setrange' : 'setrange',
+        'click #clearHighlights' : 'clearHighlights',
+        'change #colorSelector': 'changeColorScheme',
+        'click #measuringTool': 'measuringTool',
+        'click #moveLabels': 'moveLabels',
+      },
 
 	initialize: function() {
 
