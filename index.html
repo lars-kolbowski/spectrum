@@ -18,7 +18,7 @@
 	<script type="text/javascript" src="src/graph/Graph.js"></script>
 	<script type="text/javascript" src="src/graph/Peak.js"></script>
 	<script type="text/javascript" src="src/graph/Fragment.js"></script>
-	<script type="text/javascript" src="src/graph/IsotopeCluster.js"></script>
+	<!--  <script type="text/javascript" src="src/graph/IsotopeCluster.js"></script> -->
 
     <style type="text/css">
 		html, body{
@@ -73,9 +73,23 @@
 			SpectrumModel.set({annotatedPeaksCSV: csv});
 		});*/
 
-		$.getJSON("json/example_XL.json", function(json) {
+/*		$.getJSON("json/example_XL.json", function(json) {
 			console.log("json:" + json);
 			SpectrumModel.set({JSONdata: json});
+		});*/
+
+		d3.json("http://129.215.14.63/xiAnnotator/annotate/3421/85160-94827-96653-69142/210313888/?peptide=TVTAMDVVYALK&peptide=YKAAFTECcmCcmQAADK&link=21&link=1", function(json) {
+			//~ alert("yo");
+			console.log("json:" + json);
+			SpectrumModel.set({JSONdata: json});
+		});
+
+		$( "#change_model" ).click(function() {
+	  		d3.json("http://129.215.14.63/xiAnnotator/annotate/3421/85160-94827-96653-69142/210313888/?peptide=TVTAMDVVYALK&peptide=YKAAFTECcmCcmQAADK&link=21&link=1&custom=fragment:BLikeDoubleFragmentation", function(json) {
+				//~ alert("yo");
+				console.log("json:" + json);
+				SpectrumModel.set({JSONdata: json});
+			});
 		});
 
 
@@ -84,7 +98,7 @@
 </head>
 
 <body>
-
+		<button id="change_model">change model</button>
 		<div id='spectrumDiv'>
 			<label>lossy labels
 				<input id="lossyChkBx" type="checkbox">
