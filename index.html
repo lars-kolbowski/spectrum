@@ -78,27 +78,17 @@
 			SpectrumModel.set({JSONdata: json});
 		});*/
 
-		d3.json("http://129.215.14.63/xiAnnotator/annotate/3421/85160-94827-96653-69142/210313888/?peptide=TVTAMDVVYALK&peptide=YKAAFTECcmCcmQAADK&link=21&link=1", function(json) {
+		d3.json("http://129.215.14.63/xiAnnotator/annotate/3421/85160-94827-96653-69142/210313888/?peptide=TVTAMDVVYALK&peptide=YKAAFTECcmCcmQAADK&link=21&link=1&custom=fragment:BLikeDoubleFragmentation", function(json) {
 			//~ alert("yo");
 			console.log("json:" + json);
 			SpectrumModel.set({JSONdata: json});
 		});
-
-		$( "#change_model" ).click(function() {
-	  		d3.json("http://129.215.14.63/xiAnnotator/annotate/3421/85160-94827-96653-69142/210313888/?peptide=TVTAMDVVYALK&peptide=YKAAFTECcmCcmQAADK&link=21&link=1&custom=fragment:BLikeDoubleFragmentation", function(json) {
-				//~ alert("yo");
-				console.log("json:" + json);
-				SpectrumModel.set({JSONdata: json});
-			});
-		});
-
 
 });
 	</script>
 </head>
 
 <body>
-		<button id="change_model">change model</button>
 		<div id='spectrumDiv'>
 			<label>lossy labels
 				<input id="lossyChkBx" type="checkbox">

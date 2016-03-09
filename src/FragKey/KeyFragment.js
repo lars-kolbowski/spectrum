@@ -107,13 +107,24 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 			.attr("fragKeyIndex", index)
 			.attr("class", "fragBar");
 
+
+		var ion = "";
+		for (var i = 0; i < fragments.b.length; i++) {
+			if(fragments.b[i].type.indexOf("AIon") != -1)
+				ion = "a"+bfrag_index;		
+			else if(fragments.b[i].type.indexOf("BIon") != -1)
+				ion = "b"+bfrag_index;
+			else if(fragments.b[i].type.indexOf("CIon") != -1)
+				ion = "c"+bfrag_index;
+		};
+
 		this.bText = this.g.append("text")
 			.attr("x", this.x - 7)
 			.attr("y", y + 15)			
 			.style("font-size", "0.6em")
 			.style("fill", color)
 			//.attr("text-anchor", "middle")
-			.text("b"+bfrag_index)
+			.text(ion)
 			.attr("opacity", 0);	
 
 		//check if only lossy fragments
@@ -155,13 +166,22 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 			.attr("fragKeyIndex", index)
 			.attr("class", "fragBar");
 
+		var ion = "";
+		for (var i = 0; i < fragments.y.length; i++) {		
+			if(fragments.y[i].type.indexOf("XIon") != -1)
+				ion = "x"+yfrag_index;		
+			else if(fragments.y[i].type.indexOf("YIon") != -1)
+				ion = "y"+yfrag_index;
+			else if(fragments.y[i].type.indexOf("ZIon") != -1)
+				ion = "z"+yfrag_index;
+		}
 		this.yText = this.g.append("text")
 			.attr("x", this.x - 2)
 			.attr("y", y - barHeight - 7)			
 			.style("font-size", "0.6em")
 			.style("fill", color)
 			//.attr("text-anchor", "end")
-			.text("y"+yfrag_index)
+			.text(ion)
 			.attr("opacity", 0);
 
 		//check if only lossy fragments
@@ -202,11 +222,13 @@ KeyFragment.prototype.highlight = function(show, fragments){
 		for(f = 0; f < fragments.length; f++){
 			if( this.b.indexOf(fragments[f]) != -1 && this.bHighlight){
 				this.bHighlight.attr("opacity", 1);
-				this.bText.attr("opacity", 1);
+				if (fragments[f].type.indexOf("AIon") != -1 || fragments[f].type.indexOf("BIon") != -1 || fragments[f].type.indexOf("CIon") != -1)
+					this.bText.attr("opacity", 1);
 			}
 			if (this.y.indexOf(fragments[f]) != -1 && this.yHighlight){
 				this.yHighlight.attr("opacity", 1);
-				this.yText.attr("opacity", 1);
+				if (fragments[f].type.indexOf("XIon") != -1 || fragments[f].type.indexOf("YIon") != -1 || fragments[f].type.indexOf("ZIon") != -1)
+					this.yText.attr("opacity", 1);
 			}
 		}
 	}
