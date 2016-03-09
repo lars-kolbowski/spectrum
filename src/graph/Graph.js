@@ -24,17 +24,18 @@
 Graph = function(targetSvg, model, options) {
 	this.x = d3.scale.linear();
 	this.y = d3.scale.linear();
+	this.y1 = d3.scale.linear();
 	this.model = model;
 
 	this.margin = {
 		"top":    options.title  ? 130 : 110,
-		"right":  10,
+		"right":  options.ylabelRight ? 60 : 45,
 		"bottom": options.xlabel ? 50 : 20,
-		"left":   options.ylabel ? 60 : 30
+		"left":   options.ylabelLeft ? 65 : 30
 	};
 	this.g =  targetSvg.append("g").attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
 	
-	this.xaxis = this.g.append("g")
+	this.xaxisSVG = this.g.append("g")
 		.attr("class", "x axis");
 		//~ 
 	/*
@@ -58,7 +59,9 @@ Graph = function(targetSvg, model, options) {
 	this.xaxisRect.call(this.brush);	
 	//~ this	
 		
-	this.yaxis = this.g.append("g")
+	this.yAxisLeftSVG = this.g.append("g")
+		.attr("class", "y axis");
+	this.yAxisRightSVG = this.g.append("g")
 		.attr("class", "y axis");
 	this.plot = this.g.append("rect")
 		.style("fill", "white")
@@ -115,10 +118,17 @@ Graph = function(targetSvg, model, options) {
 		.style("text-anchor","middle").style("pointer-events","none");
 	}
 	// add y-axis label
-	if (options.ylabel) {
-	this.ylabel = this.g.append("g").append("text")
+	if (options.ylabelLeft) {
+	this.ylabelLeft = this.g.append("g").append("text")
 		.attr("class", "axis")
-		.text(options.ylabel)
+		.text(options.ylabelLeft)
+		.style("text-anchor","middle").style("pointer-events","none");
+	}
+	// add 2nd y-axis label
+	if (options.ylabelRight) {
+	this.ylabelRight = this.g.append("g").append("text")
+		.attr("class", "axis")
+		.text(options.ylabelRight)
 		.style("text-anchor","middle").style("pointer-events","none");
 	}
 	
@@ -145,8 +155,8 @@ Graph = function(targetSvg, model, options) {
 	  self.dragZoomHighlight.attr("display","none");
 	  var s = self.brush.extent();
 	  self.x.domain(s);
-	  self.brush.x(self.x)
-	  self.redraw()();
+	  self.brush.x(self.x);
+	  self.resize(s[0], s[1], self.model.ymin, self.model.ymax);
 	}
 };
 
@@ -175,7 +185,7 @@ Graph.prototype.setData = function(){
         this.updatePeakColors();
     }
 
-	this.resize(this.model.xminPrimary, this.model.xmaxPrimary, this.model.ymin, this.model.ymax);
+	this.resize(this.model.xminPrimary, this.model.xmaxPrimary, this.model.ymin, this.model.ymaxPrimary);
 }
 
 Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
@@ -193,20 +203,29 @@ Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 	self.x.domain([xmin, xmax])
 		.range([0, width]);
 	// y-scale (inverted domain)
-	self.y.domain([0, ymax]).nice()
+	self.y.domain([0, ymax*0.95]).nice()
 		.range([height, 0]).nice();
+	self.y1.domain([0, ymax]).nice()
+		.range([height, 0]).nice();
+	//y0 = d3.scale.linear().range([height, 0]);
+	//self.y1 = d3.scale.linear().range([height, 0]);
 
 	var yTicks = height / 40;
 	var xTicks = width / 100;
 
+	this.yTicks = yTicks;
 	
-	self.yaxis.call(d3.svg.axis().scale(self.y).ticks(yTicks)
-						.orient("left").tickFormat(d3.format("s")));
+	self.yAxisLeft = d3.svg.axis().scale(self.y).ticks(yTicks).orient("left").tickFormat(d3.format("s"));
+	self.yAxisRight = d3.svg.axis().scale(self.y1).ticks(yTicks).orient("right").tickFormat(d3.format("s")); 
+
+	self.yAxisLeftSVG.call(self.yAxisLeft);
+	self.yAxisRightSVG.attr("transform", "translate(" + width + " ,0)");
+	self.yAxisRightSVG.call(self.yAxisRight);
 	
 
 	self.xAxis = d3.svg.axis().scale(self.x).ticks(xTicks).orient("bottom");
 		
-	self.xaxis.attr("transform", "translate(0," + height + ")")
+	self.xaxisSVG.attr("transform", "translate(0," + height + ")")
 		.call(self.xAxis);
 	
 	this.g.selectAll('.axis line, .axis path')
@@ -233,7 +252,10 @@ Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 		this.title.attr("x", width/2);
 	}
 	this.xlabel.attr("x", width/2).attr("y", height);
-	this.ylabel.attr("transform","translate(" + -45 + " " + height/2+") rotate(-90)");
+	this.ylabelLeft.attr("transform","translate(" + -50 + " " + height/2+") rotate(-90)");
+	var test = width+45;
+	this.ylabelRight.attr("transform","translate(" + test + " " + height/2+") rotate(-90)");
+
 	
 	self.redraw()();
 }
@@ -472,13 +494,30 @@ Graph.prototype.redraw = function(){
 	var self = this;
 	//self.measure();
 	return function (){
+
+		//get highest intensity from peaks in x range
+		//adjust y scale to new highest intensity
+
+
 		self.measureClear();
 		if (self.points) {
+			var ymax = 0
+			var xDomain = self.x.domain();
 			for (var i = 0; i < self.points.length; i++){
-			  self.points[i].update();
+			  if (self.points[i].y > ymax && (self.points[i].x > xDomain[0] && self.points[i].x < xDomain[1]))
+			  	ymax = self.points[i].y;
 			}
+			//console.log(ymax);
+			//self.y.domain([0, ymax/0.9]).nice();
+			self.y.domain([0, ymax/0.95]).nice();
+			self.y1.domain([0, (ymax/(self.model.ymaxPrimary*0.95))*100]).nice();
+			self.yAxisLeftSVG.call(self.yAxisLeft);
+			self.yAxisRightSVG.call(self.yAxisRight);
+			for (var i = 0; i < self.points.length; i++){
+				self.points[i].update();
+			}			
 		}
-		self.xaxis.call( self.xAxis);
+		self.xaxisSVG.call( self.xAxis);
 		if (self.model.measureMode)
 			self.disablePanning();
 		//d3.behavior.zoom().x(self.x).on("zoom", self.redraw()));

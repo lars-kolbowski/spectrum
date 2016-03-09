@@ -17,7 +17,7 @@ var SpectrumView = Backbone.View.extend({
 
 
 		//create graph
-		this.graph = new Graph (this.svg, this.model, {xlabel:"m/z", ylabel:"Intensity"});
+		this.graph = new Graph (this.svg, this.model, {xlabel:"m/z", ylabelLeft:"Intensity", ylabelRight:"% of base Peak"});
 
 		this.listenTo(this.model, 'change', this.render);
 		this.listenTo(this.model, "changed:Zoom", this.updateRange);
@@ -34,7 +34,7 @@ var SpectrumView = Backbone.View.extend({
 	},
 
 	resetZoom: function(){
-		this.graph.resize(this.model.xminPrimary, this.model.xmaxPrimary, this.model.ymin, this.model.ymax);
+		this.graph.resize(this.model.xminPrimary, this.model.xmaxPrimary, this.model.ymin, this.model.ymaxPrimary);
 	},
 
 	resize: function(){
@@ -65,6 +65,7 @@ var SpectrumView = Backbone.View.extend({
 	},
 
 	updateRange: function(){
+
 		$("#xleft").val(this.model.xmin);
 		$("#xright").val(this.model.xmax);
 	},

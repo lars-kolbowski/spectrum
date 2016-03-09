@@ -71,6 +71,11 @@ function Peak (id, graph){
 
 	this.fragments = notLossyFragments.concat(lossyFragments); //merge arrays*/
 
+	//error
+	for (var i = 0; i < this.fragments.length; i++) {
+		this.error = this.fragments[i].clusterInfo[0].error.toFixed(2)+" "+this.fragments[i].clusterInfo[0].errorUnit;
+	};
+
 	//make tooltip
 	var tooltip = "";
 	var fragCount = this.fragments.length;
@@ -80,7 +85,8 @@ function Peak (id, graph){
 		};
 		tooltip += this.fragments[f].sequence;
 	};
-	this.tooltip = tooltip + " m/z: " + this.x + ", i: " + this.y + ", charge: " + this.charge;
+
+	this.tooltip = tooltip + " m/z: " + this.x + ", i: " + this.y + ", charge: " + this.charge + ", error: "+ this.error;
 
 	//svg elements
 	this.g = this.graph.peaks.append('g');
