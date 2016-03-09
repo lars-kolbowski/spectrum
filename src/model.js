@@ -79,7 +79,8 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		    if (tmp > ymax) ymax = tmp;
 		}
 
-		this.ymaxPrimary = ymax * 1.0/0.9;
+		//this.ymaxPrimary = ymax / 0.9;
+		this.ymaxPrimary = ymax;
 		//this.ymax = d3.max(this.points, function(d){return d.y;});
 		this.ymin = 0;//d3.min(this.points, function(d){return d.y;});
 	},
