@@ -201,9 +201,9 @@ Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 	self.x.domain([xmin, xmax])
 		.range([0, width]);
 	// y-scale (inverted domain)
-	self.y.domain([0, ymax]).nice()
+	self.y.domain([0, ymax*0.95]).nice()
 		.range([height, 0]).nice();
-	self.y1.domain([0, (ymax/self.model.ymaxPrimary)]).nice()
+	self.y1.domain([0, ymax]).nice()
 		.range([height, 0]).nice();
 	//y0 = d3.scale.linear().range([height, 0]);
 	//self.y1 = d3.scale.linear().range([height, 0]);
@@ -470,8 +470,8 @@ Graph.prototype.redraw = function(){
 			}
 			//console.log(ymax);
 			//self.y.domain([0, ymax/0.9]).nice();
-			self.y.domain([0, ymax]).nice();
-			self.y1.domain([0, (ymax/self.model.ymaxPrimary)*100]).nice();
+			self.y.domain([0, ymax/0.95]).nice();
+			self.y1.domain([0, (ymax/(self.model.ymaxPrimary*0.95))*100]).nice();
 			self.yAxisLeftSVG.call(self.yAxisLeft);
 			self.yAxisRightSVG.call(self.yAxisRight);
 			for (var i = 0; i < self.points.length; i++){
