@@ -196,9 +196,6 @@ Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 	// ...the graph is not fitting entirely within its SVG element
 	var fragKeyHeight = 100;//can tidy this up somehow 
 	var cy = self.g.node().parentNode.parentNode.clientHeight;// - fragKeyHeight;
-    
-    var gg = self.g.node();
-    console.log ("parent chain", gg, gg.parentNode, gg.parentNode.parentNode, self.margin);
 	
 	self.g.attr("width", cx).attr("height", cy);
 	var width = cx - self.margin.left - self.margin.right;
@@ -418,13 +415,32 @@ Graph.prototype.measure = function(on){
             		var positionX = coords[0] + Math.abs(measureStartX - measureEndX)/2 - 10;
 
 
+            // Because chrome is deprecating offset on svg elements
+            function getSVGOffset (svg) {
+                var pnode = svg;
+                var pBCR;
+                while (pnode && !pBCR) {
+                    var posType = (pnode == document) ? "static" : d3.select(pnode).style("position");
+                    if (posType !== "" && posType !== "static" && posType !== "inherit") {
+                        pBCR = pnode.getBoundingClientRect();
+                    }
+                    pnode = pnode.parentNode;
+                }
+                var svgBCR = svg.getBoundingClientRect();
+                pBCR = pBCR || {top: 0, left: 0};
+                return {top: svgBCR.top - pBCR.top, left: svgBCR.left - pBCR.left};
+            }
+            
+            
             var svgNode = self.g.node().parentNode;
             var rectBounds = this.getBoundingClientRect();
             var svgBounds = svgNode.getBoundingClientRect();
             var rectOffX = 0; //rectBounds.left - svgBounds.left;
             var rectOffY = rectBounds.top - svgBounds.top;
-            rectOffX += svgNode.offsetLeft; // add on offsets to svg's relative parent
-            rectOffY += svgNode.offsetTop;
+            var svgOffset = getSVGOffset (svgNode);
+            //console.log ("svg offset", svgOffset);
+            rectOffX += svgOffset.left; // add on offsets to svg's relative parent
+            rectOffY += svgOffset.top;
             rectOffX += positionX;
             rectOffY += y - 16; // the offset of the drag in the rect
             
