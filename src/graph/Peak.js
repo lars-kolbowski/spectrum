@@ -73,18 +73,15 @@ function Peak (id, graph){
 
 
 	//make tooltip
-	var tooltip = "";
+	this.tooltip =[];
+	this.tooltip[0] = " m/z: " + this.x + ", i: " + this.y;
 	var fragCount = this.fragments.length;
 	for (var f = 0; f < fragCount; f++){
-		if (f > 0) {
-			tooltip += "<br/>";
-		};
 		charge = graph.model.JSONdata.clusters[this.fragments[f].clusterIds[0]].charge;
 		error = this.fragments[f].clusterInfo[0].error.toFixed(2)+" "+this.fragments[f].clusterInfo[0].errorUnit;
-		tooltip += this.fragments[f].name + " (" + this.fragments[f].sequence + ") - " + "charge: " + charge + ", error: " + error;
+		this.tooltip.push(this.fragments[f].name + " (" + this.fragments[f].sequence + ") - " + "charge: " + charge + ", error: " + error);
 	};
 
-	this.tooltip = " m/z: " + this.x + ", i: " + this.y + "<p>" + tooltip + "</p>";
 
 	//svg elements
 	this.g = this.graph.peaks.append('g');
@@ -96,7 +93,6 @@ function Peak (id, graph){
 	    .style("position", "absolute")               
 	    .style("opacity", 0)
 	    .style("font-size", "0.8em")
-	    .html(this.tooltip);
 	 //end
 
 	if (this.fragments.length > 0) {
@@ -130,10 +126,25 @@ function Peak (id, graph){
 			stickyHighlight(evt.ctrlKey);
 		}
 
-		function showTooltip(x,y){
+		function showTooltip(x, y, fragId){
+			for (var i = 0; i < self.fragments.length; i++) {
+				if (self.fragments[i].id == fragId)
+					var fragname = self.fragments[i].name
+			};
+			if(fragId){
+				for (var i = 1; i < self.tooltip.length; i++) {
+					if(self.tooltip[i].indexOf(fragname) != -1)
+						var frag_tooltip = self.tooltip[i]; 
+				};
+				self.tip.html(self.tooltip[0] + "<br/>" + frag_tooltip);
+			}
+			else
+				self.tip.html(self.tooltip.join("<br/>"));
+				 
 			self.tip.style("opacity", 1)
-					.style("left", (x+10) + "px")
-					.style("top", (y - 28) + "px"); 
+					.style("left", (x + 10) + "px")
+					.style("top", (y - 28) + "px")
+					
 		}
 		function hideTooltip(){
 			self.tip.style("opacity", 0);
@@ -155,7 +166,6 @@ function Peak (id, graph){
 			self.graph.model.clearHighlight(self.fragments);	
 		}
 		function stickyHighlight(ctrl, fragId){
-
 			var fragments = [];
 			if(fragId){
 				for (var i = 0; i < self.fragments.length; i++) {
@@ -238,39 +248,55 @@ function Peak (id, graph){
 					.style("stroke-dasharray", ("3, 3"));
 						
 				label[0][0].onmouseover = function(evt) {
-					if(!self.graph.model.moveLabels)
+					if(!self.graph.model.moveLabels){
 						startHighlight(this.getAttribute("fragId"));
+						showTooltip(evt.clientX, evt.clientY, this.getAttribute("fragId"));
+					}
 				};
 				label[0][0].onmouseout = function(evt) {
-					if(!self.graph.model.moveLabels)				
+					if(!self.graph.model.moveLabels){				
 						endHighlight();
+						hideTooltip();
+					}
 				};
 				label[0][0].ontouchstart = function(evt) {
-					if(!self.graph.model.moveLabels)
+					if(!self.graph.model.moveLabels){
 						startHighlight(this.getAttribute("fragId"));
+						showTooltip(evt.clientX, evt.clientY, this.getAttribute("fragId"));
+					}
 				};
 				label[0][0].ontouchend = function(evt) {
-					if(!self.graph.model.moveLabels)				
+					if(!self.graph.model.moveLabels){			
 						endHighlight();
+						hideTooltip();
+					}
 				};
 				label[0][0].onclick = function(evt) {
 					stickyHighlight(evt.ctrlKey, this.getAttribute("fragId"));
 				};
 				labelHighlight[0][0].onmouseover = function(evt) {
-					if(!self.graph.model.moveLabels)
+					if(!self.graph.model.moveLabels){
 						startHighlight(this.getAttribute("fragId"));
+						showTooltip(evt.clientX, evt.clientY, this.getAttribute("fragId"));
+					}
 				};
 				labelHighlight[0][0].onmouseout = function(evt) {
-					if(!self.graph.model.moveLabels)				
+					if(!self.graph.model.moveLabels){			
 						endHighlight();
+						hideTooltip();
+					}
 				};
 				labelHighlight[0][0].ontouchstart = function(evt) {
-					if(!self.graph.model.moveLabels)
+					if(!self.graph.model.moveLabels){
 						startHighlight(this.getAttribute("fragId"));
+						showTooltip(evt.clientX, evt.clientY, this.getAttribute("fragId"));
+					}
 				};
 				labelHighlight[0][0].ontouchend = function(evt) {
-					if(!self.graph.model.moveLabels)				
+					if(!self.graph.model.moveLabels){			
 						endHighlight();
+						hideTooltip();
+					}
 				};
 				labelHighlight[0][0].onclick = function(evt) {
 					stickyHighlight(evt.ctrlKey, this.getAttribute("fragId"));
