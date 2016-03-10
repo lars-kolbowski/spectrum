@@ -157,9 +157,9 @@ function Peak (id, graph){
 			});
 			this.labelDrag.on("drag", function() {
 				var coords = d3.mouse(this);
-				var frag = this.innerHTML;
+				var fragId = this.getAttribute("fragId");
 				for (var f = 0; f < self.fragments.length; f++){
-					if(self.fragments[f].name == frag){
+					if(self.fragments[f].id == fragId){
 						var curLabelLine = self.labelLines[f];
 						self.labelHighlights[f].attr("x", coords[0]);
 						self.labels[f].attr("x", coords[0]);
