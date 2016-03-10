@@ -93,6 +93,7 @@ function Peak (id, graph){
 	    .style("position", "absolute")               
 	    .style("opacity", 0)
 	    .style("font-size", "0.8em")
+	    .style("pointer-events", "none");
 	 //end
 
 	if (this.fragments.length > 0) {
@@ -140,7 +141,7 @@ function Peak (id, graph){
 			}
 			else
 				self.tip.html(self.tooltip.join("<br/>"));
-				 
+
 			self.tip.style("opacity", 1)
 					.style("left", (x + 10) + "px")
 					.style("top", (y - 28) + "px")
