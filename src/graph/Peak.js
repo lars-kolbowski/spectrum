@@ -71,26 +71,31 @@ function Peak (id, graph){
 
 	this.fragments = notLossyFragments.concat(lossyFragments); //merge arrays*/
 
-	//error
-	for (var i = 0; i < this.fragments.length; i++) {
-		this.error = this.fragments[i].clusterInfo[0].error.toFixed(2)+" "+this.fragments[i].clusterInfo[0].errorUnit;
-	};
 
 	//make tooltip
-	var tooltip = "";
+	this.tooltip =[];
+	this.tooltip[0] = " m/z: " + this.x + ", i: " + this.y;
 	var fragCount = this.fragments.length;
 	for (var f = 0; f < fragCount; f++){
-		if (f > 0) {
-			tooltip += ", ";
-		};
-		tooltip += this.fragments[f].sequence;
+		charge = graph.model.JSONdata.clusters[this.fragments[f].clusterIds[0]].charge;
+		error = this.fragments[f].clusterInfo[0].error.toFixed(2)+" "+this.fragments[f].clusterInfo[0].errorUnit;
+		this.tooltip.push(this.fragments[f].name + " (" + this.fragments[f].sequence + ") - " + "charge: " + charge + ", error: " + error);
 	};
 
-	this.tooltip = tooltip + " m/z: " + this.x + ", i: " + this.y + ", charge: " + this.charge + ", error: "+ this.error;
 
 	//svg elements
 	this.g = this.graph.peaks.append('g');
-	this.g.append("svg:title").text(this.tooltip);	// easy tooltip
+	//this.g.append("svg:title").text(this.tooltip);	// easy tooltip
+
+	//new tooltip
+	this.tip = d3.select("body").append("div")   
+	    .attr("class", "tooltip")
+	    .style("position", "absolute")               
+	    .style("opacity", 0)
+	    .style("font-size", "0.8em")
+	    .style("pointer-events", "none");
+	 //end
+
 	if (this.fragments.length > 0) {
 		this.highlightLine = this.g.append('line')
 							.attr("stroke", this.graph.model.highlightColour)
@@ -103,21 +108,48 @@ function Peak (id, graph){
 		var self = this;
 		var group = this.g[0][0];
 		group.onmouseover = function(evt) {
+			showTooltip(evt.clientX, evt.clientY);
 			startHighlight();
 		};
 		group.onmouseout = function(evt) {
+			hideTooltip();
 			endHighlight();
 		};
 		group.ontouchstart = function(evt) {
+			showTooltip(evt.clientX, evt.clientY);
 			startHighlight();
 		};
 		group.ontouchend = function(evt) {
+			hideTooltip();
 			endHighlight();
 		};
 		group.onclick = function(evt){
 			stickyHighlight(evt.ctrlKey);
 		}
 
+		function showTooltip(x, y, fragId){
+			for (var i = 0; i < self.fragments.length; i++) {
+				if (self.fragments[i].id == fragId)
+					var fragname = self.fragments[i].name
+			};
+			if(fragId){
+				for (var i = 1; i < self.tooltip.length; i++) {
+					if(self.tooltip[i].indexOf(fragname) != -1)
+						var frag_tooltip = self.tooltip[i]; 
+				};
+				self.tip.html(self.tooltip[0] + "<br/>" + frag_tooltip);
+			}
+			else
+				self.tip.html(self.tooltip.join("<br/>"));
+
+			self.tip.style("opacity", 1)
+					.style("left", (x + 10) + "px")
+					.style("top", (y - 28) + "px")
+					
+		}
+		function hideTooltip(){
+			self.tip.style("opacity", 0);
+		}
 		function startHighlight(fragId){
 			var fragments = [];
 			if(fragId){
@@ -131,10 +163,10 @@ function Peak (id, graph){
 			self.graph.model.addHighlight(fragments);	
 		}
 		function endHighlight(){
+			self.tip.style("opacity", 0)
 			self.graph.model.clearHighlight(self.fragments);	
 		}
 		function stickyHighlight(ctrl, fragId){
-
 			var fragments = [];
 			if(fragId){
 				for (var i = 0; i < self.fragments.length; i++) {
@@ -157,9 +189,9 @@ function Peak (id, graph){
 			});
 			this.labelDrag.on("drag", function() {
 				var coords = d3.mouse(this);
-				var frag = this.innerHTML;
+				var fragId = this.getAttribute("fragId");
 				for (var f = 0; f < self.fragments.length; f++){
-					if(self.fragments[f].name == frag){
+					if(self.fragments[f].id == fragId){
 						var curLabelLine = self.labelLines[f];
 						self.labelHighlights[f].attr("x", coords[0]);
 						self.labels[f].attr("x", coords[0]);
@@ -217,39 +249,55 @@ function Peak (id, graph){
 					.style("stroke-dasharray", ("3, 3"));
 						
 				label[0][0].onmouseover = function(evt) {
-					if(!self.graph.model.moveLabels)
+					if(!self.graph.model.moveLabels){
 						startHighlight(this.getAttribute("fragId"));
+						showTooltip(evt.clientX, evt.clientY, this.getAttribute("fragId"));
+					}
 				};
 				label[0][0].onmouseout = function(evt) {
-					if(!self.graph.model.moveLabels)				
+					if(!self.graph.model.moveLabels){				
 						endHighlight();
+						hideTooltip();
+					}
 				};
 				label[0][0].ontouchstart = function(evt) {
-					if(!self.graph.model.moveLabels)
+					if(!self.graph.model.moveLabels){
 						startHighlight(this.getAttribute("fragId"));
+						showTooltip(evt.clientX, evt.clientY, this.getAttribute("fragId"));
+					}
 				};
 				label[0][0].ontouchend = function(evt) {
-					if(!self.graph.model.moveLabels)				
+					if(!self.graph.model.moveLabels){			
 						endHighlight();
+						hideTooltip();
+					}
 				};
 				label[0][0].onclick = function(evt) {
 					stickyHighlight(evt.ctrlKey, this.getAttribute("fragId"));
 				};
 				labelHighlight[0][0].onmouseover = function(evt) {
-					if(!self.graph.model.moveLabels)
+					if(!self.graph.model.moveLabels){
 						startHighlight(this.getAttribute("fragId"));
+						showTooltip(evt.clientX, evt.clientY, this.getAttribute("fragId"));
+					}
 				};
 				labelHighlight[0][0].onmouseout = function(evt) {
-					if(!self.graph.model.moveLabels)				
+					if(!self.graph.model.moveLabels){			
 						endHighlight();
+						hideTooltip();
+					}
 				};
 				labelHighlight[0][0].ontouchstart = function(evt) {
-					if(!self.graph.model.moveLabels)
+					if(!self.graph.model.moveLabels){
 						startHighlight(this.getAttribute("fragId"));
+						showTooltip(evt.clientX, evt.clientY, this.getAttribute("fragId"));
+					}
 				};
 				labelHighlight[0][0].ontouchend = function(evt) {
-					if(!self.graph.model.moveLabels)				
+					if(!self.graph.model.moveLabels){			
 						endHighlight();
+						hideTooltip();
+					}
 				};
 				labelHighlight[0][0].onclick = function(evt) {
 					stickyHighlight(evt.ctrlKey, this.getAttribute("fragId"));

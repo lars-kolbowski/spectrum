@@ -8,6 +8,7 @@ var SpectrumView = Backbone.View.extend({
         'change #colorSelector': 'changeColorScheme',
         'click #measuringTool': 'measuringTool',
         'click #moveLabels': 'moveLabels',
+		'click #downloadSVG': 'downloadSVG',
       },
 
 	initialize: function() {
@@ -29,7 +30,8 @@ var SpectrumView = Backbone.View.extend({
 
 	render: function() {
 		this.graph.clear();
-		this.graph.setData();
+		if (this.model.JSONdata)
+			this.graph.setData();
 
 	},
 
@@ -135,5 +137,12 @@ var SpectrumView = Backbone.View.extend({
 				}
 			}			
 		}
-	}
+	},
+	downloadSVG:function(){
+            var svgSel = d3.select(this.el).selectAll("svg");
+            var svgArr = [svgSel.node()];
+            var svgStrings = CLMSUI.svgUtils.capture (svgArr);
+            var svgXML = CLMSUI.svgUtils.makeXMLStr (new XMLSerializer(), svgStrings[0]);
+            download (svgXML, 'application/svg', "view.svg");
+    },
 });
