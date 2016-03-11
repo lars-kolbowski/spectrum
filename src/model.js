@@ -11,15 +11,19 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		this.sticky = Array();
 		this.highlights = Array();
 		this.measureMode = false;
-		this.on("change:JSONdata", function(model){
-			this.setData();
+		this.on("change:JSONdata", function(){
+			var json = this.get("JSONdata");
+			if (typeof json !== 'undefined')
+				this.setData(json);
+			else
+				this.trigger("cleared");
 		});
 	},
-	setData: function(){
+	setData: function(json){
 		//var annotatedPeaksCSV = this.get("annotatedPeaksCSV");
 		//this.set("annotatedPeaks", d3.csv.parse(annotatedPeaksCSV.trim()));
 
-		this.JSONdata = this.get("JSONdata");
+		this.JSONdata = json;
 		console.log(this.JSONdata);
 		this.peptides = this.JSONdata.Peptides;
 		this.pepStrs = [];
@@ -50,7 +54,8 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 	},
 
 	clear: function(){
-		this.set({ pep1: "", pep2: "" });
+		this.JSONdata = null;
+		Backbone.Model.prototype.clear.call(this);
 	},
 
 	setGraphData: function(){
