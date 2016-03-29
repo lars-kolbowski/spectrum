@@ -21,14 +21,15 @@
 function Peak (id, graph){
 	var peak = graph.model.JSONdata.peaks[id];
 
+	if (id == 162)
+		console.log("test");
 	this.x = peak.mz;
 	this.y = peak.intensity;
 	this.IsotopeClusters = [];
 	this.labels = [];
 	for (i=0; i<peak.clusterIds.length; i++)
 		this.IsotopeClusters.push(graph.model.JSONdata.clusters[peak.clusterIds[i]]);
-	if (this.IsotopeClusters.length > 0)
-		this.charge = this.IsotopeClusters[0].charge;	//TODO charge multiple clusters?
+	this.clusterIds = peak.clusterIds
 	this.graph = graph;
 
 	//make fragments
@@ -77,8 +78,16 @@ function Peak (id, graph){
 	this.tooltip[0] = " m/z: " + this.x + ", i: " + this.y;
 	var fragCount = this.fragments.length;
 	for (var f = 0; f < fragCount; f++){
-		charge = graph.model.JSONdata.clusters[this.fragments[f].clusterIds[0]].charge;
-		error = this.fragments[f].clusterInfo[0].error.toFixed(2)+" "+this.fragments[f].clusterInfo[0].errorUnit;
+		//get right cluster for peak
+		index = 0
+		for (var i = 0; i < this.clusterIds.length; i++) {
+			if(this.fragments[f].clusterInfo.indexOf(this.clusterIds[i]) != -1)
+				index = this.fragments[f].clusterInfo.indexOf(this.clusterIds[i])
+				cluster = graph.model.JSONdata.clusters[this.clusterIds[i]]
+		}
+		
+		charge = cluster.charge;
+		error = this.fragments[f].clusterInfo[index].error.toFixed(2)+" "+this.fragments[f].clusterInfo[index].errorUnit;
 		this.tooltip.push(this.fragments[f].name + " (" + this.fragments[f].sequence + ") - " + "charge: " + charge + ", error: " + error);
 	};
 
