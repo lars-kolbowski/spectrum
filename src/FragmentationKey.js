@@ -32,9 +32,8 @@ function PeptideFragmentationKey (targetSvg, model, options){
 		"bottom": 40,
 		"left":   40
 	};
-
 	this.highlights =  targetSvg.append("g").attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
-	this.g =  targetSvg.append("g").attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
+	this.g =  targetSvg.append("g").attr("class", "fragKey").attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
 
 }
 
@@ -110,7 +109,6 @@ PeptideFragmentationKey.prototype.setData = function(){
 	        this.peptides[1] = this.peptides[1] + Array(diff + 1).join("#");
 		}
 	}
-
 	/*
     #==========================================================================
     #  FRAGMENTATION KEY STARTS HERE
@@ -122,6 +120,7 @@ PeptideFragmentationKey.prototype.setData = function(){
 	drawPeptide( this.peptides[0], pepModsArray[0], 20, 5, this.model.p1color, this.pepLetters[0], this.pepModLetters[0]);
 	if(this.peptides[1])
     	drawPeptide( this.peptides[1], pepModsArray[1], 71, 83, this.model.p2color, this.pepLetters[1], this.pepModLetters[1]);
+
 	function drawPeptide( pep, mods, y1, y2, colour, pepLetters, modLetters) {
 		var l = pep.length;
 		var shift = 0;
@@ -194,7 +193,6 @@ PeptideFragmentationKey.prototype.setData = function(){
 	};*/
 
 	console.log(annotations);
-
 
     drawFragmentationEvents(annotations[0], self.pepoffset[0], 0);
 	if(this.peptides[1])	

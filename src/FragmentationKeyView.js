@@ -12,19 +12,18 @@ var FragmentationKeyView = Backbone.View.extend({
 			"bottom": 40,
 			"left":   40
 		};
-		this.highlights =  this.svg.append("g").attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
-		this.g =  this.svg.append("g").attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
-
+		this.fragKeyWrapper = this.svg.append("g").attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
 
 		//d3.select(this.el).append("svg").attr("width", 50).attr("height", 50).append("circle").attr("cx", 25).attr("cy", 25).attr("r", 25).style("fill", "purple");
 
 		//create peptide frag key
-		this.peptideFragKey = new PeptideFragmentationKey(this.svg, this.model);
+		this.peptideFragKey = new PeptideFragmentationKey(this.fragKeyWrapper, this.model);
 
 		this.listenTo(this.model, 'change', this.render);
 		this.listenTo(this.model, 'destroy', this.remove);
 		this.listenTo(this.model, 'changed:Highlights', this.updateHighlights);
 		this.listenTo(this.model, 'changed:ColorScheme', this.updateColors);
+		this.listenTo(window, 'resize', _.debounce(this.resize));
 	},
 
 	render: function() {
@@ -111,6 +110,15 @@ var FragmentationKeyView = Backbone.View.extend({
 			}
 		}
 		this.peptideFragKey.colorLetters("all");
-	}
+	},
+
+	resize: function(){
+	    var parentDivWidth = $("#spectrumPanelWrapper").width();
+	    var fragKeyWidth = $(".fragKey")[0].getBBox().width;
+		if (parentDivWidth < fragKeyWidth+this.margin.left)
+			this.fragKeyWrapper.attr("transform", "scale("+parentDivWidth/(fragKeyWidth+this.margin.left)+")")
+		else
+			this.fragKeyWrapper.attr("transform", "scale(1)")
+	}		
 
 });
