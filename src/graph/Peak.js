@@ -97,7 +97,7 @@ function Peak (id, graph){
 	//this.g.append("svg:title").text(this.tooltip);	// easy tooltip
 
 	//new tooltip
-	this.tip = d3.select("body").append("div")   
+	this.tip = d3.select("#spectrumDiv").append("div")   
 	    .attr("class", "tooltip")
 	    .style("position", "absolute")               
 	    .style("opacity", 0)
