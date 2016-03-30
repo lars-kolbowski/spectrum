@@ -27,8 +27,7 @@ function Peak (id, graph){
 	this.labels = [];
 	for (i=0; i<peak.clusterIds.length; i++)
 		this.IsotopeClusters.push(graph.model.JSONdata.clusters[peak.clusterIds[i]]);
-	if (this.IsotopeClusters.length > 0)
-		this.charge = this.IsotopeClusters[0].charge;	//TODO charge multiple clusters?
+	this.clusterIds = peak.clusterIds
 	this.graph = graph;
 
 	//make fragments
@@ -77,8 +76,16 @@ function Peak (id, graph){
 	this.tooltip[0] = " m/z: " + this.x + ", i: " + this.y;
 	var fragCount = this.fragments.length;
 	for (var f = 0; f < fragCount; f++){
-		charge = graph.model.JSONdata.clusters[this.fragments[f].clusterIds[0]].charge;
-		error = this.fragments[f].clusterInfo[0].error.toFixed(2)+" "+this.fragments[f].clusterInfo[0].errorUnit;
+		//get right cluster for peak
+		index = 0
+		for (var i = 0; i < this.clusterIds.length; i++) {
+			if(this.fragments[f].clusterInfo.indexOf(this.clusterIds[i]) != -1)
+				index = this.fragments[f].clusterInfo.indexOf(this.clusterIds[i])
+				cluster = graph.model.JSONdata.clusters[this.clusterIds[i]]
+		}
+		
+		charge = cluster.charge;
+		error = this.fragments[f].clusterInfo[index].error.toFixed(2)+" "+this.fragments[f].clusterInfo[index].errorUnit;
 		this.tooltip.push(this.fragments[f].name + " (" + this.fragments[f].sequence + ") - " + "charge: " + charge + ", error: " + error);
 	};
 
@@ -88,9 +95,14 @@ function Peak (id, graph){
 	//this.g.append("svg:title").text(this.tooltip);	// easy tooltip
 
 	//new tooltip
-	this.tip = d3.select("body").append("div")   
+	//~ var containingDiv = this.graph.g.node().parentNode.parentNode;//this would get you #spectrumPanel
+	this.tip = d3.select("#spectrumPanel").append("div")   
 	    .attr("class", "tooltip")
-	    .style("position", "absolute")               
+	    .style("background-color", "#f0f0f0")
+	    .style("border", "1px solid black")
+	    .style("border-radius", "6px")
+	    .style("position", "absolute")
+	    .style("padding", "3px")               
 	    .style("opacity", 0)
 	    .style("font-size", "0.8em")
 	    .style("pointer-events", "none");
@@ -143,7 +155,7 @@ function Peak (id, graph){
 				self.tip.html(self.tooltip.join("<br/>"));
 
 			self.tip.style("opacity", 1)
-					.style("left", (x + 10) + "px")
+					.style("left", (x + 20) + "px")
 					.style("top", (y - 28) + "px")
 					
 		}
