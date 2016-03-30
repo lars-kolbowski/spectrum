@@ -95,7 +95,8 @@ function Peak (id, graph){
 	//this.g.append("svg:title").text(this.tooltip);	// easy tooltip
 
 	//new tooltip
-	this.tip = d3.select("#spectrumDiv").append("div")   
+	//~ var containingDiv = this.graph.g.node().parentNode.parentNode;//this would get you #spectrumPanel
+	this.tip = d3.select("#spectrumPanel").append("div")   
 	    .attr("class", "tooltip")
 	    .style("background-color", "#f0f0f0")
 	    .style("border", "1px solid black")
