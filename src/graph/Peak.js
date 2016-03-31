@@ -92,21 +92,6 @@ function Peak (id, graph){
 
 	//svg elements
 	this.g = this.graph.peaks.append('g');
-	//this.g.append("svg:title").text(this.tooltip);	// easy tooltip
-
-	//new tooltip
-	//~ var containingDiv = this.graph.g.node().parentNode.parentNode;//this would get you #spectrumPanel
-	this.tip = d3.select("#spectrumPanel").append("div")   
-	    .attr("class", "tooltip")
-	    .style("background-color", "#f0f0f0")
-	    .style("border", "1px solid black")
-	    .style("border-radius", "6px")
-	    .style("position", "absolute")
-	    .style("padding", "3px")               
-	    .style("opacity", 0)
-	    .style("font-size", "0.8em")
-	    .style("pointer-events", "none");
-	 //end
 
 	if (this.fragments.length > 0) {
 		this.highlightLine = this.g.append('line')
@@ -149,18 +134,19 @@ function Peak (id, graph){
 					if(self.tooltip[i].indexOf(fragname) != -1)
 						var frag_tooltip = self.tooltip[i]; 
 				};
-				self.tip.html(self.tooltip[0] + "<br/>" + frag_tooltip);
+				self.graph.tip.html(self.tooltip[0] + "<br/>" + frag_tooltip);
 			}
 			else
-				self.tip.html(self.tooltip.join("<br/>"));
+				self.graph.tip.html(self.tooltip.join("<br/>"));
 
-			self.tip.style("opacity", 1)
-					.style("left", (x + 20) + "px")
-					.style("top", (y - 28) + "px")
+			var offset = $(self.graph.g.node().parentNode.parentNode).position();
+			self.graph.tip.style("opacity", 1)
+					.style("left", (offset.top+x + 20) + "px")
+					.style("top", (offset.left+y - 28) + "px")
 					
 		}
 		function hideTooltip(){
-			self.tip.style("opacity", 0);
+			self.graph.tip.style("opacity", 0);
 		}
 		function startHighlight(fragId){
 			var fragments = [];
@@ -175,7 +161,7 @@ function Peak (id, graph){
 			self.graph.model.addHighlight(fragments);	
 		}
 		function endHighlight(){
-			self.tip.style("opacity", 0)
+			self.graph.tip.style("opacity", 0)
 			self.graph.model.clearHighlight(self.fragments);	
 		}
 		function stickyHighlight(ctrl, fragId){

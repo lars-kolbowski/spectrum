@@ -76,6 +76,21 @@ Graph = function(targetSvg, model, options) {
 		this.model.clearStickyHighlights();
 	}.bind(this));
 
+
+	//Tooltip
+	target = this.g.node().parentNode.parentNode;
+	this.tip = d3.select(target).append("div")//this would get you #spectrumPanel
+		.attr("class", "specViewer_tooltip")
+		.style("background-color", "#f0f0f0")
+	    .style("border", "1px solid black")
+	    .style("color", "black")
+	    .style("border-radius", "6px")
+	    .style("position", "absolute")
+	    .style("padding", "3px")               
+	    .style("opacity", 0)
+	    .style("font-size", "0.8em")
+	    .style("pointer-events", "none");
+
 	//MeasuringTool
 	this.measuringTool = this.innerSVG.append("g")
 	this.measuringToolVLineStart = this.measuringTool.append("line")
@@ -316,8 +331,8 @@ Graph.prototype.measure = function(on){
 			var mouseX = self.x.invert(coords[0]);
 			//find start and endPeak
 			var distance = 2;
-			var highlighttrigger = 10;	//triggerdistance to prioritize highlighted peaks as endpoint
-			var triggerdistance = 5;	//triggerdistance to use peak as endpoint
+			var highlighttrigger = 15;	//triggerdistance to prioritize highlighted peaks as endpoint
+			var triggerdistance = 10;	//triggerdistance to use peak as endpoint
 			var peakCount = self.points.length;
 			for (var p = 0; p < peakCount; p++) {
 				var peak = self.points[p];
