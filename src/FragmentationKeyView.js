@@ -6,15 +6,7 @@ var FragmentationKeyView = Backbone.View.extend({
 
 	initialize: function() {
 		this.svg = d3.select(this.el.getElementsByTagName("svg")[0]);//d3.select(this.el).append("svg").style("width", "100%").style("height", "100%");
-		this.margin = {
-			"top":    20,
-			"right":  20,
-			"bottom": 40,
-			"left":   40
-		};
-		this.fragKeyWrapper = this.svg.append("g").attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
-
-		//d3.select(this.el).append("svg").attr("width", 50).attr("height", 50).append("circle").attr("cx", 25).attr("cy", 25).attr("r", 25).style("fill", "purple");
+		this.fragKeyWrapper = this.svg.append("g");
 
 		//create peptide frag key
 		this.peptideFragKey = new PeptideFragmentationKey(this.fragKeyWrapper, this.model);
@@ -115,8 +107,8 @@ var FragmentationKeyView = Backbone.View.extend({
 	resize: function(){
 	    var parentDivWidth = $("#spectrumPanelWrapper").width();
 	    var fragKeyWidth = $(".fragKey")[0].getBBox().width;
-		if (parentDivWidth < fragKeyWidth+this.margin.left)
-			this.fragKeyWrapper.attr("transform", "scale("+parentDivWidth/(fragKeyWidth+this.margin.left)+")")
+		if (parentDivWidth < fragKeyWidth)
+			this.fragKeyWrapper.attr("transform", "scale("+parentDivWidth/fragKeyWidth+")")
 		else
 			this.fragKeyWrapper.attr("transform", "scale(1)")
 	}		
