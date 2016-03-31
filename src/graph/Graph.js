@@ -104,6 +104,9 @@ Graph = function(targetSvg, model, options) {
 		.attr("y2", 50)
 		.attr("stroke-width", 1)
 		.attr("stroke", "Red");
+	this.measureDistance = this.innerSVG.append("text")
+		.attr("text-anchor", "middle")
+		.attr("pointer-events", "none")
 	this.measureInfo =  d3.select("div#measureTooltip")
 		.style("font-size", "0.8em");
 
@@ -384,9 +387,11 @@ Graph.prototype.measure = function(on){
 			if (measureStartX  < measureEndX)
 				var labelX = measureStartX  + deltaX/2;
 			else
-				var labelX = measureEndX + deltaX/2;	
-			var PeakInfo = distance.toFixed(2)+" Th<br/>"
+				var labelX = measureEndX + deltaX/2;
 
+			self.measureDistance.text(distance.toFixed(2)+" Th");		
+			//var PeakInfo = distance.toFixed(2)+" Th<br/>"
+			var PeakInfo = ""
 			if(self.measureStartPeak.fragments.length > 0){
 				if (self.measureStartPeak.isMonoisotopic)
 					PeakInfo += "From: <span style='color:"+ self.measureStartPeak.colour +"'>" + self.measureStartPeak.fragments[0].name +"</span> (" + self.measureStartPeak.x + " m/z)";
@@ -425,9 +430,9 @@ Graph.prototype.measure = function(on){
 				var positionX = coords[0] + $("#measureTooltip").width()/2 + "px";
             else*/
             	if (measureStartX < measureEndX)
-            		var positionX = coords[0] - Math.abs(measureStartX - measureEndX)/2 - 10;
+            		var positionX = coords[0] - Math.abs(measureStartX - measureEndX)/2;
             	else
-            		var positionX = coords[0] + Math.abs(measureStartX - measureEndX)/2 - 10;
+            		var positionX = coords[0] + Math.abs(measureStartX - measureEndX)/2;
 
 
             // Because chrome is deprecating offset on svg elements
@@ -450,25 +455,23 @@ Graph.prototype.measure = function(on){
             var svgNode = self.g.node().parentNode;
             var rectBounds = this.getBoundingClientRect();
             var svgBounds = svgNode.getBoundingClientRect();
-            var rectOffX = 0; //rectBounds.left - svgBounds.left;
+            var rectOffX = -8; //rectBounds.left - svgBounds.left;
             var rectOffY = rectBounds.top - svgBounds.top;
             var svgOffset = getSVGOffset (svgNode);
-            //console.log ("svg offset", svgOffset);
             rectOffX += svgOffset.left; // add on offsets to svg's relative parent
             rectOffY += svgOffset.top;
             rectOffX += positionX;
-            rectOffY += y - 16; // the offset of the drag in the rect
+            rectOffY += y + 10; // the offset of the drag in the rect
             
+            self.measureDistance.attr("x", positionX).attr("y", coords[1]-10)
 			self.measureInfo
 				.style("display", "inline")
 				.html(PeakInfo)
             	.style("left", 
                     rectOffX +"px"
-                    //positionX +"px"
                 )
             	.style("top",
                        rectOffY + "px"
-                   //(window.pageYOffset + matrix.f + y -16) + "px"
                 );		  
 		}
         
