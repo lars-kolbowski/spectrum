@@ -83,6 +83,7 @@ Graph = function(targetSvg, model, options) {
 		.attr("class", "specViewer_tooltip")
 		.style("background-color", "#f0f0f0")
 	    .style("border", "1px solid black")
+	    .style("color", "black")
 	    .style("border-radius", "6px")
 	    .style("position", "absolute")
 	    .style("padding", "3px")               
