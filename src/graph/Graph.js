@@ -293,6 +293,7 @@ Graph.prototype.measure = function(on){
 
 		function measureStart() {
 			self.measuringTool.attr("display","inline");
+			self.measureDistance.attr("display","inline");
 			//self.measureInfo.style("display", "inline");
 			var coords = d3.mouse(this);
 			var mouseX = self.x.invert(coords[0]);
@@ -505,6 +506,7 @@ Graph.prototype.measure = function(on){
 
 Graph.prototype.measureClear = function(){
 		this.measuringTool.attr("display","none");
+		this.measureDistance.attr("display","none");
 		this.measureInfo.style("display","none");	
 }
 
