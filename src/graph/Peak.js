@@ -139,7 +139,8 @@ function Peak (id, graph){
 			else
 				self.graph.tip.html(self.tooltip.join("<br/>"));
 
-			var offset = $(self.graph.g.node().parentNode.parentNode.parentNode).position();
+			var offset = $(self.graph.g.node().parentNode.parentNode.parentNode.parentNode).position();
+			console.log(offset.top+x + 20, offset.left+y - 28)
 			self.graph.tip.style("opacity", 1)
 					.style("left", (offset.top+x + 20) + "px")
 					.style("top", (offset.left+y - 28) + "px")
