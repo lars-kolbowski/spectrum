@@ -27,8 +27,7 @@ function Peak (id, graph){
 	this.labels = [];
 	for (i=0; i<peak.clusterIds.length; i++)
 		this.IsotopeClusters.push(graph.model.JSONdata.clusters[peak.clusterIds[i]]);
-	if (this.IsotopeClusters.length > 0)
-		this.charge = this.IsotopeClusters[0].charge;	//TODO charge multiple clusters?
+	this.clusterIds = peak.clusterIds
 	this.graph = graph;
 
 	//make fragments
@@ -77,24 +76,22 @@ function Peak (id, graph){
 	this.tooltip[0] = " m/z: " + this.x + ", i: " + this.y;
 	var fragCount = this.fragments.length;
 	for (var f = 0; f < fragCount; f++){
-		charge = graph.model.JSONdata.clusters[this.fragments[f].clusterIds[0]].charge;
-		error = this.fragments[f].clusterInfo[0].error.toFixed(2)+" "+this.fragments[f].clusterInfo[0].errorUnit;
+		//get right cluster for peak
+		index = 0
+		for (var i = 0; i < this.clusterIds.length; i++) {
+			if(this.fragments[f].clusterInfo.indexOf(this.clusterIds[i]) != -1)
+				index = this.fragments[f].clusterInfo.indexOf(this.clusterIds[i])
+				cluster = graph.model.JSONdata.clusters[this.clusterIds[i]]
+		}
+		
+		charge = cluster.charge;
+		error = this.fragments[f].clusterInfo[index].error.toFixed(2)+" "+this.fragments[f].clusterInfo[index].errorUnit;
 		this.tooltip.push(this.fragments[f].name + " (" + this.fragments[f].sequence + ") - " + "charge: " + charge + ", error: " + error);
 	};
 
 
 	//svg elements
 	this.g = this.graph.peaks.append('g');
-	//this.g.append("svg:title").text(this.tooltip);	// easy tooltip
-
-	//new tooltip
-	this.tip = d3.select("body").append("div")   
-	    .attr("class", "tooltip")
-	    .style("position", "absolute")               
-	    .style("opacity", 0)
-	    .style("font-size", "0.8em")
-	    .style("pointer-events", "none");
-	 //end
 
 	if (this.fragments.length > 0) {
 		this.highlightLine = this.g.append('line')
@@ -108,7 +105,7 @@ function Peak (id, graph){
 		var self = this;
 		var group = this.g[0][0];
 		group.onmouseover = function(evt) {
-			showTooltip(evt.clientX, evt.clientY);
+			showTooltip(evt.layerX, evt.layerY);
 			startHighlight();
 		};
 		group.onmouseout = function(evt) {
@@ -116,7 +113,7 @@ function Peak (id, graph){
 			endHighlight();
 		};
 		group.ontouchstart = function(evt) {
-			showTooltip(evt.clientX, evt.clientY);
+			showTooltip(evt.layerX, evt.layerY);
 			startHighlight();
 		};
 		group.ontouchend = function(evt) {
@@ -137,18 +134,30 @@ function Peak (id, graph){
 					if(self.tooltip[i].indexOf(fragname) != -1)
 						var frag_tooltip = self.tooltip[i]; 
 				};
-				self.tip.html(self.tooltip[0] + "<br/>" + frag_tooltip);
+				self.graph.tip.html(self.tooltip[0] + "<br/>" + frag_tooltip);
 			}
 			else
-				self.tip.html(self.tooltip.join("<br/>"));
+				self.graph.tip.html(self.tooltip.join("<br/>"));
 
-			self.tip.style("opacity", 1)
-					.style("left", (x + 10) + "px")
-					.style("top", (y - 28) + "px")
+			var wrapperWidth = $(self.graph.g.node().parentNode.parentNode.parentNode.parentNode).width();
+			if (x+250 > wrapperWidth){
+
+			//console.log(offset.top+x + 20, offset.left+y - 28)
+				self.graph.tip.style("opacity", 1)
+						.style("left", "")
+						.style("right", (wrapperWidth - x + 20) + "px")
+						.style("top", (y - 28) + "px")
+			}
+			else{
+				self.graph.tip.style("opacity", 1)
+						.style("right", "")
+						.style("left", (x + 20) + "px")
+						.style("top", (y - 28) + "px")
+			}
 					
 		}
 		function hideTooltip(){
-			self.tip.style("opacity", 0);
+			self.graph.tip.style("opacity", 0);
 		}
 		function startHighlight(fragId){
 			var fragments = [];
@@ -163,7 +172,7 @@ function Peak (id, graph){
 			self.graph.model.addHighlight(fragments);	
 		}
 		function endHighlight(){
-			self.tip.style("opacity", 0)
+			self.graph.tip.style("opacity", 0)
 			self.graph.model.clearHighlight(self.fragments);	
 		}
 		function stickyHighlight(ctrl, fragId){
@@ -251,7 +260,7 @@ function Peak (id, graph){
 				label[0][0].onmouseover = function(evt) {
 					if(!self.graph.model.moveLabels){
 						startHighlight(this.getAttribute("fragId"));
-						showTooltip(evt.clientX, evt.clientY, this.getAttribute("fragId"));
+						showTooltip(evt.layerX, evt.layerY, this.getAttribute("fragId"));
 					}
 				};
 				label[0][0].onmouseout = function(evt) {
@@ -263,7 +272,7 @@ function Peak (id, graph){
 				label[0][0].ontouchstart = function(evt) {
 					if(!self.graph.model.moveLabels){
 						startHighlight(this.getAttribute("fragId"));
-						showTooltip(evt.clientX, evt.clientY, this.getAttribute("fragId"));
+						showTooltip(evt.layerX, evt.layerY, this.getAttribute("fragId"));
 					}
 				};
 				label[0][0].ontouchend = function(evt) {
@@ -278,7 +287,7 @@ function Peak (id, graph){
 				labelHighlight[0][0].onmouseover = function(evt) {
 					if(!self.graph.model.moveLabels){
 						startHighlight(this.getAttribute("fragId"));
-						showTooltip(evt.clientX, evt.clientY, this.getAttribute("fragId"));
+						showTooltip(evt.layerX, evt.layerY, this.getAttribute("fragId"));
 					}
 				};
 				labelHighlight[0][0].onmouseout = function(evt) {
@@ -290,7 +299,7 @@ function Peak (id, graph){
 				labelHighlight[0][0].ontouchstart = function(evt) {
 					if(!self.graph.model.moveLabels){
 						startHighlight(this.getAttribute("fragId"));
-						showTooltip(evt.clientX, evt.clientY, this.getAttribute("fragId"));
+						showTooltip(evt.layerX, evt.layerY, this.getAttribute("fragId"));
 					}
 				};
 				labelHighlight[0][0].ontouchend = function(evt) {

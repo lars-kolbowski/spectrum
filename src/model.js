@@ -55,6 +55,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 
 	clear: function(){
 		this.JSONdata = null;
+		this.sticky = Array();
 		Backbone.Model.prototype.clear.call(this);
 	},
 
