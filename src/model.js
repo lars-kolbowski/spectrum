@@ -24,7 +24,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		//this.set("annotatedPeaks", d3.csv.parse(annotatedPeaksCSV.trim()));
 
 		this.JSONdata = json;
-		console.log(this.JSONdata);
+		//console.log(this.JSONdata);
 		this.peptides = this.JSONdata.Peptides;
 		this.pepStrs = [];
 		for(i=0; i < this.peptides.length; i++){

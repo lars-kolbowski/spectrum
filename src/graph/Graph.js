@@ -51,11 +51,14 @@ Graph = function(targetSvg, model, options) {
 		.on("brushstart", brushstart)
 		.on("brush", brushmove)
 		.on("brushend", brushend);
-	this.xaxisRect = this.g.append("rect")
-					.attr("height", "25")
+	this.xaxisRect = //this.g.append("rect")
+                    this.g.append("g")   // MJG
+					//.attr("height", "25")
+                    .attr("class", "x brush")
 					.attr("opacity", 0)
-					.attr("pointer-events", "all")
-					.style("cursor", "crosshair");
+					//.attr("pointer-events", "all")
+					//.style("cursor", "crosshair")
+    ;
 	this.xaxisRect.call(this.brush);	
 	//~ this	
 		
@@ -63,14 +66,19 @@ Graph = function(targetSvg, model, options) {
 		.attr("class", "y axis");
 	this.yAxisRightSVG = this.g.append("g")
 		.attr("class", "y axis");
-	this.plot = this.g.append("rect")
+    this.plot = this.g.append("rect") 
 		.style("fill", "white")
-		.attr("pointer-events", "all");
+		.attr("pointer-events", "all")
+    ;
+    this.mainBrush = this.g.append("g") // MJG
+        .attr("class", "x brush")
+        .attr("opacity", 0)
+    ;
 	this.innerSVG = this.g.append("g")
-		.attr("top", 0)
-		.attr("left", 0)
+		//.attr("top", 0)
+		//.attr("left", 0)    // MG - g elements shouldnt have these attributes
 		.attr("class", "line");
-	this.dragZoomHighlight = this.innerSVG.append("rect").attr("y", 0).attr("fill","#addd8e");	
+	this.dragZoomHighlight = this.innerSVG.append("rect").attr("y", 0).attr("width", 0).attr("fill","#addd8e");	
 	
 	this.plot.on("click", function(){
 		this.model.clearStickyHighlights();
@@ -157,8 +165,10 @@ Graph = function(targetSvg, model, options) {
 
 	function brushstart() {
 		//brushmove();
-		self.dragZoomHighlight.attr("width",0);
-		self.dragZoomHighlight.attr("display","inline");
+		self.dragZoomHighlight
+            .attr("width",0)
+            .attr("display","inline")
+        ;
 	}
 
 	function brushmove() {
@@ -215,7 +225,7 @@ Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 	var fragKeyHeight = 100;//can tidy this up somehow 
 	var cy = self.g.node().parentNode.parentNode.clientHeight;// - fragKeyHeight;
 	
-	self.g.attr("width", cx).attr("height", cy);
+	//self.g.attr("width", cx).attr("height", cy); // MG - g elements shouldn't have these attributes
 	var width = cx - self.margin.left - self.margin.right;
 	var height = cy - self.margin.top  - self.margin.bottom;
 	self.x.domain([xmin, xmax])
@@ -237,8 +247,10 @@ Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 	self.yAxisRight = d3.svg.axis().scale(self.y1).ticks(yTicks).orient("right").tickFormat(d3.format("s")); 
 
 	self.yAxisLeftSVG.call(self.yAxisLeft);
-	self.yAxisRightSVG.attr("transform", "translate(" + width + " ,0)");
-	self.yAxisRightSVG.call(self.yAxisRight);
+	self.yAxisRightSVG
+        .attr("transform", "translate(" + width + " ,0)")
+        .call(self.yAxisRight)
+    ;
 	
 
 	self.xAxis = d3.svg.axis().scale(self.x).ticks(xTicks).orient("bottom");
@@ -255,11 +267,27 @@ Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 	self.plot.attr("width", width)
 		.attr("height", height)
 
-	self.innerSVG.attr("width", width)
-			.attr("height", height)
-			.attr("viewBox", "0 0 "+width+" "+height);
+	//self.innerSVG.attr("width", width)
+	//		.attr("height", height)
+	//		.attr("viewBox", "0 0 "+width+" "+height); // MG - g element shouldn't have these attributes
 	
-	self.xaxisRect.attr("width",width).attr("y", height).attr("height", self.margin.bottom);
+	//self.xaxisRect.attr("width",width).attr("y", height).attr("height", self.margin.bottom);
+    self.xaxisRect
+        .call(this.brush)
+        .selectAll("rect")
+            .attr("y", height)
+            .attr("height", self.margin.bottom)
+    ;
+    self.xaxisRect.selectAll("rect.extent").style("pointer-events", "none");
+    
+    if (this.measureBrush) {
+        this.mainBrush.call(this.measureBrush);
+    }
+    this.mainBrush.selectAll("rect")    // MJG
+        .attr("height", height)
+    ;
+    this.mainBrush.selectAll("rect.extent").style("pointer-events", "none");
+    
 	self.dragZoomHighlight.attr("height", height);
 				
 	self.zoom = d3.behavior.zoom().x(self.x).on("zoom", self.redraw());
@@ -279,16 +307,20 @@ Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 }
 
 Graph.prototype.disablePanning = function(){
+    this.plot.style("pointer-events", "none");
+    /*
 		this.plot.call(this.zoom)
 			.on("mousedown.zoom", null)
 			.on("touchstart.zoom", null)
 			.on("touchmove.zoom", null)
 			.on("touchend.zoom", null);
+            */
 }
 
 Graph.prototype.measure = function(on){
 	if (on === true){
-		this.disablePanning();
+        this.plot.style("pointer-events", "none");
+		//this.disablePanning();  // MJG
 		var self = this;
 
 		function measureStart() {
@@ -482,21 +514,33 @@ Graph.prototype.measure = function(on){
 			.x(this.x)
 			.on("brushstart", measureStart)
 			.on("brush", measureMove)
+        ;
+        var cy = this.g.node().parentNode.parentNode.clientHeight;// - fragKeyHeight;
+        var height = cy - this.margin.top  - this.margin.bottom;
+        this.mainBrush  // MJG
+            .call(this.measureBrush)
+            .style ("display", "inline")
+            .selectAll("rect")
+            .attr("height", height)
+        ;
 
-		this.plot.call(this.measureBrush);
+		//this.plot.call(this.measureBrush);
 		//this.innerSVG.call(this.measureBrush);
-
-
 	}
 	else{
 		this.measureClear();
-		this.plot.call(this.zoom);
+        this.plot.style("pointer-events","all");    // MJG
+		//this.plot.call(this.zoom);
 		//this.innerSVG.call(this.zoom);
+        /*
 		this.measureBrush = d3.svg.brush()
 			.on("brushstart", null)
 			.on("brush", null)
 			.on("brushend", null);
-		this.plot.call(this.measureBrush);
+        this.plot.call(this.measureBrush);
+        this.mainBrush.call(this.measureBrush); // MJG
+        */
+        this.mainBrush.style("display", "none"); // MJG
 /*		this.plot.on("click", function(){
 			this.model.clearStickyHighlights();
 		}.bind(this));*/
