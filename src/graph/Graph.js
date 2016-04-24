@@ -417,7 +417,7 @@ Graph.prototype.measure = function(on){
             }
 			PeakInfo += "<br/><br/><p style='font-size:0.8em'>";
 			for(i=1; i<7; i++){
-			PeakInfo += "z = "+i+": "+(distance/i).toFixed(2)+" Da</br>";	
+			PeakInfo += "z = "+i+": "+(distance*i).toFixed(2)+" Da</br>";	
 			}
 			PeakInfo += "</p>";
 			
