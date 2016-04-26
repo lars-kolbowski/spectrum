@@ -58,23 +58,24 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 	//svg elements
 	this.g = this.FragKey.highlights.append('g');
 
-	var group = this.g[0][0];
-	group.onmouseover = function(evt) {
-		startHighlight();
-	};
-	group.onmouseout = function(evt) {
-		endHighlight();
-
-	};
-	group.ontouchstart = function(evt) {
-		startHighlight();
-	};
-	group.ontouchend = function(evt) {
-		endHighlight();
-	};
-	group.onclick = function(evt) {
-		self.FragKey.model.updateStickyHighlight(self.fragments, evt.ctrlKey);
-	};
+	var group = this.g
+	   .on("mouseover", function() {
+            startHighlight();
+        })
+        .on("mouseout", function() {
+            endHighlight();
+        })
+	   .on("touchstart", function() {
+		  startHighlight();
+	   })
+	   .on("touchend", function() {
+            endHighlight();
+        })
+	   .on("click", function() {
+           var evt = d3.event;
+            self.FragKey.model.updateStickyHighlight(self.fragments, evt.ctrlKey);
+        })
+    ;
 
 	function startHighlight(){
 		self.FragKey.model.addHighlight(self.fragments);	
@@ -94,8 +95,7 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 			.attr("stroke", this.FragKey.model.highlightColour)
 			.attr("stroke-width", this.FragKey.model.highlightWidth)
 			.attr("opacity", 0)						
-			.attr("peptide", this.peptide)
-			//.attr("fragKeyIndex", index);  //MG
+;
 		
 					
 		this.bTail = this.g.append("line")
@@ -103,8 +103,6 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 			.attr("y1", y)
 			.attr("x2", this.x- tailX)
 			.attr("y2", y + tailY)
-			.attr("peptide", this.peptide)
-			//.attr("fragKeyIndex", index)   // MG
 			.attr("class", "fragBar");
 
 
@@ -153,8 +151,7 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 			.attr("stroke", this.FragKey.model.highlightColour)
 			.attr("stroke-width", this.FragKey.model.highlightWidth)
 			.attr("opacity", 0)
-			.attr("peptide", this.peptide)
-			//.attr("fragKeyIndex", index);  // MG
+;
 		
 		
 		this.yTail = this.g.append("line")
@@ -162,8 +159,6 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 			.attr("y1", y - barHeight)
 			.attr("x2", this.x + tailX)
 			.attr("y2", y - barHeight - tailY)
-			.attr("peptide", this.peptide)
-			//.attr("fragKeyIndex", index)   //MG
 			.attr("class", "fragBar");
 
 		var ion = "";
@@ -203,8 +198,6 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 		.attr("y1", y)
 		.attr("x2", this.x)
 		.attr("y2", y - barHeight)
-		.attr("peptide", this.peptide)
-		//.attr("fragKeyIndex", index)    // MG
 		.attr("class", "fragBar");
 
 	//if all fragments are lossy 	
