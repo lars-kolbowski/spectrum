@@ -144,19 +144,20 @@ function Peak (id, graph){
 			else
 				self.graph.tip.html(self.tooltip.join("<br/>"));
 
+			// check if there is enough space right of the peak to display the tooltip. If not display it on the left of the peak
 			var wrapperWidth = $(self.graph.g.node().parentNode.parentNode.parentNode.parentNode).width();
 			if (x+250 > wrapperWidth){
-
-			//console.log(offset.top+x + 20, offset.left+y - 28)
 				self.graph.tip.style("opacity", 1)
 						.style("left", "")
 						.style("right", (wrapperWidth - x + 20) + "px")
+						.style("max-width", wrapperWidth - (wrapperWidth-x+25) + "px")
 						.style("top", (y - 28) + "px")
 			}
 			else{
 				self.graph.tip.style("opacity", 1)
 						.style("right", "")
 						.style("left", (x + 20) + "px")
+						.style("max-width", x-25 + "px")
 						.style("top", (y - 28) + "px")
 			}
 					

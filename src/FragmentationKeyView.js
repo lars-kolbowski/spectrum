@@ -22,6 +22,7 @@ var FragmentationKeyView = Backbone.View.extend({
 		this.peptideFragKey.clear();
 		if (this.model.JSONdata)
 			this.peptideFragKey.setData();
+		this.resize();
 	},
 
 	clearHighlights: function(){

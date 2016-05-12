@@ -96,7 +96,7 @@ Graph = function(targetSvg, model, options) {
 	    .style("position", "absolute")
 	    .style("padding", "3px")               
 	    .style("opacity", 0)
-	    .style("font-size", "0.8em")
+	    .style("font-size", "0.7em")
 	    .style("pointer-events", "none");
 
 	//MeasuringTool
