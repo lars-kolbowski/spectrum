@@ -20,7 +20,8 @@
 
 function Peak (id, graph){
 	var peak = graph.model.JSONdata.peaks[id];
-
+	if (peak.mz == 705.15869)
+		console.log(id)
 	this.x = peak.mz;
 	this.y = peak.intensity;
 	this.IsotopeClusters = [];
@@ -79,9 +80,10 @@ function Peak (id, graph){
 		//get right cluster for peak
 		index = 0
 		for (var i = 0; i < this.clusterIds.length; i++) {
-			if(this.fragments[f].clusterInfo.indexOf(this.clusterIds[i]) != -1)
-				index = this.fragments[f].clusterInfo.indexOf(this.clusterIds[i])
+			if(this.fragments[f].clusterIds.indexOf(this.clusterIds[i]) != -1){
+				index = this.fragments[f].clusterIds.indexOf(this.clusterIds[i])
 				cluster = graph.model.JSONdata.clusters[this.clusterIds[i]]
+			}
 		}
 		
 		charge = cluster.charge;
