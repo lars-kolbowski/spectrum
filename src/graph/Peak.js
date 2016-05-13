@@ -20,14 +20,15 @@
 
 function Peak (id, graph){
 	var peak = graph.model.JSONdata.peaks[id];
-	if (peak.mz == 705.15869)
-		console.log(id)
 	this.x = peak.mz;
 	this.y = peak.intensity;
 	this.IsotopeClusters = [];
 	this.labels = [];
-	for (i=0; i<peak.clusterIds.length; i++)
-		this.IsotopeClusters.push(graph.model.JSONdata.clusters[peak.clusterIds[i]]);
+	for (i=0; i<peak.clusterIds.length; i++){
+		cluster = graph.model.JSONdata.clusters[peak.clusterIds[i]]
+		cluster.id = peak.clusterIds[i]
+		this.IsotopeClusters.push(cluster);
+	}
 	this.clusterIds = peak.clusterIds
 	this.graph = graph;
 
@@ -35,16 +36,27 @@ function Peak (id, graph){
 	var notLossyFragments = [];
 	var lossyFragments = [];
 	this.isMonoisotopic = false;
-	for (var i = 0; i < this.IsotopeClusters.length; i++) {
-		this.isotope = id - this.IsotopeClusters[i].firstPeakId;
-		if (this.isotope == 0)
-			this.isMonoisotopic = true;
-	};
 
 	var fragments = graph.model.fragments;
 
 	for (var f = 0; f < fragments.length; f++) {
-		if(_.intersection(fragments[f].clusterIds, peak.clusterIds).length != 0){
+		if(_.intersection(fragments[f].clusterIds, this.clusterIds).length != 0){
+			//monoisotopic peak for this fragment
+			intersect = _.intersection(fragments[f].clusterIds, this.clusterIds) 
+				for (var i = 0; i < intersect.length; i++) {
+					console.log(intersect[i])
+					for (var j = 0; j < this.IsotopeClusters.length; j++) {
+						if (this.IsotopeClusters[j].id == intersect[i] && this.IsotopeClusters[j].firstPeakId == id)
+							this.isMonoisotopic = true
+					}
+					//intersect[i]
+				}
+
+/*				for (var i = 0; i < this.IsotopeClusters.length; i++) {
+					if(id == this.IsotopeClusters[i].firstPeakId;
+						this.isMonoisotopic = true;
+				};*/
+			//
 			if(fragments[f].class == "lossy")
 				lossyFragments.push(fragments[f]);
 			else
