@@ -78,8 +78,8 @@ Graph = function(targetSvg, model, options) {
 
 
 	//Tooltip
-	target = this.g.node().parentNode.parentNode;
-	this.tip = d3.select(target).append("div")//this would get you #spectrumPanel
+	target = this.g.node().parentNode.parentNode; //this would get you #spectrumPanel
+	this.tip = d3.select(target).append("div")
 		.attr("class", "specViewer_tooltip")
 		.style("background-color", "#f0f0f0")
 	    .style("border", "1px solid black")
@@ -89,7 +89,8 @@ Graph = function(targetSvg, model, options) {
 	    .style("padding", "3px")               
 	    .style("opacity", 0)
 	    .style("font-size", "0.7em")
-	    .style("pointer-events", "none");
+	    .style("pointer-events", "none")
+	    .style("line-height", "100%");
 
 	//MeasuringTool
 	this.measuringTool = this.innerSVG.append("g")

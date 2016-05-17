@@ -166,7 +166,7 @@ function Peak (id, graph){
 				self.graph.tip.style("opacity", 1)
 						.style("right", "")
 						.style("left", (x + 20) + "px")
-						.style("max-width", x-25 + "px")
+						.style("max-width", wrapperWidth-(x+25) + "px")
 						.style("top", (y - 28) + "px")
 			}
 					
