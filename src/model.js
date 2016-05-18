@@ -172,9 +172,10 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 	},
 
 	changeLink: function(linkPos1, linkPos2){
-		this.match.linkPos1[0] = linkPos1;
-		this.match.linkPos2[0] = linkPos2;
-		CLMSUI.loadSpectra(this.match, this.randId, this);
+		var newmatch = $.extend(true, {}, this.match);	//way to clone object so linkpos change is not cached
+		newmatch.linkPos1[0] = linkPos1;
+		newmatch.linkPos2[0] = linkPos2;
+		CLMSUI.loadSpectra(newmatch, this.randId, this);
 
 	}	
 });
