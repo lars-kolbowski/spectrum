@@ -25,6 +25,8 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		this.sticky = Array();
 		this.highlights = Array();
 		this.JSONdata = json;
+		this.match = this.get("match");
+		this.randId = this.get("randId");
 		console.log(this.JSONdata);
 		this.peptides = this.JSONdata.Peptides;
 		this.pepStrs = [];
@@ -167,6 +169,12 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		this.p2color_cluster = this.cmap[5];
 		this.p2color_loss = this.cmap[6];
 		this.trigger("changed:ColorScheme");
-	}
+	},
 
+	changeLink: function(linkPos1, linkPos2){
+		this.match.linkPos1[0] = linkPos1;
+		this.match.linkPos2[0] = linkPos2;
+		CLMSUI.loadSpectra(this.match, this.randId, this);
+
+	}	
 });
