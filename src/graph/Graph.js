@@ -394,22 +394,17 @@ Graph.prototype.measure = function(on){
 			self.measureDistance.text(distance.toFixed(2)+" Th");		
 			//var PeakInfo = distance.toFixed(2)+" Th<br/>"
 			var PeakInfo = ""
-			if(self.measureStartPeak.fragments.length > 0){
-				if (self.measureStartPeak.isMonoisotopic)
+			if(self.measureStartPeak.fragments.length > 0)
 					PeakInfo += "From: <span style='color:"+ self.measureStartPeak.colour +"'>" + self.measureStartPeak.fragments[0].name +"</span> (" + self.measureStartPeak.x + " m/z)";
-				else
-					PeakInfo += "From: <span style='color:"+ self.measureStartPeak.colour +"'>" + self.measureStartPeak.fragments[0].name +"</span>+"+self.measureStartPeak.isotope+ " (" + self.measureStartPeak.x + " m/z)";
-			}
+			else if (self.measureStartPeak.isotopes.length > 0)
+					PeakInfo += "From: <span style='color:"+ self.measureStartPeak.colour +"'>" + self.measureStartPeak.isotopes[0].name + "+" + self.measureStartPeak.isotopenumbers[0]+ "</span> (" + self.measureStartPeak.x + " m/z)";
 			else
 				PeakInfo += "From: Peak (" + self.measureStartPeak.x + " m/z)"; 
 			if(endPeak){
-				if(endPeak.fragments.length > 0){
-					if (endPeak.isMonoisotopic)
+				if(endPeak.fragments.length > 0)
 						PeakInfo += "<br/>To: <span style='color:"+ endPeak.colour +"'>" + endPeak.fragments[0].name +"</span> (" + endPeak.x + " m/z)";
-					else{
-						PeakInfo += "<br/>To: <span style='color:"+ endPeak.colour +"'>" + endPeak.fragments[0].name +"</span>+"+endPeak.isotope+ " (" + endPeak.x + " m/z)";
-					}
-				}
+				else if(endPeak.isotopes.length > 0)
+						PeakInfo += "<br/>To: <span style='color:"+ endPeak.colour +"'>" + endPeak.isotopes[0].name + "+" + endPeak.isotopenumbers[0]+ "</span> (" + endPeak.x + " m/z)";
 				else{
 					PeakInfo += "<br/>To: Peak (" + endPeak.x + " m/z)";
 					} 
