@@ -35,26 +35,22 @@ function Peak (id, graph){
 	//make fragments
 	//var notLossyFragments = [];
 	//var lossyFragments = [];
-	this.fragments = []
-	this.isotopes = []
+	this.fragments = [];
+	this.isotopes = [];
+	this.isotopenumbers = [];
 	//this.isMonoisotopic = false;	//monoisotopic peak for at least one fragment
 
 	var fragments = graph.model.fragments;
-
-	if(id == 114)
-		console.log(id)
-
-
 	for (var f = 0; f < fragments.length; f++) {
 		if(_.intersection(fragments[f].clusterIds, this.clusterIds).length != 0){
 			//monoisotopic peak for this fragment
 			intersect = _.intersection(fragments[f].clusterIds, this.clusterIds) 
 				for (var i = 0; i < intersect.length; i++) {
-					//console.log(intersect[i])
-					fragments[f].isMonoisotopic = false
+					fragments[f].isMonoisotopic = false;
 					for (var j = 0; j < this.IsotopeClusters.length; j++) {
+						var isotope = id - this.IsotopeClusters[j].firstPeakId;
 						if (this.IsotopeClusters[j].id == intersect[i] && this.IsotopeClusters[j].firstPeakId == id){
-							fragments[f].isMonoisotopic = true
+							fragments[f].isMonoisotopic = true;
 							//this.isMonoisotopic = true
 						}
 					}
@@ -62,8 +58,10 @@ function Peak (id, graph){
 				}
 			if(fragments[f].isMonoisotopic)
 				this.fragments.push(fragments[f])
-			else
+			else{
 				this.isotopes.push(fragments[f])
+				this.isotopenumbers.push(isotope)
+			}
 /*			if(fragments[f].class == "lossy")
 				lossyFragments.push(fragments[f]);
 			else
@@ -127,7 +125,7 @@ function Peak (id, graph){
 		//set the dom events for it
 		var self = this;
 		var group = this.g[0][0];
-		group.onmouseover = function(evt) {
+		group.onmouseover = function(evt) {		
 			showTooltip(evt.layerX, evt.layerY);
 			startHighlight();
 		};
