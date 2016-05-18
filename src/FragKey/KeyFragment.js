@@ -95,6 +95,7 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 			.attr("stroke-width", this.FragKey.model.highlightWidth)
 			.attr("opacity", 0)						
 			.attr("peptide", this.peptide)
+			.style("cursor", "pointer")
 			.attr("fragKeyIndex", index);
 		
 					
@@ -105,6 +106,7 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 			.attr("y2", y + tailY)
 			.attr("peptide", this.peptide)
 			.attr("fragKeyIndex", index)
+			.style("cursor", "pointer")
 			.attr("class", "fragBar");
 
 
@@ -123,6 +125,7 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 			.attr("y", y + 15)			
 			.style("font-size", "0.6em")
 			.style("fill", color)
+			.style("cursor", "default")
 			//.attr("text-anchor", "middle")
 			.text(ion)
 			.attr("opacity", 0);	
@@ -154,6 +157,7 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 			.attr("stroke-width", this.FragKey.model.highlightWidth)
 			.attr("opacity", 0)
 			.attr("peptide", this.peptide)
+			.style("cursor", "pointer")
 			.attr("fragKeyIndex", index);
 		
 		
@@ -164,6 +168,7 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 			.attr("y2", y - barHeight - tailY)
 			.attr("peptide", this.peptide)
 			.attr("fragKeyIndex", index)
+			.style("cursor", "pointer")
 			.attr("class", "fragBar");
 
 		var ion = "";
@@ -180,6 +185,7 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 			.attr("y", y - barHeight - 7)			
 			.style("font-size", "0.6em")
 			.style("fill", color)
+			.style("cursor", "default")
 			//.attr("text-anchor", "end")
 			.text(ion)
 			.attr("opacity", 0);
@@ -205,6 +211,7 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 		.attr("y2", y - barHeight)
 		.attr("peptide", this.peptide)
 		.attr("fragKeyIndex", index)
+		.style("cursor", "pointer")
 		.attr("class", "fragBar");
 
 	//if all fragments are lossy 	

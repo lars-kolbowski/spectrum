@@ -61,10 +61,10 @@ var FragmentationKeyView = Backbone.View.extend({
 	setData: function(){
 
 		var self = this;
-		//this.clear();
+
 		var pepCount = self.model.peptides.length;
-		var	linkPos = self.model.JSONdata.LinkSite;
-		
+		this.linkPos = self.model.JSONdata.LinkSite;
+		this.changeCL = false;
 		var pepModsArray = [];
 		this.peptideStrs = self.model.pepStrs;
 		var fragments = self.model.JSONdata.fragments;
@@ -106,21 +106,21 @@ var FragmentationKeyView = Backbone.View.extend({
 		    // #    account for crosslink shift
 		    // #    this alings the peptide sequences at the cross-link site
 		    // #==========================================================================
-		    var shift = linkPos[0].linkSite - linkPos[1].linkSite;
+		    var shift = this.linkPos[0].linkSite - this.linkPos[1].linkSite;
 		    var spaceArray = arrayOfHashes(Math.abs(shift));
-		    var linkpos;
+		    var linkPos;
 		    if  (shift <= 0) {
 		        this.peptides[0] = Array(Math.abs(shift) + 1).join("#") + this.peptideStrs[0];
-		        linkpos = linkPos[1].linkSite+1;
+		        linkPos = this.linkPos[1].linkSite+1;
 		        this.pepoffset[0] = Math.abs(shift) - 0;
 		    }
 		    else {
 		        this.peptides[1] = Array(shift + 1).join("#") + this.peptideStrs[1];
-		        linkpos = linkPos[0].linkSite+1;
+		        linkPos = this.linkPos[0].linkSite+1;
 		        this.pepoffset[1] = shift - 0;
 			}
 
-			console.log("linkpos: "+linkpos);
+			console.log("linkpos: "+ linkPos);
 
 		    var diff = this.peptideStrs[0].length - this.peptideStrs[1].length;
 		    spaceArray = arrayOfHashes(Math.abs(diff));
@@ -153,7 +153,28 @@ var FragmentationKeyView = Backbone.View.extend({
 						.attr("y", y1)
 						.attr("text-anchor", "middle")
 						.attr("fill", colour)
+						.attr("pos", i-shift)
+						.style("cursor", "default")
 						.text(pep[i]);
+					pepLetters[i][0][0].onclick = function() {
+						if(self.changeCL){
+							//get y attribute to see which peptide
+							if (this.getAttribute("y") == "20"){		//pep1
+								self.linkPos[0].linkSite = this.getAttribute("pos");
+								self.CLline.attr("x1", this.getAttribute("x"));
+								self.CLlineHighlight.attr("x1", this.getAttribute("x"));
+							}
+							else{
+								self.linkPos[1].linkSite = this.getAttribute("pos");
+								self.CLline.attr("x2", this.getAttribute("x"))
+								self.CLlineHighlight.attr("x2", this.getAttribute("x"));	
+							}
+							var newlinkpos1 = parseInt(self.linkPos[0].linkSite)+1;
+							var newlinkpos2 = parseInt(self.linkPos[1].linkSite)+1;
+							self.model.changeLink(newlinkpos1, newlinkpos2);
+						}
+					};
+					
 					if(mods[i-shift]){
 						modLetters[i] = self.g.append("text")
 							.attr("x", xStep * i)
@@ -169,14 +190,40 @@ var FragmentationKeyView = Backbone.View.extend({
 			}
 		}
 		if(this.peptides[1]){
-			// the the link line
-			self.g.append("line")
-				.attr("x1", xStep * (linkpos - 1))//the one...
+			this.CL = self.g.append("g");
+			//highlight
+			this.CLlineHighlight = this.CL.append("line")
+				.attr("x1", xStep * (linkPos - 1))
 				.attr("y1", 25)
-				.attr("x2", xStep * (linkpos - 1))//the one...
+				.attr("x2", xStep * (linkPos - 1))
+				.attr("y2", 55)
+				.attr("stroke", "yellow")
+				.attr("stroke-width", 10)
+				.style("opacity", 0)
+				.style("cursor", "pointer");
+			// the the link line
+			this.CLline = this.CL.append("line")
+				.attr("x1", xStep * (linkPos - 1))//the one...
+				.attr("y1", 25)
+				.attr("x2", xStep * (linkPos - 1))//the one...
 				.attr("y2", 55)
 				.attr("stroke", "black")
-				.attr("stroke-width", 1.5);
+				.attr("stroke-width", 1.5)
+				.style("cursor", "pointer");
+
+
+			this.CL[0][0].onclick = function() {
+				self.CLlineHighlight.style("opacity", 1)
+				self.changeCL = true;
+				for (i=0; i < self.pepLetters.length; i++){
+					var letterCount = self.pepLetters[i].length;
+					for (j = 0; j < letterCount; j++){
+						if (self.pepLetters[i][j])
+							self.pepLetters[i][j].style("cursor", "pointer");			
+					}
+				}
+			};
+
 		}
 
 		this.fraglines = new Array();
@@ -377,6 +424,6 @@ var FragmentationKeyView = Backbone.View.extend({
 		this.linkPos = [];
 		this.g.selectAll("*").remove();
 		this.highlights.selectAll("*").remove();
-	}		
+	}	
 
 });
