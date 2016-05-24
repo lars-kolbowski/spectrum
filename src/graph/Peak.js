@@ -251,6 +251,12 @@ function Peak (id, graph){
 		this.labels = []; // will be array of d3 selections
 		this.labelHighlights = []; // will be array of d3 selections
 		this.labelLines = []; // will be array of d3 selections
+
+		//sort fragments for label order first non-lossy then lossy
+		this.fragments.sort(function (a, b) {
+            return a["class"] < b["class"];
+        });
+
 		var fragCount = this.fragments.length;
 		for (var f = 0; f < fragCount; f++){
 			if (this.fragments[f].isMonoisotopic){
