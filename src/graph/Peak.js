@@ -363,18 +363,27 @@ function Peak (id, graph){
 		this.highlightLine.style("cursor", "pointer");
 	}
 
+
 	this.colour = this.graph.model.lossFragBarColour;
 	if (this.fragments.length > 0){
-		if (this.fragments[0].peptideId == 0) {
-			if (this.fragments[0].class == "non-lossy")
+
+		var lossy = true;
+		for (var i = 0; i < this.fragments.length; i++) {
+			if (this.fragments[i].class == "non-lossy"){
+				lossy = false;
+				var index = i;
+			}
+		}
+		if (this.fragments[index].peptideId == 0) {
+			if (!lossy)
 				this.colour = this.graph.model.p1color;
-			else if (this.fragments[0].class == "lossy")
+			else
 				this.colour = this.graph.model.p1color_loss;	
 		}
-		else if (this.fragments[0].peptideId == 1) {
-			if (this.fragments[0].class == "non-lossy")
+		else if (this.fragments[index].peptideId == 1) {
+			if (!lossy)
 				this.colour = this.graph.model.p2color;
-			else if (this.fragments[0].class == "lossy")
+			else
 				this.colour = this.graph.model.p2color_loss;			
 		}
 	}
