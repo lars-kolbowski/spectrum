@@ -77,10 +77,12 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 	};
 
 	function startHighlight(){
-		self.FragKey.model.addHighlight(self.fragments);	
+		if (!self.FragKey.changeCL)
+			self.FragKey.model.addHighlight(self.fragments);	
 	}
 	function endHighlight(){
-		self.FragKey.model.clearHighlight(self.fragments);	
+		if (!self.FragKey.changeCL)
+			self.FragKey.model.clearHighlight(self.fragments);	
 	}
 	// # bions; either normal or lossy; have different colors
 	if (fragments.b.length != 0){ // really a, b, or c , see get_fragment_annotation()
