@@ -374,10 +374,11 @@ function Peak (id, graph){
 	if (this.fragments.length > 0){
 
 		var lossy = true;
+		var index = 0;
 		for (var i = 0; i < this.fragments.length; i++) {
 			if (this.fragments[i].class == "non-lossy"){
 				lossy = false;
-				var index = i;
+				index = i;
 			}
 		}
 		if (this.fragments[index].peptideId == 0) {
