@@ -125,11 +125,17 @@ function Peak (id, graph){
 		//set the dom events for it
 		var self = this;
 		var group = this.g[0][0];
-		group.onmouseover = function(evt) {		
+		group.onmouseover = function(evt) {
+			if (evt.ctrlKey){
+				self.line.style("cursor", "copy");
+				self.highlightLine.style("cursor", "copy");
+			}		
 			showTooltip(evt.layerX, evt.layerY);
 			startHighlight();
 		};
 		group.onmouseout = function(evt) {
+			self.line.style("cursor", "pointer");
+			self.highlightLine.style("cursor", "pointer");
 			hideTooltip();
 			endHighlight();
 		};
