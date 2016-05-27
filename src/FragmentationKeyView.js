@@ -65,6 +65,7 @@ var FragmentationKeyView = Backbone.View.extend({
 		var pepCount = self.model.peptides.length;
 		this.linkPos = self.model.JSONdata.LinkSite;
 		this.changeCL = false;
+		this.changeMod = false;
 		var pepModsArray = [];
 		this.peptideStrs = self.model.pepStrs;
 		var fragments = self.model.JSONdata.fragments;
@@ -76,6 +77,7 @@ var FragmentationKeyView = Backbone.View.extend({
 	    this.pepLetters = [];
 	    this.pepLetterHighlights = [];
 		this.pepModLetters = [];
+		this.pepModLetterHighlights = [];
 		this.pepoffset = [0,0];
 		for(p=0; p < pepCount; p++){
 			annotations[p] = [];
@@ -89,6 +91,7 @@ var FragmentationKeyView = Backbone.View.extend({
 			this.pepLetters[p] = [];
 			this.pepModLetters[p] = [];
 			this.pepLetterHighlights[p] = [];
+			this.pepModLetterHighlights[p] = [];
 			pepModsArray[p] = [];
 			for(i = 0; i < self.model.peptides[p].sequence.length; i++){
 				if (self.model.peptides[p].sequence[i].Modification != "")
@@ -139,13 +142,15 @@ var FragmentationKeyView = Backbone.View.extend({
 	    #==========================================================================
 		*/
 
-	    var xStep = 20;
-	    // the letters
-		drawPeptide( this.peptides[0], pepModsArray[0], 20, 5, this.model.p1color, this.pepLetters[0], this.pepLetterHighlights[0], this.pepModLetters[0]);
-		if(this.peptides[1])
-	    	drawPeptide( this.peptides[1], pepModsArray[1], 71, 83, this.model.p2color, this.pepLetters[1], this.pepLetterHighlights[1], this.pepModLetters[1]);
 
-		function drawPeptide( pep, mods, y1, y2, colour, pepLetters, pepLetterHighlights, modLetters) {
+	    var xStep = 22;
+
+	    // the letters
+		drawPeptide( this.peptides[0], 0, pepModsArray[0], 20, 5, this.model.p1color, this.pepLetters[0], this.pepLetterHighlights[0], this.pepModLetters[0], this.pepModLetterHighlights[0]);
+		if(this.peptides[1])
+	    	drawPeptide( this.peptides[1], 1, pepModsArray[1], 71, 83, this.model.p2color, this.pepLetters[1], this.pepLetterHighlights[1], this.pepModLetters[1], this.pepModLetterHighlights[1]);
+
+		function drawPeptide(pep, pepIndex, mods, y1, y2, colour, pepLetters, pepLetterHighlights, modLetters, modLetterHighlights) {
 			var pepLettersG = self.g.append('g');
 			var l = pep.length;
 			var shift = 0;
@@ -158,7 +163,7 @@ var FragmentationKeyView = Backbone.View.extend({
 						.attr("text-anchor", "middle")
 						.attr("fill", colour)
 						.attr("pos", i-shift)
-						.attr("stroke-width", "5px")
+						.attr("stroke-width", "2px")
 						.attr("stroke", self.model.highlightColour)
 						.attr("opacity", 0)
 						.style("cursor", "default")
@@ -169,31 +174,70 @@ var FragmentationKeyView = Backbone.View.extend({
 						.attr("text-anchor", "middle")
 						.attr("fill", colour)
 						.attr("pos", i-shift)
+						.attr("pep", pepIndex)
 						.style("cursor", "default")
 						.text(pep[i]);
 					pepLetterG[0][0].onclick = function() {
 						if(self.changeCL){
 							//get y attribute to see which peptide
-							if (this.childNodes[0].getAttribute("y") == "20"){		//pep1
+							if (this.childNodes[1].getAttribute("pep") == 0)		//pep1
 								self.linkPos[0].linkSite = this.childNodes[0].getAttribute("pos");
-								//self.CLline.attr("x1", this.getAttribute("x"));
-								//self.CLlineHighlight.attr("x1", this.getAttribute("x"));
-							}
-							else{
+							else
 								self.linkPos[1].linkSite = this.childNodes[0].getAttribute("pos");
-								//self.CLline.attr("x2", this.getAttribute("x"))
-								//self.CLlineHighlight.attr("x2", this.getAttribute("x"));	
-							}
 							var newlinkpos1 = parseInt(self.linkPos[0].linkSite)+1;
 							var newlinkpos2 = parseInt(self.linkPos[1].linkSite)+1;
 							self.model.changeLink(newlinkpos1, newlinkpos2);
 						}
+						if(self.changeMod !== false && self.validModChange){	//if changeMod is active and the mod is from the same peptide
+							var modification = self.changeMod[1].innerHTML;
+							var aminoAcid = this.childNodes[1].innerHTML;
+							var aaPosition = parseInt(this.childNodes[1].getAttribute("pos"));
+							var pepIndex = parseInt(this.childNodes[1].getAttribute("pep"));
+							var peptide = self.model.pepStrs[pepIndex];
+							var newPepSeq = peptide.slice(0, aaPosition+1) + modification + peptide.slice(aaPosition+1);
+							self.model.changeMod(newPepSeq, pepIndex);
+						}
 					};
 					pepLetterG[0][0].onmouseover = function() {
+						if(self.changeMod !== false && this.childNodes[1].getAttribute("pep") == self.changeMod[1].getAttribute("pep")){	//if changeMod is active and the mod is from the same peptide
+							var pepLetterHighlight = this.childNodes[0];
+							pepLetterHighlight.setAttribute("opacity", 1);
+							var highlight = self.changeMod[0];
+							var oldModLetters = self.changeMod[1];
+							var x = parseInt(this.childNodes[0].getAttribute("x"));
+							var y = parseInt(oldModLetters.getAttribute("y"));
+							var modtext = oldModLetters.innerHTML;
+							var aminoAcid = this.childNodes[1].innerHTML;
+							//check if it is a valid modification change
+							if (self.model.checkForValidModification(modtext, aminoAcid)){
+								self.validModChange = true;
+							}
+							else{
+								self.validModChange = false;
+								this.childNodes[0].setAttribute("style", "cursor:not-allowed");
+								this.childNodes[1].setAttribute("style", "cursor:not-allowed");
+							}
+							//
+							if (oldModLetters.getAttribute("pep") == 0)
+								var colour = self.model.p1color;
+							else if (oldModLetters.getAttribute("pep") == 1)
+								var colour = self.model.p2color;
+							oldModLetters.setAttribute("fill", "grey");
+							highlight.setAttribute("x", x);
+							highlight.setAttribute("y", y);
+							highlight.setAttribute("opacity", 1)
+							self.changeModLetter.attr("x", x)
+								.text(modtext)
+								.attr("y", y)
+								.attr("fill", colour)
+								.attr("opacity", 1);	
+						}
+
 						if(self.changeCL){
 							var pepLetterHighlight = this.childNodes[0];
-							if (pepLetterHighlight.getAttribute("y") == "20"){		//pep1
-								//set opacity of all letters of this highligh to zero
+							var pepLetter = this.childNodes[1];
+							if (pepLetter.getAttribute("pep") == 0){		//pep1
+								//set opacity of all letters of this highlight to zero
 								for (var i = 0; i < self.pepLetterHighlights[0].length; i++) {
 									if(typeof(self.pepLetterHighlights[0][i]) !== "undefined")
 										self.pepLetterHighlights[0][i].attr("opacity", 0);
@@ -204,7 +248,7 @@ var FragmentationKeyView = Backbone.View.extend({
 								self.CLlineHighlight.attr("x1", pepLetterHighlight.getAttribute("x"));
 							}
 							else{
-								//set opacity of all letters of this highligh to zero
+								//set opacity of all letters of this highlight to zero
 								for (var i = 0; i < self.pepLetterHighlights[1].length; i++) {
 									if(typeof(self.pepLetterHighlights[1][i]) !== "undefined")
 										self.pepLetterHighlights[1][i].attr("opacity", 0);
@@ -217,40 +261,76 @@ var FragmentationKeyView = Backbone.View.extend({
 							pepLetterHighlight.setAttribute("opacity", 1);
 						}		
 					};
-					// pepLetterG[0][0].onmouseout = function() {
-					// 	if(self.changeCL){
-					// 		var pepLetterHighlight = this.childNodes[0];
-					// 		pepLetterHighlight.setAttribute("opacity", 0);
-					// 	}		
-					// };
+					pepLetterG[0][0].onmouseout = function() {
+						if(self.changeMod !== false && this.childNodes[1].getAttribute("pep") == self.changeMod[1].getAttribute("pep")){	//if changeMod is active and the mod is from the same peptide
+							var pepLetterHighlight = this.childNodes[0];
+							var highlight = self.changeMod[0];
+							pepLetterHighlight.setAttribute("opacity", 0);
+							self.changeModLetter.attr("opacity", 0);
+							highlight.setAttribute("opacity", 0);
+						}
+					};
 
 
-					
+
 					if(mods[i-shift]){
-						modLetters[i] = self.g.append("text")
+						var modLetterG = pepLettersG.append('g');
+						modLetterHighlights[i] = modLetterG.append("text")
+							.attr("x", xStep * i)
+							.attr("y", y2)
+							.attr("text-anchor", "middle")
+							.attr("stroke", self.model.highlightColour)
+							.attr("stroke-width", "2px")
+							.attr("opacity", 0)
+							.style("font-size", "0.7em")
+							.style("cursor", "pointer")
+							.text(mods[i-shift]);						
+						modLetters[i] = modLetterG.append("text")
 							.attr("x", xStep * i)
 							.attr("y", y2)
 							.attr("text-anchor", "middle")
 							.attr("fill", colour)
+							.attr("pep", pepIndex)
 							.style("font-size", "0.7em")
+							.style("cursor", "pointer")
 							.text(mods[i-shift]);
-					}
+						modLetterG[0][0].onclick = function() {
+							var letters = this.childNodes[1];
+							var highlight = this.childNodes[0];
+							highlight.setAttribute("style","cursor:default");
+							//set changeMod var to the clicked modification
+							self.changeMod = this.childNodes;
+							highlight.setAttribute("opacity", 1);
+							//disable fragBar cursor
+							for (var i = 0; i < self.fraglines.length; i++) {
+								self.fraglines[i].disableCursor();
+							}
+							//enable pepLetter cursor pointer
+							i = parseInt(letters.getAttribute("pep"));
+							var letterCount = self.pepLetters[i].length;
+							for (j = 0; j < letterCount; j++){
+								if (self.pepLetters[i][j])
+									self.pepLetters[i][j].style("cursor", "pointer");			
+							}
+						};
+					};
 				}
 				else
 					shift++;
 			}
 		}
+		//CL line svg elements
 		if(this.peptides[1]){
-			this.CL = self.g.append("g");
+			this.CL = this.g.append("g");
 			//highlight
 			this.CLlineHighlight = this.CL.append("line")
 				.attr("x1", xStep * (linkPos - 1))
 				.attr("y1", 25)
 				.attr("x2", xStep * (linkPos - 1))
 				.attr("y2", 55)
-				.attr("stroke", "yellow")
+				.attr("stroke", self.model.highlightColour)
 				.attr("stroke-width", 10)
-				.style("opacity", 0)
+				.attr("opacity", 0)
 				.style("cursor", "pointer");
 			// the the link line
 			this.CLline = this.CL.append("line")
@@ -262,8 +342,22 @@ var FragmentationKeyView = Backbone.View.extend({
 				.attr("stroke-width", 1.5)
 				.style("cursor", "pointer");
 
+			this.CL[0][0].onclick = function() {
+				self.CLlineHighlight.attr("opacity", 1);
+				self.changeCL = true;
+				for (var i = 0; i < self.fraglines.length; i++) {
+					self.fraglines[i].disableCursor();
+				}
+				for (i=0; i < self.pepLetters.length; i++){
+					var letterCount = self.pepLetters[i].length;
+					for (j = 0; j < letterCount; j++){
+						if (self.pepLetters[i][j])
+							self.pepLetters[i][j].style("cursor", "pointer");			
+					}
+				}
+			};
 			//line for changing
-			this.changeCLline = this.CL.append("line")
+			this.changeCLline = this.g.append("line")
 				.attr("x1", xStep * (linkPos - 1))
 				.attr("y1", 25)
 				.attr("x2", xStep * (linkPos - 1))
@@ -273,20 +367,13 @@ var FragmentationKeyView = Backbone.View.extend({
 				.attr("opacity", 0)
 				.style("cursor", "pointer");
 
-
-			this.CL[0][0].onclick = function() {
-				self.CLlineHighlight.style("opacity", 1)
-				self.changeCL = true;
-				for (i=0; i < self.pepLetters.length; i++){
-					var letterCount = self.pepLetters[i].length;
-					for (j = 0; j < letterCount; j++){
-						if (self.pepLetters[i][j])
-							self.pepLetters[i][j].style("cursor", "pointer");			
-					}
-				}
-			};
-
 		}
+
+		//change-mod svg element
+	    this.changeModLetter = this.g.append("text")
+	    	.attr("text-anchor", "middle")
+			.style("font-size", "0.7em")
+			.style("cursor", "default");
 
 		this.fraglines = new Array();
 		var self = this;
@@ -301,28 +388,6 @@ var FragmentationKeyView = Backbone.View.extend({
 					annotations[pepId][fragments[i].range[r].to].b.push(fragments[i]);
 			}
 		};
-
-
-	/*	for (var i = 0; i < fragments.length; i++) {
-			for (var r = 0; r < fragments[i].range.length; r++) {
-				if(fragments[i].range[r].peptideId == fragments[i].peptideId){
-					if (fragments[i].range[r].from == 0){	//a,b,c-ion
-
-						//End
-						var index = fragments[i].range[r].to;
-						annotations[fragments[i].peptideId][index].b.push(fragments[i]);
-					}
-					else{	//x,y,z-ion
-						//check for double fragmentation
-						
-						//End
-						var index = fragments[i].range[r].from - 1;
-						annotations[fragments[i].peptideId][index].y.push(fragments[i]);
-					}
-				}
-			}
-		};*/
-
 		console.log(annotations);
 
 	    drawFragmentationEvents(annotations[0], self.pepoffset[0], 0);
@@ -339,6 +404,57 @@ var FragmentationKeyView = Backbone.View.extend({
 				}
 			}
 		}
+
+		//changeInfo
+		if (this.model.match.oldLinkPos !== undefined){
+		    var linkPos = [];
+		    for (var i = 0; i < this.peptides.length; i++) {
+		    	linkPos.push(this.model.match.oldLinkPos[i][0])
+		    	var j = 0;
+		    	while(this.peptides[i][j] == "#") {
+		    			linkPos[i] += 1
+		    			j++;
+		    	}
+		    }
+		    this.origCL = this.g.append("g");
+		    this.origCLHighlight = this.origCL.append("line")
+				.attr("x1", xStep * (linkPos[0] - 1))
+				.attr("y1", 25)
+				.attr("x2", xStep * (linkPos[1] - 1))
+				.attr("y2", 55)
+				.attr("stroke", this.model.highlightColour)
+				.attr("stroke-width", 5)
+				.attr("opacity", 0)
+				.style("cursor", "pointer");
+		    this.origCLline = this.origCL.append("line")
+				.attr("x1", xStep * (linkPos[0] - 1))
+				.attr("y1", 25)
+				.attr("x2", xStep * (linkPos[1] - 1))
+				.attr("y2", 55)
+				.attr("stroke", "lightgrey")
+				.attr("opacity", 1)
+				.style("cursor", "pointer");
+			this.origCL[0][0].onmouseover = function(){
+				self.origCLHighlight.attr("opacity", 1);
+			};
+			this.origCL[0][0].onmouseout = function(){
+				self.origCLHighlight.attr("opacity", 0);
+			};
+			this.origCL[0][0].onclick = function(){
+				self.model.changeLink(self.model.match.oldLinkPos[0][0], self.model.match.oldLinkPos[1][0]);
+			};
+			// //get position
+			// var x = 0
+			// for (var i = 0; i < this.pepLetters.length; i++) {
+			// 		if(parseInt(this.pepLetters[i][this.pepLetters[i].length-1][0][0].getAttribute("x")) > x)
+			// 			x = parseInt(this.pepLetters[i][this.pepLetters[i].length-1][0][0].getAttribute("x"));
+			// }
+			// this.changeInfo = this.g.append('g');
+			// var scoreInfo = this.changeInfo.append('text')
+			// 	.text("link was changed")
+			// 	.attr("x", x+20);
+		}
+
 
 	},
 

@@ -44,7 +44,7 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 
 
 
-	var xStep = 20;
+	var xStep = 22;
 
 	this.x = (xStep * (index+offset)) + (xStep / 2);
 	if (this.peptideId == 0)
@@ -56,10 +56,33 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 	var self = this;
 
 	//svg elements
-	this.g = this.FragKey.highlights.append('g');
-
+	this.g = this.FragKey.g.append('g');
 	var group = this.g[0][0];
 	group.onmouseover = function(evt) {
+		if(!self.FragKey.changeMod && !self.FragKey.changeCL){
+			if (evt.ctrlKey){
+				self.fragBar.style("cursor", "copy");
+				if(self.yTail){
+					self.yTail.style("cursor", "copy");
+					self.yHighlight.style("cursor", "copy");
+				}
+				if(self.bTail){
+					self.bTail.style("cursor", "copy");
+					self.bHighlight.style("cursor", "copy");
+				}
+			}
+			else{
+				self.fragBar.style("cursor", "pointer");
+				if(self.yTail){
+					self.yTail.style("cursor", "pointer");
+					self.yHighlight.style("cursor", "pointer");
+				}
+				if(self.bTail){
+					self.bTail.style("cursor", "pointer");
+					self.bHighlight.style("cursor", "pointer");
+				}
+			}
+		}
 		startHighlight();
 	};
 	group.onmouseout = function(evt) {
@@ -77,11 +100,11 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 	};
 
 	function startHighlight(){
-		if (!self.FragKey.changeCL)
+		if (!self.FragKey.changeCL && !self.FragKey.changeMod)
 			self.FragKey.model.addHighlight(self.fragments);	
 	}
 	function endHighlight(){
-		if (!self.FragKey.changeCL)
+		if (!self.FragKey.changeCL && !self.FragKey.changeMod)
 			self.FragKey.model.clearHighlight(self.fragments);	
 	}
 	// # bions; either normal or lossy; have different colors
@@ -206,7 +229,7 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 		}
 	}
 
-	var fragBar = this.g.append("line")
+	this.fragBar = this.g.append("line")
 		.attr("x1", this.x)
 		.attr("y1", y)
 		.attr("x2", this.x)
@@ -218,10 +241,10 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 
 	//if all fragments are lossy 	
 	if ((fragments.y.length == 0 || ylossy) && (fragments.b.length == 0 || blossy)){
-		fragBar.attr("stroke", this.FragKey.model.lossFragBarColour);
+		this.fragBar.attr("stroke", this.FragKey.model.lossFragBarColour);
 	}
 	else {
-		fragBar.attr("stroke", "black");
+		this.fragBar.attr("stroke", "black");
 	}
 			
 }
@@ -250,5 +273,17 @@ KeyFragment.prototype.highlight = function(show, fragments){
 			this.bHighlight.attr("opacity", 0);	
 			this.bText.attr("opacity", 0);
 		}	
+	}
+}
+
+KeyFragment.prototype.disableCursor = function(){
+	this.fragBar.style("cursor", "default");
+	if(this.yTail){
+		this.yTail.style("cursor", "default");
+		this.yHighlight.style("cursor", "default");
+	}
+	if(this.bTail){
+		this.bTail.style("cursor", "default");
+		this.bHighlight.style("cursor", "default");
 	}
 }

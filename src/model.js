@@ -172,10 +172,32 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 	},
 
 	changeLink: function(linkPos1, linkPos2){
-		var newmatch = $.extend(true, {}, this.match);	//way to clone object so linkpos change is not cached
+		var newmatch = $.extend(true, {}, this.match);	//clone object so linkpos change is not cached
 		newmatch.linkPos1[0] = linkPos1;
 		newmatch.linkPos2[0] = linkPos2;
+		//set the original linkPos if its not set yet
+		if (this.match.oldLinkPos === undefined)
+			newmatch.oldLinkPos = [this.match.linkPos1, this.match.linkPos2];
+		//if the newlinkpos are the original ones delete oldLinkPos
+		else if (this.match.oldLinkPos[0] == linkPos1 && this.match.oldLinkPos[1] == linkPos2)	
+			newmatch.oldLinkPos = undefined;
 		CLMSUI.loadSpectra(newmatch, this.randId, this);
 
-	}	
+	},
+
+	changeMod: function(pepSeq, pepIndex){
+		var newmatch = $.extend(true, {}, this.match);	//clone object
+		if (pepIndex == 0)
+			newmatch.pepSeq1raw = pepSeq;
+		if (pepIndex == 1)
+			newmatch.pepSeq2raw = pepSeq;
+		CLMSUI.loadSpectra(newmatch, this.randId, this);
+	},
+
+	checkForValidModification: function(modification, aminoAcid){
+		var oxAAs = "MNQCWFYHP";
+		if (modification == "ox" && oxAAs.indexOf(aminoAcid) != -1)
+			return true;
+		return false;
+	}
 });
