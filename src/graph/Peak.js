@@ -685,7 +685,8 @@ Peak.prototype.updateColor = function(){
 		}
 	}
 	this.line.attr("stroke", this.colour);
-    if (this.labels.length)
-	//for (var i = 0; i < this.labels.length; i++)
-		this.labels.attr("fill", this.colour);	
+    if (this.labels.length) {
+		  this.labels.attr("fill", this.colour);	
+    }
 }
+
