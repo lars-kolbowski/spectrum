@@ -51,7 +51,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		this.p2color_loss = this.cmap[6];
 		this.lossFragBarColour = "#cccccc";
 		this.highlightColour = "yellow";
-		this.highlightWidth = 11;
+		this.highlightWidth = 10;
 		this.setGraphData();
 
 	},
@@ -194,9 +194,15 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		CLMSUI.loadSpectra(newmatch, this.randId, this);
 	},
 
-	checkForValidModification: function(modification, aminoAcid){
+	checkForValidModification: function(mod, aminoAcid){
 		var oxAAs = "MNQCWFYHP";
-		if (modification == "ox" && oxAAs.indexOf(aminoAcid) != -1)
+		var phosphoAAs = "ST";
+		var bs3AAs = "KS";
+		if (mod == "ox" && oxAAs.indexOf(aminoAcid) != -1)
+			return true;
+		if (mod == "p" && phosphoAAs.indexOf(aminoAcid) != -1)
+			return true;
+		if ((mod == "bs3nh2" || mod == "bs3oh" || mod == "bs3loop") && bs3AAs.indexOf(aminoAcid) != -1)
 			return true;
 		return false;
 	}

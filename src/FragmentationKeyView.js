@@ -188,7 +188,8 @@ var FragmentationKeyView = Backbone.View.extend({
 							var newlinkpos2 = parseInt(self.linkPos[1].linkSite)+1;
 							self.model.changeLink(newlinkpos1, newlinkpos2);
 						}
-						if(self.changeMod !== false && self.validModChange){	//if changeMod is active and the mod is from the same peptide
+						//if changeMod is active and the mod is from the same peptide and it's a valid modification for this aa
+						if(self.changeMod !== false && self.validModChange && this.childNodes[1].getAttribute("pep") == self.changeMod[1].getAttribute("pep")){	
 							var modification = self.changeMod[1].innerHTML;
 							var aminoAcid = this.childNodes[1].innerHTML;
 							var aaPosition = parseInt(this.childNodes[1].getAttribute("pos"));
@@ -224,7 +225,7 @@ var FragmentationKeyView = Backbone.View.extend({
 								var colour = self.model.p2color;
 							oldModLetters.setAttribute("fill", "grey");
 							highlight.setAttribute("x", x);
-							highlight.setAttribute("y", y);
+							highlight.setAttribute("y", y+1);
 							highlight.setAttribute("opacity", 1)
 							self.changeModLetter.attr("x", x)
 								.text(modtext)
@@ -280,11 +281,12 @@ var FragmentationKeyView = Backbone.View.extend({
 							.attr("y", y2)
 							.attr("text-anchor", "middle")
 							.attr("stroke", self.model.highlightColour)
-							.attr("stroke-width", "2px")
-							.attr("opacity", 0)
+							.attr("pep", pepIndex)
 							.style("font-size", "0.7em")
 							.style("cursor", "pointer")
-							.text(mods[i-shift]);						
+							.text(mods[i-shift])
+							.attr("stroke-width", "2px")
+							.attr("opacity", 0);				
 						modLetters[i] = modLetterG.append("text")
 							.attr("x", xStep * i)
 							.attr("y", y2)
@@ -297,7 +299,7 @@ var FragmentationKeyView = Backbone.View.extend({
 						modLetterG[0][0].onclick = function() {
 							var letters = this.childNodes[1];
 							var highlight = this.childNodes[0];
-							highlight.setAttribute("style","cursor:default");
+							highlight.setAttribute("style","font-size:0.7em; cursor:default;");
 							//set changeMod var to the clicked modification
 							self.changeMod = this.childNodes;
 							highlight.setAttribute("opacity", 1);
