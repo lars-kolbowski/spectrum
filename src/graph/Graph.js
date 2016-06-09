@@ -66,6 +66,11 @@ Graph = function(targetSvg, model, options) {
 	this.plot = this.g.append("rect")
 		.style("fill", "white")
 		.attr("pointer-events", "all");
+
+	this.measureBackground = this.g.append("rect")
+		.style("fill", "white")
+		.attr("pointer-events", "all");
+
 	this.innerSVG = this.g.append("g")
 		.attr("top", 0)
 		.attr("left", 0)
@@ -75,7 +80,6 @@ Graph = function(targetSvg, model, options) {
 	this.plot.on("click", function(){
 		this.model.clearStickyHighlights();
 	}.bind(this));
-
 
 	//Tooltip
 	target = this.g.node().parentNode.parentNode; //this would get you #spectrumPanel
@@ -151,7 +155,6 @@ Graph = function(targetSvg, model, options) {
 		.style("text-anchor","middle").style("pointer-events","none");
 	}
 	
-
 	var self = this;
 	
 	//~ brushstart();
@@ -289,6 +292,11 @@ Graph.prototype.disablePanning = function(){
 
 Graph.prototype.measure = function(on){
 	if (on === true){
+		this.measureBackground
+		.attr("width", this.plot[0][0].getAttribute("width"))
+		.attr("height", this.plot[0][0].getAttribute("height"))
+
+
 		this.disablePanning();
 		var self = this;
 
@@ -479,8 +487,7 @@ Graph.prototype.measure = function(on){
 			.on("brushstart", measureStart)
 			.on("brush", measureMove)
 
-		this.plot.call(this.measureBrush);
-		//this.innerSVG.call(this.measureBrush);
+		this.measureBackground.call(this.measureBrush);
 
 
 	}
@@ -488,11 +495,11 @@ Graph.prototype.measure = function(on){
 		this.measureClear();
 		this.plot.call(this.zoom);
 		//this.innerSVG.call(this.zoom);
-		this.measureBrush = d3.svg.brush()
-			.on("brushstart", null)
-			.on("brush", null)
-			.on("brushend", null);
-		this.plot.call(this.measureBrush);
+		//this.measureBrush = d3.svg.brush()
+		//	.on("brushstart", null)
+		//	.on("brush", null)
+		//	.on("brushend", null);
+		//this.plot.call(this.measureBrush);
 /*		this.plot.on("click", function(){
 			this.model.clearStickyHighlights();
 		}.bind(this));*/
@@ -501,9 +508,10 @@ Graph.prototype.measure = function(on){
 }
 
 Graph.prototype.measureClear = function(){
-		this.measuringTool.attr("display","none");
-		this.measureDistance.attr("display","none");
-		this.measureInfo.style("display","none");	
+	this.measureBackground.attr("height", 0);
+	this.measuringTool.attr("display","none");
+	this.measureDistance.attr("display","none");
+	this.measureInfo.style("display","none");	
 }
 
 Graph.prototype.redraw = function(){
