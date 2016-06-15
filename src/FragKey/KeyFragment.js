@@ -35,8 +35,8 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 		this.fragments = this.fragments.concat(fragments.y);
 	}
 
-	var yfrag_index = this.peptide.sequence.length - (index + 1);
-	var bfrag_index = (index + 1);
+	this.yfrag_index = this.peptide.sequence.length - (index + 1);
+	this.bfrag_index = (index + 1);
 	if (this.peptideId == 0)
 		var color = this.FragKey.model.p1color;
 	else if (this.peptideId == 1)
@@ -138,12 +138,39 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 		var ion = "";
 		for (var i = 0; i < fragments.b.length; i++) {
 			if(fragments.b[i].type.indexOf("AIon") != -1)
-				ion = "a"+bfrag_index;		
+				ion = "a"+this.bfrag_index;		
 			else if(fragments.b[i].type.indexOf("BIon") != -1)
-				ion = "b"+bfrag_index;
+				ion = "b"+this.bfrag_index;
 			else if(fragments.b[i].type.indexOf("CIon") != -1)
-				ion = "c"+bfrag_index;
+				ion = "c"+this.bfrag_index;
 		};
+
+
+//Idea for multiple texts, could be to crowded
+/*		this.bTexts = []	//Array of d3 selections
+		bions = []
+		for (var i = 0; i < fragments.b.length; i++) {		
+			if(fragments.b[i].type.indexOf("AIon") != -1 && bions.indexOf("a"+this.bfrag_index) == -1)
+				bions.push("a"+this.bfrag_index);		
+			if(fragments.b[i].type.indexOf("BIon") != -1 && bions.indexOf("b"+this.bfrag_index) == -1)
+				bions.push("b"+this.bfrag_index);		
+			if(fragments.b[i].type.indexOf("CIon") != -1 && bions.indexOf("c"+this.bfrag_index) == -1)
+				bions.push("c"+this.bfrag_index);		
+		}
+
+		for (var i = 0; i < bions.length; i++) {
+			bText = this.g.append("text")
+			.attr("x", this.x - 7)
+			.attr("y", y + 15)			
+			.style("font-size", "0.6em")
+			.style("fill", color)
+			.style("cursor", "default")
+			//.attr("text-anchor", "end")
+			.text(bions[i])
+			.attr("opacity", 0);
+			this.bTexts.push(bText);
+		}
+*/
 
 		this.bText = this.g.append("text")
 			.attr("x", this.x - 7)
@@ -199,12 +226,38 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 		var ion = "";
 		for (var i = 0; i < fragments.y.length; i++) {		
 			if(fragments.y[i].type.indexOf("XIon") != -1)
-				ion = "x"+yfrag_index;		
+				ion = "x"+this.yfrag_index;		
 			else if(fragments.y[i].type.indexOf("YIon") != -1)
-				ion = "y"+yfrag_index;
+				ion = "y"+this.yfrag_index;
 			else if(fragments.y[i].type.indexOf("ZIon") != -1)
-				ion = "z"+yfrag_index;
+				ion = "z"+this.yfrag_index;
 		}
+		
+//Idea for multiple texts, could be to crowded
+/*		this.yTexts = []	//Array of d3 selections
+		yions = []
+		for (var i = 0; i < fragments.y.length; i++) {		
+			if(fragments.y[i].type.indexOf("XIon") != -1 && yions.indexOf("x"+this.yfrag_index) == -1)
+				yions.push("x"+this.yfrag_index);		
+			if(fragments.y[i].type.indexOf("YIon") != -1 && yions.indexOf("y"+this.yfrag_index) == -1)
+				yions.push("y"+this.yfrag_index);		
+			if(fragments.y[i].type.indexOf("ZIon") != -1 && yions.indexOf("z"+this.yfrag_index) == -1)
+				yions.push("z"+this.yfrag_index);		
+		}
+
+		for (var i = 0; i < yions.length; i++) {
+			yText = this.g.append("text")
+			.attr("x", this.x - 2)
+			.attr("y", y - barHeight - 7)			
+			.style("font-size", "0.6em")
+			.style("fill", color)
+			.style("cursor", "default")
+			//.attr("text-anchor", "end")
+			.text(yions[i])
+			.attr("opacity", 0);
+			this.yTexts.push(yText);
+		}*/
+
 		this.yText = this.g.append("text")
 			.attr("x", this.x - 2)
 			.attr("y", y - barHeight - 7)			
@@ -254,13 +307,25 @@ KeyFragment.prototype.highlight = function(show, fragments){
 		for(f = 0; f < fragments.length; f++){
 			if( this.b.indexOf(fragments[f]) != -1 && this.bHighlight){
 				this.bHighlight.attr("opacity", 1);
-				if (fragments[f].type.indexOf("AIon") != -1 || fragments[f].type.indexOf("BIon") != -1 || fragments[f].type.indexOf("CIon") != -1)
-					this.bText.attr("opacity", 1);
+				if (fragments[f].type.indexOf("AIon") != -1)
+					this.bText.text("a" + this.bfrag_index)
+				if (fragments[f].type.indexOf("BIon") != -1)
+					this.bText.text("b" + this.bfrag_index)
+				if (fragments[f].type.indexOf("CIon") != -1)
+					this.bText.text("c" + this.bfrag_index)	
+				//if (fragments[f].type.indexOf("AIon") != -1 || fragments[f].type.indexOf("BIon") != -1 || fragments[f].type.indexOf("CIon") != -1)
+				this.bText.attr("opacity", 1);
 			}
 			if (this.y.indexOf(fragments[f]) != -1 && this.yHighlight){
 				this.yHighlight.attr("opacity", 1);
-				if (fragments[f].type.indexOf("XIon") != -1 || fragments[f].type.indexOf("YIon") != -1 || fragments[f].type.indexOf("ZIon") != -1)
-					this.yText.attr("opacity", 1);
+				if (fragments[f].type.indexOf("XIon") != -1)
+					this.yText.text("x" + this.yfrag_index)
+				if (fragments[f].type.indexOf("YIon") != -1)
+					this.yText.text("y" + this.yfrag_index)
+				if (fragments[f].type.indexOf("ZIon") != -1)
+					this.yText.text("z" + this.yfrag_index)	
+				//if (fragments[f].type.indexOf("XIon") != -1 || fragments[f].type.indexOf("YIon") != -1 || fragments[f].type.indexOf("ZIon") != -1)
+				this.yText.attr("opacity", 1);
 			}
 		}
 	}
