@@ -22,6 +22,8 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 	setData: function(json){
 		//var annotatedPeaksCSV = this.get("annotatedPeaksCSV");
 		//this.set("annotatedPeaks", d3.csv.parse(annotatedPeaksCSV.trim()));
+		$("#measuringTool").prop("checked", false);
+		$("#moveLabels").prop("checked", false);			
 		this.sticky = Array();
 		this.highlights = Array();
 		this.JSONdata = json;
