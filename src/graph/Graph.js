@@ -82,19 +82,21 @@ Graph = function(targetSvg, model, options) {
 	}.bind(this));
 
 	//Tooltip
-	target = this.g.node().parentNode.parentNode; //this would get you #spectrumPanel
-	this.tip = d3.select(target).append("div")
-		.attr("class", "specViewer_tooltip")
-		.style("background-color", "#f0f0f0")
-	    .style("border", "1px solid black")
-	    .style("color", "black")
-	    .style("border-radius", "6px")
-	    .style("position", "absolute")
-	    .style("padding", "3px")               
-	    .style("opacity", 0)
-	    .style("font-size", "0.7em")
-	    .style("pointer-events", "none")
-	    .style("line-height", "100%");
+	this.tooltip = CLMSUI.compositeModelInst.get("tooltipModel");
+
+	//target = this.g.node().parentNode.parentNode; //this would get you #spectrumPanel
+	// this.tip = d3.select(target).append("div")
+	// 	.attr("class", "specViewer_tooltip")
+	// 	.style("background-color", "#f0f0f0")
+	//     .style("border", "1px solid black")
+	//     .style("color", "black")
+	//     .style("border-radius", "6px")
+	//     .style("position", "absolute")
+	//     .style("padding", "3px")               
+	//     .style("opacity", 0)
+	//     .style("font-size", "0.7em")
+	//     .style("pointer-events", "none")
+	//     .style("line-height", "100%");
 
 	//MeasuringTool
 	this.measuringTool = this.innerSVG.append("g")
