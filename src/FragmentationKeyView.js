@@ -39,9 +39,6 @@ var FragmentationKeyView = Backbone.View.extend({
 		this.highlights = this.fragKeyWrapper.append("g").attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
 		this.g =  this.fragKeyWrapper.append("g").attr("class", "fragKey").attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
 
-		//create peptide frag key
-		//this.peptideFragKey = new PeptideFragmentationKey(this.fragKeyWrapper, this.model);
-
 		this.listenTo(this.model, 'change', this.render);
 		this.listenTo(this.model, 'destroy', this.remove);
 		this.listenTo(this.model, 'changed:Highlights', this.updateHighlights);
@@ -341,24 +338,26 @@ var FragmentationKeyView = Backbone.View.extend({
 					.text(pep[i]);
 				pepLetterG[0][0].onclick = function() {
 					if(self.changeCL){
-						//get y attribute to see which peptide
-						if (this.childNodes[1].getAttribute("pep") == 0)		//pep1
-							self.linkPos[0].linkSite = this.childNodes[0].getAttribute("pos");
-						else
-							self.linkPos[1].linkSite = this.childNodes[0].getAttribute("pos");
-						var newlinkpos1 = parseInt(self.linkPos[0].linkSite)+1;
-						var newlinkpos2 = parseInt(self.linkPos[1].linkSite)+1;
-						self.model.changeLink(newlinkpos1, newlinkpos2);
+						for (var pepIndex = 0; pepIndex < self.pepLetterHighlights.length; pepIndex++) {
+							var offset = 0;
+							for (var j = 0; j < self.pepLetterHighlights[pepIndex].length; j++) {
+								if(self.pepLetterHighlights[pepIndex][j] === undefined)
+									offset += 1;
+								else{
+									if(self.pepLetterHighlights[pepIndex][j][0][0].getAttribute("opacity") == "1")
+										self.linkPos[pepIndex].linkSite = j-offset;
+								}
+							}
+						}
+						var newlinkpos = new Array(self.linkPos[0].linkSite, self.linkPos[1].linkSite);
+						self.model.changeLinkPos(newlinkpos);
 					}
 					//if changeMod is active and the mod is from the same peptide and it's a valid modification for this aa
 					if(self.changeMod !== false && self.validModChange && this.childNodes[1].getAttribute("pep") == self.changeMod[1].getAttribute("pep")){	
-						var modification = self.changeMod[1].innerHTML;
-						var aminoAcid = this.childNodes[1].innerHTML;
-						var aaPosition = parseInt(this.childNodes[1].getAttribute("pos"));
+						var oldPos = self.changeMod[0].getAttribute('pos');
+						var newPos = parseInt(this.childNodes[1].getAttribute("pos"));
 						var pepIndex = parseInt(this.childNodes[1].getAttribute("pep"));
-						var peptide = self.model.pepStrs[pepIndex];
-						var newPepSeq = peptide.slice(0, aaPosition+1) + modification + peptide.slice(aaPosition+1);
-						self.model.changeMod(newPepSeq, pepIndex);
+						self.model.changeMod(oldPos, newPos, pepIndex);
 					}
 				};
 				pepLetterG[0][0].onmouseover = function() {
@@ -444,6 +443,7 @@ var FragmentationKeyView = Backbone.View.extend({
 						.attr("text-anchor", "middle")
 						.attr("stroke", self.model.highlightColour)
 						.attr("pep", pepIndex)
+						.attr("pos", i-shift)
 						.style("font-size", "0.7em")
 						.style("cursor", "pointer")
 						.text(mods[i-shift])

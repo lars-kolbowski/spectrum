@@ -165,8 +165,6 @@ function Peak (id, graph){
 
 			// check if there is enough space right of the peak to display the tooltip. If not display it on the left of the peak
 			var wrapperWidth = $(self.graph.g.node().parentNode.parentNode.parentNode.parentNode).width();
-			var x = x + 20;
-			var y = y - 28; 
 					
 			self.graph.tooltip.set("contents", contents )
 				.set("header", header.join(" "))
