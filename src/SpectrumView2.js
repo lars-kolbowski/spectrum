@@ -112,7 +112,7 @@ var SpectrumView = Backbone.View.extend({
 	moveLabels: function(e){
 
 		var $target = $(e.target);
-        var selected = $target .is(':checked');
+        var selected = $target.is(':checked');
         this.model.moveLabels = selected;
 		
 		var peaks = this.graph.points;
