@@ -201,8 +201,8 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 
 		if (this.match !== undefined){
 			var newmatch = $.extend(true, {}, this.match);	//clone object so linkpos change is not cached
-			newmatch.linkPos1[0] = newLinkSites[0];
-			newmatch.linkPos2[0] = newLinkSites[1];
+			newmatch.linkPos1 = newLinkSites[0];
+			newmatch.linkPos2 = newLinkSites[1];
 			//set the original linkPos if its not set yet
 			if (this.match.oldLinkPos === undefined)
 				newmatch.oldLinkPos = [this.match.linkPos1, this.match.linkPos2];

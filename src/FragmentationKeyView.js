@@ -205,7 +205,7 @@ var FragmentationKeyView = Backbone.View.extend({
 			if (this.model.match.oldLinkPos !== undefined){
 			    var linkPos = [];
 			    for (var i = 0; i < this.peptides.length; i++) {
-			    	linkPos.push(this.model.match.oldLinkPos[i][0])
+			    	linkPos.push(this.model.match.oldLinkPos[i])
 			    	var j = 0;
 			    	while(this.peptides[i][j] == "#") {
 			    			linkPos[i] += 1
@@ -237,7 +237,7 @@ var FragmentationKeyView = Backbone.View.extend({
 					self.origCLHighlight.attr("opacity", 0);
 				};
 				this.origCL[0][0].onclick = function(){
-					self.model.changeLinkPos([self.model.match.oldLinkPos[0][0], self.model.match.oldLinkPos[1][0]]);
+					self.model.changeLinkPos([self.model.match.oldLinkPos[0], self.model.match.oldLinkPos[1]]);
 				};
 				// //get position
 				// var x = 0
