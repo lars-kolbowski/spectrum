@@ -237,7 +237,7 @@ var FragmentationKeyView = Backbone.View.extend({
 					self.origCLHighlight.attr("opacity", 0);
 				};
 				this.origCL[0][0].onclick = function(){
-					self.model.changeLink(self.model.match.oldLinkPos[0][0], self.model.match.oldLinkPos[1][0]);
+					self.model.changeLinkPos([self.model.match.oldLinkPos[0][0], self.model.match.oldLinkPos[1][0]]);
 				};
 				// //get position
 				// var x = 0
@@ -349,7 +349,7 @@ var FragmentationKeyView = Backbone.View.extend({
 								}
 							}
 						}
-						var newlinkpos = new Array(self.linkPos[0].linkSite, self.linkPos[1].linkSite);
+						var newlinkpos = new Array(self.linkPos[0].linkSite+1, self.linkPos[1].linkSite+1);
 						self.model.changeLinkPos(newlinkpos);
 					}
 					//if changeMod is active and the mod is from the same peptide and it's a valid modification for this aa
