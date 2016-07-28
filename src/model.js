@@ -196,31 +196,31 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		this.trigger("changed:ColorScheme");
 	},
 
-//TODO: combine changeLink and changeLinkPos from standalone and integrated version
-	changeLink: function(linkPos1, linkPos2){
-		var newmatch = $.extend(true, {}, this.match);	//clone object so linkpos change is not cached
-		newmatch.linkPos1[0] = linkPos1;
-		newmatch.linkPos2[0] = linkPos2;
-		//set the original linkPos if its not set yet
-		if (this.match.oldLinkPos === undefined)
-			newmatch.oldLinkPos = [this.match.linkPos1, this.match.linkPos2];
-		//if the newlinkpos are the original ones delete oldLinkPos
-		else if (this.match.oldLinkPos[0] == linkPos1 && this.match.oldLinkPos[1] == linkPos2)	
-			newmatch.oldLinkPos = undefined;
-		CLMSUI.loadSpectra(newmatch, this.randId, this);
-	},
 
 	changeLinkPos: function(newLinkSites){
 
-
-		for (var i = 0; i < newLinkSites.length; i++) {
-			if (this.JSONdata.LinkSite[i] === undefined){
-				this.JSONdata.LinkSite[i] = {id: 0, linkSite: newLinkSites[i], peptideId: i}		
-			}
-			else
-				this.JSONdata.LinkSite[i].linkSite = newLinkSites[i];
+		if (this.match !== undefined){
+			var newmatch = $.extend(true, {}, this.match);	//clone object so linkpos change is not cached
+			newmatch.linkPos1[0] = newLinkSites[0];
+			newmatch.linkPos2[0] = newLinkSites[1];
+			//set the original linkPos if its not set yet
+			if (this.match.oldLinkPos === undefined)
+				newmatch.oldLinkPos = [this.match.linkPos1, this.match.linkPos2];
+			//if the newlinkpos are the original ones delete oldLinkPos
+			else if (this.match.oldLinkPos[0] == newLinkSites[0] && this.match.oldLinkPos[1] == newLinkSites[1])
+				newmatch.oldLinkPos = undefined;
+			CLMSUI.loadSpectra(newmatch, this.randId, this);			
 		}
-		this.setData();		
+		else{
+			for (var i = 0; i < newLinkSites.length; i++) {
+				if (this.JSONdata.LinkSite[i] === undefined){
+					this.JSONdata.LinkSite[i] = {id: 0, linkSite: newLinkSites[i], peptideId: i}		
+				}
+				else
+					this.JSONdata.LinkSite[i].linkSite = newLinkSites[i];
+			}
+			this.setData();	
+		}	
 
 	},
 
