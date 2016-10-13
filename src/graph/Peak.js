@@ -307,7 +307,8 @@ function Peak (id, graph){
 					}
 				};
 				label[0][0].onclick = function(evt) {
-					stickyHighlight(evt.ctrlKey, this.getAttribute("fragId"));
+					if(self.graph.model.moveLabels == false) 
+						stickyHighlight(evt.ctrlKey, this.getAttribute("fragId"));
 				};
 				labelHighlight[0][0].onmouseover = function(evt) {
 					if(!self.graph.model.moveLabels){
