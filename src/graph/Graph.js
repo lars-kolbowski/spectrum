@@ -349,13 +349,15 @@ Graph.prototype.measure = function(on){
 			var peakCount = self.points.length;
 			for (var p = 0; p < peakCount; p++) {
 				var peak = self.points[p];
-				if (_.intersection(self.model.highlights, peak.fragments).length != 0 && Math.abs(peak.x - mouseX)  < highlighttrigger){
-					var endPeak = peak;
-					break;
-				}
-				if (mouseX - triggerdistance < peak.x < mouseX + triggerdistance && Math.abs(peak.x - mouseX)  < distance){
-					var endPeak = peak
-					distance = Math.abs(peak.x - mouseX);
+				if (peak != self.measureStartPeak){
+					if (_.intersection(self.model.highlights, peak.fragments).length != 0 && Math.abs(peak.x - mouseX)  < highlighttrigger){
+						var endPeak = peak;
+						break;
+					}
+					if (mouseX - triggerdistance < peak.x < mouseX + triggerdistance && Math.abs(peak.x - mouseX)  < distance){
+						var endPeak = peak
+						distance = Math.abs(peak.x - mouseX);
+					}
 				}
 			}
 			
