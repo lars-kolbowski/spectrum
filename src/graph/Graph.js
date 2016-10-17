@@ -24,7 +24,7 @@
 Graph = function(targetSvg, model, options) {
 	this.x = d3.scale.linear();
 	this.y = d3.scale.linear();
-	this.y1 = d3.scale.linear();
+	this.y_right = d3.scale.linear();
 	this.model = model;
 
 	this.margin = {
@@ -227,7 +227,7 @@ Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 	// y-scale (inverted domain)
 	self.y.domain([0, ymax*0.95]).nice()
 		.range([height, 0]).nice();
-	self.y1.domain([0, ymax]).nice()
+	self.y_right.domain([0, ymax]).nice()
 		.range([height, 0]).nice();
 	//y0 = d3.scale.linear().range([height, 0]);
 	//self.y1 = d3.scale.linear().range([height, 0]);
@@ -275,8 +275,7 @@ Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 	}
 	this.xlabel.attr("x", width/2).attr("y", height);
 	this.ylabelLeft.attr("transform","translate(" + -50 + " " + height/2+") rotate(-90)");
-	var test = width+45;
-	this.ylabelRight.attr("transform","translate(" + test + " " + height/2+") rotate(-90)");
+	this.ylabelRight.attr("transform","translate(" + (width+45) + " " + height/2+") rotate(-90)");
 
 	
 	self.redraw()();
