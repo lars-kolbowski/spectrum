@@ -230,7 +230,7 @@ Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 	self.y_right.domain([0, ymax]).nice()
 		.range([height, 0]).nice();
 	//y0 = d3.scale.linear().range([height, 0]);
-	//self.y1 = d3.scale.linear().range([height, 0]);
+	//self.y_right = d3.scale.linear().range([height, 0]);
 
 	var yTicks = height / 40;
 	var xTicks = width / 100;
@@ -238,7 +238,7 @@ Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 	this.yTicks = yTicks;
 	
 	self.yAxisLeft = d3.svg.axis().scale(self.y).ticks(yTicks).orient("left").tickFormat(d3.format("s"));
-	self.yAxisRight = d3.svg.axis().scale(self.y1).ticks(yTicks).orient("right").tickFormat(d3.format("s")); 
+	self.yAxisRight = d3.svg.axis().scale(self.y_right).ticks(yTicks).orient("right").tickFormat(d3.format("s")); 
 
 	self.yAxisLeftSVG.call(self.yAxisLeft);
 	self.yAxisRightSVG.attr("transform", "translate(" + width + " ,0)");
@@ -545,7 +545,7 @@ Graph.prototype.redraw = function(){
 			//console.log(ymax);
 			//self.y.domain([0, ymax/0.9]).nice();
 			self.y.domain([0, ymax/0.95]).nice();
-			self.y1.domain([0, (ymax/(self.model.ymaxPrimary*0.95))*100]).nice();
+			self.y_right.domain([0, (ymax/(self.model.ymaxPrimary*0.95))*100]).nice();
 			self.yAxisLeftSVG.call(self.yAxisLeft);
 			self.yAxisRightSVG.call(self.yAxisRight);
 			for (var i = 0; i < self.points.length; i++){
