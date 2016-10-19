@@ -118,25 +118,32 @@ var SpectrumView = Backbone.View.extend({
 		var peaks = this.graph.points;
 
 		if (selected){
+			// for(p = 0; p < peaks.length; p++){
+			// 	if(peaks[p].labels){
+			// 		for(l = 0; l < peaks[p].labels.length; l++){
+			// 			peaks[p].labels[l].call(peaks[p].labelDrag);
+			// 			peaks[p].labels[l].style("cursor", "pointer");
+			// 		}
+			// 	}
+			// }	
 			for(p = 0; p < peaks.length; p++){
-				if(peaks[p].labels){
-					for(l = 0; l < peaks[p].labels.length; l++){
-						peaks[p].labels[l].call(peaks[p].labelDrag);
-						peaks[p].labels[l].style("cursor", "pointer");
-					}			
+				if(peaks[p].labels.length){
+						peaks[p].labels
+							.call(peaks[p].labelDrag)
+							//.style("cursor", "pointer");
 				}
 			}
 		}
 		else{
 			for(p = 0; p < peaks.length; p++){
-				if(peaks[p].labels){
-					for(l = 0; l < peaks[p].labels.length; l++){
-						peaks[p].labels[l].on(".drag", null);
-						peaks[p].labels[l].style("cursor", "default");
-					}
+				if(peaks[p].labels.length){
+						peaks[p].labels
+							.on(".drag", null)
+							//.style("cursor", "default");
 				}
 			}			
 		}
+
 	},
 	downloadSVG:function(){
             var svgSel = d3.select(this.el).selectAll("svg");

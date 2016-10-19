@@ -33,7 +33,9 @@ Graph = function(targetSvg, model, options) {
 		"bottom": options.xlabel ? 50 : 20,
 		"left":   options.ylabelLeft ? 65 : 30
 	};
-	this.g =  targetSvg.append("g").attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
+	this.g =  targetSvg.append("g")
+				.attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")")
+				.attr("class", "spectrum");
 	
 	this.xaxisSVG = this.g.append("g")
 		.attr("class", "x axis");
@@ -74,7 +76,7 @@ Graph = function(targetSvg, model, options) {
 	this.innerSVG = this.g.append("g")
 		.attr("top", 0)
 		.attr("left", 0)
-		.attr("class", "line");
+		.attr("class", "innerSpectrum");
 	this.dragZoomHighlight = this.innerSVG.append("rect").attr("y", 0).attr("fill","#addd8e");	
 	
 	this.plot.on("click", function(){
@@ -99,7 +101,7 @@ Graph = function(targetSvg, model, options) {
 	//     .style("line-height", "100%");
 
 	//MeasuringTool
-	this.measuringTool = this.innerSVG.append("g")
+	this.measuringTool = this.innerSVG.append("g").attr("class", "measuringTool");
 	this.measuringToolVLineStart = this.measuringTool.append("line")
 		.attr("stroke-width", 1)
 		.attr("stroke", "Black");
@@ -111,7 +113,7 @@ Graph = function(targetSvg, model, options) {
 		.attr("y2", 50)
 		.attr("stroke-width", 1)
 		.attr("stroke", "Red");
-	this.measureDistance = this.innerSVG.append("text")
+	this.measureDistance = this.measuringTool.append("text")
 		.attr("text-anchor", "middle")
 		.attr("pointer-events", "none")
 	this.measureInfo =  d3.select("div#measureTooltip")
@@ -120,10 +122,10 @@ Graph = function(targetSvg, model, options) {
 	//------------------------------------
 
 
-	this.highlights = this.innerSVG.append("g");
-	this.peaks = this.innerSVG.append("g");
-	this.lossyAnnotations = this.innerSVG.append("g");
-	this.annotations = this.innerSVG.append("g");
+	this.highlights = this.innerSVG.append("g").attr("class", "peakHighlights");
+	this.peaks = this.innerSVG.append("g").attr("class", "peaks");
+	this.lossyAnnotations = this.innerSVG.append("g").attr("class", "lossyAnnotations");
+	this.annotations = this.innerSVG.append("g").attr("class", "annotations");
 	
 	
 	// add Chart Title
@@ -185,13 +187,13 @@ Graph.prototype.setData = function(){
 	this.pep1 = this.model.pep1;
 	this.pep2 = this.model.pep2;
     if (this.model.JSONdata) {
-    	var test = "";
+    	//var test = "";
         for (var i = 0; i < this.model.JSONdata.peaks.length; i++){
         		var peak = this.model.JSONdata.peaks[i];
-				test += peak.mz + "\t" + peak.intensity + "\r\n";
+				//test += peak.mz + "\t" + peak.intensity + "\r\n";
             this.points.push(new Peak(i, this));
         }
-        console.log(test);
+        //console.log(test);
         this.model.points = this.points;
         //Isotope cluster
     /*	this.cluster = new Array();
@@ -241,8 +243,10 @@ Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 	self.yAxisRight = d3.svg.axis().scale(self.y_right).ticks(yTicks).orient("right").tickFormat(d3.format("s")); 
 
 	self.yAxisLeftSVG.call(self.yAxisLeft);
-	self.yAxisRightSVG.attr("transform", "translate(" + width + " ,0)");
-	self.yAxisRightSVG.call(self.yAxisRight);
+	self.yAxisRightSVG
+		.attr("transform", "translate(" + width + " ,0)")
+		.call(self.yAxisRight)
+	;
 	
 
 	self.xAxis = d3.svg.axis().scale(self.x).ticks(xTicks).orient("bottom");
@@ -498,8 +502,10 @@ Graph.prototype.measure = function(on){
 			.on("brushend", brushend);
 		var self = this;
 		function brushstart() {
-			self.dragZoomHighlight.attr("width",0);
-			self.dragZoomHighlight.attr("display","inline");
+			self.dragZoomHighlight
+				.attr("width",0)
+				.attr("display","inline")
+			;
 		}
 
 		function brushmove() {
