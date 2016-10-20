@@ -20,7 +20,7 @@
 
 function Peak (id, graph){
 	var peak = graph.model.JSONdata.peaks[id];
-	this.id = id
+	this.id = id;
 	this.x = peak.mz;
 	this.y = peak.intensity;
 	this.IsotopeClusters = [];
@@ -88,7 +88,6 @@ function Peak (id, graph){
 	};
 
 	this.fragments = notLossyFragments.concat(lossyFragments); //merge arrays*/
-
 
 	//svg elements
 	this.g = this.graph.peaks.append('g').attr("class", "line");
@@ -246,7 +245,7 @@ function Peak (id, graph){
 
 				var startX = self.graph.x(self.x);
 				var startY = self.graph.y(self.y)
-				var mouseX = coords[0]-startX;
+				var mouseX = coords[0];//-startX;
 				var mouseY = coords[1];
 				var r = Math.sqrt((mouseX * mouseX) + ((mouseY-startY) * (mouseY-startY) ));
 				if (r > 15){
@@ -283,16 +282,25 @@ function Peak (id, graph){
 		    {frags: lossy, group: this.graph.lossyAnnotations, type: "lossy", colourClass: "color_loss"},
 		    {frags: nonlossy, group: this.graph.annotations, type: "nonlossy", colourClass: "color"},
 		];
+        
+        CLMSUI.idList = CLMSUI.idList || [];
+        
+        var makeIdentityID = function (d) {
+            return d.id;
+        };
 
 		partitions.forEach (function (partition) {
-			if (partition.frags.length > 0){         
+            var peakFrags = partition.frags;
+            
+			if (peakFrags.length > 0) {
 				var group = partition.group;
-				var labelgroup = group.selectAll("g.label").data (partition.frags, function(d) { return d.id; });
-				var labelLines = self.g.selectAll("line.labelLine").data (partition.frags, function(d) { return d.id; });
+				//var labelgroup = group.selectAll("g.label").data (peakFrags, makeIdentityID);
+                var labelgroup = self.g.selectAll("g.label").data (peakFrags, makeIdentityID);
+				var labelLines = self.g.selectAll("line.labelLine").data (peakFrags, makeIdentityID);
 
 			    labelLines.enter()
 			        .append("line")
-						.attr("stroke-width", 1)
+				    .attr("stroke-width", 1)
 					.attr("stroke", "Black")
 			        .attr("class", "labelLine")
 					.style("stroke-dasharray", ("3, 3"));    
@@ -300,7 +308,7 @@ function Peak (id, graph){
 				var label = labelgroup.enter()
 					.append("g")
 						.attr("class", "label")
-						.attr("peakId", self.id)
+						//.attr("peakId", self.id)
 						.style("cursor", "pointer")
 						.on("mouseover", function(d) {
 							var evt = d3.event;
@@ -372,10 +380,17 @@ function Peak (id, graph){
 			}
 		    
 		}, this);
-		this.labelgroups = self.graph.g.selectAll("g.labelgroup").data (this.fragments, function(d) { return d.id; });
-		this.labels = self.graph.g.selectAll("text.peakAnnot").data (this.fragments, function(d) { return d.id; });
-		this.labelHighlights = self.graph.g.selectAll("text.peakAnnotHighlight").data (this.fragments, function(d) { return d.id; });
-		this.labelLines = self.g.selectAll("line.labelLine").data (this.fragments, function(d) { return d.id; });
+		//this.labelgroups = self.graph.g.selectAll("g.labelgroup").data (this.fragments, makeIdentityID);
+        //this.labelgroups = self.graph.g.selectAll("g.label").data (this.fragments, makeIdentityID);
+        var fset = d3.set (this.fragments.map (function (frag) { return frag.id; }));
+        //this.labelgroups = self.graph.g.selectAll("g.label").filter (function(d) { return fset.has(d.id); });
+        this.labelgroups = self.g.selectAll("g.label").filter (function(d) { return fset.has(d.id); });
+        this.labels = this.labelgroups.selectAll("text.peakAnnot");
+		this.labelHighlights = this.labelgroups.selectAll("text.peakAnnotHighlight");
+		//this.labels = self.graph.g.selectAll("text.peakAnnot").data (this.fragments, makeIdentityID);
+		//this.labelHighlights = self.graph.g.selectAll("text.peakAnnotHighlight").data (this.fragments, makeIdentityID);
+		//this.labelLines = self.g.selectAll("line.labelLine").data (this.fragments, makeIdentitylID);
+        this.labelLines = self.g.selectAll("line.labelLine").filter (function(d) { return fset.has(d.id); });
 		this.highlight(false);
 
 	}
@@ -480,21 +495,22 @@ Peak.prototype.updateX = function(){
 	var self = this;
 	if (labelCount) {
 		this.labels
-		    .attr("x", this.graph.x(this.x))
+		    //.attr("x", this.graph.x(this.x))
+            .attr("x", 0)
 		    .attr("display",function(d, i) {
 		        return stickyTest (d, self) ? "inline" : "none";
 		    })
 		;
 		this.labelHighlights
-		    .attr("x", this.graph.x(this.x))
+		    //.attr("x", this.graph.x(this.x))
+            .attr("x", 0)
 		    .attr("display",function(d) {
 		        return stickyTest (d, self) ? "inline" : "none";
 		    })
 		;
 
 	}
-
-}
+};
 
 Peak.prototype.updateY = function(){
 	var yScale = this.graph.y;
