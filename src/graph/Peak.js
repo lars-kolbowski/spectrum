@@ -65,10 +65,12 @@ function Peak (id, graph){
 	};
 
 	//svg elements
-	this.g = this.graph.peaks.append('g').attr("class", "line");
+	this.g = this.graph.peaks.append('g');
+
+	this.linegroup = this.g.append('g');
 
 	if (this.fragments.length > 0) {
-		this.highlightLine = this.g.append('line')
+		this.highlightLine = this.linegroup.append('line')
 								.attr("stroke", this.graph.model.highlightColour)
 								.attr("stroke-width", this.graph.model.highlightWidth)
 								.attr("opacity","0")
@@ -80,7 +82,7 @@ function Peak (id, graph){
 		var self = this;
 
 
-		this.g
+		this.linegroup
 			.on("mouseover", function() {
 			    var evt = d3.event;
 				if (evt.ctrlKey){
@@ -335,7 +337,7 @@ function Peak (id, graph){
 
 	}
 
-	this.line = this.g.append('line')
+	this.line = this.linegroup.append('line')
 					.attr("stroke-width","1")
 					.attr("x1", 0)
 					.attr("x2", 0);
@@ -402,33 +404,34 @@ Peak.prototype.highlight = function(show, fragments){
 }
 
 Peak.prototype.update = function(){
-	//reset label lines
-	if (this.labels.length > 0){
-			this.labelLines
-				.attr("opacity", 0)
-				.attr("x1", 0)
-				.attr("x2", 0)
-				.attr("y1", 0)
-				.attr("y2", 0)
-		}
-	//update Peak position
-	this.updateX();
-	this.updateY();
-}
 
-
-Peak.prototype.updateX = function(){
 	this.g.attr("transform", "translate("+this.graph.x(this.x)+",0)");
 	var xDomain = this.graph.x.domain();
 	if (this.x > xDomain[0] && this.x < xDomain[1]){
+		//reset label lines
+		if (this.labels.length > 0){
+				this.labelLines
+					.attr("opacity", 0)
+					.attr("x1", 0)
+					.attr("x2", 0)
+					.attr("y1", 0)
+					.attr("y2", 0)
+			}
+		//update Peak position
+		this.updateX(xDomain);
+		this.updateY();
+		//show peaks
 		this.g.attr("display","inline");
 	} else {
 		this.g.attr("display","none");
 	}	
+}
+
+Peak.prototype.updateX = function(xDomain){
 	var labelCount = this.labels.length;
 
 	function stickyTest (d, peakObj) {
-	    return (peakObj.x > xDomain[0] && peakObj.x < xDomain[1])	//in current range
+		return (peakObj.x > xDomain[0] && peakObj.x < xDomain[1])	//in current range
 			 && (peakObj.graph.lossyShown === true || d.class == "non-lossy" || _.intersection(peakObj.graph.model.sticky, peakObj.fragments).length != 0)	//lossy enabled OR not lossy OR isStickyFrag
 			 && (_.intersection(peakObj.graph.model.sticky, peakObj.fragments).length != 0 || peakObj.graph.model.sticky.length == 0)	//isStickyFrag OR no StickyFrags
 	};
@@ -464,8 +467,14 @@ Peak.prototype.updateY = function(){
 			.attr("y2", yScale(0));
 		var yStep = 15;
 		var self = this;
-		this.labels.attr("y", function(d,i) { return yScale(self.y) - 5 - (yStep * i); });
-		this.labelHighlights.attr("y", function(d,i) { return yScale(self.y) - 5 - (yStep * i); });
+
+		for (var i = 0; i < labelCount; i++) {
+			this.labels[i][0].setAttribute("y",  yScale(self.y) - 5 - (yStep * i));
+			this.labelHighlights[i][0].setAttribute("y",  yScale(self.y) - 5 - (yStep * i));
+		}
+		
+		//this.labels.attr("y", function(d,i) { return yScale(self.y) - 5 - (yStep * i); });
+		//this.labelHighlights.attr("y", function(d,i) { return yScale(self.y) - 5 - (yStep * i); });
 	}
 }
 
