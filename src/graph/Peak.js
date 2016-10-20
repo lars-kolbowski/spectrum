@@ -121,21 +121,29 @@ function Peak (id, graph){
 			var contents = [["m/z", self.x], ["Int", self.y]];
 			var header = [];
 
-			var fragCount = self.fragments.length;
+			//filter fragments shown in tooltip (only fraglabel is hovered over)
+			if(fragId){
+				fragId = parseInt(fragId);
+				var fragments = self.fragments.filter(function(d) { return d.id == fragId; });
+			}
+			else
+				var fragments = self.fragments;
+
+			var fragCount = fragments.length;
 			for (var f = 0; f < fragCount; f++){
 					//get right cluster for peak
 					index = 0;
 					for (var i = 0; i < self.clusterIds.length; i++) {
-						if(self.fragments[f].clusterIds.indexOf(self.clusterIds[i]) != -1){
-							index = self.fragments[f].clusterIds.indexOf(self.clusterIds[i])
+						if(fragments[f].clusterIds.indexOf(self.clusterIds[i]) != -1){
+							index = fragments[f].clusterIds.indexOf(self.clusterIds[i])
 							cluster = graph.model.JSONdata.clusters[self.clusterIds[i]]
 						}
 					}
 					
 					charge = cluster.charge;
-					error = self.fragments[f].clusterInfo[index].error.toFixed(2)+" "+self.fragments[f].clusterInfo[index].errorUnit;
-					header.push(self.fragments[f].name);
-					contents.push([self.fragments[f].name + " (" + self.fragments[f].sequence + ")", "charge: " + charge + ", error: " + error]);
+					error = fragments[f].clusterInfo[index].error.toFixed(2)+" "+fragments[f].clusterInfo[index].errorUnit;
+					header.push(fragments[f].name);
+					contents.push([fragments[f].name + " (" + fragments[f].sequence + ")", "charge: " + charge + ", error: " + error]);
 			};
 
 					
@@ -150,10 +158,8 @@ function Peak (id, graph){
 		function startHighlight(fragId){
 			var fragments = [];
 			if(fragId){
-				for (var i = 0; i < self.fragments.length; i++) {
-					if(self.fragments[i].id == parseInt(fragId))
-						fragments.push(self.fragments[i]);	
-				};
+				fragId = parseInt(fragId);
+				fragments = self.fragments.filter(function(d) { return d.id == fragId; });
 			}
 			else{
 				fragments = self.fragments;
@@ -167,10 +173,8 @@ function Peak (id, graph){
 		function stickyHighlight(ctrl, fragId){
 			var fragments = [];
 			if(fragId){
-				for (var i = 0; i < self.fragments.length; i++) {
-					if(self.fragments[i].id == parseInt(fragId))
-						fragments.push(self.fragments[i]);	
-				};
+				fragId = parseInt(fragId);
+				fragments = self.fragments.filter(function(d) { return d.id == fragId; });
 			}
 			else	
 				fragments = self.fragments;
