@@ -74,10 +74,8 @@ Graph = function(targetSvg, model, options) {
 		.attr("pointer-events", "all");
 
 	this.innerSVG = this.g.append("g")
-		.attr("top", 0)
-		.attr("left", 0)
 		.attr("class", "innerSpectrum");
-	this.dragZoomHighlight = this.innerSVG.append("rect").attr("y", 0).attr("fill","#addd8e");	
+	this.dragZoomHighlight = this.innerSVG.append("rect").attr("y", 0).attr("width", 0).attr("fill","#addd8e");	
 	
 	this.plot.on("click", function(){
 		this.model.clearStickyHighlights();
@@ -162,8 +160,9 @@ Graph = function(targetSvg, model, options) {
 	var self = this;
 
 	function brushstart() {
-		self.dragZoomHighlight.attr("width",0);
-		self.dragZoomHighlight.attr("display","inline");
+		self.dragZoomHighlight
+			.attr("width",0)
+			.attr("display","inline");
 	}
 
 	function brushmove() {
@@ -221,7 +220,7 @@ Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 	var fragKeyHeight = 100;//can tidy this up somehow 
 	var cy = self.g.node().parentNode.parentNode.clientHeight;// - fragKeyHeight;
 	
-	self.g.attr("width", cx).attr("height", cy);
+	//self.g.attr("width", cx).attr("height", cy);
 	var width = cx - self.margin.left - self.margin.right;
 	var height = cy - self.margin.top  - self.margin.bottom;
 	self.x.domain([xmin, xmax])
@@ -263,9 +262,9 @@ Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 	self.plot.attr("width", width)
 		.attr("height", height);
 
-	self.innerSVG.attr("width", width)
-			.attr("height", height)
-			.attr("viewBox", "0 0 "+width+" "+height);
+	// self.innerSVG.attr("width", width)
+	// 		.attr("height", height)
+	// 		.attr("viewBox", "0 0 "+width+" "+height);
 	
 	self.xaxisRect.attr("width",width).attr("y", height).attr("height", self.margin.bottom);
 	self.dragZoomHighlight.attr("height", height);
