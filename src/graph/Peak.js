@@ -34,8 +34,6 @@ function Peak (id, graph){
 	this.graph = graph;
 
 	//make fragments
-	//var notLossyFragments = [];
-	//var lossyFragments = [];
 	this.fragments = [];
 	this.isotopes = [];
 	this.isotopenumbers = [];
@@ -63,31 +61,8 @@ function Peak (id, graph){
 				this.isotopes.push(fragments[f])
 				this.isotopenumbers.push(isotope)
 			}
-/*			if(fragments[f].class == "lossy")
-				lossyFragments.push(fragments[f]);
-			else
-				notLossyFragments.push(fragments[f]);*/
 		}				
 	};
-
-	//this.fragments = notLossyFragments.concat(lossyFragments); //merge arrays
-/*
-	if (this.IsotopeClusters.length > 0){
-		var fragments = graph.model.JSONdata.fragments;
-		for(i=0; i<fragments.length; i++){
-			for(j=0; j<this.IsotopeClusters.length; j++){
-				if(_.contains(fragments[i].clusterIds, this.IsotopeClusters[j].id)){
-					//var frag = new Fragment (fragments[i]);
-					if(fragments[i].class == "lossy")
-						lossyFragments.push(fragments[i]);
-					else
-						notLossyFragments.push(fragments[i]);
-				}
-			}
-		}
-	};
-
-	this.fragments = notLossyFragments.concat(lossyFragments); //merge arrays*/
 
 	//svg elements
 	this.g = this.graph.peaks.append('g').attr("class", "line");
@@ -143,20 +118,9 @@ function Peak (id, graph){
 		function showTooltip(x, y, fragId){
 			var contents = [["m/z", self.x], ["Int", self.y]];
 			var header = [];
-			// if(fragId){
-			// 	for (var i = 0; i < self.fragments.length; i++) {
-			// 		if (self.fragments[i].id == fragId)
-			// 			var fragname = self.fragments[i].name;
-			// 	};
-			// 	for (var i = 1; i < self.tooltip.length; i++) {
-			// 		if(self.tooltip[i].indexOf(fragname) != -1)
-			// 			var frag_tooltip = self.tooltip[i]; 
-			// 	};
-			// }
 
 			var fragCount = self.fragments.length;
 			for (var f = 0; f < fragCount; f++){
-				//if (self.fragments[f].isMonoisotopic){
 					//get right cluster for peak
 					index = 0;
 					for (var i = 0; i < self.clusterIds.length; i++) {
@@ -170,12 +134,8 @@ function Peak (id, graph){
 					error = self.fragments[f].clusterInfo[index].error.toFixed(2)+" "+self.fragments[f].clusterInfo[index].errorUnit;
 					header.push(self.fragments[f].name);
 					contents.push([self.fragments[f].name + " (" + self.fragments[f].sequence + ")", "charge: " + charge + ", error: " + error]);
-				//}
 			};
 
-
-			// check if there is enough space right of the peak to display the tooltip. If not display it on the left of the peak
-			var wrapperWidth = $(self.graph.g.node().parentNode.parentNode.parentNode.parentNode).width();
 					
 			self.graph.tooltip.set("contents", contents )
 				.set("header", header.join(" "))
@@ -232,16 +192,6 @@ function Peak (id, graph){
                 
                 filteredLabels.attr("x", coords[0]).attr("y", coords[1]);
 				filteredHighlights.attr("x", coords[0]).attr("y", coords[1]);
-				/*
-				for (var f = 0; f < self.fragments.length; f++){
-					if(self.fragments[f].id == fragId){
-						var curLabelLine = self.labelLines[f];
-						self.labelHighlights[f].attr("x", coords[0]);
-						self.labels[f].attr("x", coords[0]);
-						self.labelHighlights[f].attr("y", coords[1]);
-						self.labels[f].attr("y", coords[1]);
-					}
-				}*/
 
 				var startX = self.graph.x(self.x);
 				var startY = self.graph.y(self.y)
@@ -261,9 +211,6 @@ function Peak (id, graph){
 					filteredLabelLines.attr("opacity", 0);
 			})
 		;	
-		//this.labels = []; // will be array of d3 selections
-		//this.labelHighlights = []; // will be array of d3 selections
-		//this.labelLines = []; // will be array of d3 selections
 
 		//sort fragments for label order first non-lossy then lossy - Not sure if still necessary after changes from MG
 		this.fragments.sort(function (a, b) {
@@ -294,7 +241,6 @@ function Peak (id, graph){
             
 			if (peakFrags.length > 0) {
 				var group = partition.group;
-				//var labelgroup = group.selectAll("g.label").data (peakFrags, makeIdentityID);
                 var labelgroup = self.g.selectAll("g.label").data (peakFrags, makeIdentityID);
 				var labelLines = self.g.selectAll("line.labelLine").data (peakFrags, makeIdentityID);
 
@@ -308,7 +254,6 @@ function Peak (id, graph){
 				var label = labelgroup.enter()
 					.append("g")
 						.attr("class", "label")
-						//.attr("peakId", self.id)
 						.style("cursor", "pointer")
 						.on("mouseover", function(d) {
 							var evt = d3.event;
@@ -380,16 +325,11 @@ function Peak (id, graph){
 			}
 		    
 		}, this);
-		//this.labelgroups = self.graph.g.selectAll("g.labelgroup").data (this.fragments, makeIdentityID);
-        //this.labelgroups = self.graph.g.selectAll("g.label").data (this.fragments, makeIdentityID);
+
         var fset = d3.set (this.fragments.map (function (frag) { return frag.id; }));
-        //this.labelgroups = self.graph.g.selectAll("g.label").filter (function(d) { return fset.has(d.id); });
         this.labelgroups = self.g.selectAll("g.label").filter (function(d) { return fset.has(d.id); });
         this.labels = this.labelgroups.selectAll("text.peakAnnot");
 		this.labelHighlights = this.labelgroups.selectAll("text.peakAnnotHighlight");
-		//this.labels = self.graph.g.selectAll("text.peakAnnot").data (this.fragments, makeIdentityID);
-		//this.labelHighlights = self.graph.g.selectAll("text.peakAnnotHighlight").data (this.fragments, makeIdentityID);
-		//this.labelLines = self.g.selectAll("line.labelLine").data (this.fragments, makeIdentitylID);
         this.labelLines = self.g.selectAll("line.labelLine").filter (function(d) { return fset.has(d.id); });
 		this.highlight(false);
 
@@ -495,14 +435,12 @@ Peak.prototype.updateX = function(){
 	var self = this;
 	if (labelCount) {
 		this.labels
-		    //.attr("x", this.graph.x(this.x))
             .attr("x", 0)
 		    .attr("display",function(d, i) {
 		        return stickyTest (d, self) ? "inline" : "none";
 		    })
 		;
 		this.labelHighlights
-		    //.attr("x", this.graph.x(this.x))
             .attr("x", 0)
 		    .attr("display",function(d) {
 		        return stickyTest (d, self) ? "inline" : "none";
