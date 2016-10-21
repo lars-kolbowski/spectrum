@@ -529,4 +529,4 @@ Peak.prototype.updateColor = function(){
 
 	if(this.labels.length)
 		this.labels.attr("fill", this.colour);
-
+}
