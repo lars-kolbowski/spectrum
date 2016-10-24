@@ -73,9 +73,7 @@ var SpectrumView = Backbone.View.extend({
 	},
 
 	clearHighlights: function(){
-		this.model.sticky.length = 0;
-		this.model.highlights.length = 0;
-		this.updateHighlights();
+		this.model.clearStickyHighlights();
 	},
 
 	changeColorScheme: function(e){

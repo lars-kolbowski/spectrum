@@ -20,9 +20,9 @@
 //		PeptideFragmentationKeyView.js
 var FragmentationKeyView = Backbone.View.extend({
 
-	events : {
-		'click #clearHighlights' : 'clearHighlights',
-	},
+	// events : {
+	// 	'click #clearHighlights' : 'clearHighlights',
+	// },
 
 	initialize: function() {
 		this.svg = d3.select(this.el.getElementsByTagName("svg")[0]);//d3.select(this.el).append("svg").style("width", "100%").style("height", "100%");
@@ -484,11 +484,6 @@ var FragmentationKeyView = Backbone.View.extend({
 		}
 	},
 
-
-	clearHighlights: function(){
-		this.clearHighlights();
-	},
-
 	updateHighlights: function(){
 
 		var lines = this.fraglines;
@@ -616,13 +611,13 @@ var FragmentationKeyView = Backbone.View.extend({
 			this.fragKeyWrapper.attr("transform", "scale(1)")
 	},
 
-	clearHighlights: function(){
-		for (var f = 0; f < this.fraglines.length; f++) {
-			if (_.intersection(this.model.sticky, this.fraglines[f].fragments).length == 0) {
-				this.fraglines[f].highlight(false);
-			}
-		}
-	},
+	// clearHighlights: function(){
+	// 	for (var f = 0; f < this.fraglines.length; f++) {
+	// 		if (_.intersection(this.model.sticky, this.fraglines[f].fragments).length == 0) {
+	// 			this.fraglines[f].highlight(false);
+	// 		}
+	// 	}
+	// },
 
 	clear: function(){
 		this.pepoffset = [];
