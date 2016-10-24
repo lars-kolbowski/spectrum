@@ -216,13 +216,7 @@ function Peak (id, graph){
                 else
 					filteredLabelLines.attr("opacity", 0);
 			})
-		;	
-
-		//sort fragments for label order first non-lossy then lossy - Not sure if still necessary after changes from MG
-		this.fragments.sort(function (a, b) {
-            return a["class"] < b["class"];
-        });
-
+		;
 
 		var lossy = [];
 		var nonlossy = this.fragments.filter(function(frag) { 
@@ -232,8 +226,8 @@ function Peak (id, graph){
 		});
 
 		var partitions = [
-		    {frags: lossy, group: this.graph.lossyAnnotations, type: "lossy", colourClass: "color_loss"},
-		    {frags: nonlossy, group: this.graph.annotations, type: "nonlossy", colourClass: "color"},
+			{frags: nonlossy, group: this.graph.annotations, type: "nonlossy", colourClass: "color"},
+			{frags: lossy, group: this.graph.lossyAnnotations, type: "lossy", colourClass: "color_loss"},
 		];
         
         CLMSUI.idList = CLMSUI.idList || [];
