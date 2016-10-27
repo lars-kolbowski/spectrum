@@ -73,9 +73,7 @@ var SpectrumView = Backbone.View.extend({
 	},
 
 	clearHighlights: function(){
-		this.model.sticky.length = 0;
-		this.model.highlights.length = 0;
-		this.updateHighlights();
+		this.model.clearStickyHighlights();
 	},
 
 	changeColorScheme: function(e){
@@ -91,12 +89,13 @@ var SpectrumView = Backbone.View.extend({
 		var peaks = this.graph.points;
 
 		for(p = 0; p < peaks.length; p++){
+			if(peaks[p].fragments.length > 0)
+				peaks[p].highlight(false);
+			
 			var highlightFragments = _.intersection(peaks[p].fragments, this.model.highlights);
 			if(highlightFragments.length != 0){
 				peaks[p].highlight(true, highlightFragments);
 			}
-			else if(peaks[p].fragments.length > 0)
-				peaks[p].highlight(false);
 		}
 		this.graph.updatePeakColors();
 		this.graph.updatePeakLabels();
