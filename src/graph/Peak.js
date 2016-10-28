@@ -289,8 +289,8 @@ function Peak (id, graph){
 								}
 								showTooltip(evt.pageX, evt.pageY, d.id);
 								startHighlight(d.id);
-								}
-							})
+							}
+						})
 						.on("touchend", function() {
 							if(!self.graph.model.moveLabels){			
 								hideTooltip();
@@ -327,10 +327,10 @@ function Peak (id, graph){
 		}, this);
 
         var fset = d3.set (this.fragments.map (function (frag) { return frag.id; }));
-        this.labelgroups = self.g.selectAll("g.label").filter (function(d) { return fset.has(d.id); });
-        this.labels = this.labelgroups.selectAll("text.peakAnnot");
+		this.labelgroups = self.g.selectAll("g.label").filter (function(d) { return fset.has(d.id); });
+		this.labels = this.labelgroups.selectAll("text.peakAnnot");
 		this.labelHighlights = this.labelgroups.selectAll("text.peakAnnotHighlight");
-        this.labelLines = self.g.selectAll("line.labelLine").filter (function(d) { return fset.has(d.id); });
+		this.labelLines = self.g.selectAll("line.labelLine").filter (function(d) { return fset.has(d.id); });
 		this.highlight(false);
 
 	}
