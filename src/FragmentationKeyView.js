@@ -146,7 +146,7 @@ var FragmentationKeyView = Backbone.View.extend({
 			this.CL.on("click", function() {
 				if (!self.changeMod){
 					self.CLlineHighlight.attr("opacity", 1);
-					self.changeCL = true;
+					self.changeCL = self.linkPos;
 					for (var i = 0; i < self.fraglines.length; i++) {
 						self.fraglines[i].disableCursor();
 					}
@@ -329,7 +329,7 @@ var FragmentationKeyView = Backbone.View.extend({
 				.append('g')
 				.attr('class', "pepLetterG")
 				.on("click", function(d, i) {
-					if(self.changeCL){
+					if(self.changeCL != false){
 						changeCrossLink(d);
 					}
 					//if changeMod is active and the mod is from the same peptide and it's a valid modification for this aa
@@ -375,7 +375,7 @@ var FragmentationKeyView = Backbone.View.extend({
 							.attr("opacity", 1);	
 					}
 
-					if(self.changeCL){
+					if(self.changeCL != false){
 						var pepLetterHighlight = this.childNodes[0];
 						var pepLetter = this.childNodes[1];
 							//set opacity of all letters of this highlight to zero
@@ -385,13 +385,20 @@ var FragmentationKeyView = Backbone.View.extend({
 							}
 							
 							self.CLline.attr("stroke", "grey");
+							// update changeCL to the currently highlighted ones
+							for (var i = 0; i < self.changeCL.length; i++) {
+								if(self.changeCL[i].peptideId == d.pepIndex)
+									self.changeCL[i].linkSite = d.pos;
+							}						
 							if (d.pepIndex == 0){		//pep1
-							self.changeCLline.attr("x1", pepLetterHighlight.getAttribute("x"))
-								.attr("opacity", 1);
-							self.CLlineHighlight.attr("x1", pepLetterHighlight.getAttribute("x"));
+								self.changeCLline
+									.attr("x1", pepLetterHighlight.getAttribute("x"))
+									.attr("opacity", 1);
+								self.CLlineHighlight.attr("x1", pepLetterHighlight.getAttribute("x"));
 							}
 							else if (d.pepIndex == 1){
-						 		self.changeCLline.attr("x2", pepLetterHighlight.getAttribute("x"))
+						 		self.changeCLline
+						 			.attr("x2", pepLetterHighlight.getAttribute("x"))
 						 			.attr("opacity", 1);
 								self.CLlineHighlight.attr("x2", pepLetterHighlight.getAttribute("x"));
 							}
@@ -471,7 +478,7 @@ var FragmentationKeyView = Backbone.View.extend({
 				.append('g')
 				.attr('class', "modLetterG")
 				.on("click", function(d) {
-					if (!self.changeCL){
+					if (self.changeCL == false){
 						self.CLline.style("cursor", "not-allowed");
 						self.CLlineHighlight.style("cursor", "not-allowed");
 						
