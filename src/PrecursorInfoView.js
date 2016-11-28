@@ -1,0 +1,75 @@
+var PrecursorInfoView = Backbone.View.extend({
+	
+	events : {
+		'click .toggle' : 'toggle',
+	  },
+
+	initialize: function() {
+
+		this.show = true;
+
+		var self = this;
+
+		this.svg = d3.select(this.el.getElementsByTagName("svg")[0]); //spectrumSVG
+
+		//create
+		this.wrapper = this.svg.append('text')
+			.attr("class", "precursorInfo")
+			.attr("x", 10)
+			.attr("y", 13)
+			.attr("font-size", 12);
+
+		this.toggle = this.wrapper.append('tspan')
+			.text("[-]")
+			.style("cursor", "pointer")
+			.attr("font-family", "monospace")
+			.attr("class", "toggle");
+
+		this.wrapper.append('tspan')
+			.text("  Precursor: ")
+			.style("cursor", "pointer")
+			.attr("class", "toggle");
+
+		this.content = this.wrapper.append('tspan')
+			.style("cursor", "default");
+
+
+		this.listenTo(this.model, 'change', this.render);
+	},
+
+	render: function() {
+		var data = this.model.annotationData;
+		var content = "";
+
+		var dataArr = [];
+		if (data.precursorIntensity !== undefined && data.precursorIntensity != -1)
+			dataArr.push("Intensity=" + data.precursorIntensity);
+		if (data.precursorMZ !== undefined)
+			dataArr.push("m/z=" + data.precursorMZ.toFixed(4));
+		if (data.precursorCharge !== undefined)
+			dataArr.push("z=" + data.precursorCharge);
+		if (data.precursorError !== undefined)
+			dataArr.push("error=" + data.precoursorError);
+		if (data.psmID !== undefined)
+			dataArr.push("psmID=" + data.psmID);
+
+		content += dataArr.join("; ");
+		this.content.text(content);
+
+	},
+
+	toggle: function(){
+		var active   = this.show ? false : true,
+		  newOpacity = active ? 1 : 0;
+		// Hide or show the elements
+		this.content.style("opacity", newOpacity);
+		if (!active)
+			this.toggle.text("[+]")
+		else
+			this.toggle.text("[-]")
+		// Update whether or not the elements are active
+		this.show = active;
+	}
+});
+
+

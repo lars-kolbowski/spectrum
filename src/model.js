@@ -41,6 +41,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		this.match = this.get("match");
 		this.randId = this.get("randId");
 		//console.log(this.JSONdata);
+		this.annotationData = this.JSONdata.annotation;
 		this.pepStrs = [];
 		this.pepStrsMods = [];
 		this.peptides = this.JSONdata.Peptides;
