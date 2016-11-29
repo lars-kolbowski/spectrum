@@ -49,7 +49,7 @@ var PrecursorInfoView = Backbone.View.extend({
 		if (data.precursorCharge !== undefined)
 			dataArr.push("z=" + data.precursorCharge);
 		if (data.precursorError !== undefined)
-			dataArr.push("error=" + data.precoursorError);
+			dataArr.push("error=" + data.precursorError);
 		if (data.psmID !== undefined)
 			dataArr.push("psmID=" + data.psmID);
 
