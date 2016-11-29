@@ -69,6 +69,7 @@ Graph = function(targetSvg, model, options) {
 		.attr("pointer-events", "all");
 
 	this.measureBackground = this.g.append("rect")
+		.attr("width", "0")
 		.style("fill", "white")
 		.style("cursor", "crosshair")
 		.attr("pointer-events", "all");
@@ -246,7 +247,7 @@ Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 		.attr("transform", "translate(" + width + " ,0)")
 		.call(self.yAxisRight)
 	;
-	
+	self.xaxisRect.attr("width", width);
 
 	self.xAxis = d3.svg.axis().scale(self.x).ticks(xTicks).orient("bottom");
 		

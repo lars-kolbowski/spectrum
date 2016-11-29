@@ -41,6 +41,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		this.match = this.get("match");
 		this.randId = this.get("randId");
 		//console.log(this.JSONdata);
+		this.annotationData = this.JSONdata.annotation;
 		this.pepStrs = [];
 		this.pepStrsMods = [];
 		this.peptides = this.JSONdata.Peptides;
@@ -228,9 +229,10 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 
 	changeMod: function(oldPos, newPos, pepIndex){
 
-		this.JSONdata.Peptides[pepIndex].sequence[newPos].Modification = this.JSONdata.Peptides[pepIndex].sequence[oldPos].Modification;
-		this.JSONdata.Peptides[pepIndex].sequence[oldPos].Modification = "";
-
+		if (oldPos != newPos){
+			this.JSONdata.Peptides[pepIndex].sequence[newPos].Modification = this.JSONdata.Peptides[pepIndex].sequence[oldPos].Modification;
+			this.JSONdata.Peptides[pepIndex].sequence[oldPos].Modification = "";
+		}
 		//this.setData();			
 		var pepSeq = ""
 		for (var i = 0; i < this.JSONdata.Peptides[pepIndex].sequence.length; i++) {
