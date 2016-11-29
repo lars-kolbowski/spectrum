@@ -49,7 +49,7 @@ var FragmentationKeyView = Backbone.View.extend({
 	},
 
 	render: function() {
-		this.clear()
+		this.clear();
 		if (this.model.JSONdata)
 			this.setData();
 		this.resize();
@@ -299,11 +299,6 @@ var FragmentationKeyView = Backbone.View.extend({
 
 	drawPeptides: function(){
 
-		// this.drawPeptide( 0, 20, 5);
-		// if(this.peptides[1])
-			//this.drawPeptide( 1, 71, 83);
-
-
 		var self = this;
 
 		var peptides = [
@@ -449,7 +444,7 @@ var FragmentationKeyView = Backbone.View.extend({
 			;
 
 			function changeCrossLink(d){
-				self.linkPos[d.pepIndex].linkSite = d.pos;
+				//self.linkPos[d.pepIndex].linkSite = d.pos; not necessary pos is already updated through mouseover
 				var newlinkpos = new Array(self.linkPos[0].linkSite+1, self.linkPos[1].linkSite+1);
 				self.model.changeLinkPos(newlinkpos);
 			}
