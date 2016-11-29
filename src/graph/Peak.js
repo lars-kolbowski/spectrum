@@ -116,7 +116,6 @@ function Peak (id, graph){
 			})
 			;
 
-
 		function showTooltip(x, y, fragId){
 			var contents = [["m/z", self.x], ["Int", self.y]];
 			var header = [];
@@ -143,10 +142,12 @@ function Peak (id, graph){
 				.set("header", header.join(" "))
 				.set("location", {pageX: x, pageY: y});
 				//.set("location", {pageX: d3.event.pageX, pageY: d3.event.pageY})				
-		}
+		};
+
 		function hideTooltip(){
 			self.graph.tooltip.set("contents", null);
-		}
+		};
+
 		function startHighlight(fragId){
 			var fragments = [];
 			if(fragId){
@@ -159,11 +160,13 @@ function Peak (id, graph){
 				fragments = self.fragments;
 			}
 			self.graph.model.addHighlight(fragments);	
-		}
+		};
+
 		function endHighlight(){
 			//hideTooltip();
 			self.graph.model.clearHighlight(self.fragments);	
-		}
+		};
+
 		function stickyHighlight(ctrl, fragId){
 			var fragments = [];
 			if(fragId){
@@ -175,7 +178,7 @@ function Peak (id, graph){
 			else	
 				fragments = self.fragments;
 			self.graph.model.updateStickyHighlight(fragments, ctrl);
-		}
+		};
 
 
 	  	//create frag labels
@@ -232,7 +235,7 @@ function Peak (id, graph){
 		    {frags: nonlossy, group: this.graph.annotations, type: "nonlossy", colourClass: "color"},
 		];
         
-        CLMSUI.idList = CLMSUI.idList || [];
+        CLMSUI.idList = CLMSUI.idList || [];	//obsolete?
         
         var makeIdentityID = function (d) {
             return d.id;

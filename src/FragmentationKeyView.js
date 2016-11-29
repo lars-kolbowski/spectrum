@@ -96,6 +96,17 @@ var FragmentationKeyView = Backbone.View.extend({
 			}
 		}
 
+		this.tooltip = d3.select(this.el).append("span")
+			.html("Click to change cross-linker position")
+			.style("font-size", "small")
+			//.style("height", "20px")
+			.style("padding", "0 5px")
+			.style("border-radius", "6px")		
+			.attr("class", "tooltip")
+			.style("background-color", "black")
+			.attr("pointer-events", "none")
+			.style("position", "absolute")				
+			.style("opacity", 0);
 
 
 		this.align_peptides_to_CL();
@@ -142,17 +153,34 @@ var FragmentationKeyView = Backbone.View.extend({
 				.attr("stroke-width", 1.5)
 				.style("cursor", "pointer");
 
-			this.CL[0][0].onclick = function() {
-				self.CLlineHighlight.attr("opacity", 1);
-				self.changeCL = true;
-				for (var i = 0; i < self.fraglines.length; i++) {
-					self.fraglines[i].disableCursor();
+			this.CL.on("mouseover", function() {
+				if (!self.changeMod  && !self.changeCL){
+					self.CLlineHighlight.attr("opacity", 0.8);
+
+					self.tooltip.transition()		
+					    .duration(200)		
+					    .style("opacity", .9);		
+					self.tooltip.style("left", (d3.event.layerX + 35) + "px")		
+					    .style("top", (d3.event.layerY) + "px");	
 				}
-				for (i=0; i < self.pepLetters.length; i++){
-					var letterCount = self.pepLetters[i].length;
-					for (j = 0; j < letterCount; j++){
-						if (self.pepLetters[i][j])
-							self.pepLetters[i][j].style("cursor", "pointer");			
+			});
+
+			this.CL.on("mouseout", function() {
+				if (!self.changeMod  && !self.changeCL){
+					self.CLlineHighlight.attr("opacity", 0);
+					self.tooltip.transition()		
+						.duration(500)		
+						.style("opacity", 0);	
+					}
+			});
+
+			this.CL.on("click", function() {
+				if (!self.changeMod){
+					self.tooltip.style("opacity", 0);
+					self.CLlineHighlight.attr("opacity", 1);
+					self.changeCL = self.linkPos;
+					for (var i = 0; i < self.fraglines.length; i++) {
+						self.fraglines[i].disableCursor();
 					}
 				}
 			};
