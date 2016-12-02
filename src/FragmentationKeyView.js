@@ -161,7 +161,7 @@ var FragmentationKeyView = Backbone.View.extend({
 					self.tooltip.transition()		
 					    .duration(200)		
 					    .style("opacity", .9);		
-					self.tooltip.style("left", (d3.event.layerX + 35) + "px")		
+					self.tooltip.style("left", (d3.event.layerX + 15) + "px")		
 					    .style("top", (d3.event.layerY) + "px");	
 				}
 			});
