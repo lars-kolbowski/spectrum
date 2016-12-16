@@ -104,7 +104,7 @@ var FragmentationKeyView = Backbone.View.extend({
 			.style("border-radius", "6px")		
 			.attr("class", "tooltip")
 			.style("background-color", "black")
-			.attr("pointer-events", "none")
+			.style("pointer-events", "none")
 			.style("position", "absolute")				
 			.style("opacity", 0);
 
