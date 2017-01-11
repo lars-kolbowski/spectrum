@@ -1,4 +1,4 @@
 <?php
-$json = file_get_contents('http://129.215.14.63/xiAnnotator/annotate/knownModifications');
+$json = file_get_contents('http://xi3.bio.ed.ac.uk/xiAnnotator/annotate/knownModifications');
 echo json_encode($json);
 ?>
