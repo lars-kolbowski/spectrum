@@ -73,7 +73,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		this.highlightWidth = 10;
 
 
-		//this.calcPrecursorMass();//hack by col
+		this.calcPrecursorMass();
 		if (window.modTable !== undefined)
 			modTable.ajax.url( "forms/convertMods.php?peps="+encodeURIComponent(this.pepStrsMods.join(";"))).load();
 		this.trigger("changed:data");
