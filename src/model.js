@@ -227,24 +227,29 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 	},
 
 
-	changeMod: function(oldPos, newPos, pepIndex){
+	changeMod: function(oldPos, newPos, oldPepIndex, newPepIndex){
 
-		if (oldPos != newPos){
-			this.JSONdata.Peptides[pepIndex].sequence[newPos].Modification = this.JSONdata.Peptides[pepIndex].sequence[oldPos].Modification;
-			this.JSONdata.Peptides[pepIndex].sequence[oldPos].Modification = "";
+		if (oldPos != newPos || oldPepIndex != newPepIndex){
+			this.JSONdata.Peptides[newPepIndex].sequence[newPos].Modification = this.JSONdata.Peptides[oldPepIndex].sequence[oldPos].Modification;
+			this.JSONdata.Peptides[oldPepIndex].sequence[oldPos].Modification = "";
 		}
-		//this.setData();			
-		var pepSeq = ""
-		for (var i = 0; i < this.JSONdata.Peptides[pepIndex].sequence.length; i++) {
-			pepSeq += this.JSONdata.Peptides[pepIndex].sequence[i].aminoAcid;
-			pepSeq += this.JSONdata.Peptides[pepIndex].sequence[i].Modification;
-		}
+			
+		var pepSeq1 = "";
+		for (var i = 0; i < this.JSONdata.Peptides[0].sequence.length; i++) {
+			pepSeq1 += this.JSONdata.Peptides[0].sequence[i].aminoAcid;
+			pepSeq1 += this.JSONdata.Peptides[0].sequence[i].Modification;
+		};
+
+		var pepSeq2 = "";
+		for (var i = 0; i < this.JSONdata.Peptides[1].sequence.length; i++) {
+			pepSeq2 += this.JSONdata.Peptides[1].sequence[i].aminoAcid;
+			pepSeq2 += this.JSONdata.Peptides[1].sequence[i].Modification;
+		};		
 
 		var newmatch = $.extend(true, {}, this.match);	//clone object
-		if (pepIndex == 0)
-			newmatch.pepSeq1raw = pepSeq;
-		if (pepIndex == 1)
-			newmatch.pepSeq2raw = pepSeq;
+
+		newmatch.pepSeq1raw = pepSeq1;
+		newmatch.pepSeq2raw = pepSeq2;
 		CLMSUI.loadSpectra(newmatch, this.randId, this);
 	},
 

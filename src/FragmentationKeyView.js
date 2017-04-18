@@ -355,13 +355,13 @@ var FragmentationKeyView = Backbone.View.extend({
 					if(self.changeCL != false){
 						changeCrossLink(d);
 					}
-					//if changeMod is active and the mod is from the same peptide and it's a valid modification for this aa
-					if(self.changeMod !== false && self.validModChange && d.pepIndex == self.changeMod.pepIndex){	
+					//change the mod if changeMod is active and it's a valid modification for this aa
+					if(self.changeMod !== false && self.validModChange){	
 						changeMod(d);
 					}
 				})
 				.on("mouseover", function(d, i) {
-					if(self.changeMod !== false && d.pepIndex == self.changeMod.pepIndex){	//if changeMod is active and the mod is from the same peptide
+					if(self.changeMod !== false){	//if changeMod is active
 						changeModStartHighlight(this, d);
 					};
 
@@ -370,7 +370,7 @@ var FragmentationKeyView = Backbone.View.extend({
 					}		
 				})
 				.on("mouseout", function(d) {
-					// if(self.changeMod !== false && d.pepIndex == self.changeMod.pepIndex){	//if changeMod is active and the mod is from the same peptide
+					// if(self.changeMod !== false){	//if changeMod is active
 					// 	changeModEndHighlight(d);
 					// }
 				})
@@ -415,10 +415,10 @@ var FragmentationKeyView = Backbone.View.extend({
 			};
 
 			function changeMod(d){
-				var offset = self.pepoffset[d.pepIndex]
-				var oldPos = self.changeMod.pos-offset;
+				var offset = self.pepoffset[self.changeMod.pepIndex];
+				var oldPos = self.changeMod.pos - offset;
 				var newPos = d.pos;
-				self.model.changeMod(oldPos, newPos, d.pepIndex);
+				self.model.changeMod(oldPos, newPos, self.changeMod.pepIndex, d.pepIndex);
 			};
 
 			function changeModStartHighlight(pepLetterG, pepLetterData){
@@ -429,15 +429,20 @@ var FragmentationKeyView = Backbone.View.extend({
 				var pepLetter = pepLetterG.childNodes[1];
 				pepLetterHighlight.setAttribute("opacity", 1);
 				
-				var offset = self.pepoffset[pepLetterData.pepIndex];
-				var highlight = self.modLetterHighlights[pepLetterData.pepIndex][0][self.changeMod.pos-offset];
-				var oldModLetters = self.modLetters[pepLetterData.pepIndex][0][self.changeMod.pos-offset]
+				var offset = self.pepoffset[self.changeMod.pepIndex];
+				var highlight = self.modLetterHighlights[self.changeMod.pepIndex][0][self.changeMod.pos-offset];
+				var oldModLetters = self.modLetters[self.changeMod.pepIndex][0][self.changeMod.pos-offset]
 				var x = parseInt(pepLetterHighlight.getAttribute("x"));
-				var y = parseInt(oldModLetters.getAttribute("y"));
+				if (pepLetterData.pepIndex == 0)
+					var y = 5;
+				else if (pepLetterData.pepIndex == 1)
+					var y = 83;
 
 				//check if it is a valid modification change
 				if (self.model.checkForValidModification(self.changeMod.mod, pepLetterData.aminoAcid)){
 					self.validModChange = true;
+					pepLetterHighlight.setAttribute("style", "cursor:pointer");
+					pepLetter.setAttribute("style", "cursor:pointer");
 				}
 				else{
 					self.validModChange = false;
@@ -445,9 +450,9 @@ var FragmentationKeyView = Backbone.View.extend({
 					pepLetter.setAttribute("style", "cursor:not-allowed");
 				}
 				//
-				if (self.changeMod.pepIndex == 0)
+				if (pepLetterData.pepIndex == 0)
 					var color = self.model.p1color;
-				else if (self.changeMod.pepIndex == 1)
+				else if (pepLetterData.pepIndex == 1)
 					var color = self.model.p2color;
 				oldModLetters.setAttribute("fill", "grey");
 				highlight.setAttribute("x", x);
@@ -531,9 +536,7 @@ var FragmentationKeyView = Backbone.View.extend({
 						//disable fragBar cursor
 						for (var i = 0; i < self.fraglines.length; i++) {
 							self.fraglines[i].disableCursor();
-						}
-						//enable pepLetter cursor pointer
-						self.pepLetters[d.pepIndex].style("cursor", "pointer");
+						};
 					}
 				})
 			;
