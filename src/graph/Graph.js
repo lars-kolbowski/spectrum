@@ -298,8 +298,8 @@ Graph.prototype.measure = function(on){
 	if (on === true){
 		var self = this;
 		self.measureBackground
-		.attr("width", self.plot[0][0].getAttribute("width"))
-		.attr("height", self.plot[0][0].getAttribute("height"))
+			.attr("width", self.plot[0][0].getAttribute("width"))
+			.attr("height", self.plot[0][0].getAttribute("height"))
 
 		self.disableZoom();
 
@@ -568,6 +568,8 @@ Graph.prototype.redraw = function(){
 }
 
 Graph.prototype.clear = function(){
+	this.model.measureMode = false;
+	this.measure(false);
 	this.points= [];
 	this.highlights.selectAll("*").remove();
 	this.peaks.selectAll("*").remove();
