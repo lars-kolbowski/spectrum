@@ -17,7 +17,7 @@
 //		authors: Sven Giese, Colin Combe, Lars Kolbowski
 //
 //
-//		PeptideFragmentationKeyView.js
+//		FragmentationKeyView.js
 var FragmentationKeyView = Backbone.View.extend({
 
 	// events : {
@@ -28,8 +28,6 @@ var FragmentationKeyView = Backbone.View.extend({
 		this.svg = d3.select(this.el.getElementsByTagName("svg")[0]);//d3.select(this.el).append("svg").style("width", "100%").style("height", "100%");
 		this.fragKeyWrapper = this.svg.append("g");
 
-
-		//this.model = model;
 		this.margin = {
 			"top":    20,
 			"right":  20,
@@ -573,8 +571,6 @@ var FragmentationKeyView = Backbone.View.extend({
 			pepIndex++;
 
 		})
-
-
 	},
 
 	updateHighlights: function(){

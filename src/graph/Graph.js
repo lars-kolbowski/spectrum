@@ -137,25 +137,25 @@ Graph = function(targetSvg, model, options) {
 	}
 	// add the x-axis label
 	if (options.xlabel) {
-	this.xlabel = this.g.append("text")
-		.attr("class", "aWWWAAAAAxis")
-		.text(options.xlabel)
-		.attr("dy","2.4em")
-		.style("text-anchor","middle").style("pointer-events","none");
+		this.xlabel = this.g.append("text")
+			.attr("class", "aWWWAAAAAxis")
+			.text(options.xlabel)
+			.attr("dy","2.4em")
+			.style("text-anchor","middle").style("pointer-events","none");
 	}
 	// add y-axis label
 	if (options.ylabelLeft) {
-	this.ylabelLeft = this.g.append("g").append("text")
-		.attr("class", "axis")
-		.text(options.ylabelLeft)
-		.style("text-anchor","middle").style("pointer-events","none");
+		this.ylabelLeft = this.g.append("g").append("text")
+			.attr("class", "axis")
+			.text(options.ylabelLeft)
+			.style("text-anchor","middle").style("pointer-events","none");
 	}
 	// add 2nd y-axis label
 	if (options.ylabelRight) {
-	this.ylabelRight = this.g.append("g").append("text")
-		.attr("class", "axis")
-		.text(options.ylabelRight)
-		.style("text-anchor","middle").style("pointer-events","none");
+		this.ylabelRight = this.g.append("g").append("text")
+			.attr("class", "axis")
+			.text(options.ylabelRight)
+			.style("text-anchor","middle").style("pointer-events","none");
 	}
 	
 	var self = this;
@@ -538,7 +538,6 @@ Graph.prototype.redraw = function(){
 
 		//get highest intensity from peaks in x range
 		//adjust y scale to new highest intensity
-
 
 		self.measureClear();
 		if (self.points) {
