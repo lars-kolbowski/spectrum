@@ -301,6 +301,8 @@ Graph.prototype.measure = function(on){
 			.attr("width", self.plot[0][0].getAttribute("width"))
 			.attr("height", self.plot[0][0].getAttribute("height"))
 
+		self.peaks.style("pointer-events", "none");		//disable peak highlighting
+
 		self.disableZoom();
 
 		function measureStart() {
@@ -495,40 +497,42 @@ Graph.prototype.measure = function(on){
 	}
 	else{
 		this.measureClear();
-		this.plot.call(this.zoom);
-		this.xaxisRect.style("cursor", "crosshair");
-		this.brush.on("brushstart", brushstart)
-			.on("brush", brushmove)
-			.on("brushend", brushend);
-		var self = this;
-		function brushstart() {
-			self.dragZoomHighlight
-				.attr("width",0)
-				.attr("display","inline")
-			;
-		}
-
-		function brushmove() {
-		  var s = self.brush.extent();
-		  var width = self.x(s[1] - s[0]) - self.x(0);
-		  self.dragZoomHighlight.attr("x",self.x(s[0])).attr("width", width);
-		}
-
-		function brushend() {
-		  self.dragZoomHighlight.attr("display","none");
-		  var s = self.brush.extent();
-		  self.x.domain(s);
-		  self.brush.x(self.x);
-		  self.resize(s[0], s[1], self.model.ymin, self.model.ymax);
-		}
 	}
 }
 
 Graph.prototype.measureClear = function(){
+	this.peaks.style("pointer-events", "all");	
 	this.measureBackground.attr("height", 0);
 	this.measuringTool.attr("display","none");
 	this.measureDistance.attr("display","none");
-	this.measureInfo.style("display","none");	
+	this.measureInfo.style("display","none");
+
+	this.plot.call(this.zoom);
+	this.xaxisRect.style("cursor", "crosshair");
+	this.brush.on("brushstart", brushstart)
+		.on("brush", brushmove)
+		.on("brushend", brushend);
+	var self = this;
+	function brushstart() {
+		self.dragZoomHighlight
+			.attr("width",0)
+			.attr("display","inline")
+		;
+	}
+
+	function brushmove() {
+	  var s = self.brush.extent();
+	  var width = self.x(s[1] - s[0]) - self.x(0);
+	  self.dragZoomHighlight.attr("x",self.x(s[0])).attr("width", width);
+	}
+
+	function brushend() {
+	  self.dragZoomHighlight.attr("display","none");
+	  var s = self.brush.extent();
+	  self.x.domain(s);
+	  self.brush.x(self.x);
+	  self.resize(s[0], s[1], self.model.ymin, self.model.ymax);
+	}		
 }
 
 Graph.prototype.redraw = function(){
