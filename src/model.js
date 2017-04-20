@@ -248,8 +248,8 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 
 		var newmatch = $.extend(true, {}, this.match);	//clone object
 
-		newmatch.matchedPeptide[0].seq_mods = pepSeq1;
-		newmatch.matchedPeptide[1].seq_mods = pepSeq2;
+		newmatch.matchedPeptides[0].seq_mods = pepSeq1;
+		newmatch.matchedPeptides[1].seq_mods = pepSeq2;
 
 		CLMSUI.loadSpectra(newmatch, this.randId, this);
 	},
