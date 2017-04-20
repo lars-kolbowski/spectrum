@@ -95,7 +95,6 @@ var FragmentationKeyView = Backbone.View.extend({
 		}
 
 		this.tooltip = d3.select(this.el).append("span")
-			.html("Click to change cross-linker position")
 			.style("font-size", "small")
 			//.style("height", "20px")
 			.style("padding", "0 5px")
@@ -155,7 +154,7 @@ var FragmentationKeyView = Backbone.View.extend({
 			this.CL.on("mouseover", function() {
 				if (!self.changeMod  && !self.changeCL){
 					self.CLlineHighlight.attr("opacity", 0.8);
-
+					self.tooltip.text("Click to change cross-link position");
 					self.tooltip.transition()		
 					    .duration(200)		
 					    .style("opacity", .9);		
@@ -180,7 +179,10 @@ var FragmentationKeyView = Backbone.View.extend({
 					self.changeCL = self.linkPos;
 					for (var i = 0; i < self.fraglines.length; i++) {
 						self.fraglines[i].disableCursor();
-					}
+					};
+					for (var i = 0; i < self.pepLetters.length; i++){
+						self.pepLetters[i].style("cursor", "pointer");
+					};
 				}
 			});
 			//line for changing
@@ -259,9 +261,18 @@ var FragmentationKeyView = Backbone.View.extend({
 					.style("cursor", "pointer");
 				this.origCL.on("mouseover", function(){
 					self.origCLHighlight.attr("opacity", 1);
+					self.tooltip.text("Revert to original cross-link position");
+					self.tooltip.transition()		
+					    .duration(200)		
+					    .style("opacity", .9);		
+					self.tooltip.style("left", (d3.event.layerX + 15) + "px")		
+					    .style("top", (d3.event.layerY) + "px");
 				});
 				this.origCL.on("mouseout", function(){
 					self.origCLHighlight.attr("opacity", 0);
+					self.tooltip.transition()		
+						.duration(500)		
+						.style("opacity", 0);
 				});
 				this.origCL.on("click", function(){
 					self.model.changeLinkPos([self.model.match.oldLinkPos[0], self.model.match.oldLinkPos[1]]);
