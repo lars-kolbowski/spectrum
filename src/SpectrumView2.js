@@ -4,6 +4,7 @@ var SpectrumView = Backbone.View.extend({
 		'click #reset' : 'resetZoom',
 		'click #lossyChkBx': 'showLossy',
 		'submit #setrange' : 'setrange',
+		'click #lockZoom' : 'lockZoom',
 		'click #clearHighlights' : 'clearHighlights',
 		'change #colorSelector': 'changeColorScheme',
 		'click #measuringTool': 'measuringTool',
@@ -30,6 +31,7 @@ var SpectrumView = Backbone.View.extend({
 
 	render: function() {
 		this.graph.clear();
+		this.lockZoom();
 		if (this.model.JSONdata)
 			this.graph.setData();
 
@@ -70,6 +72,24 @@ var SpectrumView = Backbone.View.extend({
 
 		$("#xleft").val(this.model.xmin);
 		$("#xright").val(this.model.xmax);
+	},
+
+	lockZoom: function(){
+
+		if ($('#lockZoom').is(':checked')) {
+			$('#rangeSubmit').prop('disabled', true);
+			$('#xleft').prop('disabled', true);
+			$('#xright').prop('disabled', true);
+			this.model.lockZoom = true;
+			this.graph.disableZoom();
+		} else { 
+			$('#rangeSubmit').prop('disabled', false);
+			$('#xleft').prop('disabled', false);
+			$('#xright').prop('disabled', false);
+			this.model.lockZoom = false;
+			this.graph.enableZoom();
+		}
+
 	},
 
 	clearHighlights: function(){

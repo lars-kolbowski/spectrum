@@ -48,10 +48,10 @@ Graph = function(targetSvg, model, options) {
 			user-select: none;*/
 	//brush
 	this.brush = d3.svg.brush()
-		.x(this.x)
-		.on("brushstart", brushstart)
-		.on("brush", brushmove)
-		.on("brushend", brushend);
+		.x(this.x);
+		// .on("brushstart", brushstart)
+		// .on("brush", brushmove)
+		// .on("brushend", brushend);
 	this.xaxisRect = this.g.append("rect")
 					.attr("height", "25")
 					.attr("opacity", 0)
@@ -158,7 +158,7 @@ Graph = function(targetSvg, model, options) {
 			.style("text-anchor","middle").style("pointer-events","none");
 	}
 	
-	var self = this;
+/*	var self = this;
 
 	function brushstart() {
 		self.dragZoomHighlight
@@ -177,8 +177,10 @@ Graph = function(targetSvg, model, options) {
 	  var s = self.brush.extent();
 	  self.x.domain(s);
 	  self.brush.x(self.x);
-	  self.resize(s[0], s[1], self.model.ymin, self.model.ymax);
-	}
+  	  self.model.xmin = s[0];
+	  self.model.xmax = s[1]; //--
+	  self.resize(self.model.xmin, self.model.xmax, self.model.ymin, self.model.ymax);
+	}*/
 };
 
 Graph.prototype.setData = function(){
@@ -208,8 +210,14 @@ Graph.prototype.setData = function(){
         //console.log(this.cluster);
         this.updatePeakColors();
     }
-
-	this.resize(this.model.xminPrimary, this.model.xmaxPrimary, this.model.ymin, this.model.ymaxPrimary);
+    if(this.model.lockZoom){
+    	this.resize(this.model.xmin, this.model.xmax, this.model.ymin, this.model.ymax);
+		this.disableZoom();
+	}
+    else{
+		this.resize(this.model.xminPrimary, this.model.xmaxPrimary, this.model.ymin, this.model.ymaxPrimary);
+		this.enableZoom();
+	}
 }
 
 Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
@@ -286,6 +294,8 @@ Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 }
 
 Graph.prototype.disableZoom = function(){
+
+	this.plot.attr("pointer-events", "none");
 	this.xaxisRect.style("cursor", "default");
 	this.brush.on("brushstart", null)
 		.on("brush", null)
@@ -294,12 +304,44 @@ Graph.prototype.disableZoom = function(){
 		.on("zoom", null);
 }
 
+Graph.prototype.enableZoom = function(){
+	this.plot.attr("pointer-events", "all");
+	this.plot.call(this.zoom);
+	this.xaxisRect.style("cursor", "crosshair");
+	this.brush.on("brushstart", brushstart)
+		.on("brush", brushmove)
+		.on("brushend", brushend);
+	var self = this;
+	function brushstart() {
+		self.dragZoomHighlight
+			.attr("width",0)
+			.attr("display","inline")
+		;
+	}
+
+	function brushmove() {
+	  var s = self.brush.extent();
+	  var width = self.x(s[1] - s[0]) - self.x(0);
+	  self.dragZoomHighlight.attr("x",self.x(s[0])).attr("width", width);
+	}
+
+	function brushend() {
+	  self.dragZoomHighlight.attr("display","none");
+	  var s = self.brush.extent();
+	  self.x.domain(s);
+	  self.brush.x(self.x);
+	  self.model.xmin = s[0];
+	  self.model.xmax = s[1]; //--
+	  self.resize(self.model.xmin, self.model.xmax, self.model.ymin, self.model.ymax);
+	}		
+}
+
 Graph.prototype.measure = function(on){
 	if (on === true){
 		var self = this;
-		self.measureBackground
-			.attr("width", self.plot[0][0].getAttribute("width"))
-			.attr("height", self.plot[0][0].getAttribute("height"))
+    	self.measureBackground 
+      		.attr("width", self.plot[0][0].getAttribute("width")) 
+      		.attr("height", self.plot[0][0].getAttribute("height"));
 
 		self.peaks.style("pointer-events", "none");		//disable peak highlighting
 
@@ -507,32 +549,7 @@ Graph.prototype.measureClear = function(){
 	this.measureDistance.attr("display","none");
 	this.measureInfo.style("display","none");
 
-	this.plot.call(this.zoom);
-	this.xaxisRect.style("cursor", "crosshair");
-	this.brush.on("brushstart", brushstart)
-		.on("brush", brushmove)
-		.on("brushend", brushend);
-	var self = this;
-	function brushstart() {
-		self.dragZoomHighlight
-			.attr("width",0)
-			.attr("display","inline")
-		;
-	}
-
-	function brushmove() {
-	  var s = self.brush.extent();
-	  var width = self.x(s[1] - s[0]) - self.x(0);
-	  self.dragZoomHighlight.attr("x",self.x(s[0])).attr("width", width);
-	}
-
-	function brushend() {
-	  self.dragZoomHighlight.attr("display","none");
-	  var s = self.brush.extent();
-	  self.x.domain(s);
-	  self.brush.x(self.x);
-	  self.resize(s[0], s[1], self.model.ymin, self.model.ymax);
-	}		
+	this.enableZoom();
 }
 
 Graph.prototype.redraw = function(){
@@ -543,7 +560,7 @@ Graph.prototype.redraw = function(){
 		//get highest intensity from peaks in x range
 		//adjust y scale to new highest intensity
 
-		self.measureClear();
+		//self.measureClear();
 		if (self.points) {
 			var ymax = 0
 			var xDomain = self.x.domain();
@@ -552,7 +569,6 @@ Graph.prototype.redraw = function(){
 			  	ymax = self.points[i].y;
 			}
 			//console.log(ymax);
-			//self.y.domain([0, ymax/0.9]).nice();
 			self.y.domain([0, ymax/0.95]).nice();
 			self.y_right.domain([0, (ymax/(self.model.ymaxPrimary*0.95))*100]).nice();
 			self.yAxisLeftSVG.call(self.yAxisLeft);

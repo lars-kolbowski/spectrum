@@ -104,9 +104,6 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		this.xmaxPrimary = xmax + 50;
 		this.xminPrimary = xmin - 50;
 
-		this.xmax = this.xmaxPrimary;
-		this.xmin = this.xminPrimary;
-
 		var ymax = Number.NEGATIVE_INFINITY;
 		var tmp;
 		var peaks = this.JSONdata.peaks;
@@ -117,8 +114,14 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 
 		//this.ymaxPrimary = ymax / 0.9;
 		this.ymaxPrimary = ymax;
-		//this.ymax = d3.max(this.points, function(d){return d.y;});
-		this.ymin = 0;//d3.min(this.points, function(d){return d.y;});
+
+		if (!this.lockZoom){
+			this.xmax = this.xmaxPrimary;
+			this.xmin = this.xminPrimary;
+			this.ymax = this.ymaxPrimary;
+			this.ymin = 0;
+		}
+
 	},
 
 	setZoom: function(domain){
