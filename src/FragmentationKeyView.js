@@ -610,7 +610,7 @@ var FragmentationKeyView = Backbone.View.extend({
 		else{	
 			var color = true;
 			for(i = 1; i < this.model.highlights.length; i++){
-				if(this.model.highlights[i].range != this.model.highlights[i-1].range)
+				if(JSON.stringify(this.model.highlights[i].range) !== JSON.stringify(this.model.highlights[i-1].range))
 					color = false;
 			}
 
