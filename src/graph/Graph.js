@@ -235,7 +235,7 @@ Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 	self.x.domain([xmin, xmax])
 		.range([0, width]);
 	// y-scale (inverted domain)
-	self.y.domain([0, ymax*0.95]).nice()
+	self.y.domain([0, ymax]).nice()
 		.range([height, 0]).nice();
 	self.y_right.domain([0, ymax]).nice()
 		.range([height, 0]).nice();
@@ -569,8 +569,8 @@ Graph.prototype.redraw = function(){
 			  	ymax = self.points[i].y;
 			}
 			//console.log(ymax);
-			self.y.domain([0, ymax/0.95]).nice();
-			self.y_right.domain([0, (ymax/(self.model.ymaxPrimary*0.95))*100]).nice();
+			self.y.domain([0, ymax/0.95]);
+			self.y_right.domain([0, (ymax/(self.model.ymaxPrimary*0.95))*100]);
 			self.yAxisLeftSVG.call(self.yAxisLeft);
 			self.yAxisRightSVG.call(self.yAxisRight);
 			for (var i = 0; i < self.points.length; i++){
