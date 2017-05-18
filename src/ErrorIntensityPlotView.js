@@ -45,6 +45,8 @@ var ErrorIntensityPlotView = Backbone.View.extend({
 			.attr('class', 'wrapper')
 			.style("opacity", 0); 
 
+		this.tooltip = CLMSUI.compositeModelInst.get("tooltipModel");
+
 		this.listenTo(this.model, 'change', this.render);
 		this.listenTo(this.model, 'changed:ColorScheme', this.render);
 		this.listenTo(this.model, 'changed:Highlights', this.updateHighlights);
@@ -87,7 +89,8 @@ var ErrorIntensityPlotView = Backbone.View.extend({
 					peptideId: peptideId,
 					intensity: self.model.JSONdata.peaks[firstPeakId].intensity,
 					error: Math.abs(cluster.error),
-					mz: self.model.JSONdata.peaks[firstPeakId].intensity
+					charge: self.model.JSONdata.clusters[cluster.Clusterid].charge,
+					//mz: self.model.JSONdata.peaks[firstPeakId].mz
 				}
 				self.data.push(point);
 			});
@@ -188,10 +191,13 @@ var ErrorIntensityPlotView = Backbone.View.extend({
 				if (d['peptideId'] == 0) return p1color;
 				else return p2color; } )
 			.on("mouseover", function(d) {
-				self.model.addHighlight([self.model.fragments[d.fragId]])
+				var evt = d3.event;
+				self.model.addHighlight([self.model.fragments[d.fragId]]);
+				self.showTooltip(evt.pageX, evt.pageY, d);
 			})
 			.on("mouseout", function(d) {
-				self.model.clearHighlight([self.model.fragments[d.fragId]])
+				self.model.clearHighlight([self.model.fragments[d.fragId]]);
+				self.hideTooltip();
 			})
 			.on("click", function(d) {
 				var evt = d3.event;
@@ -201,6 +207,27 @@ var ErrorIntensityPlotView = Backbone.View.extend({
 
 		this.updateHighlights();
 
+	},
+
+	showTooltip: function(x, y, data){
+		if (this.model.showSpectrum)
+			return
+
+		var contents = [["charge", data.charge], ["error", data.error.toFixed(3)], ["Int", data.intensity.toFixed(0)]];
+		
+		var fragId = data.fragId;
+		var fragments = this.model.fragments.filter(function(d) { return d.id == fragId; });
+		var header = [[fragments[0].name]];
+				
+		this.tooltip.set("contents", contents )
+			.set("header", header.join(" "))
+			.set("location", {pageX: x, pageY: y});
+	},
+
+	hideTooltip: function(){
+		if (this.model.showSpectrum)
+			return
+		this.tooltip.set("contents", null);
 	},
 
 	stickyHighlight: function(fragId, ctrlKey){
