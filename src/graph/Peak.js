@@ -56,10 +56,10 @@ function Peak (id, graph){
 
 				}
 			if(fragments[f].isMonoisotopic)
-				this.fragments.push(fragments[f])
+				this.fragments.push(fragments[f]);
 			else{
-				this.isotopes.push(fragments[f])
-				this.isotopenumbers.push(isotope)
+				this.isotopes.push(fragments[f]);
+				this.isotopenumbers.push(isotope);
 			}
 		}				
 	};

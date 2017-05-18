@@ -35,7 +35,9 @@ Graph = function(targetSvg, model, options) {
 	};
 	this.g =  targetSvg.append("g")
 				.attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")")
-				.attr("class", "spectrum");
+				.attr("class", "spectrum")
+				.attr("id", "spectrumGraph");
+
 	
 	this.xaxisSVG = this.g.append("g")
 		.attr("class", "x axis");
@@ -55,7 +57,7 @@ Graph = function(targetSvg, model, options) {
 	this.xaxisRect = this.g.append("rect")
 					.attr("height", "25")
 					.attr("opacity", 0)
-					.attr("pointer-events", "all")
+					.attr("pointer-events", "visible")
 					.style("cursor", "crosshair");
 	this.xaxisRect.call(this.brush);	
 	//~ this	
@@ -66,13 +68,13 @@ Graph = function(targetSvg, model, options) {
 		.attr("class", "y axis");
 	this.plot = this.g.append("rect")
 		.style("fill", "white")
-		.attr("pointer-events", "all");
+		.attr("pointer-events", "visible");
 
 	this.measureBackground = this.g.append("rect")
 		.attr("width", "0")
 		.style("fill", "white")
 		.style("cursor", "crosshair")
-		.attr("pointer-events", "all");
+		.attr("pointer-events", "visible");
 
 	this.innerSVG = this.g.append("g")
 		.attr("class", "innerSpectrum");
@@ -158,29 +160,6 @@ Graph = function(targetSvg, model, options) {
 			.style("text-anchor","middle").style("pointer-events","none");
 	}
 	
-/*	var self = this;
-
-	function brushstart() {
-		self.dragZoomHighlight
-			.attr("width",0)
-			.attr("display","inline");
-	}
-
-	function brushmove() {
-	  var s = self.brush.extent();
-	  var width = self.x(s[1] - s[0]) - self.x(0);
-	  self.dragZoomHighlight.attr("x",self.x(s[0])).attr("width", width);
-	}
-
-	function brushend() {
-	  self.dragZoomHighlight.attr("display","none");
-	  var s = self.brush.extent();
-	  self.x.domain(s);
-	  self.brush.x(self.x);
-  	  self.model.xmin = s[0];
-	  self.model.xmax = s[1]; //--
-	  self.resize(self.model.xmin, self.model.xmax, self.model.ymin, self.model.ymax);
-	}*/
 };
 
 Graph.prototype.setData = function(){
@@ -189,25 +168,12 @@ Graph.prototype.setData = function(){
 	this.pep1 = this.model.pep1;
 	this.pep2 = this.model.pep2;
     if (this.model.JSONdata) {
-    	//var test = "";
         for (var i = 0; i < this.model.JSONdata.peaks.length; i++){
         		var peak = this.model.JSONdata.peaks[i];
-				//test += peak.mz + "\t" + peak.intensity + "\r\n";
             this.points.push(new Peak(i, this));
         }
-        //console.log(test);
-        this.model.points = this.points;
-        //Isotope cluster
-    /*	this.cluster = new Array();
 
-        var peakCount = this.points.length;
-        for (var p = 0; p < peakCount; p++) {
-            var peak = this.points[p];
-            if (peak.fragments.length > 0){
-                this.cluster.push(new IsotopeCluster(p, this));
-            }
-        }*/
-        //console.log(this.cluster);
+        this.model.points = this.points;
         this.updatePeakColors();
     }
     if(this.model.lockZoom){
@@ -305,7 +271,7 @@ Graph.prototype.disableZoom = function(){
 }
 
 Graph.prototype.enableZoom = function(){
-	this.plot.attr("pointer-events", "all");
+	this.plot.attr("pointer-events", "visible");
 	this.plot.call(this.zoom);
 	this.xaxisRect.style("cursor", "crosshair");
 	this.brush.on("brushstart", brushstart)
@@ -543,7 +509,7 @@ Graph.prototype.measure = function(on){
 }
 
 Graph.prototype.measureClear = function(){
-	this.peaks.style("pointer-events", "all");	
+	this.peaks.style("pointer-events", "visible");	
 	this.measureBackground.attr("height", 0);
 	this.measuringTool.attr("display","none");
 	this.measureDistance.attr("display","none");
@@ -653,6 +619,18 @@ Graph.prototype.updateColors = function(){
 		for (var p = 0; p < peakCount; p++) {
 			this.points[p].updateColor();
 		}
+}
+
+Graph.prototype.show = function(){
+	this.g.attr("visibility", "visible");
+	this.enableZoom();
+}
+
+Graph.prototype.hide = function(){
+	this.g.attr("visibility", "hidden");
+	this.disableZoom();
+	//this.xaxisRect.attr("pointer-events", "none");
+	//this.g.style("pointer-events", "none");
 }
 /*
 
