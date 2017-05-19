@@ -275,6 +275,9 @@ var FragmentationKeyView = Backbone.View.extend({
 						.style("opacity", 0);
 				});
 				this.origCL.on("click", function(){
+					self.tooltip.transition()		
+							.duration(500)		
+							.style("opacity", 0);
 					self.model.changeLinkPos([self.model.match.oldLinkPos[0], self.model.match.oldLinkPos[1]]);
 				});
 				// //get position
@@ -533,6 +536,24 @@ var FragmentationKeyView = Backbone.View.extend({
 			var modLetterG = modLettersG.enter()
 				.append('g')
 				.attr('class', "modLetterG")
+				.on("mouseover", function() {
+					if (!self.changeMod  && !self.changeCL){
+						self.tooltip.text("Change modification position");
+						self.tooltip.transition()		
+						    .duration(200)		
+						    .style("opacity", .9);		
+						self.tooltip.style("left", (d3.event.layerX + 15) + "px")		
+						    .style("top", (d3.event.layerY) + "px");
+					}
+				})
+				.on("mouseout", function() {
+					if (!self.changeMod  && !self.changeCL){
+						self.CLlineHighlight.attr("opacity", 0);
+						self.tooltip.transition()		
+							.duration(500)		
+							.style("opacity", 0);	
+					}
+				})
 				.on("click", function(d) {
 					if (self.changeCL == false){
 						self.CLline.style("cursor", "not-allowed");
