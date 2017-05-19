@@ -98,8 +98,8 @@ var ErrorIntensityPlotView = Backbone.View.extend({
 			});
 		});
 
-		var cx = this.wrapper.node().parentNode.clientWidth;
-		var cy = this.wrapper.node().parentNode.clientHeight;
+		var cx = this.wrapper.node().parentNode.width.baseVal.value;
+		var cy = this.wrapper.node().parentNode.height.baseVal.value;
 
 		var width = cx - self.margin.left - self.margin.right;
 		var height = cy - self.margin.top - self.margin.bottom;
