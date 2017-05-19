@@ -614,11 +614,12 @@ var FragmentationKeyView = Backbone.View.extend({
 
 		for(l = 0; l < lines.length; l++){
 			var highlightFragments = _.intersection(lines[l].fragments, this.model.highlights);
+
+			if(lines[l].fragments.length > 0)
+				lines[l].highlight(false);
 			if(highlightFragments.length != 0){
 				lines[l].highlight(true, highlightFragments);
 			}
-			else if(lines[l].fragments.length > 0)
-				lines[l].highlight(false);
 		}
 		if(this.model.highlights.length == 0)
 			this.colorLetters("all");

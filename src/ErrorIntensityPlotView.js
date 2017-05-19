@@ -26,8 +26,6 @@ var ErrorIntensityPlotView = Backbone.View.extend({
 
 	initialize: function() {
 
-		//this.show = true;
-
 		var self = this;
 
 		this.svg = d3.select(this.el.getElementsByTagName("svg")[0]);
@@ -82,11 +80,15 @@ var ErrorIntensityPlotView = Backbone.View.extend({
 		fragments.forEach(function(fragment){
 			var peptideId = fragment.peptideId;
 			var fragId = fragment.id;
+			var lossy = false; 
+      		if (fragment.type.includes("Loss"))  
+        		lossy = true;
 			fragment.clusterInfo.forEach(function(cluster){
 				var firstPeakId = self.model.JSONdata.clusters[cluster.Clusterid].firstPeakId;
 				var point = {
 					fragId: fragId,
 					peptideId: peptideId,
+					lossy: lossy,
 					intensity: self.model.JSONdata.peaks[firstPeakId].intensity,
 					error: Math.abs(cluster.error),
 					charge: self.model.JSONdata.clusters[cluster.Clusterid].charge,
@@ -184,12 +186,8 @@ var ErrorIntensityPlotView = Backbone.View.extend({
 			.style("cursor", "pointer")
 			.style("fill-opacity", 0)
 			.style("stroke-width", 1)
-			.style("fill", function(d) { 
-				if (d['peptideId'] == 0) return p1color;
-				else return p2color; } )
-			.style("stroke", function(d) { 
-				if (d['peptideId'] == 0) return p1color;
-				else return p2color; } )
+			.style("fill", function(d) { return getColor(d); }) 
+			.style("stroke", function(d) { return getColor(d); }) 
 			.on("mouseover", function(d) {
 				var evt = d3.event;
 				self.model.addHighlight([self.model.fragments[d.fragId]]);
@@ -204,6 +202,17 @@ var ErrorIntensityPlotView = Backbone.View.extend({
 				self.stickyHighlight(d.fragId, evt.ctrlKey);
 			})
 			.attr("r", 3);
+
+		function getColor(d){ 
+		  if (d.lossy){  
+		    if (d['peptideId'] == 0) return self.model.p1color_loss; 
+		    else return self.model.p2color_loss; 
+		  } 
+		  else{ 
+		    if (d['peptideId'] == 0) return self.model.p1color; 
+		    else return self.model.p2color;           
+		  } 
+		}; 
 
 		this.updateHighlights();
 
@@ -276,19 +285,3 @@ var ErrorIntensityPlotView = Backbone.View.extend({
 	},
 
 });
-
-
-
-		// var peaks = this.graph.points;
-
-		// for(p = 0; p < peaks.length; p++){
-		// 	if(peaks[p].fragments.length > 0)
-		// 		peaks[p].highlight(false);
-			
-		// 	var highlightFragments = _.intersection(peaks[p].fragments, this.model.highlights);
-		// 	if(highlightFragments.length != 0){
-		// 		peaks[p].highlight(true, highlightFragments);
-		// 	}
-		// }
-		// this.graph.updatePeakColors();
-		// this.graph.updatePeakLabels();
