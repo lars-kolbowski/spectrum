@@ -54,6 +54,7 @@ var ErrorIntensityPlotView = Backbone.View.extend({
 		if (!this.model.showSpectrum){
 			this.render();
 			this.wrapper.style("opacity", 1);
+			this.background.attr("height", this.height);
 		}
 		else{
 			this.wrapper.style("opacity", 0);
@@ -101,29 +102,29 @@ var ErrorIntensityPlotView = Backbone.View.extend({
 		var cx = this.wrapper.node().parentNode.width.baseVal.value;
 		var cy = this.wrapper.node().parentNode.height.baseVal.value;
 
-		var width = cx - self.margin.left - self.margin.right;
-		var height = cy - self.margin.top - self.margin.bottom;
+		this.width = cx - self.margin.left - self.margin.right;
+		this.height = cy - self.margin.top - self.margin.bottom;
 
 		this.xmax = d3.max(this.data, function(d) { return d['error']; });
 		this.ymax = d3.max(this.data, function(d) { return d['intensity']; });
 
 		this.x = d3.scale.linear()
 		          .domain([ 0, this.xmax ])
-		          .range([ 0, width ]);
+		          .range([ 0, this.width ]);
 
 
 		this.y = d3.scale.linear()
 			      .domain([ 0, this.ymax ]).nice()
-			      .range([ height, 0 ]).nice();
+			      .range([ this.height, 0 ]).nice();
 
-		this.yTicks = height / 40;
-		this.xTicks = width / 100;
+		this.yTicks = this.height / 40;
+		this.xTicks = this.width / 100;
 		    
 		// draw the x axis
 		this.xAxis = d3.svg.axis().scale(self.x).ticks(this.xTicks).orient("bottom");
 
 		this.xAxisSVG = this.wrapper.append('g')
-			.attr('transform', 'translate(0,' + height + ')')
+			.attr('transform', 'translate(0,' + this.height + ')')
 			.attr('class', 'axis')
 			.call(this.xAxis);
 
@@ -132,7 +133,7 @@ var ErrorIntensityPlotView = Backbone.View.extend({
 			.text("ppm error")
 			.attr("dy","2.4em")
 			.style("text-anchor","middle").style("pointer-events","none");
-		this.xLabel.attr("x", width/2).attr("y", height);
+		this.xLabel.attr("x", this.width/2).attr("y", this.height);
 
 		// draw the y axis
 		self.yAxis = d3.svg.axis().scale(this.y).ticks(this.yTicks).orient("left").tickFormat(d3.format("s"));
@@ -147,7 +148,7 @@ var ErrorIntensityPlotView = Backbone.View.extend({
 			.text("Intensity")
 			.style("text-anchor","middle").style("pointer-events","none");
 
-		this.yLabel.attr("transform","translate(" + -50 + " " + height/2+") rotate(-90)");
+		this.yLabel.attr("transform","translate(" + -50 + " " + this.height/2+") rotate(-90)");
 
 		this.wrapper.selectAll('.axis line, .axis path')
 				.style({'stroke': 'Black', 'fill': 'none', 'stroke-width': '1.2px'});
@@ -156,8 +157,8 @@ var ErrorIntensityPlotView = Backbone.View.extend({
 
 		this.background = this.g.append("rect")
 			.style("fill", "white")
-			.attr("width", width)
-			.attr("height", height);
+			.attr("width", this.width)
+			.attr("height", 0);
 
 		this.background.on("click", function(){
 			this.model.clearStickyHighlights();
