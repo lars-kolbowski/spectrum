@@ -22,7 +22,7 @@
 //		and https://gist.github.com/mbostock/3019563
 
 Graph = function(targetSvg, model, options) {
-	this.x = d3.scale.linear();
+	this.x = d3.scale.linear().clamp(true);
 	this.y = d3.scale.linear();
 	this.y_right = d3.scale.linear();
 	this.model = model;
@@ -236,15 +236,12 @@ Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 		
 	self.plot.attr("width", width)
 		.attr("height", height);
-
-	// self.innerSVG.attr("width", width)
-	// 		.attr("height", height)
-	// 		.attr("viewBox", "0 0 "+width+" "+height);
 	
 	self.xaxisRect.attr("width",width).attr("y", height).attr("height", self.margin.bottom);
 	self.dragZoomHighlight.attr("height", height);
 				
 	self.zoom = d3.behavior.zoom().x(self.x).on("zoom", self.redraw());
+	self.zoom.scaleExtent([0, self.model.xmaxPrimary]);
 	self.plot.call(self.zoom);
 	//self.innerSVG.call(self.zoom);
 

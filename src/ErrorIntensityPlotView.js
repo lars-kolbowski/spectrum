@@ -57,7 +57,7 @@ var ErrorIntensityPlotView = Backbone.View.extend({
 		}
 		else{
 			this.wrapper.style("opacity", 0);
-			this.background.attr("height", 0)
+			this.background.attr("height", 0);
 		}
 	},
 
