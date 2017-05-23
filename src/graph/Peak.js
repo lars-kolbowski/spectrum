@@ -145,15 +145,38 @@ function Peak (id, graph){
 					contents.push([fragments[f].name + " (" + fragments[f].sequence + ")", "charge: " + charge + ", error: " + error]);
 			};
 
-					
+			
+		//Tooltip
+		if (CLMSUI.compositeModelInst !== undefined){
 			self.graph.tooltip.set("contents", contents )
 				.set("header", header.join(" "))
 				.set("location", {pageX: x, pageY: y});
-				//.set("location", {pageX: d3.event.pageX, pageY: d3.event.pageY})				
+				//.set("location", {pageX: d3.event.pageX, pageY: d3.event.pageY})		
+		}
+		else{
+			var html = header.join(" ");
+			for (var i = contents.length - 1; i >= 0; i--) {
+				html += "</br>";
+				html += contents[i].join(": ");
+			}
+			self.graph.tooltip.html(html);
+			self.graph.tooltip.transition()		
+				.duration(200)		
+				.style("opacity", .9);		
+			self.graph.tooltip.style("left", (x + 15) + "px")		
+				.style("top", y + "px");	
+		}
+
+		
 		};
 
 		function hideTooltip(){
-			self.graph.tooltip.set("contents", null);
+			if (CLMSUI.compositeModelInst !== undefined)
+				self.graph.tooltip.set("contents", null);
+			else{
+				self.graph.tooltip.style("opacity", 0);
+				self.graph.tooltip.html("");
+			}
 		};
 
 		function startHighlight(fragId){
