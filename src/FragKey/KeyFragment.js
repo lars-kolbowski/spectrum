@@ -355,6 +355,7 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 		.attr("x2", this.x)
 		.attr("y2", y - barHeight)
 		.style("cursor", "pointer")
+		.style("pointer-events", "none")
 		.attr("class", "fragBar");
 
 	//if all fragments are lossy 	
