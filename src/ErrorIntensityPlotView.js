@@ -43,7 +43,20 @@ var ErrorIntensityPlotView = Backbone.View.extend({
 			.attr('class', 'wrapper')
 			.style("opacity", 0); 
 
-		this.tooltip = CLMSUI.compositeModelInst.get("tooltipModel");
+		if (CLMSUI.compositeModelInst !== undefined)
+			this.tooltip = CLMSUI.compositeModelInst.get("tooltipModel");		
+		else{
+			target = this.wrapper.node().parentNode.parentNode.parentNode; //this would get you #spectrumPanel
+			this.tooltip = d3.select(target).append("span")
+				.style("font-size", "small")
+				.style("padding", "0 5px")
+				.style("border-radius", "6px")		
+				.attr("class", "tooltip")
+				.style("background-color", "black")
+				.style("pointer-events", "none")
+				.style("position", "absolute")				
+				.style("opacity", 0);
+		}
 
 		this.listenTo(this.model, 'change', this.render);
 		this.listenTo(this.model, 'changed:ColorScheme', this.render);
@@ -228,16 +241,36 @@ var ErrorIntensityPlotView = Backbone.View.extend({
 		var fragId = data.fragId;
 		var fragments = this.model.fragments.filter(function(d) { return d.id == fragId; });
 		var header = [[fragments[0].name]];
-				
-		this.tooltip.set("contents", contents )
-			.set("header", header.join(" "))
-			.set("location", {pageX: x, pageY: y});
+		
+		//Tooltip
+		if (CLMSUI.compositeModelInst !== undefined){
+			this.tooltip.set("contents", contents )
+				.set("header", header.join(" "))
+				.set("location", {pageX: x, pageY: y});	
+		}
+		else{
+			var html = header.join(" ");
+			for (var i = contents.length - 1; i >= 0; i--) {
+				html += "</br>";
+				html += contents[i].join(": ");
+			}
+			this.tooltip.html(html);
+			this.tooltip.transition()		
+				.duration(200)		
+				.style("opacity", .9);		
+			this.tooltip.style("left", (x + 15) + "px")		
+				.style("top", y + "px");	
+		}
+
 	},
 
 	hideTooltip: function(){
-		if (this.model.showSpectrum)
-			return
-		this.tooltip.set("contents", null);
+		if (CLMSUI.compositeModelInst !== undefined)
+			this.tooltip.set("contents", null);
+		else{
+			this.tooltip.style("opacity", 0);
+			this.tooltip.html("");
+		}
 	},
 
 	stickyHighlight: function(fragId, ctrlKey){

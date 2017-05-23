@@ -205,7 +205,14 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 
 	changeLinkPos: function(newLinkSites){
 
-		if (this.match !== undefined){
+		if(this.get("JSONrequest") !== undefined){ 
+			json_req = this.get("JSONrequest");
+			for (var i = 0; i < newLinkSites.length; i++) {
+				json_req.LinkSite[i].linkSite = newLinkSites[i]-1;
+			}
+			this.request_annotation(json_req);
+		}
+		else if (this.match !== undefined){
 			var newmatch = $.extend(true, {}, this.match);	//clone object so linkpos change is not cached
 			newmatch.linkPos1 = newLinkSites[0];
 			newmatch.linkPos2 = newLinkSites[1];
@@ -226,36 +233,55 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 					this.JSONdata.LinkSite[i].linkSite = newLinkSites[i];
 			}
 			this.setData();	
-		}	
+		}
 
 	},
 
 
 	changeMod: function(oldPos, newPos, oldPepIndex, newPepIndex){
 
-		if (oldPos != newPos || oldPepIndex != newPepIndex){
+		if (oldPos == newPos && oldPepIndex == newPepIndex)
+			return
+
+		if(this.get("JSONrequest") !== undefined){ 
+			json_req = this.get("JSONrequest");
+			//standalone
+			json_req.Peptides[newPepIndex].sequence[newPos].Modification = this.JSONdata.Peptides[oldPepIndex].sequence[oldPos].Modification;
+			json_req.Peptides[oldPepIndex].sequence[oldPos].Modification = "";
+			this.request_annotation(json_req);
+		}
+		else if (this.match !== undefined){
+			//CLMSUI integrated
 			this.JSONdata.Peptides[newPepIndex].sequence[newPos].Modification = this.JSONdata.Peptides[oldPepIndex].sequence[oldPos].Modification;
 			this.JSONdata.Peptides[oldPepIndex].sequence[oldPos].Modification = "";
+				
+			var pepSeq1 = "";
+			for (var i = 0; i < this.JSONdata.Peptides[0].sequence.length; i++) {
+				pepSeq1 += this.JSONdata.Peptides[0].sequence[i].aminoAcid;
+				pepSeq1 += this.JSONdata.Peptides[0].sequence[i].Modification;
+			};
+
+			var pepSeq2 = "";
+			for (var i = 0; i < this.JSONdata.Peptides[1].sequence.length; i++) {
+				pepSeq2 += this.JSONdata.Peptides[1].sequence[i].aminoAcid;
+				pepSeq2 += this.JSONdata.Peptides[1].sequence[i].Modification;
+			};		
+
+			var newmatch = $.extend(true, {}, this.match);	//clone object
+
+			newmatch.matchedPeptides[0].seq_mods = pepSeq1;
+			newmatch.matchedPeptides[1].seq_mods = pepSeq2;
+
+			CLMSUI.loadSpectra(newmatch, this.randId, this);
 		}
-			
-		var pepSeq1 = "";
-		for (var i = 0; i < this.JSONdata.Peptides[0].sequence.length; i++) {
-			pepSeq1 += this.JSONdata.Peptides[0].sequence[i].aminoAcid;
-			pepSeq1 += this.JSONdata.Peptides[0].sequence[i].Modification;
-		};
+		else{
+			//Preview
+			this.JSONdata.Peptides[newPepIndex].sequence[newPos].Modification = this.JSONdata.Peptides[oldPepIndex].sequence[oldPos].Modification;
+			this.JSONdata.Peptides[oldPepIndex].sequence[oldPos].Modification = "";
+			this.setData();	
+		}
 
-		var pepSeq2 = "";
-		for (var i = 0; i < this.JSONdata.Peptides[1].sequence.length; i++) {
-			pepSeq2 += this.JSONdata.Peptides[1].sequence[i].aminoAcid;
-			pepSeq2 += this.JSONdata.Peptides[1].sequence[i].Modification;
-		};		
 
-		var newmatch = $.extend(true, {}, this.match);	//clone object
-
-		newmatch.matchedPeptides[0].seq_mods = pepSeq1;
-		newmatch.matchedPeptides[1].seq_mods = pepSeq2;
-
-		CLMSUI.loadSpectra(newmatch, this.randId, this);
 	},
 
 	checkForValidModification: function(mod, aminoAcid){
@@ -354,7 +380,31 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 				}
 			}				
 		}	
+	},
 
-	
-	}
+	request_annotation: function(json_request){
+		//send request to xi annotator - needs to be on the same server because of cross-scripting protection
+		console.log(json_request);
+		// Send the request
+		var self = this;
+		var response = $.ajax({
+			type: "POST",
+			datatype: "json",
+			headers: { 
+			    'Accept': 'application/json',
+			    'Content-Type': 'application/json' 
+			},
+			data: JSON.stringify(json_request),
+			async: false,
+			url: "/xiAnnotator/annotate/FULL",
+			success: function(data) {
+				self.set("JSONdata", data)
+				self.setData();
+			}
+		});			
+
+		// $.post('/xiAnnotator/annotate/FULL', JSON.stringify(json_request), function(response) {
+		// 	console.log(response);
+		// }, 'application/json');
+	}	
 });
