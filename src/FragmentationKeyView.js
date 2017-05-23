@@ -20,12 +20,9 @@
 //		FragmentationKeyView.js
 var FragmentationKeyView = Backbone.View.extend({
 
-	// events : {
-	// 	'click #clearHighlights' : 'clearHighlights',
-	// },
 
 	initialize: function() {
-		this.svg = d3.select(this.el.getElementsByTagName("svg")[0]);//d3.select(this.el).append("svg").style("width", "100%").style("height", "100%");
+		this.svg = d3.select(this.el.getElementsByTagName("svg")[0]);
 		this.fragKeyWrapper = this.svg.append("g");
 
 		this.margin = {
@@ -556,6 +553,11 @@ var FragmentationKeyView = Backbone.View.extend({
 				})
 				.on("click", function(d) {
 					if (self.changeCL == false){
+
+						self.tooltip.transition()		
+							.duration(500)		
+							.style("opacity", 0);
+							
 						self.CLline.style("cursor", "not-allowed");
 						self.CLlineHighlight.style("cursor", "not-allowed");
 						
