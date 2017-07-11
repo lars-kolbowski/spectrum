@@ -365,8 +365,6 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 	else {
 		this.fragBar.attr("stroke", "black");
 	}
-
-
 			
 }
 

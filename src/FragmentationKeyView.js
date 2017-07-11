@@ -18,6 +18,14 @@
 //
 //
 //		FragmentationKeyView.js
+
+//TODO: find a better place for this?
+d3.selection.prototype.moveToFront = function() {
+  return this.each(function(){
+    this.parentNode.appendChild(this);
+  });
+};
+
 var FragmentationKeyView = Backbone.View.extend({
 
 
@@ -31,13 +39,14 @@ var FragmentationKeyView = Backbone.View.extend({
 			"bottom": 40,
 			"left":   40
 		};
-		this.highlights = this.fragKeyWrapper.append("g").attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
+		//this.highlights = this.fragKeyWrapper.append("g").attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
 		this.g =  this.fragKeyWrapper.append("g").attr("class", "fragKey").attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
 
 		this.listenTo(this.model, 'change', this.render);
 		this.listenTo(this.model, 'destroy', this.remove);
 		this.listenTo(this.model, 'changed:Highlights', this.updateHighlights);
 		this.listenTo(this.model, 'changed:ColorScheme', this.updateColors);
+		this.listenTo(this.model, 'changed:HighlightColor', this.updateHighlightColors);
 		this.listenTo(window, 'resize', _.debounce(this.resize));
 
 
@@ -196,10 +205,18 @@ var FragmentationKeyView = Backbone.View.extend({
 		}
 
 		//change-mod svg element
-	    this.changeModLetter = this.g.append("text")
-	    	.attr("text-anchor", "middle")
+
+		var changeModLetterG = this.g.append("g")
+		this.changeModLetterHighlight = changeModLetterG.append("text")
+			.attr("text-anchor", "middle")
+			.attr("stroke", self.model.highlightColour)
+			.style("font-size", "0.7em")
+			.attr("stroke-width", "2px")
+		this.changeModLetter = changeModLetterG.append("text")
+			.attr("text-anchor", "middle")
 			.style("font-size", "0.7em")
 			.style("cursor", "default");
+
 
 		this.fraglines = new Array();
 		var self = this;
@@ -367,7 +384,8 @@ var FragmentationKeyView = Backbone.View.extend({
 						changeCrossLink(d);
 					}
 					//change the mod if changeMod is active and it's a valid modification for this aa
-					if(self.changeMod !== false && self.validModChange){	
+					//if(self.changeMod !== false && self.validModChange){	
+					if(self.changeMod !== false){
 						changeMod(d);
 					}
 				})
@@ -429,28 +447,33 @@ var FragmentationKeyView = Backbone.View.extend({
 				var offset = self.pepoffset[self.changeMod.pepIndex];
 				var oldPos = self.changeMod.pos - offset;
 				var newPos = d.pos;
-				self.model.changeMod(oldPos, newPos, self.changeMod.pepIndex, d.pepIndex);
+				if (oldPos == newPos && self.changeMod.pepIndex == d.pepIndex)
+					self.render();
+				else 
+					self.model.changeMod(oldPos, newPos, self.changeMod.pepIndex, d.pepIndex);
 			};
 
 			function changeModStartHighlight(pepLetterG, pepLetterData){
 
 				clearHighlights();
 
-				var pepLetterHighlight = pepLetterG.childNodes[0];
-				var pepLetter = pepLetterG.childNodes[1];
-				pepLetterHighlight.setAttribute("opacity", 1);
-				
+				var pepLetterHighlight = d3.select(pepLetterG).select(".pepLetterHighlight");
+				var pepLetter = d3.select(pepLetterG).select(".pepLetter");
+				pepLetterHighlight.style("opacity", 1);
+				pepLetter.style("cursor","pointer");
+
 				var offset = self.pepoffset[self.changeMod.pepIndex];
 				var highlight = self.modLetterHighlights[self.changeMod.pepIndex][0][self.changeMod.pos-offset];
-				var oldModLetters = self.modLetters[self.changeMod.pepIndex][0][self.changeMod.pos-offset]
-				var x = parseInt(pepLetterHighlight.getAttribute("x"));
+				var oldModLetters = self.modLetters[self.changeMod.pepIndex][0][self.changeMod.pos-offset];
+				
+				var x = parseInt(pepLetterHighlight[0][0].getAttribute("x"));
 				if (pepLetterData.pepIndex == 0)
 					var y = 5;
 				else if (pepLetterData.pepIndex == 1)
 					var y = 83;
 
 				//check if it is a valid modification change
-				if (self.model.checkForValidModification(self.changeMod.mod, pepLetterData.aminoAcid)){
+/*				if (self.model.checkForValidModification(self.changeMod.mod, pepLetterData.aminoAcid)){
 					self.validModChange = true;
 					pepLetterHighlight.setAttribute("style", "cursor:pointer");
 					pepLetter.setAttribute("style", "cursor:pointer");
@@ -459,18 +482,24 @@ var FragmentationKeyView = Backbone.View.extend({
 					self.validModChange = false;
 					pepLetterHighlight.setAttribute("style", "cursor:not-allowed");
 					pepLetter.setAttribute("style", "cursor:not-allowed");
-				}
+				}*/
 				//
 				if (pepLetterData.pepIndex == 0)
 					var color = self.model.p1color;
 				else if (pepLetterData.pepIndex == 1)
 					var color = self.model.p2color;
 				oldModLetters.setAttribute("fill", "grey");
-				highlight.setAttribute("x", x);
-				highlight.setAttribute("y", y+1);
-				highlight.setAttribute("opacity", 1)
+				// highlight.setAttribute("x", x);
+				// highlight.setAttribute("y", y+1);
+				highlight.setAttribute("opacity", 0)
+
 				self.changeModLetter.attr("x", x)
-					.text(self.changeMod.mod)
+					.text(self.changeMod.fullMod)
+					.attr("y", y)
+					.attr("fill", color)
+					.attr("opacity", 1);
+				self.changeModLetterHighlight.attr("x", x)
+					.text(self.changeMod.fullMod)
 					.attr("y", y)
 					.attr("fill", color)
 					.attr("opacity", 1);
@@ -487,7 +516,7 @@ var FragmentationKeyView = Backbone.View.extend({
 
 			function clearHighlights(){
 				self.pepLetterHighlights.forEach(function(peptide){
-					peptide.attr("opacity", 0);
+					peptide.style("opacity", 0);
 				});
 			};
 
@@ -525,34 +554,65 @@ var FragmentationKeyView = Backbone.View.extend({
 					if (pep.sequence[shift] != "#")
 						break;
 				}
-				mod_data.push({mod: self.pepModsArray[pepIndex][i], pepIndex: pepIndex, pos: shift+i})
+				mod_data.push({
+					fullMod: self.pepModsArray[pepIndex][i], 
+					shortMod: short_modname(self.pepModsArray[pepIndex][i]),
+					pepIndex: pepIndex, 
+					pos: shift+i, 
+				})
 			}
+
+			function short_modname(fullModName){
+				if (fullModName === undefined)
+					return;
+				if (fullModName.length > 5)
+					return fullModName.substr(0,3) + "..";
+				return fullModName;
+			};
 
 			var modLettersG = pep.group.selectAll("g.modLetterG").data (mod_data);
 			
 			var modLetterG = modLettersG.enter()
 				.append('g')
 				.attr('class', "modLetterG")
+				.style("cursor", "pointer")
 				.on("mouseover", function() {
 					if (!self.changeMod  && !self.changeCL){
-						self.tooltip.text("Change modification position");
+						//highlight pepLetter
+						var pepIndex = this.__data__.pepIndex;
+						var pos = this.__data__.pos;
+						d3.select(self.pepLetterHighlights[pepIndex][0][pos]).style("opacity", 1);
+
+						d3.select(this).select("text.modLetterHighlight").style("opacity", 1); //highlight modLetter
+						d3.select(this).moveToFront();
+						self.tooltip.text("Click to change the position");
 						self.tooltip.transition()		
-						    .duration(200)		
-						    .style("opacity", .9);		
+							.duration(200)		
+							.style("opacity", .9);		
 						self.tooltip.style("left", (d3.event.layerX + 15) + "px")		
-						    .style("top", (d3.event.layerY) + "px");
+							.style("top", (d3.event.layerY) + "px");
+						d3.select(this).selectAll("text")
+							.text(function(d){return d.fullMod});
 					}
 				})
 				.on("mouseout", function() {
 					if (!self.changeMod  && !self.changeCL){
+						d3.selectAll("text.pepLetterHighlight").style("opacity", 0);
 						self.CLlineHighlight.attr("opacity", 0);
 						self.tooltip.transition()		
 							.duration(500)		
 							.style("opacity", 0);	
 					}
+
+					d3.selectAll("text.modLetterHighlight").style("opacity", 0);
+					d3.select(this).selectAll("text")
+						.text(function(d){return d.shortMod});
+
 				})
 				.on("click", function(d) {
-					if (self.changeCL == false){
+					d3.selectAll("text.pepLetterHighlight").style("opacity", 0);
+					d3.selectAll("g.modLetterG").style("cursor", "default");
+					if (!self.changeMod  && !self.changeCL){
 
 						self.tooltip.transition()		
 							.duration(500)		
@@ -561,44 +621,45 @@ var FragmentationKeyView = Backbone.View.extend({
 						self.CLline.style("cursor", "not-allowed");
 						self.CLlineHighlight.style("cursor", "not-allowed");
 						
-						var letters = this.childNodes[1];
-						var highlight = this.childNodes[0];
-						highlight.setAttribute("style","font-size:0.7em; cursor:default;");
+
+						var highlight = d3.select(this).select(".modLetterHighlight");
+						highlight.style("font-size","0.7em").style("cursor","default");
 						//set changeMod var to the clicked modification
 						self.changeMod = d;
-						highlight.setAttribute("opacity", 1);
+						highlight.style("opacity", 1);
 						//disable fragBar cursor
 						for (var i = 0; i < self.fraglines.length; i++) {
 							self.fraglines[i].disableCursor();
 						};
+						var pepIndex = this.__data__.pepIndex;
+						var pos = this.__data__.pos;
+						pepLetterG = self.pepLetters[pepIndex][0][pos].parentNode;
+						pepLetterData = self.pepLetters[pepIndex][0][pos].__data__;
+						changeModStartHighlight(pepLetterG, pepLetterData);
 					}
 				})
 			;
 			modLetterG.append("text")
-				.attr("x", function(d){ 
-					return self.xStep * d.pos;
-				})
+				.attr("x", function(d){ return self.xStep * d.pos; })
 				.attr("class", "modLetterHighlight")
 				.attr("y", pep.y[1])
 				.attr("text-anchor", "middle")
 				.attr("stroke", self.model.highlightColour)
 				.style("font-size", "0.7em")
-				.style("cursor", "pointer")
-				.text(function(d){ return d.mod; })
+				.text(function(d){ return d.shortMod;})
 				.attr("stroke-width", "2px")
 				.attr("opacity", 0)
 			;				
 			modLetterG.append("text")
-				.attr("x", function(d){ 
-					return self.xStep * d.pos;
-				})
+				.attr("x", function(d){ return self.xStep * d.pos; })
 				.attr("class", "modLetter")
 				.attr("y", pep.y[1])
 				.attr("text-anchor", "middle")
 				.attr("fill", pep.color)
 				.style("font-size", "0.7em")
-				.style("cursor", "pointer")
-				.text(function(d){ return d.mod; })
+				.text(function(d){ return d.shortMod;})
+				.attr("data-ShortModName", function(d){ return d.shortMod;})
+				.attr("data-FullModName", function(d){ return d.fullMod;})
 			;
 
 			self.pepLetterHighlights[pepIndex] = pep.group.selectAll("text.pepLetterHighlight");
@@ -725,6 +786,18 @@ var FragmentationKeyView = Backbone.View.extend({
 		this.colorLetters("all");
 	},
 
+	updateHighlightColors: function(){
+
+		for (var i = 0; i < this.fraglines.length; i++) {
+			
+			if (this.fraglines[i].bHighlight !== undefined)
+				this.fraglines[i].bHighlight.attr("stroke", this.model.highlightColour);
+			if (this.fraglines[i].yHighlight !== undefined)
+				this.fraglines[i].yHighlight.attr("stroke", this.model.highlightColour);
+		}
+
+	},
+
 	resize: function(){
 	    var parentDivWidth = $(this.el).width();
 	    var fragKeyWidth = $(".fragKey")[0].getBBox().width;
@@ -746,7 +819,7 @@ var FragmentationKeyView = Backbone.View.extend({
 		this.pepoffset = [];
 		this.linkPos = [];
 		this.g.selectAll("*").remove();
-		this.highlights.selectAll("*").remove();
+		//this.highlights.selectAll("*").remove();
 	}	
 
 });
