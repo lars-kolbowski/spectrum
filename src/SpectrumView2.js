@@ -26,6 +26,7 @@ var SpectrumView = Backbone.View.extend({
 		this.listenTo(this.model, "changed:Zoom", this.updateRange);
 		this.listenTo(window, 'resize', _.debounce(this.resize));
 		this.listenTo(this.model, 'changed:ColorScheme', this.updateColors);
+		this.listenTo(this.model, 'changed:HighlightColor', this.updateHighlightColors);
 		this.listenTo(this.model, 'changed:Highlights', this.updateHighlights);
 		//this.listenTo(this.model, 'destroy', this.remove);
 	},
@@ -135,6 +136,10 @@ var SpectrumView = Backbone.View.extend({
 
 	updateColors: function(){
 		this.graph.updateColors();
+	},
+
+	updateHighlightColors: function(){
+		this.graph.updateHighlightColors();
 	},
 
 	updateHighlights: function(){

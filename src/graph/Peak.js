@@ -117,7 +117,7 @@ function Peak (id, graph){
 			;
 
 		function showTooltip(x, y, fragId){
-			var contents = [["m/z", self.x], ["Int", self.y]];
+			var contents = [["m/z", self.x.toFixed(self.graph.model.showDecimals)], ["Int", self.y.toFixed(self.graph.model.showDecimals)]];
 			var header = [];
 
 			//filter fragments shown in tooltip (only fraglabel is hovered over)
@@ -372,7 +372,7 @@ function Peak (id, graph){
 	}
 
 
-	this.colour = this.graph.model.lossFragBarColour;
+	this.colour = this.graph.model.peakColour;
 	if (this.fragments.length > 0){
 
 		var lossy = true;
@@ -527,7 +527,7 @@ Peak.prototype.showLabels = function(lossyOverride){
 }
 
 Peak.prototype.updateColor = function(){
-	this.colour = this.graph.model.lossFragBarColour;
+	this.colour = this.graph.model.peakColour;
 	if (this.fragments.length > 0){
 		if (this.fragments[0].peptideId == 0) {
 			if (this.fragments[0].class == "non-lossy")

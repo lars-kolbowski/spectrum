@@ -735,8 +735,8 @@ var FragmentationKeyView = Backbone.View.extend({
 
 	greyLetters: function(){
 		for (var i = 0; i < this.pepLetters.length; i++) {
-			this.pepLetters[i].attr("fill", this.model.lossFragBarColour);
-			this.modLetters[i].attr("fill", this.model.lossFragBarColour);
+			this.pepLetters[i].attr("fill", this.model.peakColour);
+			this.modLetters[i].attr("fill", this.model.peakColour);
 		}
 	},
 

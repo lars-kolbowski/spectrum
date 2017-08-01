@@ -64,11 +64,13 @@ var PrecursorInfoView = Backbone.View.extend({
 		var dataArr = [];
 		if (data.precursorIntensity !== undefined && data.precursorIntensity != -1)
 			dataArr.push("Intensity=" + data.precursorIntensity);
-		if (data.precursorMZ !== undefined)
+		if (data.precursorMZ !== undefined && data.precursorIntensity != -1)
 			dataArr.push("m/z=" + data.precursorMZ.toFixed(4));
+		else
+			dataArr.push("m/z=" + this.model.mass);		
 		if (data.precursorCharge !== undefined)
 			dataArr.push("z=" + data.precursorCharge);
-		if (data.precursorError !== undefined)
+		if (data.precursorError !== undefined && data.precursorError != "")
 			dataArr.push("error=" + data.precursorError);
 		if (data.psmID !== undefined)
 			dataArr.push("psmID=" + data.psmID);

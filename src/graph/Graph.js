@@ -22,7 +22,7 @@
 //		and https://gist.github.com/mbostock/3019563
 
 Graph = function(targetSvg, model, options) {
-	this.x = d3.scale.linear().clamp(true);
+	this.x = d3.scale.linear();
 	this.y = d3.scale.linear();
 	this.y_right = d3.scale.linear();
 	this.model = model;
@@ -85,21 +85,23 @@ Graph = function(targetSvg, model, options) {
 	}.bind(this));
 
 	//Tooltip
-	this.tooltip = CLMSUI.compositeModelInst.get("tooltipModel");
+	if (CLMSUI.compositeModelInst !== undefined)
+		this.tooltip = CLMSUI.compositeModelInst.get("tooltipModel");		
+	else{
+		target = this.g.node().parentNode.parentNode; //this would get you #spectrumPanel
+		this.tooltip = d3.select(target).append("span")
+			.style("font-size", "small")
+			.style("padding", "0 5px")
+			.style("border-radius", "6px")		
+			.attr("class", "tooltip")
+			.style("background-color", "black")
+			.style("pointer-events", "none")
+			.style("position", "absolute")				
+			.style("opacity", 0)
+			.style("z-index", 1);
+	}
 
-	//target = this.g.node().parentNode.parentNode; //this would get you #spectrumPanel
-	// this.tip = d3.select(target).append("div")
-	// 	.attr("class", "specViewer_tooltip")
-	// 	.style("background-color", "#f0f0f0")
-	//     .style("border", "1px solid black")
-	//     .style("color", "black")
-	//     .style("border-radius", "6px")
-	//     .style("position", "absolute")
-	//     .style("padding", "3px")               
-	//     .style("opacity", 0)
-	//     .style("font-size", "0.7em")
-	//     .style("pointer-events", "none")
-	//     .style("line-height", "100%");
+
 
 	//MeasuringTool
 	this.measuringTool = this.innerSVG.append("g").attr("class", "measuringTool");
@@ -159,6 +161,8 @@ Graph = function(targetSvg, model, options) {
 			.text(options.ylabelRight)
 			.style("text-anchor","middle").style("pointer-events","none");
 	}
+
+	this.zoom = d3.behavior.zoom().x(this.x).on("zoom", this.redraw());
 	
 };
 
@@ -239,8 +243,8 @@ Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 	
 	self.xaxisRect.attr("width",width).attr("y", height).attr("height", self.margin.bottom);
 	self.dragZoomHighlight.attr("height", height);
-				
-	self.zoom = d3.behavior.zoom().x(self.x).on("zoom", self.redraw());
+	
+	self.zoom = d3.behavior.zoom().x(self.x).on("zoom", self.redraw());			
 	self.zoom.scaleExtent([0, self.model.xmaxPrimary]);
 	self.plot.call(self.zoom);
 	//self.innerSVG.call(self.zoom);
@@ -284,7 +288,8 @@ Graph.prototype.enableZoom = function(){
 
 	function brushmove() {
 	  var s = self.brush.extent();
-	  var width = self.x(s[1] - s[0]) - self.x(0);
+	  //var width = self.x(s[1] - s[0]) - self.x(0);
+	  var width = self.x(s[1]) - self.x(s[0]);
 	  self.dragZoomHighlight.attr("x",self.x(s[0])).attr("width", width);
 	}
 
@@ -373,6 +378,18 @@ Graph.prototype.measure = function(on){
 			
 			//draw vertical end Line
 			if(endPeak){
+				//check if distance matches the mass of an aminoAcid
+				if(endPeak.x > self.measureStartPeak.x){
+					var delta = endPeak.x - self.measureStartPeak.x;
+					var matchPeak = endPeak.x;
+				}
+				else{
+					var delta = self.measureStartPeak.x - endPeak.x;
+					var matchPeak = self.measureStartPeak.x;
+				}
+				endPeak.matchedAA = self.model.matchMassToAA(delta, matchPeak);
+
+				//set end of the measuringTool to endPeak
 				self.measuringToolVLineEnd
 					.attr("x1", self.x(endPeak.x))
 					.attr("x2", self.x(endPeak.x))
@@ -411,29 +428,30 @@ Graph.prototype.measure = function(on){
 			else
 				var labelX = measureEndX + deltaX/2;
 
-			self.measureDistance.text(distance.toFixed(2)+" Th");		
+			self.measureDistance.text(distance.toFixed(self.model.showDecimals)+" Th");		
 			//var PeakInfo = distance.toFixed(2)+" Th<br/>"
 			var PeakInfo = ""
 			if(self.measureStartPeak.fragments.length > 0)
-					PeakInfo += "From: <span style='color:"+ self.measureStartPeak.colour +"'>" + self.measureStartPeak.fragments[0].name +"</span> (" + self.measureStartPeak.x + " m/z)";
+					PeakInfo += "From: <span style='color:"+ self.measureStartPeak.colour +"'>" + self.measureStartPeak.fragments[0].name +"</span> (" + self.measureStartPeak.x.toFixed(self.model.showDecimals) + " m/z)";
 			else if (self.measureStartPeak.isotopes.length > 0)
-					PeakInfo += "From: <span style='color:"+ self.measureStartPeak.colour +"'>" + self.measureStartPeak.isotopes[0].name + "+" + self.measureStartPeak.isotopenumbers[0]+ "</span> (" + self.measureStartPeak.x + " m/z)";
+					PeakInfo += "From: <span style='color:"+ self.measureStartPeak.colour +"'>" + self.measureStartPeak.isotopes[0].name + "+" + self.measureStartPeak.isotopenumbers[0]+ "</span> (" + self.measureStartPeak.x.toFixed(self.model.showDecimals) + " m/z)";
 			else
-				PeakInfo += "From: Peak (" + self.measureStartPeak.x + " m/z)"; 
+				PeakInfo += "From: Peak (" + self.measureStartPeak.x.toFixed(self.model.showDecimals) + " m/z)"; 
 			if(endPeak){
 				if(endPeak.fragments.length > 0)
-						PeakInfo += "<br/>To: <span style='color:"+ endPeak.colour +"'>" + endPeak.fragments[0].name +"</span> (" + endPeak.x + " m/z)";
+						PeakInfo += "<br/>To: <span style='color:"+ endPeak.colour +"'>" + endPeak.fragments[0].name +"</span> (" + endPeak.x.toFixed(self.model.showDecimals) + " m/z)";
 				else if(endPeak.isotopes.length > 0)
-						PeakInfo += "<br/>To: <span style='color:"+ endPeak.colour +"'>" + endPeak.isotopes[0].name + "+" + endPeak.isotopenumbers[0]+ "</span> (" + endPeak.x + " m/z)";
-				else{
-					PeakInfo += "<br/>To: Peak (" + endPeak.x + " m/z)";
-					} 
+						PeakInfo += "<br/>To: <span style='color:"+ endPeak.colour +"'>" + endPeak.isotopes[0].name + "+" + endPeak.isotopenumbers[0]+ "</span> (" + endPeak.x.toFixed(self.model.showDecimals) + " m/z)";
+				else
+					PeakInfo += "<br/>To: Peak (" + endPeak.x.toFixed(self.model.showDecimals) + " m/z)";
+				if (endPeak.matchedAA.length > 0)
+					PeakInfo += "<br/>possible match: " + endPeak.matchedAA + " ";
 			} else {
                 PeakInfo += "<br/>";
             }
 			PeakInfo += "<br/><br/><p style='font-size:0.8em'>";
 			for(i=1; i<7; i++){
-			PeakInfo += "z = "+i+": "+(distance*i).toFixed(2)+" Da</br>";	
+			PeakInfo += "z = "+i+": "+(distance*i).toFixed(self.model.showDecimals)+" Da</br>";	
 			}
 			PeakInfo += "</p>";
 			
@@ -467,7 +485,6 @@ Graph.prototype.measure = function(on){
                 pBCR = pBCR || {top: 0, left: 0};
                 return {top: svgBCR.top - pBCR.top, left: svgBCR.left - pBCR.left};
             }
-            
             
             var svgNode = self.g.node().parentNode;
             var rectBounds = this.getBoundingClientRect();
@@ -579,12 +596,23 @@ Graph.prototype.updatePeakColors = function(){
 		}
 	}
 	else{
-		for (var p = 0; p < peakCount; p++) {
-			if (_.intersection(this.model.highlights, this.points[p].fragments).length == 0)
-				this.points[p].line.attr("stroke", this.model.lossFragBarColour);
+		var self = this; 
+		//var curPeaks = this.points.filter(function(peak){ if (peak.x > self.x.domain()[0] && peak.x < self.x.domain()[1]) return peak; })
+		var highlightClusterIds = [].concat.apply([], this.model.highlights.map(function(h){ return h.clusterIds;}));
+		this.points.forEach(function(p){
+			if (_.intersection(self.model.highlights, p.fragments).length > 0 || _.intersection(highlightClusterIds, p.clusterIds).length > 0)
+				p.line.attr("stroke", p.colour);
 			else
-				this.points[p].line.attr("stroke", this.points[p].colour);
-		}
+				p.line.attr("stroke", self.model.peakColour);
+						
+		});
+
+		// for (var p = 0; p < peakCount; p++) {
+		// 	if (_.intersection(this.model.highlights, this.points[p].fragments).length == 0)
+		// 		this.points[p].line.attr("stroke", this.model.peakColour);
+		// 	else
+		// 		this.points[p].line.attr("stroke", this.points[p].colour);
+		// }
 	}
 }
 
@@ -615,6 +643,16 @@ Graph.prototype.updateColors = function(){
 	var peakCount = this.points.length;
 		for (var p = 0; p < peakCount; p++) {
 			this.points[p].updateColor();
+		}
+}
+
+Graph.prototype.updateHighlightColors = function(){
+	var peakCount = this.points.length;
+		for (var p = 0; p < peakCount; p++) {
+			if(this.points[p].highlightLine !== undefined){
+				this.points[p].highlightLine.attr("stroke", this.model.highlightColour);
+				this.points[p].labelHighlights.attr("stroke", this.model.highlightColour);
+			}
 		}
 }
 

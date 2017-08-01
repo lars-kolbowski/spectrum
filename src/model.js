@@ -1,13 +1,18 @@
 var AnnotatedSpectrumModel = Backbone.Model.extend({
 
 	initialize: function(){
+		var self = this;
 		this.getKnownModifications();
 		//this.sticky = Array();
 		//this.highlights = Array();
+		this.showDecimals = 2;
 		this.moveLabels = false;
 		this.measureMode = false;
 		this.showSpectrum = true;
 		this.userModifications = [];
+		$.getJSON('json/aaMasses.json', function(data) {         
+    		self.aaMasses = data
+		});
 		this.on("change:JSONdata", function(){
 			var json = this.get("JSONdata");
 			if (typeof json !== 'undefined')
@@ -50,6 +55,14 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		this.randId = this.get("randId");
 		//console.log(this.JSONdata);
 		this.annotationData = this.JSONdata.annotation;
+
+		if (this.annotationData !== undefined){
+			this.MSnTolerance = { 
+				"value": parseFloat(this.annotationData.fragementTolerance.split(" ")[0]),
+				"unit": this.annotationData.fragementTolerance.split(" ")[1]
+			};
+		}
+
 		this.pepStrs = [];
 		this.pepStrsMods = [];
 		this.peptides = this.JSONdata.Peptides;
@@ -76,7 +89,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		this.p2color = this.cmap[7];
 		this.p2color_cluster = this.cmap[5];
 		this.p2color_loss = this.cmap[6];
-		this.lossFragBarColour = "#cccccc";
+		this.peakColour = "#ccc";
 		this.highlightColour = "#FFFF00";
 		this.highlightWidth = 10;
 
@@ -310,6 +323,30 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 
 	},
 
+	matchMassToAA: function(delta, peak) {
+		var self = this;
+		var result = this.aaMasses.filter(function(d){
+			if(self.MSnTolerance.unit == "ppm"){
+				var uplim = d.monoisotopicMass + peak * self.MSnTolerance.value * 1e-6;
+				var lowlim = d.monoisotopicMass - peak * self.MSnTolerance.value * 1e-6;
+				if(delta < uplim && delta > lowlim)
+					return d.aminoAcid;
+			}
+			//TODO: matchMass for Da error type
+			// if(self.MSnTolerance.unit == "Da"){
+			// 	var uplim = d.monoisotopicMass + self.MSnTolerance.value;
+			// 	var lowlim = d.monoisotopicMass - self.MSnTolerance.value;
+			// 	if(delta < uplim && delta > lowlim)
+			// 		return d.aminoAcid;
+			// }
+		})
+		aaStr = ""
+		for (var i = 0; i < result.length; i++) {
+			aaStr += result[i].aminoAcid;
+		}
+		return aaStr;
+	},
+
 	checkForValidModification: function(mod, aminoAcid){
 
 		for (var i = 0; i < this.userModifications.length; i++) {
@@ -348,29 +385,29 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		//	this.getKnownModifications();
 		var aastr = "ARNDCEQGHILKMFPSTWYV";
 		var mA = new Array();
-		mA[aastr.indexOf("A")] = 71.0788;
-		mA[aastr.indexOf("R")] = 156.1876;
-		mA[aastr.indexOf("N")] = 114.1039;
-		mA[aastr.indexOf("D")] = 115.0886;
-		mA[aastr.indexOf("C")] = 103.1448;
-		mA[aastr.indexOf("E")] = 129.1155;
-		mA[aastr.indexOf("Q")] = 128.1308;
-		mA[aastr.indexOf("G")] = 57.0520;
-		mA[aastr.indexOf("H")] = 137.1412;
-		mA[aastr.indexOf("I")] = 113.1595;
-		mA[aastr.indexOf("L")] = 113.1595;
-		mA[aastr.indexOf("K")] = 128.1742;
-		mA[aastr.indexOf("M")] = 131.1986;
-		mA[aastr.indexOf("F")] = 147.1766;
-		mA[aastr.indexOf("P")] = 97.1167;
-		mA[aastr.indexOf("S")] = 87.0782;
-		mA[aastr.indexOf("T")] = 101.1051;
-		mA[aastr.indexOf("W")] = 186.2133;
-		mA[aastr.indexOf("Y")] = 163.1760;
-		mA[aastr.indexOf("V")] = 99.1326;
+		mA[aastr.indexOf("A")] = 71.03711;
+		mA[aastr.indexOf("R")] = 156.10111;
+		mA[aastr.indexOf("N")] = 114.04293;
+		mA[aastr.indexOf("D")] = 115.02694;
+		mA[aastr.indexOf("C")] = 103.00919;
+		mA[aastr.indexOf("E")] = 129.04259;
+		mA[aastr.indexOf("Q")] = 128.05858;
+		mA[aastr.indexOf("G")] = 57.02146;
+		mA[aastr.indexOf("H")] = 137.05891;
+		mA[aastr.indexOf("I")] = 113.08406;
+		mA[aastr.indexOf("L")] = 113.08406;
+		mA[aastr.indexOf("K")] = 128.09496;
+		mA[aastr.indexOf("M")] = 131.04049;
+		mA[aastr.indexOf("F")] = 147.06841;
+		mA[aastr.indexOf("P")] = 97.05276;
+		mA[aastr.indexOf("S")] = 87.03203;
+		mA[aastr.indexOf("T")] = 101.04768;
+		mA[aastr.indexOf("W")] = 186.07931;
+		mA[aastr.indexOf("Y")] = 163.06333;
+		mA[aastr.indexOf("V")] = 99.06841;
 
 		var massArr = new Array();		
-		var h2o = 18.01528;
+		var h2o = 18.010565;
 
 		for (var i = 0; i < this.peptides.length; i++) {
 			// if (this.modifications === undefined){
