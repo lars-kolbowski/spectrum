@@ -64,7 +64,7 @@ var PrecursorInfoView = Backbone.View.extend({
 		var dataArr = [];
 		if (data.precursorIntensity !== undefined && data.precursorIntensity != -1)
 			dataArr.push("Intensity=" + data.precursorIntensity);
-		if (data.precursorMZ !== undefined && data.precursorIntensity != -1)
+		if (data.precursorMZ !== undefined && data.precursorMZ != -1)
 			dataArr.push("m/z=" + data.precursorMZ.toFixed(4));
 		else
 			dataArr.push("m/z=" + this.model.mass);		
