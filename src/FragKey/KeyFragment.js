@@ -224,7 +224,7 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 				blossy = false;
 		};
 		if (blossy){
-			this.bTail.attr("stroke", this.FragKey.model.lossFragBarColour);
+			this.bTail.attr("stroke", this.FragKey.model.peakColour);
 		}
 		else {
 			this.bTail.attr("stroke", "black");
@@ -342,7 +342,7 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 				ylossy = false;
 		};
 		if (ylossy){
-			this.yTail.attr("stroke", this.FragKey.model.lossFragBarColour);
+			this.yTail.attr("stroke", this.FragKey.model.peakColour);
 		}
 		else {
 			this.yTail.attr("stroke", "black");
@@ -360,11 +360,13 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 
 	//if all fragments are lossy 	
 	if ((fragments.y.length == 0 || ylossy) && (fragments.b.length == 0 || blossy)){
-		this.fragBar.attr("stroke", this.FragKey.model.lossFragBarColour);
+		this.fragBar.attr("stroke", this.FragKey.model.peakColour);
 	}
 	else {
 		this.fragBar.attr("stroke", "black");
 	}
+
+
 			
 }
 
