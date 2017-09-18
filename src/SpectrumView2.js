@@ -207,6 +207,34 @@ var SpectrumView = Backbone.View.extend({
             var svgArr = [svgSel.node()];
             var svgStrings = CLMSUI.svgUtils.capture (svgArr);
             var svgXML = CLMSUI.svgUtils.makeXMLStr (new XMLSerializer(), svgStrings[0]);
-            download (svgXML, 'application/svg', "view.svg");
+
+            var charge = this.model.JSONdata.annotation.precursorCharge;
+            var pepStrs = this.model.pepStrsMods;
+            var linkSites = Array(this.model.JSONdata.LinkSite.length);
+
+            this.model.JSONdata.LinkSite.forEach(function(ls){
+            	linkSites[ls.peptideId] = ls.linkSite;
+            });
+
+            //insert CL sites with #
+            if (linkSites.length > 0){
+
+	            var ins_pepStrs = Array();
+	            pepStrs.forEach(function(pepStr, index){
+					var positions = [];
+					for(var i=0; i<pepStr.length; i++){
+					    if(pepStr[i].match(/[A-Z]/) != null){
+					        positions.push(i);
+					    };
+					}
+					var clAA_index = positions[linkSites[index]]+1;
+	           		var ins_pepStr = pepStr.slice(0, clAA_index) + "#" + pepStr.slice(clAA_index, pepStr.length);
+	           		pepStrs[index] = ins_pepStr;
+	            })
+	        }
+
+            var svg_name = pepStrs.join("-") + "_z=" + charge + ".svg";
+
+            download (svgXML, 'application/svg', svg_name);
     },
 });
