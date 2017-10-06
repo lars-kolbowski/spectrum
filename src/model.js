@@ -10,7 +10,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		this.measureMode = false;
 		this.showSpectrum = true;
 		this.userModifications = [];
-		$.getJSON('json/aaMasses.json', function(data) {         
+		$.getJSON('../spectrum/json/aaMasses.json', function(data) {         
     		self.aaMasses = data
 		});
 		this.on("change:JSONdata", function(){
