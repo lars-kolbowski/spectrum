@@ -95,6 +95,7 @@ Graph = function(targetSvg, model, options) {
 			.style("border-radius", "6px")		
 			.attr("class", "tooltip")
 			.style("background-color", "black")
+			.style("color", "#ccc")
 			.style("pointer-events", "none")
 			.style("position", "absolute")				
 			.style("opacity", 0)
@@ -192,6 +193,9 @@ Graph.prototype.setData = function(){
 
 Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 	var self = this;
+	//reset measureTool
+	if(this.model.measureMode)
+		this.measureClear();	
 	//see https://gist.github.com/mbostock/3019563
 	var cx = self.g.node().parentNode.parentNode.clientWidth;
 	//somewhere around here I think we need to subtract the height of the FragKey?
@@ -519,17 +523,17 @@ Graph.prototype.measure = function(on){
 	}
 	else{
 		this.measureClear();
+		this.peaks.style("pointer-events", "visible");
+		this.measureBackground.attr("height", 0);
+		this.enableZoom();
 	}
 }
 
 Graph.prototype.measureClear = function(){
-	this.peaks.style("pointer-events", "visible");	
-	this.measureBackground.attr("height", 0);
 	this.measuringTool.attr("display","none");
 	this.measureDistance.attr("display","none");
 	this.measureInfo.style("display","none");
-
-	this.enableZoom();
+	
 }
 
 Graph.prototype.redraw = function(){
