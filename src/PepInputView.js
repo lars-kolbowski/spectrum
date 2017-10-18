@@ -1,5 +1,5 @@
 var PepInputView = Backbone.View.extend({
-  
+
   events: {
     "input":  "contentChanged",
     //"keyup": "contentChanged",
@@ -17,7 +17,7 @@ var PepInputView = Backbone.View.extend({
 
     for (var i = 0; i < pepStrs.length; i++) {
 
-      var pep_noMods = pepStrs[i].replace(/([^#0-9])([a-z0-9]+)/g, '$1');
+      var pep_noMods = pepStrs[i].replace(/([^#0-9])([().a-z0-9]+)/g, '$1');
 
       //linkSite
       var cl_re = /#([0-9]+)?/g;
@@ -37,7 +37,7 @@ var PepInputView = Backbone.View.extend({
       //add in mods
       var pep_noCL = pepStrs[i].replace(cl_re, "");
       var modifications = [];
-      var mod_re = /([a-z0-9]+)/g;
+      var mod_re = /([().a-z0-9]+)/g;
       var offset = 1;
       while ((match = mod_re.exec(pep_noCL)) != null) {
         peptide['sequence'][match.index-offset].Modification = match[1];
@@ -54,7 +54,7 @@ var PepInputView = Backbone.View.extend({
     if (this.model.JSONdata !== undefined && this.model.JSONdata !== null){
       this.model.JSONdata.Peptides = peptides;
       this.model.JSONdata.LinkSite = linkSites;
-      this.model.trigger("change:JSONdata");       
+      this.model.trigger("change:JSONdata");
     }
     else
       this.model.set({JSONdata: {'Peptides': peptides, 'LinkSite': linkSites} });
@@ -86,7 +86,7 @@ var PepInputView = Backbone.View.extend({
 
     var pepsStr = pepStrsArr.join(";");
     if (this.el.value != pepsStr)
-      this.el.value = pepsStr;  
+      this.el.value = pepsStr;
   },
 
 

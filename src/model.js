@@ -1,7 +1,15 @@
 var AnnotatedSpectrumModel = Backbone.Model.extend({
 
+	defaults: function() {
+    return {
+      baseDir:  '',
+      JSONdata: false,
+    };
+  },
+
 	initialize: function(){
 		var self = this;
+		this.baseDir = this.get('baseDir');
 		this.getKnownModifications();
 		//this.sticky = Array();
 		//this.highlights = Array();
@@ -9,14 +17,20 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		this.moveLabels = false;
 		this.measureMode = false;
 		this.showSpectrum = true;
-		this.userModifications = [];
-		$.getJSON('../spectrum/json/aaMasses.json', function(data) {         
+		if (_.isUndefined(Cookies.get('customMods')))
+			this.userModifications = [];
+		else
+			this.userModifications = JSON.parse(Cookies.get('customMods'));
+		$.getJSON(self.baseDir + 'json/aaMasses.json', function(data) {
     		self.aaMasses = data
 		});
+
+		//ToDo: change JSONdata gets called 3 times for some reason?
 		this.on("change:JSONdata", function(){
 			var json = this.get("JSONdata");
-			if (typeof json !== 'undefined')
+			if (typeof json !== 'undefined'){
 				this.setData();
+			}
 			else
 				this.trigger("cleared");
 		});
@@ -29,7 +43,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		this.on("change:charge", function(){
 			this.charge = parseInt(this.get("charge"));
 			this.trigger("changed:charge");
-		});	
+		});
 
 /*		this.on("change:modifications", function(){
 			this.updateKnownModifications();
@@ -94,10 +108,12 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		this.highlightWidth = 10;
 
 		this.calcPrecursorMass();
+
+		//change this to SettignsView related call
 		if (window.modTable !== undefined)
-			modTable.ajax.url( "forms/convertMods.php?peps="+encodeURIComponent(this.pepStrsMods.join(";"))).load();
+			modTable.ajax.url( this.baseDir + "php/convertModsToJSON.php?peps="+encodeURIComponent(this.pepStrsMods.join(";"))).load();
 		this.trigger("changed:data");
-		
+
 		if (this.JSONdata.peaks !== undefined)
 			this.setGraphData();
 
@@ -325,12 +341,12 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 
 	matchMassToAA: function(delta, peak) {
 		var self = this;
-		var result = this.aaMasses.filter(function(d){
+		var aaArray = this.aaMasses.filter(function(d){
 			if(self.MSnTolerance.unit == "ppm"){
 				var uplim = d.monoisotopicMass + peak * self.MSnTolerance.value * 1e-6;
 				var lowlim = d.monoisotopicMass - peak * self.MSnTolerance.value * 1e-6;
 				if(delta < uplim && delta > lowlim)
-					return d.aminoAcid;
+					return true;
 			}
 			//TODO: matchMass for Da error type
 			// if(self.MSnTolerance.unit == "Da"){
@@ -339,11 +355,8 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 			// 	if(delta < uplim && delta > lowlim)
 			// 		return d.aminoAcid;
 			// }
-		})
-		aaStr = ""
-		for (var i = 0; i < result.length; i++) {
-			aaStr += result[i].aminoAcid;
-		}
+		}).map(function(d){return d.aminoAcid});
+		aaStr = aaArray.join();
 		return aaStr;
 	},
 
@@ -452,55 +465,77 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 
 	getKnownModifications: function(){
 		var self = this;
+
 		var response = $.ajax({
 			type: "GET",
 			datatype: "json",
 			async: false,
-			url: "/xiAnnotator/annotate/knownModifications",
+			url: self.xiAnnotatorBaseURL + "annotate/knownModifications",
 			success: function(data) {
 				self.knownModifications = data;
-			}
-		});	
+			},
+		    error: function(xhr, status, error){
+        		alert("xiAnnotator could not be reached. Please try again later!");
+    		},
+		});
 	},
 
-	updateUserModifications: function(mod){
+	updateUserModifications: function(mod, saveToCookie=true){
 
-		for (var j = 0; j < this.userModifications.length; j++) {
-			if(this.userModifications[j].id == mod.id){
-				this.userModifications[j].mass = mod.mass;
-				this.userModifications[j].aminoAcids = mod.aminoAcids;
-				return;
-			}
+		var userMod = this.userModifications.filter(function(m){ return mod.id == m.id;});
+		if (userMod.length > 0){
+			userMod[0].mass = mod.mass;
+			userMod[0].aminoAcids = mod.aminoAcids;
 		}
-		this.userModifications.push(mod);			
+		else
+			this.userModifications.push(mod);
+		if (saveToCookie)
+			this.saveUserModificationsToCookie();
+	},
+
+	saveUserModificationsToCookie: function(){
+		var cookie = JSON.stringify(this.userModifications);
+		Cookies.set('customMods', cookie);
+	},
+
+	delUserModification: function(modId, saveToCookie=true){
+		var userModIndex = this.userModifications.findIndex(function(m){ return modId == m.id;});
+		if (userModIndex != -1){
+			this.userModifications.splice(userModIndex, 1);
+		}
+		else
+			console.log("Error modification "+modId+"could not be found!");
+		if (saveToCookie)
+			this.saveUserModificationsToCookie();
 	},
 
 	request_annotation: function(json_request){
 
-		console.log(json_request);
+		console.log("annotation request:", json_request);
 		var self = this;
 		var response = $.ajax({
 			type: "POST",
-			datatype: "json",
-			headers: { 
+			datatype: "jsonp",
+			headers: {
 			    'Accept': 'application/json',
-			    'Content-Type': 'application/json' 
+			    'Content-Type': 'application/json'
 			},
 			data: JSON.stringify(json_request),
 			async: false,
-			url: "/xiAnnotator/annotate/FULL",
+			url: self.xiAnnotatorBaseURL + "annotate/FULL",
 			success: function(data) {
-
+				//ToDo: Error handling -> talked to Lutz, he will implement transfer of error message as json
+				console.log("annotation response:", data);
 				self.set({"JSONdata": data, "JSONrequest": json_request});
-				self.setData();
+				//self.setData();
 
-				if (self.settingsModel !== undefined){
+				if (self.otherModel !== undefined){
 					var json_data_copy = jQuery.extend({}, data);
-					self.settingsModel.set({"JSONdata": json_data_copy, "JSONrequest": json_request});
-					self.settingsModel.trigger("change:JSONdata");		
+					self.otherModel.set({"JSONdata": json_data_copy, "JSONrequest": json_request});
+					self.otherModel.trigger("change:JSONdata");
 				}
 			}
-		});			
+		});
 
-	}	
+	}
 });
