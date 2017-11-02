@@ -2,11 +2,11 @@ var SpectrumView = Backbone.View.extend({
 
 	events : {
 		'click #reset' : 'resetZoom',
-		'click #lossyChkBx': 'showLossy',
+// 		'click #lossyChkBx': 'showLossy',
 		'submit #setrange' : 'setrange',
 		'click #lockZoom' : 'lockZoom',
 		'click #clearHighlights' : 'clearHighlights',
-		'change #colorSelector': 'changeColorScheme',
+// 		'change #colorSelector': 'changeColorScheme',
 		'click #measuringTool': 'measuringTool',
 		'click #moveLabels': 'moveLabels',
 		'click #downloadSVG': 'downloadSVG',
@@ -28,6 +28,7 @@ var SpectrumView = Backbone.View.extend({
 		this.listenTo(this.model, 'changed:ColorScheme', this.updateColors);
 		this.listenTo(this.model, 'changed:HighlightColor', this.updateHighlightColors);
 		this.listenTo(this.model, 'changed:Highlights', this.updateHighlights);
+		this.listenTo(this.model, 'changed:lossyShown', this.showLossy);
 		//this.listenTo(this.model, 'destroy', this.remove);
 	},
 
@@ -48,10 +49,7 @@ var SpectrumView = Backbone.View.extend({
 	},
 
 	showLossy: function(e){
-		var $target = $(e.target);
-        var selected = $target .is(':checked');
-        //this.model.lossyShown = selected;
-		this.graph.lossyShown = selected;
+		this.graph.lossyShown = this.model.lossyShown;
 		this.graph.updatePeakLabels();
 	},
 
@@ -86,7 +84,7 @@ var SpectrumView = Backbone.View.extend({
 			$('#xright').prop('disabled', true);
 			this.model.lockZoom = true;
 			this.graph.disableZoom();
-		} else { 
+		} else {
 			$('#lock')[0].innerHTML = "&#128275";
 			$('#rangeSubmit').prop('disabled', false);
 			$('#xleft').prop('disabled', false);
@@ -130,9 +128,9 @@ var SpectrumView = Backbone.View.extend({
 		this.model.clearStickyHighlights();
 	},
 
-	changeColorScheme: function(e){
-		this.model.changeColorScheme(e.target.value);
-	},
+// 	changeColorScheme: function(e){
+// 		this.model.changeColorScheme(e.target.value);
+// 	},
 
 	updateColors: function(){
 		this.graph.updateColors();
@@ -149,7 +147,7 @@ var SpectrumView = Backbone.View.extend({
 		for(p = 0; p < peaks.length; p++){
 			if(peaks[p].fragments.length > 0)
 				peaks[p].highlight(false);
-			
+
 			var highlightFragments = _.intersection(peaks[p].fragments, this.model.highlights);
 			if(highlightFragments.length != 0){
 				peaks[p].highlight(true, highlightFragments);
@@ -158,7 +156,7 @@ var SpectrumView = Backbone.View.extend({
 		this.graph.updatePeakColors();
 		this.graph.updatePeakLabels();
 	},
-	
+
 	measuringTool: function(e){
 		var $target = $(e.target);
         var selected = $target .is(':checked');
@@ -171,7 +169,7 @@ var SpectrumView = Backbone.View.extend({
 		var $target = $(e.target);
         var selected = $target.is(':checked');
         this.model.moveLabels = selected;
-		
+
 		var peaks = this.graph.points;
 
 		if (selected){
@@ -182,7 +180,7 @@ var SpectrumView = Backbone.View.extend({
 			// 			peaks[p].labels[l].style("cursor", "pointer");
 			// 		}
 			// 	}
-			// }	
+			// }
 			for(p = 0; p < peaks.length; p++){
 				if(peaks[p].labels.length){
 						peaks[p].labels
@@ -198,7 +196,7 @@ var SpectrumView = Backbone.View.extend({
 							.on(".drag", null)
 							//.style("cursor", "default");
 				}
-			}			
+			}
 		}
 
 	},

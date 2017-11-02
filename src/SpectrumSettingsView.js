@@ -21,6 +21,8 @@
 var SpectrumSettingsView = Backbone.View.extend({
 
 	events : {
+		'click #lossyChkBx': 'showLossy',
+		'change #colorSelector': 'changeColorScheme',
 		'click .settingsTab' : 'changeTab',
 		'click .settingsCancel' : 'cancel',
 		'change #settingsDecimals' : 'changeDecimals',
@@ -218,7 +220,8 @@ var SpectrumSettingsView = Backbone.View.extend({
 	},
 
 	changeDecimals: function(){
-		this.model.otherModel.showDecimals = parseInt(this.decimals[0][0].value);
+		var model = this.model.otherModel; //apply changes directly for now
+		model.otherModel.showDecimals = parseInt(this.decimals[0][0].value);
 	},
 
 	applyCustomCfg: function(){
@@ -457,5 +460,16 @@ var SpectrumSettingsView = Backbone.View.extend({
 		this.model.otherModel.changeHighlightColor( color );
 	},
 
+	showLossy: function(e) {
+		var model = this.model.otherModel; //apply changes directly for now
+		var $target = $(e.target);
+        var selected = $target .is(':checked');
+		model.lossyShown = selected;
+		model.trigger("changed:lossyShown");
+	},
 
+	changeColorScheme: function(e){
+		var model = this.model.otherModel; //apply changes directly for now
+		model.changeColorScheme(e.target.value);
+	},
 });
