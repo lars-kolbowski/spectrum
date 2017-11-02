@@ -24,6 +24,7 @@ var SpectrumSettingsView = Backbone.View.extend({
 		'click .settingsTab' : 'changeTab',
 		'click .settingsCancel' : 'cancel',
 		'change #settingsDecimals' : 'changeDecimals',
+		'change #highlightColor' : 'updateJScolor',
 		'click #settingsCustomCfgApply' : 'applyCustomCfg',
 		'submit #settingsForm' : 'applyData',
 	},
@@ -179,7 +180,7 @@ var SpectrumSettingsView = Backbone.View.extend({
 		;
 
         var highlightColorSelector = appearanceTab.append("label").attr("class", "btn").text("Highlight Color: ")
-        	.append("input").attr("class", "jscolor").attr("id", "highlightColor").attr("value", "#FFFF00").attr("type", "text").attr("onchange", "updateJScolor(this.jscolor);")
+        	.append("input").attr("class", "jscolor").attr("id", "highlightColor").attr("value", "#FFFF00").attr("type", "text")
         ;
         jscolor.installByClassName("jscolor");
 
@@ -449,8 +450,11 @@ var SpectrumSettingsView = Backbone.View.extend({
 		$('#settings_'+activeTab).show();
 	},
 
-	updateJScolor: function(jscolor) {
-		this.model.changeHighlightColor('#' + jscolor);
+	updateJScolor: function(event) {
+		var color = '#' + event.originalEvent.srcElement.value;
+		//for now change color of model directly
+		//ToDo: Maybe change this also to apply/cancel and/or put in reset to default values
+		this.model.otherModel.changeHighlightColor( color );
 	},
 
 
