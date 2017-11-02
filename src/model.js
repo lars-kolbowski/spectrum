@@ -9,6 +9,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 
 	initialize: function(){
 		var self = this;
+		this.xiAnnotatorBaseURL = "/xiAnnotator/"
 		this.baseDir = this.get('baseDir');
 		this.getKnownModifications();
 		//this.sticky = Array();
