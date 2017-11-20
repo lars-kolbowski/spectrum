@@ -314,7 +314,7 @@ var SpectrumSettingsView = CLMSUI.utils.BaseFrameView.extend({
 	initializeModTable: function(){
 		var self = this;
 		var modTableVars = {
-			"scrollY": '175px',
+			"scrollY": '130px',
 			"scrollCollapse": true,
 			"paging":   false,
 			"ordering": false,

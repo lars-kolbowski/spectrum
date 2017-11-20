@@ -85,9 +85,9 @@
   width: 100%
 }
 #settingsCustomCfg-input{
-  height: 100px;
-  width: 75%;
-  margin: 0px 20% 0px 6px;
+  height: 400px;
+  width: 100%;
+  /* margin: 0px 20% 0px 6px; */
 }
 
 #settings {
