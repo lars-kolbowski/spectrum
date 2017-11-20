@@ -1,3 +1,5 @@
+var CLMSUI = CLMSUI || {};
+
 var SpectrumView = Backbone.View.extend({
 
 	events : {
@@ -11,6 +13,7 @@ var SpectrumView = Backbone.View.extend({
 		'click #moveLabels': 'moveLabels',
 		'click #downloadSVG': 'downloadSVG',
 		'click #toggleView' : 'toggleView',
+		'click #openSettings' : 'openSettings'
 	  },
 
 	initialize: function() {
@@ -122,6 +125,11 @@ var SpectrumView = Backbone.View.extend({
 			this.model.showSpectrum = true;
 			this.graph.show();
 		}
+	},
+
+	openSettings: function(event){
+		event.stopPropagation();
+		CLMSUI.vent.trigger('spectrumSettingsShow', true);
 	},
 
 	clearHighlights: function(){

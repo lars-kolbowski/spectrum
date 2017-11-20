@@ -18,37 +18,51 @@
 //
 //
 //		SpectrumSettingsView.js
-var SpectrumSettingsView = Backbone.View.extend({
 
-	events : {
-		'click #lossyChkBx': 'showLossy',
-		'change #colorSelector': 'changeColorScheme',
-		'click .settingsTab' : 'changeTab',
-		'click .settingsCancel' : 'cancel',
-		'change #settingsDecimals' : 'changeDecimals',
-		'change #highlightColor' : 'updateJScolor',
-		'click #settingsCustomCfgApply' : 'applyCustomCfg',
-		'submit #settingsForm' : 'applyData',
+var CLMSUI = CLMSUI || {};
+
+var SpectrumSettingsView = CLMSUI.utils.BaseFrameView.extend({
+
+	events: function() {
+		var parentEvents = CLMSUI.utils.BaseFrameView.prototype.events;
+		if (_.isFunction(parentEvents)) {
+				parentEvents = parentEvents();
+		}
+		return _.extend ({}, parentEvents, {
+			'click #lossyChkBx': 'showLossy',
+			'change #colorSelector': 'changeColorScheme',
+			'click .settingsTab' : 'changeTab',
+			'click .settingsCancel' : 'cancel',
+			'change #settingsDecimals' : 'changeDecimals',
+			'change #highlightColor' : 'updateJScolor',
+			'click #settingsCustomCfgApply' : 'applyCustomCfg',
+			'submit #settingsForm' : 'applyData',
+			'change .ionSelectChkbox': 'updateIons'
+		});
 	},
-	initialize: function() {
 
+	identifier: "Spectrum Settings",
+
+	initialize: function() {
+		SpectrumSettingsView.__super__.initialize.apply (this, arguments);
 		var self = this;
 
+		this.on('spectrumSettingsShow', this.bringToTop);
 		this.listenTo(this.model, 'change', this.render);
 		this.listenTo(this.model, 'change:JSONdata', this.render);
 		this.wrapper = d3.select(this.el);
 
 		//menu
 		var menu = this.wrapper.append("div").attr("class", "settings_menu");
-        var buttonData = ["Data", "Appearance", "Custom config"]
-        buttonData.forEach(function(b){
-        	var b_id = b.replace(" ", "_").toLowerCase();
-        	menu.append("button")
-        		.attr("class", "settingsTab btn btn-1a")
-        		.attr("data-tab", b_id)
-        		.text(b)
-        	;
-        });
+		var buttonData = ["Data", "Appearance", "Custom config"]
+		buttonData.forEach(function(b){
+			var b_id = b.replace(" ", "_").toLowerCase();
+			menu.append("button")
+				.attr("class", "settingsTab btn btn-1a")
+				.attr("data-tab", b_id)
+				.text(b)
+			;
+		});
 
 		var mainDiv = this.wrapper.append("div").attr("id", "settings_main");
 
@@ -59,14 +73,13 @@ var SpectrumSettingsView = Backbone.View.extend({
 
 		var dataFlexColumn = dataForm.append("div").attr("class", "flex-column");
 
-		var peptideLabel = dataFlexColumn.append("label").text("Peptide Sequence: ")
-		this.peptideViewEl = peptideLabel.append("input")
+		var peptideLabel = dataFlexColumn.append("label").attr("class", "flex-container").text("Peptide Sequence: ")
+		this.peptideViewEl = peptideLabel.append('div').attr('class', 'flex-grow').append("input")
 			.attr("type", "text")
 			.attr("required", "")
 			.attr("autofocus", "")
 			.attr("placeholder", "Peptide Sequence1[;Peptide Sequence2]")
 			.attr("name", "peps")
-			.attr("style", "width: 80%; margin-bottom: 1%;")
 		;
 		this.pepInputView = new PepInputView({model: this.model, el: this.peptideViewEl[0] });
 
@@ -84,25 +97,24 @@ var SpectrumSettingsView = Backbone.View.extend({
 
 		var rightDiv = dataFlexRow.append("div").attr("class", "settingsDataRight");
 
-		this.crossLinkerModMass = rightDiv.append("label").text("Cross-linker mod mass: ")
-			.append("input").attr("placeholder", "CL mod mass").attr("autocomplete", "off").attr("name", "clModMass").attr("required", "").attr("type", "text").attr("style", "width: 150px;")
+		this.crossLinkerModMass = rightDiv.append("label").attr("class", "flex-container").text("Cross-linker mod mass: ").append('div').attr('class', 'flex-grow')
+			.append("input").attr("placeholder", "CL mod mass").attr("autocomplete", "off").attr("name", "clModMass").attr("required", "").attr("type", "text")
 		;
 
-		this.precursorZ = rightDiv.append("label").text("Precursor charge state: ")
-			.append("input").attr("type", "number").attr("placeholder", "Charge").attr("autocomplete", "off").attr("name", "preCharge").attr("min", "1").attr("required", "").attr("style", "width: 70px")
+		this.precursorZ = rightDiv.append("label").attr("class", "flex-container").text("Precursor charge state: ").append('div').attr('class', 'flex-grow')
+			.append("input").attr("type", "number").attr("placeholder", "Charge").attr("autocomplete", "off").attr("name", "preCharge").attr("min", "1").attr("required", "")
 		;
 
-		var ionSelector = rightDiv.append("label").text("Fragment Ions: ")
-			.append("div").attr("class", "dropdown")
+		var ionSelector = rightDiv.append("label").attr("class", "flex-container").text("Fragment Ions: ")
+			.append("div").attr("class", "mulitSelect_dropdown flex-grow")
 		;
 		ionSelector.append("input")
 			.attr("type", "text")
 			.attr("class", "btn-drop")
 			.attr("id", "ionSelection")
 			.attr("readonly", "")
-			.attr("style", "width: 160px")
 		;
-		var ionSelectorDropdown = ionSelector.append("div").attr("class", "dropdown-content mutliSelect").append("ul").attr("id", 'ionList');
+		var ionSelectorDropdown = ionSelector.append("div").attr("class", "mulitSelect_dropdown-content mutliSelect").append("ul").attr("id", 'ionList');
 		var ionOptions = [
 			{value: "peptide", text: "Peptide ion"},
 			{value: "a", text: "A Ion"},
@@ -124,8 +136,8 @@ var SpectrumSettingsView = Backbone.View.extend({
 
 		;
 
-		var toleranceWrapper = rightDiv.append("label").text("MS2 tolerance: ");
-		this.toleranceValue = toleranceWrapper.append("input")
+		var toleranceWrapper = rightDiv.append("label").attr("class", "flex-container").text("MS2 tolerance: ");
+		this.toleranceValue = toleranceWrapper.append('div').attr('class', 'flex-grow').append("input")
 			.attr("type", "number")
 			.attr("placeholder", "Charge")
 			.attr("autocomplete", "off")
@@ -133,7 +145,6 @@ var SpectrumSettingsView = Backbone.View.extend({
 			.attr("min", "0")
 			.attr("step", "0.1")
 			.attr("required", "")
-			.attr("style", "width: 70px")
 		;
 		this.toleranceUnit = toleranceWrapper.append("select")
 			.attr("name", "tolUnit")
@@ -146,7 +157,7 @@ var SpectrumSettingsView = Backbone.View.extend({
 
 
 		//modTable
-		var modTableWrapper = dataForm.append("div").attr("class", "form-control").attr("style", "height:auto; width: 100%; margin-top: -25px;").append("div").attr("class", "dataTables_wrapper");
+		var modTableWrapper = dataForm.append("div").append("div").attr("class", "form-control dataTables_wrapper");
 		var modTable = modTableWrapper.append("table").attr("id", "modificationTable").attr("style", "width: 100%");
 		this.initializeModTable();
 
@@ -181,17 +192,17 @@ var SpectrumSettingsView = Backbone.View.extend({
 			.text (function(d) { return d.text; })
 		;
 
-        var highlightColorSelector = appearanceTab.append("label").attr("class", "btn").text("Highlight Color: ")
-        	.append("input").attr("class", "jscolor").attr("id", "highlightColor").attr("value", "#FFFF00").attr("type", "text")
-        ;
-        jscolor.installByClassName("jscolor");
+		var highlightColorSelector = appearanceTab.append("label").attr("class", "btn").text("Highlight Color: ")
+			.append("input").attr("class", "jscolor").attr("id", "highlightColor").attr("value", "#FFFF00").attr("type", "text")
+		;
+		jscolor.installByClassName("jscolor");
 
 		var lossyChkBx = appearanceTab.append("label").attr("class", "btn").text("Show neutral loss labels")
 			.append("input").attr("type", "checkbox").attr("id", "lossyChkBx")
 		;
 
 		this.decimals = appearanceTab.append("label").attr("class", "btn").text("Number of decimals to display: ")
-			.append("input").attr("type", "number").attr("id", "settingsDecimals").attr("min", "1").attr("max", "10").attr("autocomplete", "off").attr("style", "width: 60px;")
+			.append("input").attr("type", "number").attr("id", "settingsDecimals").attr("min", "1").attr("max", "10").attr("autocomplete", "off")
 		;
 
 
@@ -303,22 +314,24 @@ var SpectrumSettingsView = Backbone.View.extend({
 	initializeModTable: function(){
 		var self = this;
 		var modTableVars = {
-	    	"paging":   false,
-	        "ordering": false,
-	        "info":     false,
-	        "searching":false,
-	        "processing": true,
-	        "serverSide": true,
-	        "ajax": self.model.baseDir + "php/convertModsToJSON.php?peps=",
-	        "columns": [
-	            { "title": "Mod-Input", "data": "id" },
-	        	{ "title": "Modification", "className": "dt-center" },
-	            { "title": "Mass", "className": "dt-center" },
-	            { "title": "Specificity", "data": "aminoAcid", "className": "dt-center" },
-	            ],
+			"scrollY": '175px',
+			"scrollCollapse": true,
+			"paging":   false,
+			"ordering": false,
+			"info":     false,
+			"searching":false,
+			"processing": true,
+			"serverSide": true,
+			"ajax": self.model.baseDir + "php/convertModsToJSON.php?peps=",
+			"columns": [
+				{ "title": "Mod-Input", "data": "id" },
+				{ "title": "Modification", "className": "dt-center" },
+				{ "title": "Mass", "className": "dt-center" },
+				{ "title": "Specificity", "data": "aminoAcid", "className": "dt-center" },
+			],
 
-	        "columnDefs": [
-	        	{
+			"columnDefs": [
+				{
 					"render": function ( data, type, row, meta ) {
 						return '<input class="form-control" id="modName_'+meta.row+'" title="modification code" name="mods[]" readonly type="text" value='+data+'>';
 					},
@@ -458,6 +471,20 @@ var SpectrumSettingsView = Backbone.View.extend({
 		//for now change color of model directly
 		//ToDo: Maybe change this also to apply/cancel and/or put in reset to default values
 		this.model.otherModel.changeHighlightColor( color );
+	},
+
+	updateIons: function(event){
+
+		var ionSelectionArr = new Array();
+		$('.ionSelectChkbox:checkbox:checked').each(function(){
+			ionSelectionArr.push($(this).val());
+		});
+
+		if (ionSelectionArr.length == 0)
+			$('#ionSelection').val("Select ions...");
+		else
+			$('#ionSelection').val(ionSelectionArr.join(", "));
+
 	},
 
 	showLossy: function(e) {
