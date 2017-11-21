@@ -239,7 +239,7 @@ var SpectrumSettingsView = CLMSUI.utils.BaseFrameView.extend({
 	changeDecimals: function(){
 		var model = this.model.otherModel; //apply changes directly for now
 		model.showDecimals = parseInt(this.decimals[0][0].value);
-		model.trigger('change');
+		model.trigger('change'); //necessary for PrecursorInfoView update
 	},
 
 	applyCustomCfg: function(){
@@ -457,6 +457,11 @@ var SpectrumSettingsView = CLMSUI.utils.BaseFrameView.extend({
 		this.toleranceUnit[0][0].value = this.model.JSONdata.annotation.fragementTolerance.split(" ")[1];
 		this.crossLinkerModMass[0][0].value = this.model.JSONdata.annotation['cross-linker'].modMass;
 		this.decimals[0][0].value = this.model.showDecimals;
+
+		if(this.model.isLinear)
+			$(this.crossLinkerModMassWrapper[0][0]).hide();
+		else
+			$(this.crossLinkerModMassWrapper[0][0]).show();
 	},
 
 	cancel: function(){
