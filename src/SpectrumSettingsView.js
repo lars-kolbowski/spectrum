@@ -47,10 +47,16 @@ var SpectrumSettingsView = CLMSUI.utils.BaseFrameView.extend({
 		SpectrumSettingsView.__super__.initialize.apply (this, arguments);
 		var self = this;
 
-		this.on('spectrumSettingsShow', this.bringToTop);
+		this.listenTo(CLMSUI.vent, 'spectrumSettingsShow', this.bringToTop);
+		this.listenTo(CLMSUI.vent, 'spectrumSettingsToggle', this.toggleView);
 		this.listenTo(this.model, 'change', this.render);
 		this.listenTo(this.model, 'change:JSONdata', this.render);
 		this.wrapper = d3.select(this.el);
+
+		//borrowed from CLMSUI.BaseframeView
+		// add drag listener to four corners to call resizing locally rather than through dyn_div's api, which loses this view context
+		var drag = d3.behavior.drag().on ("dragend", function() { self.modTable.draw(); });
+		this.wrapper.selectAll(".draggableCorner").call (drag);
 
 		//menu
 		var menu = this.wrapper.append("div").attr("class", "settings_menu");
@@ -157,7 +163,7 @@ var SpectrumSettingsView = CLMSUI.utils.BaseFrameView.extend({
 
 
 		//modTable
-		var modTableWrapper = dataForm.append("div").append("div").attr("class", "form-control dataTables_wrapper");
+		var modTableWrapper = dataForm.append("div").attr("class", "form-control dataTables_wrapper").attr("id", "modificationTable_wrapperOuter");
 		var modTable = modTableWrapper.append("table").attr("id", "modificationTable").attr("style", "width: 100%");
 		this.initializeModTable();
 
@@ -242,6 +248,11 @@ var SpectrumSettingsView = CLMSUI.utils.BaseFrameView.extend({
 		json['annotation']['custom'] += $("#settingsCustomCfg-input").val().split("\n");
 
 		this.model.otherModel.request_annotation(json);
+	},
+
+	toggleView: function(){
+		$(this.el).toggle();
+		this.modTable.draw();
 	},
 
 	applyData: function(e){
@@ -446,7 +457,6 @@ var SpectrumSettingsView = CLMSUI.utils.BaseFrameView.extend({
 		this.toleranceUnit[0][0].value = this.model.JSONdata.annotation.fragementTolerance.split(" ")[1];
 		this.crossLinkerModMass[0][0].value = this.model.JSONdata.annotation['cross-linker'].modMass;
 		this.decimals[0][0].value = this.model.showDecimals;
-
 	},
 
 	cancel: function(){
