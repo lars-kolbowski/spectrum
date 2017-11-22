@@ -3,17 +3,17 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 	defaults: function() {
     return {
       baseDir:  '',
+			xiAnnotatorBaseURL: 'http://xi3.bio.ed.ac.uk/xiAnnotator/',
       JSONdata: false,
     };
   },
 
 	initialize: function(){
 		var self = this;
-		this.xiAnnotatorBaseURL = "http://xi3.bio.ed.ac.uk/xiAnnotator/"	// change to "/xiAnnotator/" for release
+		this.xiAnnotatorBaseURL = this.get('xiAnnotatorBaseURL');
 		this.baseDir = this.get('baseDir');
 		this.getKnownModifications();
-		//this.sticky = Array();
-		//this.highlights = Array();
+
 		this.showDecimals = 2;
 		this.moveLabels = false;
 		this.measureMode = false;
@@ -70,6 +70,9 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		this.randId = this.get("randId");
 		//console.log(this.JSONdata);
 		this.annotationData = this.JSONdata.annotation;
+
+		//overwrite xiKnownModifications with data from input
+		this.updateKnownModifications();
 
 		if (this.annotationData !== undefined){
 			this.MSnTolerance = {
@@ -485,12 +488,43 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		});
 	},
 
+
+	updateKnownModifications: function(){
+		var self = this;
+		if(this.annotationData.modifications){
+			this.annotationData.modifications.forEach(function(annotation_mod){
+				var overlap = self.knownModifications["modifications"].filter(function(km){ return annotation_mod.id == km.id;});
+				if (overlap.length > 0){
+					overlap.forEach(function(overlap_mod){
+						overlap_mod.mass = annotation_mod.massDifference;
+						if(overlap_mod.aminoAcids.indexOf(annotation_mod.aminoacid) == -1)
+							overlap_mod.aminoAcids.push(annotation_mod.aminoacid);
+// 						overlap_mod.aminoAcids = annotation_mod.aminoAcids;
+					});
+				}
+				else{
+					//what is mass in the modification array corresponds to massDifference from xiAnnotator
+					var new_mod = new Object;
+					new_mod['mass'] = annotation_mod['massDifference'];
+					new_mod['aminoAcids'] = [annotation_mod['aminoacid']];
+					new_mod['id'] = annotation_mod['id'];
+					self.knownModifications["modifications"].push(new_mod);
+				}
+
+			})
+		}
+	},
+
 	updateUserModifications: function(mod, saveToCookie=true){
 
 		var userMod = this.userModifications.filter(function(m){ return mod.id == m.id;});
 		if (userMod.length > 0){
-			userMod[0].mass = mod.mass;
-			userMod[0].aminoAcids = mod.aminoAcids;
+			userMod.forEach(function(overlap_mod){
+				overlap_mod.mass = mod.mass;
+				overlap_mod.aminoAcids = mod.aminoAcids;
+			});
+// 			userMod[0].mass = mod.mass;
+// 			userMod[0].aminoAcids = mod.aminoAcids;
 		}
 		else
 			this.userModifications.push(mod);
@@ -541,5 +575,6 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 				}
 			}
 		});
+
 	}
 });
