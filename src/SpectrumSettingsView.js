@@ -103,7 +103,9 @@ var SpectrumSettingsView = CLMSUI.utils.BaseFrameView.extend({
 
 		var rightDiv = dataFlexRow.append("div").attr("class", "settingsDataRight");
 
-		this.crossLinkerModMass = rightDiv.append("label").attr("class", "flex-container").text("Cross-linker mod mass: ").append('div').attr('class', 'flex-grow')
+		this.crossLinkerModMassWrapper = rightDiv.append("label").attr("class", "flex-container").text("Cross-linker mod mass: ");
+
+		this.crossLinkerModMass = this.crossLinkerModMassWrapper.append('div').attr('class', 'flex-grow')
 			.append("input").attr("placeholder", "CL mod mass").attr("autocomplete", "off").attr("name", "clModMass").attr("required", "").attr("type", "text")
 		;
 
