@@ -510,7 +510,11 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		}
 	},
 
-	updateUserModifications: function(mod, saveToCookie=true){
+	updateUserModifications: function(mod, saveToCookie){
+        
+        if (saveToCookie === undefined) {
+            saveToCookie = true;
+        }
 
 		var userMod = this.userModifications.filter(function(m){ return mod.id == m.id;});
 		if (userMod.length > 0){
@@ -532,7 +536,12 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		Cookies.set('customMods', cookie);
 	},
 
-	delUserModification: function(modId, saveToCookie=true){
+	delUserModification: function(modId, saveToCookie){
+        
+        if (saveToCookie === undefined) {
+            saveToCookie = true;
+        }
+        
 		var userModIndex = this.userModifications.findIndex(function(m){ return modId == m.id;});
 		if (userModIndex != -1){
 			this.userModifications.splice(userModIndex, 1);
