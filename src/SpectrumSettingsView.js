@@ -147,7 +147,7 @@ var SpectrumSettingsView = CLMSUI.utils.BaseFrameView.extend({
 		var toleranceWrapper = rightDiv.append("label").attr("class", "flex-container").text("MS2 tolerance: ");
 		this.toleranceValue = toleranceWrapper.append('div').attr('class', 'flex-grow').append("input")
 			.attr("type", "number")
-			.attr("placeholder", "Charge")
+			.attr("placeholder", "Error tolerance")
 			.attr("autocomplete", "off")
 			.attr("name", "ms2Tol")
 			.attr("min", "0")

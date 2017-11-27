@@ -117,11 +117,6 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 
 		this.calcPrecursorMass();
 
-		//change this to SettignsView related call
-		if (window.modTable !== undefined)
-			modTable.ajax.url( this.baseDir + "php/convertModsToJSON.php?peps="+encodeURIComponent(this.pepStrsMods.join(";"))).load();
-		this.trigger("changed:data");
-
 		if (this.JSONdata.peaks !== undefined)
 			this.setGraphData();
 
