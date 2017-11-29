@@ -92,10 +92,10 @@
   border-right: 1px solid white;
   border-top: 1px solid white;
   border-radius: 2px 10px 0 0;
-  background: #666;
+  /* background: rgba(192,206,224,1); */
 }
 .settings_menu .active{
-  background: #333!important;
+  background: rgba(192,206,224,1);
 }
 .settings_menu .active:hover {
     color: #fff;
