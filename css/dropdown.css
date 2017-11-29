@@ -36,6 +36,8 @@
 .mulitSelect_dropdown label {
     cursor: pointer;
     display: block;
+    line-height: 1em!important;
+    padding: 0px!important;
 }
 
 .mulitSelect_dropdown DIV LI:hover {

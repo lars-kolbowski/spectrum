@@ -59,40 +59,47 @@ var SpectrumSettingsView = CLMSUI.utils.BaseFrameView.extend({
 		this.wrapper.selectAll(".draggableCorner").call (drag);
 
 		//menu
-		var menu = this.wrapper.append("div").attr("class", "settings_menu");
+		this.menu = this.wrapper.append("div").attr("class", "settings_menu");
 		var buttonData = ["Data", "Appearance", "Custom config"]
-		buttonData.forEach(function(b){
+		buttonData.forEach(function(b, i){
+			var zIndex = 20 - i;
 			var b_id = b.replace(" ", "_").toLowerCase();
-			menu.append("button")
+			self.menu.append("button")
 				.attr("class", "settingsTab btn btn-1a")
 				.attr("data-tab", b_id)
+				.attr("style", "z-index: " + zIndex)
 				.text(b)
 			;
 		});
 
+		// add active class to first tab-button
+		this.menu.select('button').classed('active', true);
+
 		var mainDiv = this.wrapper.append("div").attr("id", "settings_main");
 
 		//data ToDo: change to more BBlike data handling
-		var dataTab = mainDiv.append("div").attr("class", "settings-tab").attr("id", "settings_data");
+		var dataTab = mainDiv.append("div").attr("class", "settings-tab flex-column").attr("id", "settings_data");
 
-		var dataForm = dataTab.append("form").attr("id", "settingsForm").attr("method", "post");
+		var dataForm = dataTab.append("form").attr("id", "settingsForm").attr("method", "post").attr("class", "flex-column");
 
-		var dataFlexColumn = dataForm.append("div").attr("class", "flex-column");
+		// var dataFlexColumn = dataForm.append("div").attr("class", "flex-column");
 
-		var peptideLabel = dataFlexColumn.append("label").attr("class", "flex-container").text("Peptide Sequence: ")
+		var peptideLabel = dataForm.append("label").attr("class", "flex-row").text("Peptide Sequence: ")
 		this.peptideViewEl = peptideLabel.append('div').attr('class', 'flex-grow').append("input")
 			.attr("type", "text")
 			.attr("required", "")
 			.attr("autofocus", "")
+			.attr("autocomplete", "off")
 			.attr("placeholder", "Peptide Sequence1[;Peptide Sequence2]")
 			.attr("name", "peps")
 		;
 		this.pepInputView = new PepInputView({model: this.model, el: this.peptideViewEl[0] });
 
-		var dataFlexRow = dataFlexColumn.append("div").attr("class", "flex-row");
+		var dataFlexRow = dataForm.append("div").attr("class", "flex-row midDataDiv");
 
 		var leftDiv = dataFlexRow.append("div").attr("class", "settingsDataLeft");
-		this.peaklist = leftDiv.append("textarea")
+
+		this.peaklist = leftDiv.append("label").attr("class", "flex-column").attr("style", "height: 100%").text("Peak list (m/z\tintensity): ").append("textarea")
 			.attr("required", "")
 			.attr("id", "settingsPeaklist")
 			.attr("type", "text")
@@ -103,17 +110,7 @@ var SpectrumSettingsView = CLMSUI.utils.BaseFrameView.extend({
 
 		var rightDiv = dataFlexRow.append("div").attr("class", "settingsDataRight");
 
-		this.crossLinkerModMassWrapper = rightDiv.append("label").attr("class", "flex-container").text("Cross-linker mod mass: ");
-
-		this.crossLinkerModMass = this.crossLinkerModMassWrapper.append('div').attr('class', 'flex-grow')
-			.append("input").attr("placeholder", "CL mod mass").attr("autocomplete", "off").attr("name", "clModMass").attr("required", "").attr("type", "text")
-		;
-
-		this.precursorZ = rightDiv.append("label").attr("class", "flex-container").text("Precursor charge state: ").append('div').attr('class', 'flex-grow')
-			.append("input").attr("type", "number").attr("placeholder", "Charge").attr("autocomplete", "off").attr("name", "preCharge").attr("min", "1").attr("required", "")
-		;
-
-		var ionSelector = rightDiv.append("label").attr("class", "flex-container").text("Fragment Ions: ")
+		var ionSelector = rightDiv.append("label").attr("class", "flex-row").text("Fragment Ions: ")
 			.append("div").attr("class", "mulitSelect_dropdown flex-grow")
 		;
 		ionSelector.append("input")
@@ -141,28 +138,36 @@ var SpectrumSettingsView = CLMSUI.utils.BaseFrameView.extend({
 				.attr("name", "ions[]")
 				.attr("id", function(d) { return d.text.replace(" ", ""); })
 				.attr("value", function(d) { return d.value; })
-
 		;
 
-		var toleranceWrapper = rightDiv.append("label").attr("class", "flex-container").text("MS2 tolerance: ");
-		this.toleranceValue = toleranceWrapper.append('div').attr('class', 'flex-grow').append("input")
+		this.precursorZ = rightDiv.append("label").attr("class", "flex-row").text("Precursor charge state: ").append('div').attr('class', 'flex-grow')
+			.append("input").attr("type", "number").attr("placeholder", "Charge").attr("autocomplete", "off").attr("name", "preCharge").attr("min", "1").attr("required", "")
+		;
+
+		var toleranceWrapper = rightDiv.append("label").attr("class", "flex-row").text("MS2 tolerance: ");
+		this.toleranceValue = toleranceWrapper.append('div').attr('class', 'flex-grow stepInput').append("input")
 			.attr("type", "number")
 			.attr("placeholder", "Error tolerance")
 			.attr("autocomplete", "off")
 			.attr("name", "ms2Tol")
 			.attr("min", "0")
-			.attr("step", "0.1")
+			.attr("step", "1")
 			.attr("required", "")
 		;
-		this.toleranceUnit = toleranceWrapper.append("select")
+		this.toleranceUnit = toleranceWrapper.append('div').append("select")
 			.attr("name", "tolUnit")
 			.attr("required", "")
-			.attr("style", "width: 100px; margin-left: 10px;")
+			.attr("style", "width: 65px; margin-left: 8px;")
 			.attr("class", "form-control")
 		;
 		this.toleranceUnit.append("option").attr("value", "ppm").text("ppm");
 		this.toleranceUnit.append("option").attr("value", "Da").text("Da");
 
+		this.crossLinkerModMassWrapper = rightDiv.append("label").attr("class", "flex-row").text("Cross-linker mod mass: ");
+
+		this.crossLinkerModMass = this.crossLinkerModMassWrapper.append('div').attr('class', 'flex-grow')
+			.append("input").attr("placeholder", "CL mod mass").attr("autocomplete", "off").attr("name", "clModMass").attr("required", "").attr("type", "text")
+		;
 
 		//modTable
 		var modTableWrapper = dataForm.append("div").attr("class", "form-control dataTables_wrapper").attr("id", "modificationTable_wrapperOuter");
@@ -177,13 +182,13 @@ var SpectrumSettingsView = CLMSUI.utils.BaseFrameView.extend({
 
 		//appearance
 		var appearanceTab = mainDiv.append("div")
-			.attr("class", "settings-tab")
+			.attr("class", "settings-tab flex-column")
 			.attr("id", "settings_appearance")
 			.style("display", "none")
 		;
 
 		var colorSchemeSelector = appearanceTab.append("label").attr("class", "btn").text("Color scheme: ")
-			.append("select").attr("id", 'colorSelector').attr("class", 'form-control')
+			.append("select").attr("id", 'colorSelector').attr("class", 'form-control pointer')
 		;
 		var colOptions = [
 			{value: "RdBu", text: "Red & Blue"},
@@ -201,7 +206,12 @@ var SpectrumSettingsView = CLMSUI.utils.BaseFrameView.extend({
 		;
 
 		var highlightColorSelector = appearanceTab.append("label").attr("class", "btn").text("Highlight Color: ")
-			.append("input").attr("class", "jscolor").attr("id", "highlightColor").attr("value", "#FFFF00").attr("type", "text")
+			.append("input")
+				.attr("class", "jscolor pointer")
+				.attr("id", "highlightColor")
+				.attr("value", "#FFFF00")
+				.attr("type", "text")
+				.attr("style", "width: 103px;")
 		;
 		jscolor.installByClassName("jscolor");
 
@@ -213,9 +223,13 @@ var SpectrumSettingsView = CLMSUI.utils.BaseFrameView.extend({
 			.append("input").attr("type", "number").attr("id", "settingsDecimals").attr("min", "1").attr("max", "10").attr("autocomplete", "off")
 		;
 
+		this.absoluteError = appearanceTab.append("label").attr("class", "btn").text("Absolute error values (QC): ")
+			.append("input").attr("type", "checkbox").attr("id", "absErrChkBx")
+		;
+
 
         //custom config
-		var customConfigTab = mainDiv.append("div").attr("class", "settings-tab").attr("id", "settings_custom_config").style("display", "none");
+		var customConfigTab = mainDiv.append("div").attr("class", "settings-tab flex-column").attr("id", "settings_custom_config").style("display", "none");
 
 		var customConfigInput = customConfigTab.append("textarea").attr("id", "settingsCustomCfg-input").attr("class", "form-control");
 		var customConfigBottom = customConfigTab.append("div").attr("class", "settings-bottom");
@@ -328,7 +342,7 @@ var SpectrumSettingsView = CLMSUI.utils.BaseFrameView.extend({
 	initializeModTable: function(){
 		var self = this;
 		var modTableVars = {
-			"scrollY": '130px',
+			// "scrollY": '130px',
 			"scrollCollapse": true,
 			"paging":   false,
 			"ordering": false,
@@ -376,7 +390,12 @@ var SpectrumSettingsView = CLMSUI.utils.BaseFrameView.extend({
 									data = self.model.knownModifications['modifications'][i].mass;
 							}
 						}
-						return '<input class="form-control" id="modMass_'+meta.row+'" row="'+meta.row+'" title="modification mass" name="modMasses[]" type="number" min=0 step=0.0001 required value='+data+' autocomplete=off>';
+						data = parseFloat(data.toFixed(10).toString()); // limit to 10 decimal places and get rid of tailing zeroes
+						if(data.toString().indexOf('.') !== -1)
+							var stepSize = '0.'+'0'.repeat(data.toString().split('.')[1].length - 1) + 1;
+						else
+							var stepSize = 1;
+						return '<input class="form-control stepInput" id="modMass_'+meta.row+'" row="'+meta.row+'" title="modification mass" name="modMasses[]" type="number" min=0 step="'+stepSize+'" required value='+data+' autocomplete=off>';
 					},
 					"targets": 2,
 				},
@@ -455,7 +474,7 @@ var SpectrumSettingsView = CLMSUI.utils.BaseFrameView.extend({
 
 		this.peaklist[0][0].value = this.model.peaksToMGF();
 		this.precursorZ[0][0].value  = this.model.JSONdata.annotation.precursorCharge;
-		this.toleranceValue[0][0].value  = parseInt(this.model.JSONdata.annotation.fragementTolerance);
+		this.toleranceValue[0][0].value  = this.model.JSONdata.annotation.fragementTolerance.split(' ')[0];
 		this.toleranceUnit[0][0].value = this.model.JSONdata.annotation.fragementTolerance.split(" ")[1];
 		this.crossLinkerModMass[0][0].value = this.model.JSONdata.annotation['cross-linker'].modMass;
 		this.decimals[0][0].value = this.model.showDecimals;
@@ -478,10 +497,23 @@ var SpectrumSettingsView = CLMSUI.utils.BaseFrameView.extend({
 
 	},
 
+	updateStepSize: function(e){
+		var $target = $(e.target);
+		//update stepsize
+		if ($target.val().toString().split('.')[1])
+			var stepSize = '0.'+'0'.repeat($target.val().toString().split('.')[1].length - 1) + 1;
+		else {
+			var stepSize = 1;
+		}
+		$target.attr('step', stepSize);
+	},
+
 	changeTab: function(e) {
 		var activeTab = $(e.currentTarget).data('tab');
 		$('.settings-tab').hide();
+		this.menu.selectAll('button').classed('active', false);
 		$('#settings_'+activeTab).show();
+		$(e.target).addClass('active');
 	},
 
 	updateJScolor: function(event) {
@@ -511,6 +543,13 @@ var SpectrumSettingsView = CLMSUI.utils.BaseFrameView.extend({
         var selected = $target .is(':checked');
 		model.lossyShown = selected;
 		model.trigger("changed:lossyShown");
+	},
+
+	absErrToggle: function(e) {
+		var model = this.model.otherModel; //apply changes directly for now
+		var $target = $(e.target);
+		var selected = $target.is(':checked');
+		CLMSUI.vent.trigger('QCabsErr', selected);
 	},
 
 	changeColorScheme: function(e){

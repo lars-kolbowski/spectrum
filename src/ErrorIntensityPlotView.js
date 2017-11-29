@@ -19,14 +19,18 @@
 //
 //		ErrorIntensityPlotView.js
 var ErrorIntensityPlotView = Backbone.View.extend({
-	
+
 	events : {
 		'click #toggleView' : 'toggleView',
 	},
 
 	initialize: function() {
 
+		this.listenTo(CLMSUI.vent, 'QCabsErr', this.toggleAbsErr);
+
 		var self = this;
+
+		this.absolute = false;
 
 		this.svg = d3.select(this.el.getElementsByTagName("svg")[0]);
 
@@ -41,20 +45,20 @@ var ErrorIntensityPlotView = Backbone.View.extend({
 			.attr('width', width)
 			.attr('height', height)
 			.attr('class', 'wrapper')
-			.style("opacity", 0); 
+			.style("opacity", 0);
 
 		if (CLMSUI.compositeModelInst !== undefined)
-			this.tooltip = CLMSUI.compositeModelInst.get("tooltipModel");		
+			this.tooltip = CLMSUI.compositeModelInst.get("tooltipModel");
 		else{
 			target = this.wrapper.node().parentNode.parentNode.parentNode; //this would get you #spectrumPanel
 			this.tooltip = d3.select(target).append("span")
 				.style("font-size", "small")
 				.style("padding", "0 5px")
-				.style("border-radius", "6px")		
+				.style("border-radius", "6px")
 				.attr("class", "tooltip")
 				.style("background-color", "black")
 				.style("pointer-events", "none")
-				.style("position", "absolute")				
+				.style("position", "absolute")
 				.style("opacity", 0);
 		}
 
@@ -94,8 +98,8 @@ var ErrorIntensityPlotView = Backbone.View.extend({
 		fragments.forEach(function(fragment){
 			var peptideId = fragment.peptideId;
 			var fragId = fragment.id;
-			var lossy = false; 
-      		if (fragment.type.includes("Loss"))  
+			var lossy = false;
+      		if (fragment.type.includes("Loss"))
         		lossy = true;
 			fragment.clusterInfo.forEach(function(cluster){
 				var firstPeakId = self.model.JSONdata.clusters[cluster.Clusterid].firstPeakId;
@@ -104,7 +108,8 @@ var ErrorIntensityPlotView = Backbone.View.extend({
 					peptideId: peptideId,
 					lossy: lossy,
 					intensity: self.model.JSONdata.peaks[firstPeakId].intensity,
-					error: Math.abs(cluster.error),
+					error: cluster.error,
+					y: self.absolute ? Math.abs(cluster.error) : cluster.error,
 					charge: self.model.JSONdata.clusters[cluster.Clusterid].charge,
 					//mz: self.model.JSONdata.peaks[firstPeakId].mz
 				}
@@ -118,73 +123,88 @@ var ErrorIntensityPlotView = Backbone.View.extend({
 		this.width = cx - self.margin.left - self.margin.right;
 		this.height = cy - self.margin.top - self.margin.bottom;
 
-		this.xmax = d3.max(this.data, function(d) { return d['error']; });
-		this.ymax = d3.max(this.data, function(d) { return d['intensity']; });
+		var xmax = d3.max(this.data, function(d) { return d['intensity']; });
+		// var ymax = d3.max(this.data, function(d) { return d['error']; });
+		var ymax = this.model.MSnTolerance.value;
+
+		var ymin = this.absolute ? 0 : 0 - ymax;
 
 		this.x = d3.scale.linear()
-		          .domain([ 0, this.xmax ])
+		          .domain([ 0, xmax ])
 		          .range([ 0, this.width ]);
 
 
 		this.y = d3.scale.linear()
-			      .domain([ 0, this.ymax ]).nice()
+			      .domain([ ymin, ymax ]).nice()
 			      .range([ this.height, 0 ]).nice();
 
-		this.yTicks = this.height / 40;
-		this.xTicks = this.width / 100;
-		    
+		var yTicks = this.height / 40;
+		var xTicks = this.width / 100;
+
+		this.wrapper.selectAll('.axis line, .axis path')
+				.style({'stroke': 'Black', 'fill': 'none', 'stroke-width': '1.2px'});
+
+		this.background = this.wrapper.append("rect")
+			.style("fill", "white")
+			// .style("z-index", -1)
+			.attr("width", this.width)
+			.attr("height", 0)
+		;
+
+		this.background.on("click", function(){
+			this.model.clearStickyHighlights();
+		}.bind(this));
+
 		// draw the x axis
-		this.xAxis = d3.svg.axis().scale(self.x).ticks(this.xTicks).orient("bottom");
+		this.xAxis = d3.svg.axis().scale(self.x).ticks(xTicks).orient("bottom").tickFormat(d3.format("s"));
 
 		this.xAxisSVG = this.wrapper.append('g')
-			.attr('transform', 'translate(0,' + this.height + ')')
-			.attr('class', 'axis')
+			.attr('transform', 'translate(0,' + this.y(0) + ')')
+			.attr('class', 'axis xAxis')
 			.call(this.xAxis);
+
+			// remove every other xTickLabel
+			var ticks = d3.selectAll('.xAxis').selectAll(".tick text");
+			ticks.attr("class", function(d,i){
+			    if(i%2 != 0) d3.select(this).remove();
+			});
 
 		this.xLabel = this.wrapper.append("text")
 			.attr("class", "xAxisLabel")
-			.text("ppm error")
+			.text("Intensity")
 			.attr("dy","2.4em")
 			.style("text-anchor","middle").style("pointer-events","none");
 		this.xLabel.attr("x", this.width/2).attr("y", this.height);
 
 		// draw the y axis
-		self.yAxis = d3.svg.axis().scale(this.y).ticks(this.yTicks).orient("left").tickFormat(d3.format("s"));
+		self.yAxis = d3.svg.axis().scale(this.y).ticks(yTicks).orient("left").tickFormat(d3.format("s"));
 
 		this.yAxisSVG = this.wrapper.append('g')
 			.attr('transform', 'translate(0,0)')
 			.attr('class', 'axis')
-			.call(this.yAxis);
+			.call(this.yAxis)
+		;
 
+		var yLabelText = self.absolute ? "absolute " : "";
+		yLabelText += "error (" + this.model.MSnTolerance.unit + ")";
 		this.yLabel = this.wrapper.append("g").append("text")
 			.attr("class", "axis")
-			.text("Intensity")
-			.style("text-anchor","middle").style("pointer-events","none");
+			.text( yLabelText)
+			.style("text-anchor","middle").style("pointer-events","none")
+		;
 
 		this.yLabel.attr("transform","translate(" + -50 + " " + this.height/2+") rotate(-90)");
-
-		this.wrapper.selectAll('.axis line, .axis path')
-				.style({'stroke': 'Black', 'fill': 'none', 'stroke-width': '1.2px'});
-
-		this.g = this.wrapper.append('g');
-
-		this.background = this.g.append("rect")
-			.style("fill", "white")
-			.attr("width", this.width)
-			.attr("height", 0);
-
-		this.background.on("click", function(){
-			this.model.clearStickyHighlights();
-		}.bind(this)); 
 
 		var p1color = this.model.p1color;
 		var p2color = this.model.p2color;
 
+		this.g = this.wrapper.append('g');
+
 		this.highlights = this.g.selectAll('scatter-dot-highlights')
 			.data(this.data)
 			.enter().append('circle')
-			.attr("cx", function (d) { return self.x(d['error']); } )
-		 	.attr("cy", function (d) { return self.y(d['intensity']); } )
+			.attr("cx", function (d) { return self.x(d['intensity']); } )
+		 	.attr("cy", function (d) { return self.y(d['y']); } )
 			.style('fill', this.model.highlightColour)
 			.style('opacity', 0)
 			.style('pointer-events', 'none')
@@ -194,14 +214,14 @@ var ErrorIntensityPlotView = Backbone.View.extend({
 		this.datapoints = this.g.selectAll('scatter-dots')
 			.data(this.data)
 			.enter().append('circle')
-			.attr("cx", function (d) { return self.x(d['error']); } )
-			.attr("cy", function (d) { return self.y(d['intensity']); } )
+			.attr("cx", function (d) { return self.x(d['intensity']); } )
+			.attr("cy", function (d) { return self.y(d['y']); } )
 			.attr('id', function (d) { return d.fragId })
 			.style("cursor", "pointer")
 			.style("fill-opacity", 0)
 			.style("stroke-width", 1)
-			.style("fill", function(d) { return getColor(d); }) 
-			.style("stroke", function(d) { return getColor(d); }) 
+			.style("fill", function(d) { return getColor(d); })
+			.style("stroke", function(d) { return getColor(d); })
 			.on("mouseover", function(d) {
 				var evt = d3.event;
 				self.model.addHighlight([self.model.fragments[d.fragId]]);
@@ -217,16 +237,16 @@ var ErrorIntensityPlotView = Backbone.View.extend({
 			})
 			.attr("r", 3);
 
-		function getColor(d){ 
-		  if (d.lossy){  
-		    if (d['peptideId'] == 0) return self.model.p1color_loss; 
-		    else return self.model.p2color_loss; 
-		  } 
-		  else{ 
-		    if (d['peptideId'] == 0) return self.model.p1color; 
-		    else return self.model.p2color;           
-		  } 
-		}; 
+		function getColor(d){
+		  if (d.lossy){
+		    if (d['peptideId'] == 0) return self.model.p1color_loss;
+		    else return self.model.p2color_loss;
+		  }
+		  else{
+		    if (d['peptideId'] == 0) return self.model.p1color;
+		    else return self.model.p2color;
+		  }
+		};
 
 		this.updateHighlights();
 
@@ -237,16 +257,16 @@ var ErrorIntensityPlotView = Backbone.View.extend({
 			return
 
 		var contents = [["charge", data.charge], ["error", data.error.toFixed(3)], ["Int", data.intensity.toFixed(0)]];
-		
+
 		var fragId = data.fragId;
 		var fragments = this.model.fragments.filter(function(d) { return d.id == fragId; });
 		var header = [[fragments[0].name]];
-		
+
 		//Tooltip
 		if (CLMSUI.compositeModelInst !== undefined){
 			this.tooltip.set("contents", contents )
 				.set("header", header.join(" "))
-				.set("location", {pageX: x, pageY: y});	
+				.set("location", {pageX: x, pageY: y});
 		}
 		else{
 			var html = header.join(" ");
@@ -255,11 +275,11 @@ var ErrorIntensityPlotView = Backbone.View.extend({
 				html += contents[i].join(": ");
 			}
 			this.tooltip.html(html);
-			this.tooltip.transition()		
-				.duration(200)		
-				.style("opacity", .9);		
-			this.tooltip.style("left", (x + 15) + "px")		
-				.style("top", y + "px");	
+			this.tooltip.transition()
+				.duration(200)
+				.style("opacity", .9);
+			this.tooltip.style("left", (x + 15) + "px")
+				.style("top", y + "px");
 		}
 
 	},
@@ -297,8 +317,6 @@ var ErrorIntensityPlotView = Backbone.View.extend({
 
 	clearHighlights: function(){
 
-
-
 		this.highlights[0].forEach(function(circle){
 			circle.style.opacity = 0;
 		})
@@ -308,14 +326,15 @@ var ErrorIntensityPlotView = Backbone.View.extend({
 		})
 	},
 
-
 	updateHighlights: function(){
 		this.clearHighlights();
 		for (var i = this.model.highlights.length - 1; i >= 0; i--) {
 			this.startHighlight(this.model.highlights[i].id);
 		};
-		
-
 	},
 
+	toggleAbsErr: function(checked){
+		this.absolute = checked;
+		this.render();
+	},
 });
