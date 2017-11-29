@@ -98,8 +98,8 @@ var ErrorIntensityPlotView = Backbone.View.extend({
 		fragments.forEach(function(fragment){
 			var peptideId = fragment.peptideId;
 			var fragId = fragment.id;
-			var lossy = false;
-      		if (fragment.type.includes("Loss"))
+			var lossy = false; 
+      		if (fragment.type.indexOf("Loss") >= 0)  
         		lossy = true;
 			fragment.clusterInfo.forEach(function(cluster){
 				var firstPeakId = self.model.JSONdata.clusters[cluster.Clusterid].firstPeakId;
