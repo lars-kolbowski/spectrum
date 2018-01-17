@@ -26,7 +26,7 @@ function pep_to_array($pep){
 		array_push($pep_array, array('aminoAcid' => $letter, 'Modification' => ''));
 	}
 
-	preg_match_all('/[(.)a-z0-9]+/', $pep, $matches, PREG_OFFSET_CAPTURE);
+	preg_match_all('/[^A-Z]+/', $pep, $matches, PREG_OFFSET_CAPTURE);
 
 	$offset = 1;
 	foreach ($matches[0] as $matchgroup) {

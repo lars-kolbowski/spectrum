@@ -17,7 +17,7 @@ var PepInputView = Backbone.View.extend({
 
     for (var i = 0; i < pepStrs.length; i++) {
 
-      var pep_noMods = pepStrs[i].replace(/([^#0-9])([().a-z0-9]+)/g, '$1');
+      var pep_noMods = pepStrs[i].replace(/([^#0-9])([^A-Z#]+)/g, '$1');
 
       //linkSite
       var cl_re = /#([0-9]+)?/g;
@@ -37,7 +37,7 @@ var PepInputView = Backbone.View.extend({
       //add in mods
       var pep_noCL = pepStrs[i].replace(cl_re, "");
       var modifications = [];
-      var mod_re = /([().a-z0-9]+)/g;
+      var mod_re = /([^A-Z#]+)/g;
       var offset = 1;
       while ((match = mod_re.exec(pep_noCL)) != null) {
         peptide['sequence'][match.index-offset].Modification = match[1];
