@@ -181,10 +181,10 @@ var SpectrumSettingsView = CLMSUI.utils.BaseFrameView.extend({
 					.attr("autocomplete", "off")
 					.attr("name", "clModMass")
 					.attr("required", "")
-					.attr("type", "text")
-					// .attr("type", "number")
-					// .attr("step", "0.001")
-					// .attr("class", "stepInput")
+					// .attr("type", "text")
+					.attr("type", "number")
+					.attr("step", "0.001")
+					.attr("class", "stepInput")
 			;
 
 			//modTable
@@ -553,6 +553,7 @@ var SpectrumSettingsView = CLMSUI.utils.BaseFrameView.extend({
 				var stepSize = 1;
 			}
 			$target.attr('step', stepSize);
+			$target.attr('value', $target.prop('value'));
 		},
 
 		changeTab: function(e) {
