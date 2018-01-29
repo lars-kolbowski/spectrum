@@ -39,7 +39,7 @@ var SpectrumSettingsView = CLMSUI.utils.BaseFrameView.extend({
 			'click #toggleCustomCfgHelp' : 'toggleCustomCfgHelp',
 			'click #settingsCustomCfgApply' : 'applyCustomCfg',
 			'submit #settingsForm' : 'applyData',
-			'keyup .stepInput' : 'updateStepSize',
+			'keyup .stepInput' : 'updateStepSizeKeyUp',
 			'change .ionSelectChkbox': 'updateIons'
 		});
 	},
@@ -181,7 +181,6 @@ var SpectrumSettingsView = CLMSUI.utils.BaseFrameView.extend({
 					.attr("autocomplete", "off")
 					.attr("name", "clModMass")
 					.attr("required", "")
-					// .attr("type", "text")
 					.attr("type", "number")
 					.attr("step", "0.001")
 					.attr("class", "stepInput")
@@ -526,6 +525,10 @@ var SpectrumSettingsView = CLMSUI.utils.BaseFrameView.extend({
 				$(this.crossLinkerModMassWrapper[0][0]).hide();
 			else
 				$(this.crossLinkerModMassWrapper[0][0]).show();
+
+			this.updateStepSize($(this.toleranceValue[0][0]));
+			this.updateStepSize($(this.crossLinkerModMass[0][0]));
+
 		},
 
 		cancel: function(){
@@ -544,11 +547,15 @@ var SpectrumSettingsView = CLMSUI.utils.BaseFrameView.extend({
 			$('#customCfgHelp').toggle();
 		},
 
-		updateStepSize: function(e){
-			var $target = $(e.target);
+		updateStepSizeKeyUp: function(e){
+			this.updateStepSize($(e.target));
+		},
+
+		updateStepSize: function($target){
+			// var $target = $(e.target);
 			//update stepsize
-			if ($target.val().toString().split('.')[1])
-				var stepSize = '0.'+'0'.repeat($target.val().toString().split('.')[1].length - 1) + 1;
+			if ($target.prop('value').toString().split('.')[1])
+				var stepSize = '0.'+'0'.repeat($target.prop('value').toString().split('.')[1].length - 1) + '1';
 			else {
 				var stepSize = 1;
 			}
