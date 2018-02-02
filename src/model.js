@@ -433,7 +433,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 			massArr[i] = h2o;
 			for (var j = 0; j < this.peptides[i].sequence.length; j++) {
 				var AA = this.peptides[i].sequence[j].aminoAcid;
-				massArr[i] += mA[aastr.indexOf(AA.charAt(i))];
+				massArr[i] += mA[aastr.indexOf(AA)];
 				//mod
 				var mod = this.peptides[i].sequence[j].Modification;
 				for (var k = 0; k < this.knownModifications['modifications'].length; k++) {
