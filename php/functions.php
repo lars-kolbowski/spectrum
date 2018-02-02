@@ -6,10 +6,13 @@ function get_link_sites($pep, $pep_index){
 	$pep_nomods = preg_replace ( '/[a-z0-9]+/' , '' , $pep);
 	preg_match_all( "/#[0-9]?/" , $pep_nomods, $matches, PREG_OFFSET_CAPTURE);
 
+	if (sizeof($matches[0]) == 0){
+		array_push($linkSitesArr, array('id' => -1, 'peptideId' => $pep_index, 'linkSite' => -1));
+	}
+
 	foreach ($matches[0] as $matchgroup) {
 		//extract cl number
 		$cl_index = (preg_match("/[0-9]+/", $matchgroup[0], $match) != 0) ? $match : 0;
-
 		array_push($linkSitesArr, array('id' => $cl_index, 'peptideId' => $pep_index, 'linkSite' => $matchgroup[1]-1));
 	}
 
