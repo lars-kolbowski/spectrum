@@ -174,8 +174,8 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 	},
 
 	setZoom: function(domain){
-		this.xmin = domain[0].toFixed(1);
-		this.xmax = domain[1].toFixed(1);
+		this.xmin = domain[0].toFixed(0);
+		this.xmax = domain[1].toFixed(0);
 		this.trigger("changed:Zoom");
 	},
 
@@ -444,25 +444,20 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		}
 
 		var totalMass = 0;
-
-
+		var clModMass = 0;
 		if(this.get("clModMass") !== undefined)
 			var clModMass = parseInt(this.get("clModMass"));
-		else if (this.annotationData !== undefined)
+		else if (this.annotationData['cross-linker'] !== undefined)
 			var clModMass = this.annotationData['cross-linker'].modMass;
 
-
-		if(clModMass !== undefined){
 			for (var i = 0; i < massArr.length; i++) {
-				totalMass += massArr[i];
-			}
+			totalMass += massArr[i];
+		}
+		// NOT Multilink future proof
+		if (this.JSONdata.LinkSite[0].linkSite != -1 && this.JSONdata.LinkSite[1].linkSite != -1)
 			totalMass += clModMass;
-			this.mass = [totalMass];
-		}
-		else{
-			this.mass = massArr;
-		}
-		console.log(this.mass);
+		this.mass = totalMass
+		// console.log(this.mass);
 		this.trigger("changed:mass");
 	},
 
