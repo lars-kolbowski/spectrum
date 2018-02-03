@@ -18,6 +18,8 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		this.moveLabels = false;
 		this.measureMode = false;
 		this.showSpectrum = true;
+		this.showAllFragmentsHighlight = true;
+
 		if (_.isUndefined(Cookies.get('customMods')))
 			this.userModifications = [];
 		else
