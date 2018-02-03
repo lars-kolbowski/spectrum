@@ -27,6 +27,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		});
 
 		//ToDo: change JSONdata gets called 3 times for some reason?
+		// define event triggers and listeners better
 		this.on("change:JSONdata", function(){
 			var json = this.get("JSONdata");
 			if (typeof json !== 'undefined'){
@@ -55,7 +56,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 	},
 
 	setData: function(){
-
+		this.changedAnnotation = false;
 		if (this.get("JSONdata") == null){
 			this.trigger("changed:data");
 			return
@@ -69,12 +70,13 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		this.match = this.get("match");
 		this.randId = this.get("randId");
 		//console.log(this.JSONdata);
-		this.annotationData = this.JSONdata.annotation;
+		this.annotationData = this.JSONdata.annotation || {};
 
 		//overwrite xiKnownModifications with data from input
-		this.updateKnownModifications();
+		// DON'T USE in xiUI! ToDo: need to find a better way to handle this that can be applied to both
+		// this.updateKnownModifications();
 
-		if (this.annotationData !== undefined){
+		if (this.annotationData.fragementTolerance !== undefined){
 			this.MSnTolerance = {
 				"value": parseFloat(this.annotationData.fragementTolerance.split(" ")[0]),
 				"unit": this.annotationData.fragementTolerance.split(" ")[1]
@@ -256,7 +258,6 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 	},
 
 	changeLinkPos: function(newLinkSites){
-
 		if(this.get("JSONrequest") !== undefined){
 			json_req = this.get("JSONrequest");
 			for (var i = 0; i < newLinkSites.length; i++) {
@@ -287,11 +288,12 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 			this.setData();
 		}
 
+		this.trigger("changed:annotation");
+		this.changedAnnotation = true;
 	},
 
 
 	changeMod: function(oldPos, newPos, oldPepIndex, newPepIndex){
-
 		if(this.get("JSONrequest") !== undefined){
 			json_req = this.get("JSONrequest");
 			//standalone
@@ -339,7 +341,8 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 			this.setData();
 		}
 
-
+		this.trigger("changed:annotation");
+		this.changedAnnotation = true;
 	},
 
 	matchMassToAA: function(delta, peak) {
@@ -450,12 +453,14 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		else if (this.annotationData['cross-linker'] !== undefined)
 			var clModMass = this.annotationData['cross-linker'].modMass;
 
-			for (var i = 0; i < massArr.length; i++) {
+		for (var i = 0; i < massArr.length; i++) {
 			totalMass += massArr[i];
 		}
 		// NOT Multilink future proof
-		if (this.JSONdata.LinkSite[0].linkSite != -1 && this.JSONdata.LinkSite[1].linkSite != -1)
-			totalMass += clModMass;
+		if(this.JSONdata.LinkSite.length > 0){
+			if (this.JSONdata.LinkSite[0].linkSite != -1 && this.JSONdata.LinkSite[1].linkSite != -1)
+				totalMass += clModMass;
+		}
 		this.mass = totalMass
 		// console.log(this.mass);
 		this.trigger("changed:mass");
@@ -505,11 +510,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		}
 	},
 
-	updateUserModifications: function(mod, saveToCookie){
-        
-        if (saveToCookie === undefined) {
-            saveToCookie = true;
-        }
+	updateUserModifications: function(mod, saveToCookie=true){
 
 		var userMod = this.userModifications.filter(function(m){ return mod.id == m.id;});
 		if (userMod.length > 0){
@@ -531,12 +532,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		Cookies.set('customMods', cookie);
 	},
 
-	delUserModification: function(modId, saveToCookie){
-        
-        if (saveToCookie === undefined) {
-            saveToCookie = true;
-        }
-        
+	delUserModification: function(modId, saveToCookie=true){
 		var userModIndex = this.userModifications.findIndex(function(m){ return modId == m.id;});
 		if (userModIndex != -1){
 			this.userModifications.splice(userModIndex, 1);
@@ -549,11 +545,11 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 
 	request_annotation: function(json_request){
 
+		this.trigger('request_annotation:pending');
 		console.log("annotation request:", json_request);
 		var self = this;
 		var response = $.ajax({
 			type: "POST",
-			datatype: "jsonp",
 			headers: {
 			    'Accept': 'application/json',
 			    'Content-Type': 'application/json'
@@ -572,8 +568,9 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 					self.otherModel.set({"JSONdata": json_data_copy, "JSONrequest": json_request});
 					self.otherModel.trigger("change:JSONdata");
 				}
+				self.trigger('request_annotation:done');
 			}
 		});
-
-	}
+	},
+	
 });
