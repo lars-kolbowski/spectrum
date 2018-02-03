@@ -38,10 +38,10 @@ Graph = function(targetSvg, model, options) {
 				.attr("class", "spectrum")
 				.attr("id", "spectrumGraph");
 
-	
+
 	this.xaxisSVG = this.g.append("g")
 		.attr("class", "x axis");
-		//~ 
+		//~
 	/*
 	 * -webkit-user-select: none;
 			-khtml-user-select: none;
@@ -59,45 +59,45 @@ Graph = function(targetSvg, model, options) {
 					.attr("opacity", 0)
 					.attr("pointer-events", "visible")
 					.style("cursor", "crosshair");
-	this.xaxisRect.call(this.brush);	
-	//~ this	
-		
+	this.xaxisRect.call(this.brush);
+	//~ this
+
 	this.yAxisLeftSVG = this.g.append("g")
 		.attr("class", "y axis");
 	this.yAxisRightSVG = this.g.append("g")
 		.attr("class", "y axis");
 	this.plot = this.g.append("rect")
-		.style("fill", "white")
+		.style("fill", "transparent")
 		.attr("pointer-events", "visible");
 
 	this.measureBackground = this.g.append("rect")
 		.attr("width", "0")
-		.style("fill", "white")
+		.style("fill", "transparent")
 		.style("cursor", "crosshair")
 		.attr("pointer-events", "visible");
 
 	this.innerSVG = this.g.append("g")
 		.attr("class", "innerSpectrum");
-	this.dragZoomHighlight = this.innerSVG.append("rect").attr("y", 0).attr("width", 0).attr("fill","#addd8e");	
-	
+	this.dragZoomHighlight = this.innerSVG.append("rect").attr("y", 0).attr("width", 0).attr("fill","#addd8e");
+
 	this.plot.on("click", function(){
 		this.model.clearStickyHighlights();
 	}.bind(this));
 
 	//Tooltip
 	if (CLMSUI.compositeModelInst !== undefined)
-		this.tooltip = CLMSUI.compositeModelInst.get("tooltipModel");		
+		this.tooltip = CLMSUI.compositeModelInst.get("tooltipModel");
 	else{
 		target = this.g.node().parentNode.parentNode; //this would get you #spectrumPanel
 		this.tooltip = d3.select(target).append("span")
 			.style("font-size", "small")
 			.style("padding", "0 5px")
-			.style("border-radius", "6px")		
+			.style("border-radius", "6px")
 			.attr("class", "tooltip")
 			.style("background-color", "black")
 			.style("color", "#ccc")
 			.style("pointer-events", "none")
-			.style("position", "absolute")				
+			.style("position", "absolute")
 			.style("opacity", 0)
 			.style("z-index", 1);
 	}
@@ -127,11 +127,11 @@ Graph = function(targetSvg, model, options) {
 
 
 	this.highlights = this.innerSVG.append("g").attr("class", "peakHighlights");
-	this.peaks = this.innerSVG.append("g").attr("class", "peaks");
+	this.peaksSVG = this.innerSVG.append("g").attr("class", "peaks");
 	this.lossyAnnotations = this.innerSVG.append("g").attr("class", "lossyAnnotations");
 	this.annotations = this.innerSVG.append("g").attr("class", "annotations");
-	
-	
+
+
 	// add Chart Title
 	if (options.title) {
 		this.title = this.g.append("text")
@@ -164,21 +164,21 @@ Graph = function(targetSvg, model, options) {
 	}
 
 	this.zoom = d3.behavior.zoom().x(this.x).on("zoom", this.redraw());
-	
+
 };
 
 Graph.prototype.setData = function(){
-	//create points array with Peaks
-	this.points = new Array();
+	//create peaks array with Peaks
+	this.peaks = new Array();
 	this.pep1 = this.model.pep1;
 	this.pep2 = this.model.pep2;
     if (this.model.JSONdata) {
         for (var i = 0; i < this.model.JSONdata.peaks.length; i++){
         		var peak = this.model.JSONdata.peaks[i];
-            this.points.push(new Peak(i, this));
+            this.peaks.push(new Peak(i, this));
         }
 
-        this.model.points = this.points;
+        this.model.peaks = this.peaks;
         this.updatePeakColors();
     }
     if(this.model.lockZoom){
@@ -195,14 +195,14 @@ Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 	var self = this;
 	//reset measureTool
 	if(this.model.measureMode)
-		this.measureClear();	
+		this.measureClear();
 	//see https://gist.github.com/mbostock/3019563
 	var cx = self.g.node().parentNode.parentNode.clientWidth;
 	//somewhere around here I think we need to subtract the height of the FragKey?
 	// ...the graph is not fitting entirely within its SVG element
-	var fragKeyHeight = 100;//can tidy this up somehow 
+	var fragKeyHeight = 100;//can tidy this up somehow
 	var cy = self.g.node().parentNode.parentNode.clientHeight;// - fragKeyHeight;
-	
+
 	//self.g.attr("width", cx).attr("height", cy);
 	var width = cx - self.margin.left - self.margin.right;
 	var height = cy - self.margin.top  - self.margin.bottom;
@@ -220,9 +220,9 @@ Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 	var xTicks = width / 100;
 
 	this.yTicks = yTicks;
-	
+
 	self.yAxisLeft = d3.svg.axis().scale(self.y).ticks(yTicks).orient("left").tickFormat(d3.format("s"));
-	self.yAxisRight = d3.svg.axis().scale(self.y_right).ticks(yTicks).orient("right").tickFormat(d3.format("s")); 
+	self.yAxisRight = d3.svg.axis().scale(self.y_right).ticks(yTicks).orient("right").tickFormat(d3.format("s"));
 
 	self.yAxisLeftSVG.call(self.yAxisLeft);
 	self.yAxisRightSVG
@@ -232,23 +232,23 @@ Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 	self.xaxisRect.attr("width", width);
 
 	self.xAxis = d3.svg.axis().scale(self.x).ticks(xTicks).orient("bottom");
-		
+
 	self.xaxisSVG.attr("transform", "translate(0," + height + ")")
 		.call(self.xAxis);
-	
+
 	this.g.selectAll('.axis line, .axis path')
 			.style({'stroke': 'Black', 'fill': 'none', 'stroke-width': '1.2px'});
-	
+
 	//~ this.g.selectAll('.tick')
 		//~ .attr("pointer-events", "none");
-		
+
 	self.plot.attr("width", width)
 		.attr("height", height);
-	
+
 	self.xaxisRect.attr("width",width).attr("y", height).attr("height", self.margin.bottom);
 	self.dragZoomHighlight.attr("height", height);
-	
-	self.zoom = d3.behavior.zoom().x(self.x).on("zoom", self.redraw());			
+
+	self.zoom = d3.behavior.zoom().x(self.x).on("zoom", self.redraw());
 	self.zoom.scaleExtent([0, self.model.xmaxPrimary]);
 	self.plot.call(self.zoom);
 	//self.innerSVG.call(self.zoom);
@@ -260,7 +260,7 @@ Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 	this.ylabelLeft.attr("transform","translate(" + -50 + " " + height/2+") rotate(-90)");
 	this.ylabelRight.attr("transform","translate(" + (width+45) + " " + height/2+") rotate(-90)");
 
-	
+
 	self.redraw()();
 }
 
@@ -305,17 +305,17 @@ Graph.prototype.enableZoom = function(){
 	  self.model.xmin = s[0];
 	  self.model.xmax = s[1]; //--
 	  self.resize(self.model.xmin, self.model.xmax, self.model.ymin, self.model.ymax);
-	}		
+	}
 }
 
 Graph.prototype.measure = function(on){
 	if (on === true){
 		var self = this;
-    	self.measureBackground 
-      		.attr("width", self.plot[0][0].getAttribute("width")) 
+    	self.measureBackground
+      		.attr("width", self.plot[0][0].getAttribute("width"))
       		.attr("height", self.plot[0][0].getAttribute("height"));
 
-		self.peaks.style("pointer-events", "none");		//disable peak highlighting
+		self.peaksSVG.style("pointer-events", "none");		//disable peak highlighting
 
 		self.disableZoom();
 
@@ -327,9 +327,9 @@ Graph.prototype.measure = function(on){
 			var mouseX = self.x.invert(coords[0]);
 			var distance = 100;
 			var highlighttrigger = 10;
-			var peakCount = self.points.length;
+			var peakCount = self.peaks.length;
 			for (var p = 0; p < peakCount; p++) {
-				var peak = self.points[p];
+				var peak = self.peaks[p];
 				if (_.intersection(self.model.highlights, peak.fragments).length != 0 && Math.abs(peak.x - mouseX)  < highlighttrigger){
 					self.measureStartPeak = peak;
 					break;
@@ -365,9 +365,9 @@ Graph.prototype.measure = function(on){
 			var distance = 2;
 			var highlighttrigger = 15;	//triggerdistance to prioritize highlighted peaks as endpoint
 			var triggerdistance = 10;	//triggerdistance to use peak as endpoint
-			var peakCount = self.points.length;
+			var peakCount = self.peaks.length;
 			for (var p = 0; p < peakCount; p++) {
-				var peak = self.points[p];
+				var peak = self.peaks[p];
 				if (peak != self.measureStartPeak){
 					if (_.intersection(self.model.highlights, peak.fragments).length != 0 && Math.abs(peak.x - mouseX)  < highlighttrigger){
 						var endPeak = peak;
@@ -379,7 +379,7 @@ Graph.prototype.measure = function(on){
 					}
 				}
 			}
-			
+
 			//draw vertical end Line
 			if(endPeak){
 				//check if distance matches the mass of an aminoAcid
@@ -432,7 +432,7 @@ Graph.prototype.measure = function(on){
 			else
 				var labelX = measureEndX + deltaX/2;
 
-			self.measureDistance.text(distance.toFixed(self.model.showDecimals)+" Th");		
+			self.measureDistance.text(distance.toFixed(self.model.showDecimals)+" Th");
 			//var PeakInfo = distance.toFixed(2)+" Th<br/>"
 			var PeakInfo = ""
 			if(self.measureStartPeak.fragments.length > 0)
@@ -440,7 +440,7 @@ Graph.prototype.measure = function(on){
 			else if (self.measureStartPeak.isotopes.length > 0)
 					PeakInfo += "From: <span style='color:"+ self.measureStartPeak.colour +"'>" + self.measureStartPeak.isotopes[0].name + "+" + self.measureStartPeak.isotopenumbers[0]+ "</span> (" + self.measureStartPeak.x.toFixed(self.model.showDecimals) + " m/z)";
 			else
-				PeakInfo += "From: Peak (" + self.measureStartPeak.x.toFixed(self.model.showDecimals) + " m/z)"; 
+				PeakInfo += "From: Peak (" + self.measureStartPeak.x.toFixed(self.model.showDecimals) + " m/z)";
 			if(endPeak){
 				if(endPeak.fragments.length > 0)
 						PeakInfo += "<br/>To: <span style='color:"+ endPeak.colour +"'>" + endPeak.fragments[0].name +"</span> (" + endPeak.x.toFixed(self.model.showDecimals) + " m/z)";
@@ -455,10 +455,10 @@ Graph.prototype.measure = function(on){
             }
 			PeakInfo += "<br/><br/><p style='font-size:0.8em'>";
 			for(i=1; i<7; i++){
-			PeakInfo += "z = "+i+": "+(distance*i).toFixed(self.model.showDecimals)+" Da</br>";	
+			PeakInfo += "z = "+i+": "+(distance*i).toFixed(self.model.showDecimals)+" Da</br>";
 			}
 			PeakInfo += "</p>";
-			
+
 
 
 			var matrix = this.getScreenCTM()
@@ -489,7 +489,7 @@ Graph.prototype.measure = function(on){
                 pBCR = pBCR || {top: 0, left: 0};
                 return {top: svgBCR.top - pBCR.top, left: svgBCR.left - pBCR.left};
             }
-            
+
             var svgNode = self.g.node().parentNode;
             var rectBounds = this.getBoundingClientRect();
             var svgBounds = svgNode.getBoundingClientRect();
@@ -500,17 +500,17 @@ Graph.prototype.measure = function(on){
             rectOffY += svgOffset.top;
             rectOffX += positionX;
             rectOffY += y + 10; // the offset of the drag in the rect
-            
+
             self.measureDistance.attr("x", positionX).attr("y", coords[1]-10)
 			self.measureInfo
 				.style("display", "inline")
 				.html(PeakInfo)
-            	.style("left", 
+            	.style("left",
                     rectOffX +"px"
                 )
             	.style("top",
                        rectOffY + "px"
-                );		  
+                );
 		}
 
 		this.measureBrush = d3.svg.brush()
@@ -523,7 +523,7 @@ Graph.prototype.measure = function(on){
 	}
 	else{
 		this.measureClear();
-		this.peaks.style("pointer-events", "visible");
+		this.peaksSVG.style("pointer-events", "visible");
 		this.measureBackground.attr("height", 0);
 		this.enableZoom();
 	}
@@ -533,7 +533,7 @@ Graph.prototype.measureClear = function(){
 	this.measuringTool.attr("display","none");
 	this.measureDistance.attr("display","none");
 	this.measureInfo.style("display","none");
-	
+
 }
 
 Graph.prototype.redraw = function(){
@@ -545,21 +545,21 @@ Graph.prototype.redraw = function(){
 		//adjust y scale to new highest intensity
 
 		//self.measureClear();
-		if (self.points) {
+		if (self.peaks) {
 			var ymax = 0
 			var xDomain = self.x.domain();
-			for (var i = 0; i < self.points.length; i++){
-			  if (self.points[i].y > ymax && (self.points[i].x > xDomain[0] && self.points[i].x < xDomain[1]))
-			  	ymax = self.points[i].y;
+			for (var i = 0; i < self.peaks.length; i++){
+			  if (self.peaks[i].y > ymax && (self.peaks[i].x > xDomain[0] && self.peaks[i].x < xDomain[1]))
+			  	ymax = self.peaks[i].y;
 			}
 			//console.log(ymax);
 			self.y.domain([0, ymax/0.95]);
 			self.y_right.domain([0, (ymax/(self.model.ymaxPrimary*0.95))*100]);
 			self.yAxisLeftSVG.call(self.yAxisLeft);
 			self.yAxisRightSVG.call(self.yAxisRight);
-			for (var i = 0; i < self.points.length; i++){
-				self.points[i].update();
-			}			
+			for (var i = 0; i < self.peaks.length; i++){
+				self.peaks[i].update();
+			}
 		}
 		self.xaxisSVG.call( self.xAxis);
 		if (self.model.measureMode)
@@ -574,88 +574,90 @@ Graph.prototype.redraw = function(){
 Graph.prototype.clear = function(){
 	this.model.measureMode = false;
 	this.measure(false);
-	this.points= [];
+	this.peaks = [];
 	this.highlights.selectAll("*").remove();
-	this.peaks.selectAll("*").remove();
+	this.peaksSVG.selectAll("*").remove();
 	this.lossyAnnotations.selectAll("*").remove();
 	this.annotations.selectAll("*").remove();
 }
 
 
 Graph.prototype.clearHighlights = function(peptide, pepI){
-	var peakCount = this.points.length;
+	var peakCount = this.peaks.length;
 	for (var p = 0; p < peakCount; p++) {
-		if (this.points[p].fragments.length > 0 && !_.contains(this.model.sticky, this.points[p].fragments[0])) {
-			this.points[p].highlight(false);
+		if (this.peaks[p].fragments.length > 0 && !_.contains(this.model.sticky, this.peaks[p].fragments[0])) {
+			this.peaks[p].highlight(false);
 		}
 	}
 }
 
 Graph.prototype.updatePeakColors = function(){
-	var peakCount = this.points.length;
+	var peakCount = this.peaks.length;
 
-	if (this.model.highlights.length == 0){
+	if (this.model.highlights.length == 0 || this.model.showAllFragmentsHighlight){
 		for (var p = 0; p < peakCount; p++) {
-			this.points[p].line.attr("stroke", this.points[p].colour);
+			this.peaks[p].line.attr("stroke", this.peaks[p].colour);
 		}
 	}
 	else{
-		var self = this; 
-		//var curPeaks = this.points.filter(function(peak){ if (peak.x > self.x.domain()[0] && peak.x < self.x.domain()[1]) return peak; })
+		var self = this;
 		var highlightClusterIds = [].concat.apply([], this.model.highlights.map(function(h){ return h.clusterIds;}));
-		this.points.forEach(function(p){
+		this.peaks.forEach(function(p){
 			if (_.intersection(self.model.highlights, p.fragments).length > 0 || _.intersection(highlightClusterIds, p.clusterIds).length > 0)
 				p.line.attr("stroke", p.colour);
 			else
 				p.line.attr("stroke", self.model.peakColour);
-						
+
 		});
 
-		// for (var p = 0; p < peakCount; p++) {
-		// 	if (_.intersection(this.model.highlights, this.points[p].fragments).length == 0)
-		// 		this.points[p].line.attr("stroke", this.model.peakColour);
-		// 	else
-		// 		this.points[p].line.attr("stroke", this.points[p].colour);
-		// }
 	}
 }
 
 Graph.prototype.updatePeakLabels = function(){
-	var peakCount = this.points.length;
+	var peakCount = this.peaks.length;
 
 	if (this.model.highlights.length == 0){
 		for (var p = 0; p < peakCount; p++) {
-			if (this.points[p].fragments.length > 0) {
-				this.points[p].removeLabels();
-				this.points[p].showLabels();
+			if (this.peaks[p].fragments.length > 0) {
+				this.peaks[p].removeLabels();
+				this.peaks[p].showLabels();
 			}
 		}
 	}
 	else{
 		for (var p = 0; p < peakCount; p++) {
-			if (_.intersection(this.model.highlights, this.points[p].fragments).length == 0)
-				this.points[p].removeLabels();
+			// if it's not a fragment from the highlight selection
+			if (_.intersection(this.model.highlights, this.peaks[p].fragments).length == 0){
+				// show it if allFragmentHighlights is true (dependent on lossyShown)
+				if (this.model.showAllFragmentsHighlight){
+					this.peaks[p].showLabels();
+				}
+				else{
+					this.peaks[p].removeLabels();
+				}
+			}
+			// if it is from the highlight selection force show all Labels overriding lossyShown
 			else{
-				this.points[p].removeLabels();
-				this.points[p].showLabels(true);
+				this.peaks[p].removeLabels();
+				this.peaks[p].showLabels(true);
 			}
 		}
 	}
 }
 
 Graph.prototype.updateColors = function(){
-	var peakCount = this.points.length;
+	var peakCount = this.peaks.length;
 		for (var p = 0; p < peakCount; p++) {
-			this.points[p].updateColor();
+			this.peaks[p].updateColor();
 		}
 }
 
 Graph.prototype.updateHighlightColors = function(){
-	var peakCount = this.points.length;
+	var peakCount = this.peaks.length;
 		for (var p = 0; p < peakCount; p++) {
-			if(this.points[p].highlightLine !== undefined){
-				this.points[p].highlightLine.attr("stroke", this.model.highlightColour);
-				this.points[p].labelHighlights.attr("stroke", this.model.highlightColour);
+			if(this.peaks[p].highlightLine !== undefined){
+				this.peaks[p].highlightLine.attr("stroke", this.model.highlightColour);
+				this.peaks[p].labelHighlights.attr("stroke", this.model.highlightColour);
 			}
 		}
 }
