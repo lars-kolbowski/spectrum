@@ -561,7 +561,10 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 	},
 
 	request_annotation: function(json_request){
- 		json_request.annotation.custom = json_request.annotation.custom.concat(this.customSettings);
+		if(json_request.annotation.custom === undefined)
+			json_request.annotation.custom = this.customSettings;
+		else
+			json_request.annotation.custom = json_request.annotation.custom.concat(this.customSettings);
 		this.trigger('request_annotation:pending');
 		console.log("annotation request:", json_request);
 		var self = this;
