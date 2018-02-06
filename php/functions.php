@@ -3,7 +3,8 @@
 function get_link_sites($pep, $pep_index){
 	$linkSitesArr = array();
 
-	$pep_nomods = preg_replace ( '/[a-z0-9]+/' , '' , $pep);
+	//ToDO: not future proof for multi-links
+	$pep_nomods = preg_replace ( '/[^A-Z#]+/' , '' , $pep);
 	preg_match_all( "/#[0-9]?/" , $pep_nomods, $matches, PREG_OFFSET_CAPTURE);
 
 	if (sizeof($matches[0]) == 0){
