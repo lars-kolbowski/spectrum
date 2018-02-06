@@ -287,21 +287,22 @@ var SpectrumSettingsView = CLMSUI.utils.BaseFrameView.extend({
 	applyCustomCfg: function(e){
 
 		this.model.otherModel.customSettings = $("#settingsCustomCfg-input").val().split("\n");
-		this.applyData(e);
-		this.render();
-// 		var json = this.model.get("JSONrequest");
-// 		if(this.model.MSnTolerance.unit == "ppm"){
-// 			json['annotation']['custom'] = ["LOWRESOLUTION:false"];	//ToDo: temp fix until new xiAnnotator version is released
-// 		}
-// 		else{
-// 			json['annotation']['custom'] = ["LOWRESOLUTION:true"];	//ToDo: temp fix until new xiAnnotator version is released
-// 		}
+		var json = this.model.get("JSONrequest");
+		// if(this.model.MSnTolerance.unit == "ppm"){
+		// 	json['annotation']['custom'] = ["LOWRESOLUTION:false"];	//ToDo: temp fix until new xiAnnotator version is released
+		// }
+		// else{
+		// 	json['annotation']['custom'] = ["LOWRESOLUTION:true"];	//ToDo: temp fix until new xiAnnotator version is released
+		// }
 
-// 		json['annotation']['custom'].concat($("#settingsCustomCfg-input").val().split("\n"));
+		json['annotation']['custom'] = $("#settingsCustomCfg-input").val().split("\n");
 
-// 		this.model.otherModel.request_annotation(json);
-// 		this.model.otherModel.changedAnnotation = true;
-// 		this.model.otherModel.trigger("changed:annotation");
+		this.model.otherModel.request_annotation(json);
+		this.model.otherModel.changedAnnotation = true;
+		this.model.otherModel.trigger("changed:annotation");
+
+		// this.render();
+
 	},
 
 	toggleView: function(){
@@ -313,7 +314,7 @@ var SpectrumSettingsView = CLMSUI.utils.BaseFrameView.extend({
 
 		e.preventDefault();
 
-		var form = document.getElementById('settingsForm');
+		var form = e.currentTarget;
 		//Todo error handling!
 		if(!this.checkInputsForValidity(form)){
 			console.log('Invalid character found in form');
@@ -335,8 +336,8 @@ var SpectrumSettingsView = CLMSUI.utils.BaseFrameView.extend({
 			success: function (response) {
 				var json = JSON.parse(response);
 				// json['annotation']['custom'] = "LOWRESOLUTION:false\n";	//ToDo: temp fix until new xiAnnotator version is released
-				self.model.otherModel.changedAnnotation = true;
 				self.model.otherModel.request_annotation(json);
+				self.model.otherModel.changedAnnotation = true;
 				self.model.otherModel.trigger("changed:annotation");
 				spinner.stop();
 				$('#settingsForm').show();
@@ -541,7 +542,8 @@ var SpectrumSettingsView = CLMSUI.utils.BaseFrameView.extend({
 		else
 			$(this.crossLinkerModMassWrapper[0][0]).show();
 
-		this.customConfigInput[0][0].value = this.model.otherModel.customSettings.join("\n");
+		if (this.model.JSONdata.annotation.custom !== undefined)
+			this.customConfigInput[0][0].value = this.model.JSONdata.annotation.custom.join("\n");
 
 		this.updateStepSize($(this.toleranceValue[0][0]));
 		this.updateStepSize($(this.crossLinkerModMass[0][0]));

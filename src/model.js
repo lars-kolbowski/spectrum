@@ -76,15 +76,6 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		this.highlights = Array();
 		this.JSONdata = this.get("JSONdata");
 		this.match = this.get("match");
-		if(!this.changedAnnotation){
-			if(this.match !== undefined){
-					this.customSettings = CLMSUI.compositeModelInst.get("clmsModel").get("searches").get(this.match.searchId).customsettings;
-					this.customSettings = this.customSettings.split("\n");
-			}
-			else{
-				this.customSettings = [""];
-			}
-		}
 		this.randId = this.get("randId");
 		//console.log(this.JSONdata);
 		this.annotationData = this.JSONdata.annotation || {};
@@ -130,9 +121,9 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		this.p2color = this.cmap[7];
 		this.p2color_cluster = this.cmap[5];
 		this.p2color_loss = this.cmap[6];
-		this.peakColour = "#ccc";
+		this.peakColour = "#a6a6a6";
 		this.highlightColour = "#FFFF00";
-		this.highlightWidth = 10;
+		this.highlightWidth = 8;
 
 		this.calcPrecursorMass();
 
@@ -561,10 +552,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 	},
 
 	request_annotation: function(json_request){
-		if(json_request.annotation.custom === undefined)
-			json_request.annotation.custom = this.customSettings;
-		else
-			json_request.annotation.custom = json_request.annotation.custom.concat(this.customSettings);
+// 		json_request.annotation.custom = json_request.annotation.custom.concat(this.customSettings);
 		this.trigger('request_annotation:pending');
 		console.log("annotation request:", json_request);
 		var self = this;
