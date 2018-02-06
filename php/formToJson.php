@@ -81,12 +81,12 @@ foreach ($_POST['ions'] as $iontype) {
 
 $cl = array('modMass' => $clModMass);
 
-if ($tolUnit == "Da"){
-  $customCfg = ["LOWRESOLUTION:true"];
-}
-else {
-  $customCfg = ["LOWRESOLUTION:false"];
-}
+// if ($tolUnit == "Da"){
+//   $customCfg = ["LOWRESOLUTION:true"];
+// }
+// else {
+//   $customCfg = ["LOWRESOLUTION:false"];
+// }
 
 $annotation = array(
   'fragmentTolerance' => $tol,
@@ -94,7 +94,7 @@ $annotation = array(
   'ions' => $ions,
   'cross-linker' => $cl,
   'precursorCharge' => $preCharge,
-  'custom' => $customCfg
+  // 'custom' => $customCfg
 );
 
 //final array
