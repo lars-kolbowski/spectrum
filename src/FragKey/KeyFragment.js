@@ -327,7 +327,7 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 
 		this.yText = this.g.append("text")
 			.attr("x", this.x - 2)
-			.attr("y", y - barHeight - 7)			
+			.attr("y", y - barHeight - 10)			
 			.style("font-size", "0.6em")
 			.style("fill", color)
 			.style("cursor", "default")
