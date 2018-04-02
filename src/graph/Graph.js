@@ -1,6 +1,6 @@
 //		a spectrum viewer
 //
-//      Copyright  2015 Rappsilber Laboratory, Edinburgh University
+//	  Copyright  2015 Rappsilber Laboratory, Edinburgh University
 //
 // 		Licensed under the Apache License, Version 2.0 (the "License");
 // 		you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ Graph = function(targetSvg, model, options) {
 	this.model = model;
 
 	this.margin = {
-		"top":    options.title  ? 130 : 110,
+		"top":	options.title  ? 130 : 110,
 		"right":  options.ylabelRight ? 60 : 45,
 		"bottom": options.xlabel ? 50 : 20,
 		"left":   options.ylabelLeft ? 65 : 30
@@ -38,16 +38,22 @@ Graph = function(targetSvg, model, options) {
 				.attr("class", "spectrum")
 				.attr("id", "spectrumGraph");
 
+	this.plot = this.g.append("rect")
+		.style("fill", "white")
+		.attr("pointer-events", "visible");
+
+	this.measureBackground = this.g.append("rect")
+		.attr("width", "0")
+		.style("fill", "white")
+		.style("cursor", "crosshair")
+		.attr("pointer-events", "visible");
+
+	this.innerSVG = this.g.append("g")
+		.attr("class", "innerSpectrum");
 
 	this.xaxisSVG = this.g.append("g")
 		.attr("class", "x axis");
-		//~
-	/*
-	 * -webkit-user-select: none;
-			-khtml-user-select: none;
-			-moz-user-select: -moz-none;
-			-o-user-select: none;
-			user-select: none;*/
+
 	//brush
 	this.brush = d3.svg.brush()
 		.x(this.x);
@@ -60,24 +66,12 @@ Graph = function(targetSvg, model, options) {
 					.attr("pointer-events", "visible")
 					.style("cursor", "crosshair");
 	this.xaxisRect.call(this.brush);
-	//~ this
 
 	this.yAxisLeftSVG = this.g.append("g")
 		.attr("class", "y axis");
 	this.yAxisRightSVG = this.g.append("g")
 		.attr("class", "y axis");
-	this.plot = this.g.append("rect")
-		.style("fill", "transparent")
-		.attr("pointer-events", "visible");
 
-	this.measureBackground = this.g.append("rect")
-		.attr("width", "0")
-		.style("fill", "transparent")
-		.style("cursor", "crosshair")
-		.attr("pointer-events", "visible");
-
-	this.innerSVG = this.g.append("g")
-		.attr("class", "innerSpectrum");
 	this.dragZoomHighlight = this.innerSVG.append("rect").attr("y", 0).attr("width", 0).attr("fill","#addd8e");
 
 	this.plot.on("click", function(){
@@ -88,8 +82,8 @@ Graph = function(targetSvg, model, options) {
 	if (CLMSUI.compositeModelInst !== undefined)
 		this.tooltip = CLMSUI.compositeModelInst.get("tooltipModel");
 	else{
-		target = this.g.node().parentNode.parentNode; //this would get you #spectrumPanel
-		this.tooltip = d3.select(target).append("span")
+		// target = this.g.node().parentNode.parentNode; //this would get you #spectrumPanel
+		this.tooltip = d3.select("body").append("span")
 			.style("font-size", "small")
 			.style("padding", "0 5px")
 			.style("border-radius", "6px")
@@ -102,7 +96,10 @@ Graph = function(targetSvg, model, options) {
 			.style("z-index", 1);
 	}
 
-
+	this.highlights = this.innerSVG.append("g").attr("class", "peakHighlights");
+	this.peaksSVG = this.innerSVG.append("g").attr("class", "peaks");
+	this.lossyAnnotations = this.innerSVG.append("g").attr("class", "lossyAnnotations");
+	this.annotations = this.innerSVG.append("g").attr("class", "annotations");
 
 	//MeasuringTool
 	this.measuringTool = this.innerSVG.append("g").attr("class", "measuringTool");
@@ -120,17 +117,27 @@ Graph = function(targetSvg, model, options) {
 	this.measureDistance = this.measuringTool.append("text")
 		.attr("text-anchor", "middle")
 		.attr("pointer-events", "none")
-	this.measureInfo =  d3.select("div#measureTooltip")
-		.style("font-size", "0.8em");
 
-	//------------------------------------
+	this.measureTooltip = this.measuringTool.append("g")
+		.attr("style", "text-anchor: middle;")
+	;
+	this.measureTooltipBackground = this.measureTooltip.append("rect")
+		.attr("x", 0)
+		.attr("y", 0)
+		.attr("fill", "rgb(200,200,200)")
+		.attr("fill-opacity", "0.5")
+		.attr("stroke-opacity", "0.5")
+		.attr("stroke-width", "1px")
+		.attr("stroke", "rgb(100,100,100)")
+	;
 
-
-	this.highlights = this.innerSVG.append("g").attr("class", "peakHighlights");
-	this.peaksSVG = this.innerSVG.append("g").attr("class", "peaks");
-	this.lossyAnnotations = this.innerSVG.append("g").attr("class", "lossyAnnotations");
-	this.annotations = this.innerSVG.append("g").attr("class", "annotations");
-
+	this.measureTooltipText = new Array();
+	this.measureTooltipText['from'] = this.measureTooltip.append("text");
+	this.measureTooltipText['to'] = this.measureTooltip.append("text");
+	this.measureTooltipText['match'] = this.measureTooltip.append("text");
+	this.measureTooltipText['masses'] = this.measureTooltip.append("g")
+		.attr("class", "measureMasses")
+	;
 
 	// add Chart Title
 	if (options.title) {
@@ -172,20 +179,20 @@ Graph.prototype.setData = function(){
 	this.peaks = new Array();
 	this.pep1 = this.model.pep1;
 	this.pep2 = this.model.pep2;
-    if (this.model.JSONdata) {
-        for (var i = 0; i < this.model.JSONdata.peaks.length; i++){
-        		var peak = this.model.JSONdata.peaks[i];
-            this.peaks.push(new Peak(i, this));
-        }
+	if (this.model.JSONdata) {
+		for (var i = 0; i < this.model.JSONdata.peaks.length; i++){
+				var peak = this.model.JSONdata.peaks[i];
+			this.peaks.push(new Peak(i, this));
+		}
 
-        this.model.peaks = this.peaks;
-        this.updatePeakColors();
-    }
-    if(this.model.lockZoom){
-    	this.resize(this.model.xmin, this.model.xmax, this.model.ymin, this.model.ymax);
+		this.model.peaks = this.peaks;
+		this.updatePeakColors();
+	}
+	if(this.model.lockZoom){
+		this.resize(this.model.xmin, this.model.xmax, this.model.ymin, this.model.ymax);
 		this.disableZoom();
 	}
-    else{
+	else{
 		this.resize(this.model.xminPrimary, this.model.xmaxPrimary, this.model.ymin, this.model.ymaxPrimary);
 		this.enableZoom();
 	}
@@ -311,9 +318,9 @@ Graph.prototype.enableZoom = function(){
 Graph.prototype.measure = function(on){
 	if (on === true){
 		var self = this;
-    	self.measureBackground
-      		.attr("width", self.plot[0][0].getAttribute("width"))
-      		.attr("height", self.plot[0][0].getAttribute("height"));
+		self.measureBackground
+	  		.attr("width", self.plot[0][0].getAttribute("width"))
+	  		.attr("height", self.plot[0][0].getAttribute("height"));
 
 		self.peaksSVG.style("pointer-events", "none");		//disable peak highlighting
 
@@ -322,7 +329,7 @@ Graph.prototype.measure = function(on){
 		function measureStart() {
 			self.measuringTool.attr("display","inline");
 			self.measureDistance.attr("display","inline");
-			//self.measureInfo.style("display", "inline");
+
 			var coords = d3.mouse(this);
 			var mouseX = self.x.invert(coords[0]);
 			var distance = 100;
@@ -355,7 +362,6 @@ Graph.prototype.measure = function(on){
 				.attr("x2", coords[0])
 				.attr("y1", self.y(0))
 				.attr("y2", 0);
-			//self.measuringToolLine.attr("display","inline");
 		}
 
 		function measureMove() {
@@ -382,16 +388,6 @@ Graph.prototype.measure = function(on){
 
 			//draw vertical end Line
 			if(endPeak){
-				//check if distance matches the mass of an aminoAcid
-				if(endPeak.x > self.measureStartPeak.x){
-					var delta = endPeak.x - self.measureStartPeak.x;
-					var matchPeak = endPeak.x;
-				}
-				else{
-					var delta = self.measureStartPeak.x - endPeak.x;
-					var matchPeak = self.measureStartPeak.x;
-				}
-				endPeak.matchedAA = self.model.matchMassToAA(delta, matchPeak);
 
 				//set end of the measuringTool to endPeak
 				self.measuringToolVLineEnd
@@ -422,7 +418,8 @@ Graph.prototype.measure = function(on){
 			self.measuringToolLine
 				.attr("x2", measureEndX)
 				.attr("y1", y)
-				.attr("y2", y);
+				.attr("y2", y)
+			;
 
 			//draw peak info
 			var deltaX = Math.abs(measureStartX - measureEndX);
@@ -433,84 +430,128 @@ Graph.prototype.measure = function(on){
 				var labelX = measureEndX + deltaX/2;
 
 			self.measureDistance.text(distance.toFixed(self.model.showDecimals)+" Th");
-			//var PeakInfo = distance.toFixed(2)+" Th<br/>"
-			var PeakInfo = ""
-			if(self.measureStartPeak.fragments.length > 0)
-					PeakInfo += "From: <span style='color:"+ self.measureStartPeak.colour +"'>" + self.measureStartPeak.fragments[0].name +"</span> (" + self.measureStartPeak.x.toFixed(self.model.showDecimals) + " m/z)";
-			else if (self.measureStartPeak.isotopes.length > 0)
-					PeakInfo += "From: <span style='color:"+ self.measureStartPeak.colour +"'>" + self.measureStartPeak.isotopes[0].name + "+" + self.measureStartPeak.isotopenumbers[0]+ "</span> (" + self.measureStartPeak.x.toFixed(self.model.showDecimals) + " m/z)";
-			else
-				PeakInfo += "From: Peak (" + self.measureStartPeak.x.toFixed(self.model.showDecimals) + " m/z)";
-			if(endPeak){
-				if(endPeak.fragments.length > 0)
-						PeakInfo += "<br/>To: <span style='color:"+ endPeak.colour +"'>" + endPeak.fragments[0].name +"</span> (" + endPeak.x.toFixed(self.model.showDecimals) + " m/z)";
-				else if(endPeak.isotopes.length > 0)
-						PeakInfo += "<br/>To: <span style='color:"+ endPeak.colour +"'>" + endPeak.isotopes[0].name + "+" + endPeak.isotopenumbers[0]+ "</span> (" + endPeak.x.toFixed(self.model.showDecimals) + " m/z)";
-				else
-					PeakInfo += "<br/>To: Peak (" + endPeak.x.toFixed(self.model.showDecimals) + " m/z)";
-				if (endPeak.matchedAA.length > 0)
-					PeakInfo += "<br/>possible match: " + endPeak.matchedAA + " ";
-			} else {
-                PeakInfo += "<br/>";
-            }
-			PeakInfo += "<br/><br/><p style='font-size:0.8em'>";
-			for(i=1; i<7; i++){
-			PeakInfo += "z = "+i+": "+(distance*i).toFixed(self.model.showDecimals)+" Da</br>";
-			}
-			PeakInfo += "</p>";
-
-
 
 			var matrix = this.getScreenCTM()
-                .translate(+this.getAttribute("cx"),
-                         +this.getAttribute("cy"));
+				.translate(+this.getAttribute("cx"),
+						 +this.getAttribute("cy"));
 
-/*			if ($("#measureTooltip").width() > Math.abs(measureStartX - measureEndX))
-				var positionX = coords[0] + $("#measureTooltip").width()/2 + "px";
-            else*/
-            	if (measureStartX < measureEndX)
-            		var positionX = coords[0] - Math.abs(measureStartX - measureEndX)/2;
-            	else
-            		var positionX = coords[0] + Math.abs(measureStartX - measureEndX)/2;
+				if (measureStartX < measureEndX)
+					var positionX = coords[0] - Math.abs(measureStartX - measureEndX)/2;
+				else
+					var positionX = coords[0] + Math.abs(measureStartX - measureEndX)/2;
 
 
-            // Because chrome is deprecating offset on svg elements
-            function getSVGOffset (svg) {
-                var pnode = svg;
-                var pBCR;
-                while (pnode && !pBCR) {
-                    var posType = (pnode == document) ? "static" : d3.select(pnode).style("position");
-                    if (posType !== "" && posType !== "static" && posType !== "inherit") {
-                        pBCR = pnode.getBoundingClientRect();
-                    }
-                    pnode = pnode.parentNode;
-                }
-                var svgBCR = svg.getBoundingClientRect();
-                pBCR = pBCR || {top: 0, left: 0};
-                return {top: svgBCR.top - pBCR.top, left: svgBCR.left - pBCR.left};
-            }
+			// Because chrome is deprecating offset on svg elements
+			function getSVGOffset (svg) {
+				var pnode = svg;
+				var pBCR;
+				while (pnode && !pBCR) {
+					var posType = (pnode == document) ? "static" : d3.select(pnode).style("position");
+					if (posType !== "" && posType !== "static" && posType !== "inherit") {
+						pBCR = pnode.getBoundingClientRect();
+					}
+					pnode = pnode.parentNode;
+				}
+				var svgBCR = svg.getBoundingClientRect();
+				pBCR = pBCR || {top: 0, left: 0};
+				return {top: svgBCR.top - pBCR.top, left: svgBCR.left - pBCR.left};
+			}
 
-            var svgNode = self.g.node().parentNode;
-            var rectBounds = this.getBoundingClientRect();
-            var svgBounds = svgNode.getBoundingClientRect();
-            var rectOffX = -8; //rectBounds.left - svgBounds.left;
-            var rectOffY = rectBounds.top - svgBounds.top;
-            var svgOffset = getSVGOffset (svgNode);
-            rectOffX += svgOffset.left; // add on offsets to svg's relative parent
-            rectOffY += svgOffset.top;
-            rectOffX += positionX;
-            rectOffY += y + 10; // the offset of the drag in the rect
+			var svgNode = self.g.node().parentNode;
+			var rectBounds = this.getBoundingClientRect();
+			var svgBounds = svgNode.getBoundingClientRect();
+			var rectOffX = -8; //rectBounds.left - svgBounds.left;
+			var rectOffY = rectBounds.top - svgBounds.top;
+			var svgOffset = getSVGOffset (svgNode);
+			rectOffX += svgOffset.left; // add on offsets to svg's relative parent
+			rectOffY += svgOffset.top;
+			rectOffX += positionX;
+			rectOffY += y + 10; // the offset of the drag in the rect
 
-            self.measureDistance.attr("x", positionX).attr("y", coords[1]-10)
-			self.measureInfo
-				.style("display", "inline")
-				.html(PeakInfo)
-            	.style("left",
-                    rectOffX +"px"
-                )
-            	.style("top",
-                       rectOffY + "px"
-                );
+			self.measureDistance.attr("x", positionX).attr("y", coords[1]-10);
+
+			//fromText
+			var fromTextColor = self.measureStartPeak.colour;
+			if(self.measureStartPeak.fragments.length > 0)
+					var fromText = "From: " + self.measureStartPeak.fragments[0].name +" (" + self.measureStartPeak.x.toFixed(self.model.showDecimals) + " m/z)";
+			else if (self.measureStartPeak.isotopes.length > 0)
+					var fromText = "From: " + self.measureStartPeak.isotopes[0].name + "+" + self.measureStartPeak.isotopenumbers[0]+ "(" + self.measureStartPeak.x.toFixed(self.model.showDecimals) + " m/z)";
+			else{
+				var fromText = "From: Peak (" + self.measureStartPeak.x.toFixed(self.model.showDecimals) + " m/z)";
+				fromTextColor = "black";
+			}
+			//toText
+			if(endPeak){
+				var toTextColor = endPeak.colour;
+				if(endPeak.fragments.length > 0)
+						var toText = "To: " + endPeak.fragments[0].name +"(" + endPeak.x.toFixed(self.model.showDecimals) + " m/z)";
+				else if(endPeak.isotopes.length > 0)
+						var toText = "To: " + endPeak.isotopes[0].name + "+" + endPeak.isotopenumbers[0]+ "(" + endPeak.x.toFixed(self.model.showDecimals) + " m/z)";
+				else{
+					var toText= "To: Peak (" + endPeak.x.toFixed(self.model.showDecimals) + " m/z)";
+					toTextColor = "black";
+				}
+			}
+			else{
+				toText = "";
+			}
+			var massArr = [];
+			for(i=1; i<7; i++){
+				var massObj = new Object();
+				massObj.mass = distance * i;
+				massObj.matchAA = self.model.matchMassToAA(distance * i)
+				massArr.push(massObj);
+			};
+
+			var yText = coords[1] + 25;
+			self.measureTooltipText['from']
+				.attr("y", yText)
+				.attr("fill", fromTextColor)
+				.text(fromText)
+			;
+
+			yText += 18;
+			self.measureTooltipText['to']
+				.attr("y", yText)
+				.attr("fill", toTextColor)
+				.text(toText)
+			;
+
+			yText += 6;
+			self.measureTooltipText['masses'].selectAll("*").remove();
+			self.measureTooltipText['masses'].selectAll('text')
+				.data(massArr)
+				.enter().append('text')
+				.text(function (d, i) {
+					var z = i + 1;
+					var matchText = "";
+					if (d.matchAA.length > 0)
+						matchText = "("+d.matchAA+")";
+					return "z="+z+": " + d.mass.toFixed(self.model.showDecimals) + " Da " + matchText;
+				})
+				.attr("y", function (d) { return yText += 15; } )
+				.attr("class", function(d){ if(d.matchAA.length > 0) return 'matchedAA' })
+			;
+
+			var maxTextWidth = Math.max.apply(Math,self.measureTooltip.selectAll('text')[0].map(function(t){return d3.select(t).node().getComputedTextLength();}));
+			var backgroundWidth = maxTextWidth + 20;
+			var backgroundWidthX = positionX - backgroundWidth / 2;
+			self.measureTooltipBackground
+				.attr("x", backgroundWidthX)
+				.attr("y", coords[1]+10)
+				.attr("width", backgroundWidth)
+				.attr("height", 140)
+			;
+
+			self.measureTooltip.selectAll('text')
+				.attr("x", positionX)
+			;
+			self.measureTooltipText['masses'].selectAll('text')
+				.attr("fill", "#333")
+			;
+			self.measureTooltipText['masses'].selectAll('.matchedAA')
+				.attr("fill", "black")
+			;
 		}
 
 		this.measureBrush = d3.svg.brush()
@@ -532,7 +573,7 @@ Graph.prototype.measure = function(on){
 Graph.prototype.measureClear = function(){
 	this.measuringTool.attr("display","none");
 	this.measureDistance.attr("display","none");
-	this.measureInfo.style("display","none");
+	// this.measureInfo.attr("display","none");
 
 }
 
@@ -630,6 +671,7 @@ Graph.prototype.updatePeakLabels = function(){
 			if (_.intersection(this.model.highlights, this.peaks[p].fragments).length == 0){
 				// show it if allFragmentHighlights is true (dependent on lossyShown)
 				if (this.model.showAllFragmentsHighlight){
+					this.peaks[p].removeLabels();
 					this.peaks[p].showLabels();
 				}
 				else{
