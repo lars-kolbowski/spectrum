@@ -4,11 +4,12 @@
   padding-left: 0.5em;
   border-top: 1px solid black;
   border-bottom: 1px solid white;
-  background: rgba(117, 0, 0, 1);
+  background: rgb(9, 29, 66);
 }
 
 .subViewHeader .btn{
   padding: 0px 6px;
+  font-size: smaller;
 }
 
 .errSVG {
