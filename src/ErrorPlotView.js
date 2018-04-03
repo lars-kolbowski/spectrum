@@ -1,6 +1,6 @@
 //		a spectrum viewer
 //
-//      Copyright  2015 Rappsilber Laboratory, Edinburgh University
+//	  Copyright  2015 Rappsilber Laboratory, Edinburgh University
 //
 // 		Licensed under the Apache License, Version 2.0 (the "License");
 // 		you may not use this file except in compliance with the License.
@@ -17,41 +17,52 @@
 //		authors: Lars Kolbowski
 //
 //
-//		ErrorIntensityPlotView.js
-var ErrorIntensityPlotView = Backbone.View.extend({
+//		ErrorPlotView.js
+var ErrorPlotView = Backbone.View.extend({
 
 	events : {
-		'click #toggleView' : 'toggleView',
+		// 'click #toggleView' : 'toggleView',
 	},
 
-	initialize: function() {
+	initialize: function(viewOptions) {
 
 		this.listenTo(CLMSUI.vent, 'QCabsErr', this.toggleAbsErr);
+		this.listenTo(CLMSUI.vent, 'QCPlotToggle', this.toggleView);
+		this.listenTo(window, 'resize', _.debounce(this.render));
+		this.listenTo(CLMSUI.vent, 'resize:spectrum', this.render);
+		this.listenTo(CLMSUI.vent, 'downloadQCSVG', this.downloadSVG);
+		this.listenTo(CLMSUI.vent, 'show:QC', this.wrapperVisToggle);
 
 		var self = this;
 
+		var defaultOptions = {
+
+		};
+		this.options = _.extend(defaultOptions, viewOptions);
+
 		this.absolute = false;
+		this.isVisible = true;
+		this.wrapperVisible = false;
 
-		this.svg = d3.select(this.el.getElementsByTagName("svg")[0]);
+		var svgId = this.options.svg || this.el.getElementsByTagName("svg")[0];
+		this.svg = d3.select(svgId);
+		var margin = this.options.margin;
 
-		this.margin = {top: 110, right: 60, bottom: 50, left: 65};
+		var width = 960 - margin.left - margin.right;
+		var height = 500 - margin.top - margin.bottom;
 
-		var width = 960 - this.margin.left - this.margin.right;
-		var height = 500 - this.margin.top - this.margin.bottom;
-
-		this.wrapper = this.svg
+		this.svgWrapper = this.svg
 			.append('g')
-			.attr('transform', 'translate(' + this.margin.left + ',' + this.margin.top + ')')
+			.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
 			.attr('width', width)
 			.attr('height', height)
 			.attr('class', 'wrapper')
-			.style("opacity", 0);
 
 		if (CLMSUI.compositeModelInst !== undefined)
 			this.tooltip = CLMSUI.compositeModelInst.get("tooltipModel");
 		else{
-			target = this.wrapper.node().parentNode.parentNode.parentNode; //this would get you #spectrumPanel
-			this.tooltip = d3.select(target).append("span")
+			// target = window; //this would get you #spectrumPanel
+			this.tooltip = d3.select("body").append("span")
 				.style("font-size", "small")
 				.style("padding", "0 5px")
 				.style("border-radius", "6px")
@@ -59,7 +70,8 @@ var ErrorIntensityPlotView = Backbone.View.extend({
 				.style("background-color", "black")
 				.style("pointer-events", "none")
 				.style("position", "absolute")
-				.style("opacity", 0);
+				.style("opacity", 0)
+				.style("z-index", 100);
 		}
 
 		this.listenTo(this.model, 'change', this.render);
@@ -67,25 +79,66 @@ var ErrorIntensityPlotView = Backbone.View.extend({
 		this.listenTo(this.model, 'changed:Highlights', this.updateHighlights);
 	},
 
-	toggleView: function(){
-		if (!this.model.showSpectrum){
-			this.render();
-			this.wrapper.style("opacity", 1);
-			this.background.attr("height", this.height);
+	wrapperVisToggle: function(show){
+		this.wrapperVisible = show;
+// 		this.render();
+	},
+
+	//ToDo: duplicate with SpectrumView2 downloadSVG function
+	downloadSVG: function(){
+		if(this.isVisible){
+			var svgSel = d3.select(this.el).selectAll("svg");
+			var svgArr = svgSel[0];
+			var svgStrings = CLMSUI.svgUtils.capture (svgArr);
+			var svgXML = CLMSUI.svgUtils.makeXMLStr (new XMLSerializer(), svgStrings[0]);
+
+			var charge = this.model.JSONdata.annotation.precursorCharge;
+			var pepStrs = this.model.pepStrsMods;
+			var linkSites = Array(this.model.JSONdata.LinkSite.length);
+
+			this.model.JSONdata.LinkSite.forEach(function(ls){
+				linkSites[ls.peptideId] = ls.linkSite;
+			});
+
+			//insert CL sites with #
+			if (linkSites.length > 0){
+
+				var ins_pepStrs = Array();
+				pepStrs.forEach(function(pepStr, index){
+					var positions = [];
+					for(var i=0; i<pepStr.length; i++){
+						if(pepStr[i].match(/[A-Z]/) != null){
+							positions.push(i);
+						};
+					}
+					var clAA_index = positions[linkSites[index]]+1;
+					var ins_pepStr = pepStr.slice(0, clAA_index) + "#" + pepStr.slice(clAA_index, pepStr.length);
+					pepStrs[index] = ins_pepStr;
+				})
+			}
+
+			var svg_name = pepStrs.join("-") + "_z=" + charge;
+			svg_name += svgSel.node().id;
+			svg_name += ".svg";
+			download (svgXML, 'application/svg', svg_name);
+		};
+	},
+
+	toggleView: function(id){
+		if (id == this.options.xData){
+			this.isVisible = (this.isVisible ? false : true);
+			$(this.el).toggle();
 		}
-		else{
-			this.wrapper.style("opacity", 0);
-			this.background.attr("height", 0);
-		}
+
 	},
 
 	clear: function() {
-		this.wrapper.selectAll("*").remove();
+		this.svgWrapper.selectAll("*").remove();
 	},
 
 	render: function() {
 
-		if (this.model.JSONdata === undefined || this.model.JSONdata === null)
+		if (this.model.JSONdata === undefined || this.model.JSONdata === null || !this.isVisible || !this.wrapperVisible)
 			return;
 
 		this.clear();
@@ -98,16 +151,16 @@ var ErrorIntensityPlotView = Backbone.View.extend({
 		fragments.forEach(function(fragment){
 			var peptideId = fragment.peptideId;
 			var fragId = fragment.id;
-			var lossy = false; 
-      		if (fragment.type.indexOf("Loss") >= 0)  
-        		lossy = true;
+			var lossy = false;
+			if (fragment.type.includes("Loss"))
+				lossy = true;
 			fragment.clusterInfo.forEach(function(cluster){
 				var firstPeakId = self.model.JSONdata.clusters[cluster.Clusterid].firstPeakId;
 				var point = {
 					fragId: fragId,
 					peptideId: peptideId,
 					lossy: lossy,
-					intensity: self.model.JSONdata.peaks[firstPeakId].intensity,
+					x: self.options.xData == 'Intensity' ? self.model.JSONdata.peaks[firstPeakId].intensity : self.model.JSONdata.peaks[firstPeakId].mz,
 					error: cluster.error,
 					y: self.absolute ? Math.abs(cluster.error) : cluster.error,
 					charge: self.model.JSONdata.clusters[cluster.Clusterid].charge,
@@ -117,34 +170,37 @@ var ErrorIntensityPlotView = Backbone.View.extend({
 			});
 		});
 
-		var cx = this.wrapper.node().parentNode.width.baseVal.value;
-		var cy = this.wrapper.node().parentNode.height.baseVal.value;
+		var cx = $(this.el).width();
+		var cy = $(this.el).height();
 
-		this.width = cx - self.margin.left - self.margin.right;
-		this.height = cy - self.margin.top - self.margin.bottom;
+		var margin_bottom = this.absolute ? self.options.margin.bottom + 20 : self.options.margin.bottom;
 
-		var xmax = d3.max(this.data, function(d) { return d['intensity']; });
+		this.width = cx - self.options.margin.left - self.options.margin.right;
+		this.height = cy - self.options.margin.top - margin_bottom;
+
+		var xmax = d3.max(this.data, function(d) { return d['x']; });
 		// var ymax = d3.max(this.data, function(d) { return d['error']; });
 		var ymax = this.model.MSnTolerance.value;
 
 		var ymin = this.absolute ? 0 : 0 - ymax;
 
 		this.x = d3.scale.linear()
-		          .domain([ 0, xmax ])
-		          .range([ 0, this.width ]);
+				  .domain([ 0, xmax ])
+				  .range([ 0, this.width ]);
 
 
 		this.y = d3.scale.linear()
-			      .domain([ ymin, ymax ]).nice()
-			      .range([ this.height, 0 ]).nice();
+			.domain([ ymin, ymax ]).nice()
+			.range([ this.height, 0 ]).nice()
+		;
 
 		var yTicks = this.height / 40;
 		var xTicks = this.width / 100;
 
-		this.wrapper.selectAll('.axis line, .axis path')
+		this.svgWrapper.selectAll('.axis line, .axis path')
 				.style({'stroke': 'Black', 'fill': 'none', 'stroke-width': '1.2px'});
 
-		this.background = this.wrapper.append("rect")
+		this.background = this.svgWrapper.append("rect")
 			.style("fill", "white")
 			// .style("z-index", -1)
 			.attr("width", this.width)
@@ -158,28 +214,32 @@ var ErrorIntensityPlotView = Backbone.View.extend({
 		// draw the x axis
 		this.xAxis = d3.svg.axis().scale(self.x).ticks(xTicks).orient("bottom").tickFormat(d3.format("s"));
 
-		this.xAxisSVG = this.wrapper.append('g')
+		this.xAxisSVG = this.svgWrapper.append('g')
 			.attr('transform', 'translate(0,' + this.y(0) + ')')
 			.attr('class', 'axis xAxis')
 			.call(this.xAxis);
 
-			// remove every other xTickLabel
-			var ticks = d3.selectAll('.xAxis').selectAll(".tick text");
-			ticks.attr("class", function(d,i){
-			    if(i%2 != 0) d3.select(this).remove();
-			});
 
-		this.xLabel = this.wrapper.append("text")
+		var ticks = this.xAxisSVG.selectAll(".tick text");
+		ticks.attr("class", function(d,i){
+			// remove 0 for non-absolute
+			if(!this.absolute && i == 0) d3.select(this).remove();
+			// remove every other xTickLabel
+			if(i%2 != 0) d3.select(this).remove();
+		});
+
+		this.xLabel = this.svgWrapper.append("text")
 			.attr("class", "xAxisLabel")
-			.text("Intensity")
+			.text(self.options.xData)
 			.attr("dy","2.4em")
 			.style("text-anchor","middle").style("pointer-events","none");
-		this.xLabel.attr("x", this.width/2).attr("y", this.height);
+		var xLabelHeight = this.absolute ? this.height : this.height-20;
+		this.xLabel.attr("x", this.width/2).attr("y", xLabelHeight);
 
 		// draw the y axis
 		self.yAxis = d3.svg.axis().scale(this.y).ticks(yTicks).orient("left").tickFormat(d3.format("s"));
 
-		this.yAxisSVG = this.wrapper.append('g')
+		this.yAxisSVG = this.svgWrapper.append('g')
 			.attr('transform', 'translate(0,0)')
 			.attr('class', 'axis')
 			.call(this.yAxis)
@@ -187,7 +247,7 @@ var ErrorIntensityPlotView = Backbone.View.extend({
 
 		var yLabelText = self.absolute ? "absolute " : "";
 		yLabelText += "error (" + this.model.MSnTolerance.unit + ")";
-		this.yLabel = this.wrapper.append("g").append("text")
+		this.yLabel = this.svgWrapper.append("g").append("text")
 			.attr("class", "axis")
 			.text( yLabelText)
 			.style("text-anchor","middle").style("pointer-events","none")
@@ -198,23 +258,23 @@ var ErrorIntensityPlotView = Backbone.View.extend({
 		var p1color = this.model.p1color;
 		var p2color = this.model.p2color;
 
-		this.g = this.wrapper.append('g');
+		this.g = this.svgWrapper.append('g');
 
 		this.highlights = this.g.selectAll('scatter-dot-highlights')
 			.data(this.data)
 			.enter().append('circle')
-			.attr("cx", function (d) { return self.x(d['intensity']); } )
+			.attr("cx", function (d) { return self.x(d['x']); } )
 		 	.attr("cy", function (d) { return self.y(d['y']); } )
 			.style('fill', this.model.highlightColour)
 			.style('opacity', 0)
 			.style('pointer-events', 'none')
 			.attr('id', function (d) { return d.fragId })
-			.attr('r', 10);
+			.attr('r', 8);
 
 		this.datapoints = this.g.selectAll('scatter-dots')
 			.data(this.data)
 			.enter().append('circle')
-			.attr("cx", function (d) { return self.x(d['intensity']); } )
+			.attr("cx", function (d) { return self.x(d['x']); } )
 			.attr("cy", function (d) { return self.y(d['y']); } )
 			.attr('id', function (d) { return d.fragId })
 			.style("cursor", "pointer")
@@ -238,14 +298,14 @@ var ErrorIntensityPlotView = Backbone.View.extend({
 			.attr("r", 3);
 
 		function getColor(d){
-		  if (d.lossy){
-		    if (d['peptideId'] == 0) return self.model.p1color_loss;
-		    else return self.model.p2color_loss;
-		  }
-		  else{
-		    if (d['peptideId'] == 0) return self.model.p1color;
-		    else return self.model.p2color;
-		  }
+			if (d.lossy){
+				if (d['peptideId'] == 0) return self.model.p1color_loss;
+				else return self.model.p2color_loss;
+			}
+			else{
+				if (d['peptideId'] == 0) return self.model.p1color;
+				else return self.model.p2color;
+			}
 		};
 
 		this.updateHighlights();
@@ -256,7 +316,7 @@ var ErrorIntensityPlotView = Backbone.View.extend({
 		if (this.model.showSpectrum)
 			return
 
-		var contents = [["charge", data.charge], ["error", data.error.toFixed(3)], ["Int", data.intensity.toFixed(0)]];
+		var contents = [["charge", data.charge], ["error", data.error.toFixed(3)], [this.options.xData, data.x.toFixed(this.model.showDecimals)]];
 
 		var fragId = data.fragId;
 		var fragments = this.model.fragments.filter(function(d) { return d.id == fragId; });
@@ -270,6 +330,10 @@ var ErrorIntensityPlotView = Backbone.View.extend({
 		}
 		else{
 			var html = header.join(" ");
+			for (var i = 0; i < data.charge; i++){
+				html += "+";
+			}
+
 			for (var i = contents.length - 1; i >= 0; i--) {
 				html += "</br>";
 				html += contents[i].join(": ");
@@ -278,6 +342,12 @@ var ErrorIntensityPlotView = Backbone.View.extend({
 			this.tooltip.transition()
 				.duration(200)
 				.style("opacity", .9);
+
+			//if cursor is too close to left window edge change tooltip to other side
+			if (window.innerWidth - x < 100){
+				var x = x - 100;
+				var y = y + 20;
+			}
 			this.tooltip.style("left", (x + 15) + "px")
 				.style("top", y + "px");
 		}
@@ -327,6 +397,8 @@ var ErrorIntensityPlotView = Backbone.View.extend({
 	},
 
 	updateHighlights: function(){
+		if(!this.isVisible || !this.wrapperVisible)
+			return;
 		this.clearHighlights();
 		for (var i = this.model.highlights.length - 1; i >= 0; i--) {
 			this.startHighlight(this.model.highlights[i].id);

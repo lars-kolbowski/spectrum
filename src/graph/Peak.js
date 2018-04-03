@@ -1,6 +1,6 @@
 //		a spectrum viewer
 //
-//      Copyright  2015 Rappsilber Laboratory, Edinburgh University
+//	  Copyright  2015 Rappsilber Laboratory, Edinburgh University
 //
 // 		Licensed under the Apache License, Version 2.0 (the "License");
 // 		you may not use this file except in compliance with the License.
@@ -65,15 +65,14 @@ function Peak (id, graph){
 	};
 
 	//svg elements
-	this.g = this.graph.peaksSVG.append('g');
-
-	this.linegroup = this.g.append('g');
+	this.linegroup = this.graph.peaksSVG.append('g');
 
 	if (this.fragments.length > 0) {
 		this.highlightLine = this.linegroup.append('line')
 								.attr("stroke", this.graph.model.highlightColour)
 								.attr("stroke-width", this.graph.model.highlightWidth)
 								.attr("opacity","0")
+								.attr("stroke-opacity", "0.7")
 								.attr("x1", 0)
 								.attr("x2", 0)
 							;
@@ -84,7 +83,7 @@ function Peak (id, graph){
 
 		this.linegroup
 			.on("mouseover", function() {
-			    var evt = d3.event;
+				var evt = d3.event;
 				if (evt.ctrlKey){
 					self.line.style("cursor", "copy");
 					self.highlightLine.style("cursor", "copy");
@@ -102,17 +101,17 @@ function Peak (id, graph){
 				endHighlight();
 			})
 			.on("touchstart", function() {
-			    var evt = d3.event;
-			    showTooltip(evt.layerX, evt.layerY);
-			    startHighlight();
+				var evt = d3.event;
+				showTooltip(evt.layerX, evt.layerY);
+				startHighlight();
 			})
 			.on("touchend", function() {
-			    hideTooltip();
-			    endHighlight();
+				hideTooltip();
+				endHighlight();
 			})
 			.on("click", function() {
-			    var evt = d3.event;
-			    stickyHighlight(evt.ctrlKey);
+				var evt = d3.event;
+				stickyHighlight(evt.ctrlKey);
 			})
 			;
 
@@ -141,7 +140,11 @@ function Peak (id, graph){
 
 					charge = cluster.charge;
 					error = fragments[f].clusterInfo[index].error.toFixed(2)+" "+fragments[f].clusterInfo[index].errorUnit;
-					header.push(fragments[f].name);
+					var chargeStr = "";
+					for (var i = 0; i < charge; i++){
+						chargeStr += "+";
+					}
+					header.push(fragments[f].name + chargeStr);
 					contents.push([fragments[f].name + " (" + fragments[f].sequence + ")", "charge: " + charge + ", error: " + error]);
 			};
 
@@ -154,7 +157,7 @@ function Peak (id, graph){
 				//.set("location", {pageX: d3.event.pageX, pageY: d3.event.pageY})
 		}
 		else{
-			var html = header.join(" ");
+			var html = header.join("; ");
 			for (var i = contents.length - 1; i >= 0; i--) {
 				html += "</br>";
 				html += contents[i].join(": ");
@@ -225,11 +228,11 @@ function Peak (id, graph){
 			.on("drag", function(d) {
 				var coords = d3.mouse(this);
 				var fragId = d.id;
-                var filteredLabels = self.labels.filter(function(d) { return d.id == fragId; });
-                var filteredHighlights = self.labelHighlights.filter(function(d) { return d.id == fragId; });
+				var filteredLabels = self.labels.filter(function(d) { return d.id == fragId; });
+				var filteredHighlights = self.labelHighlights.filter(function(d) { return d.id == fragId; });
 				var filteredLabelLines = self.labelLines.filter(function(d) { return d.id == fragId; });
 
-                filteredLabels.attr("x", coords[0]).attr("y", coords[1]);
+				filteredLabels.attr("x", coords[0]).attr("y", coords[1]);
 				filteredHighlights.attr("x", coords[0]).attr("y", coords[1]);
 
 				var startX = self.graph.x(self.x);
@@ -238,24 +241,24 @@ function Peak (id, graph){
 				var mouseY = coords[1];
 				var r = Math.sqrt((mouseX * mouseX) + ((mouseY-startY) * (mouseY-startY) ));
 				if (r > 15){
-                        filteredLabelLines
-                            .attr("opacity", 1)
-                            .attr("x1", 0)
-                            .attr("x2", mouseX)
-                            .attr("y1", startY)
-                            .attr("y2", mouseY)
-                        ;
-                }
-                else
+						filteredLabelLines
+							.attr("opacity", 1)
+							.attr("x1", 0)
+							.attr("x2", mouseX)
+							.attr("y1", startY)
+							.attr("y2", mouseY)
+						;
+				}
+				else
 					filteredLabelLines.attr("opacity", 0);
 			})
 		;
 
 		var lossy = [];
 		var nonlossy = this.fragments.filter(function(frag) {
-		    var bool = frag.class != "lossy";
-		    if (!bool) { lossy.push (frag); }
-		    return bool;
+			var bool = frag.class != "lossy";
+			if (!bool) { lossy.push (frag); }
+			return bool;
 		});
 
 		var partitions = [
@@ -263,25 +266,25 @@ function Peak (id, graph){
 			{frags: lossy, group: this.graph.lossyAnnotations, type: "lossy", colourClass: "color_loss"},
 		];
 
-        CLMSUI.idList = CLMSUI.idList || [];	//obsolete?
+		CLMSUI.idList = CLMSUI.idList || [];	//obsolete?
 
-        var makeIdentityID = function (d) {
-            return d.id;
-        };
+		var makeIdentityID = function (d) {
+			return d.id;
+		};
 
 		partitions.forEach (function (partition) {
-            var peakFrags = partition.frags;
+			var peakFrags = partition.frags;
 
 			if (peakFrags.length > 0) {
 				var group = partition.group;
-                var labelgroup = self.g.selectAll("g.label").data (peakFrags, makeIdentityID);
-				var labelLines = self.g.selectAll("line.labelLine").data (peakFrags, makeIdentityID);
+				var labelgroup = self.linegroup.selectAll("g.label").data (peakFrags, makeIdentityID);
+				var labelLines = self.linegroup.selectAll("line.labelLine").data (peakFrags, makeIdentityID);
 
-			    labelLines.enter()
-			        .append("line")
-				    .attr("stroke-width", 1)
+				labelLines.enter()
+					.append("line")
+					.attr("stroke-width", 1)
 					.attr("stroke", "Black")
-			        .attr("class", "labelLine")
+					.attr("class", "labelLine")
 					.style("stroke-dasharray", ("3, 3"));
 
 				var label = labelgroup.enter()
@@ -331,9 +334,9 @@ function Peak (id, graph){
 							}
 						})
 						.on("click", function(d) {
-			                var evt = d3.event;
-			                stickyHighlight(evt.ctrlKey, d.id);
-			            })
+							var evt = d3.event;
+							stickyHighlight(evt.ctrlKey, d.id);
+						})
 			   		;
 
 			   	label.append("text")
@@ -346,24 +349,24 @@ function Peak (id, graph){
 					.attr("stroke", this.graph.model.highlightColour);
 
 			   	label.append("text")
-		        	.text(function(d) {return d.name;})
+					.text(function(d) {return d.name;})
 					.attr("x", 0)
 					.attr("text-anchor", "middle")
 					.style("font-size", "0.8em")
 					.attr("class", "peakAnnot")
 					.attr ("fill", function(d) {
-					    var pepIndex = d.peptideId+1;
-					    return self.graph.model["p" + pepIndex + partition.colourClass];
+						var pepIndex = d.peptideId+1;
+						return self.graph.model["p" + pepIndex + partition.colourClass];
 					})
 			}
 
 		}, this);
 
-        var fset = d3.set (this.fragments.map (function (frag) { return frag.id; }));
-		this.labelgroups = self.g.selectAll("g.label").filter (function(d) { return fset.has(d.id); });
+		var fset = d3.set (this.fragments.map (function (frag) { return frag.id; }));
+		this.labelgroups = self.linegroup.selectAll("g.label").filter (function(d) { return fset.has(d.id); });
 		this.labels = this.labelgroups.selectAll("text.peakAnnot");
 		this.labelHighlights = this.labelgroups.selectAll("text.peakAnnotHighlight");
-		this.labelLines = self.g.selectAll("line.labelLine").filter (function(d) { return fset.has(d.id); });
+		this.labelLines = self.linegroup.selectAll("line.labelLine").filter (function(d) { return fset.has(d.id); });
 		this.highlight(false);
 
 	}
@@ -416,15 +419,15 @@ Peak.prototype.highlight = function(show, fragments){
 	if (show == true) {
 		this.highlightLine.attr("opacity","1");
 		if (this.labels.length) {
-		    var fragMap = d3.set (fragments.map (function (frag) { return frag.id; }));
-		    var ffunc = function (d) { return fragMap.has (d.id); };
+			var fragMap = d3.set (fragments.map (function (frag) { return frag.id; }));
+			var ffunc = function (d) { return fragMap.has (d.id); };
 			this.labelHighlights.filter(ffunc)
-		    	.attr("opacity", 1)
-		        .attr("display", "inline");
-		   ;
-		    this.labels.filter(ffunc).attr("display", "inline");
+				.attr("opacity", 1)
+				.attr("display", "inline");
+			;
+			this.labels.filter(ffunc).attr("display", "inline");
 		}
-		this.graph.peaksSVG.node().appendChild(this.g.node());
+		// this.graph.peaksSVG.node().appendChild(this.linegroup.node());
 		this.line.attr("stroke", this.colour);
 	} else {
 		this.highlightLine.attr("opacity",0);
@@ -436,7 +439,7 @@ Peak.prototype.highlight = function(show, fragments){
 
 Peak.prototype.update = function(){
 
-	this.g.attr("transform", "translate("+this.graph.x(this.x)+",0)");
+	this.linegroup.attr("transform", "translate("+this.graph.x(this.x)+",0)");
 	var xDomain = this.graph.x.domain();
 	if (this.x > xDomain[0] && this.x < xDomain[1]){
 		//reset label lines
@@ -452,9 +455,9 @@ Peak.prototype.update = function(){
 		this.updateX(xDomain);
 		this.updateY();
 		//show peaks
-		this.g.attr("display","inline");
+		this.linegroup.attr("display","inline");
 	} else {
-		this.g.attr("display","none");
+		this.linegroup.attr("display","none");
 	}
 }
 
@@ -464,21 +467,21 @@ Peak.prototype.updateX = function(xDomain){
 	function stickyTest (d, peakObj) {
 		return (peakObj.x > xDomain[0] && peakObj.x < xDomain[1])	//in current range
 			 && (peakObj.graph.lossyShown === true || d.class == "non-lossy" || _.intersection(peakObj.graph.model.sticky, peakObj.fragments).length != 0)	//lossy enabled OR not lossy OR isStickyFrag
-			 && (_.intersection(peakObj.graph.model.sticky, peakObj.fragments).length != 0 || peakObj.graph.model.sticky.length == 0)	//isStickyFrag OR no StickyFrags
+			 && (_.intersection(peakObj.graph.model.sticky, peakObj.fragments).length != 0 || peakObj.graph.model.sticky.length == 0 || peakObj.graph.model.showAllFragmentsHighlight)	//isStickyFrag OR no StickyFrags
 	};
 	var self = this;
 	if (labelCount) {
 		this.labels
-            .attr("x", 0)
-		    .attr("display",function(d, i) {
-		        return stickyTest (d, self) ? "inline" : "none";
-		    })
+			.attr("x", 0)
+			.attr("display",function(d, i) {
+				return stickyTest (d, self) ? "inline" : "none";
+			})
 		;
 		this.labelHighlights
-            .attr("x", 0)
-		    .attr("display",function(d) {
-		        return stickyTest (d, self) ? "inline" : "none";
-		    })
+			.attr("x", 0)
+			.attr("display",function(d) {
+				return stickyTest (d, self) ? "inline" : "none";
+			})
 		;
 
 	}
@@ -521,15 +524,15 @@ Peak.prototype.removeLabels = function(){
 Peak.prototype.showLabels = function(lossyOverride){
 	var xDomain = this.graph.x.domain();
 	var labelCount = this.labels.length;
-    var self = this;
+	var self = this;
 	if (labelCount) {
-        var ffunc = function(d) {
-            return (self.x > xDomain[0] && self.x < xDomain[1])
+		var ffunc = function(d) {
+			return (self.x > xDomain[0] && self.x < xDomain[1])
 				&& (self.graph.lossyShown === true || d.class == "non-lossy" || lossyOverride == true);
-        };
-        this.labels.filter(ffunc).attr("display", "inline");
-        this.labelHighlights.filter(ffunc).attr("display", "inline");
-        this.labelLines.filter(ffunc).attr("opacity", 1);
+		};
+		this.labels.filter(ffunc).attr("display", "inline");
+		this.labelHighlights.filter(ffunc).attr("display", "inline");
+		this.labelLines.filter(ffunc).attr("opacity", 1);
 	}
 }
 

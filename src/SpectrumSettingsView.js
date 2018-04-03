@@ -40,15 +40,21 @@ var SpectrumSettingsView = CLMSUI.utils.BaseFrameView.extend({
 		'click #toggleCustomCfgHelp' : 'toggleCustomCfgHelp',
 		'click #settingsCustomCfgApply' : 'applyCustomCfg',
 		'submit #settingsForm' : 'applyData',
-		'keyup .stepInput' : 'updateStepSizeKeyUp',
+		// 'keyup .stepInput' : 'updateStepSizeKeyUp',
 		'change .ionSelectChkbox': 'updateIons'
 		});
 	},
 
-
 	identifier: "Spectrum Settings",
 
-	initialize: function() {
+	initialize: function(options) {
+
+		var defaultOptions = {
+			showCustomCfg: true,
+		};
+
+		this.options = _.extend(defaultOptions, options);
+
 		SpectrumSettingsView.__super__.initialize.apply (this, arguments);
 		var self = this;
 
@@ -72,10 +78,15 @@ var SpectrumSettingsView = CLMSUI.utils.BaseFrameView.extend({
 			self.menu.append("button")
 				.attr("class", "settingsTab btn btn-1a")
 				.attr("data-tab", b_id)
+				.attr("id", b_id)
 				.attr("style", "z-index: " + zIndex)
 				.text(b)
 			;
 		});
+
+		if (!this.options.showCustomCfg){
+			this.menu.selectAll('#custom_config').style("display", "none");
+		}
 
 		// add active class to first tab-button
 		this.menu.select('button').classed('active', true);
@@ -116,7 +127,7 @@ var SpectrumSettingsView = CLMSUI.utils.BaseFrameView.extend({
 		var rightDiv = dataFlexRow.append("div").attr("class", "settingsDataRight");
 
 		var ionSelector = rightDiv.append("label").attr("class", "flex-row").text("Fragment Ions: ")
-			.append("div").attr("class", "mulitSelect_dropdown flex-grow")
+			.append("div").attr("class", "multiSelect_dropdown flex-grow")
 		;
 		ionSelector.append("input")
 			.attr("type", "text")
@@ -124,7 +135,7 @@ var SpectrumSettingsView = CLMSUI.utils.BaseFrameView.extend({
 			.attr("id", "ionSelection")
 			.attr("readonly", "")
 		;
-		var ionSelectorDropdown = ionSelector.append("div").attr("class", "mulitSelect_dropdown-content mutliSelect");
+		var ionSelectorDropdown = ionSelector.append("div").attr("class", "multiSelect_dropdown-content mutliSelect");
 		var ionSelectorList = ionSelectorDropdown.append("ul").attr("id", 'ionList');
 		var ionOptions = [
 			{value: "peptide", text: "Peptide Ion"},
@@ -155,15 +166,16 @@ var SpectrumSettingsView = CLMSUI.utils.BaseFrameView.extend({
 		;
 
 		var toleranceWrapper = rightDiv.append("label").attr("class", "flex-row").text("MS2 tolerance: ");
-		this.toleranceValue = toleranceWrapper.append('div').attr('class', 'flex-grow stepInput').append("input")
-			.attr("type", "number")
-			.attr("placeholder", "Error tolerance")
+		this.toleranceValue = toleranceWrapper.append('div').attr('class', 'flex-grow').append("input")
+			.attr("type", "text")
+			// .attr("type", "number")
+			.attr("placeholder", "tolerance")
 			.attr("autocomplete", "off")
 			.attr("name", "ms2Tol")
-			.attr("min", "0")
-			.attr("step", "0.1")
+			// .attr("min", "0")
+			// .attr("step", "0.1")
 			.attr("required", "")
-			.attr("class", "stepInput")
+			// .attr("class", "stepInput")
 		;
 		this.toleranceUnit = toleranceWrapper.append('div').append("select")
 			.attr("name", "tolUnit")
@@ -182,9 +194,10 @@ var SpectrumSettingsView = CLMSUI.utils.BaseFrameView.extend({
 				.attr("autocomplete", "off")
 				.attr("name", "clModMass")
 				.attr("required", "")
-				.attr("type", "number")
-				.attr("step", "0.001")
-				.attr("class", "stepInput")
+				.attr("type", "text")
+				// .attr("type", "number")
+				// .attr("step", "0.001")
+				// .attr("class", "stepInput")
 		;
 
 		//modTable
@@ -260,7 +273,6 @@ var SpectrumSettingsView = CLMSUI.utils.BaseFrameView.extend({
 		this.customConfigInput = customConfigTab.append("textarea").attr("id", "settingsCustomCfg-input").attr("class", "form-control");
 		var customConfigBottom = customConfigTab.append("div").attr("class", "settings-bottom");
 		var customConfigSubmit = customConfigBottom.append("input").attr("class", "btn btn-1 btn-1a network-control").attr("value", "Apply").attr("id", "settingsCustomCfgApply").attr("type", "submit");
-
 
 		d3.select(this.el).selectAll("label")
 			.classed ("label", true)
@@ -362,7 +374,7 @@ var SpectrumSettingsView = CLMSUI.utils.BaseFrameView.extend({
 		}
 
 		//peptideStr
-		var invalidChar = invalidChars(formData['peps'].value, /([^GALMFWKQESPVICYHRNDTa-z;#0-9(.)\-]+)/);
+		var invalidChar = invalidChars(formData['peps'].value, /([^GALMFWKQESPVICYHRNDTa-z:;#0-9(.)\-]+)/);
 		if (invalidChar){
 			alert('Invalid character(s) in peptide sequence: ' + invalidChar);
 			return false;
@@ -435,17 +447,22 @@ var SpectrumSettingsView = CLMSUI.utils.BaseFrameView.extend({
 						data = 0;
 						var found = false;
 						var rowNode = self.modTable.rows( meta.row ).nodes().to$();
-						for (var i = 0; i < self.model.userModifications.length; i++) {
-							if(self.model.userModifications[i].id == row.id){
-								data = self.model.userModifications[i].mass;
-								found = true;
-								displayModified(rowNode);
-							}
-						}
-						if (!found){
+
+						//check knownModifications first
+						if(self.model.knownModifications['modifications'] !== undefined){
 							for (var i = 0; i < self.model.knownModifications['modifications'].length; i++) {
 								if(self.model.knownModifications['modifications'][i].id == row.id)
 									data = self.model.knownModifications['modifications'][i].mass;
+									found = true;
+							}
+						}
+						//then check JSONdata annotation
+						if (!found && self.model.annotationData.modifications){
+							for (var i = 0; i < self.model.annotationData.modifications.length; i++) {
+								if(self.model.annotationData.modifications[i].id == row.id){
+									data = self.model.annotationData.modifications[i].massDifference;
+
+								}
 							}
 						}
 						data = parseFloat(data.toFixed(10).toString()); // limit to 10 decimal places and get rid of tailing zeroes
@@ -453,26 +470,30 @@ var SpectrumSettingsView = CLMSUI.utils.BaseFrameView.extend({
 							var stepSize = '0.'+'0'.repeat(data.toString().split('.')[1].length - 1) + 1;
 						else
 							var stepSize = 1;
-						return '<input class="form-control stepInput" id="modMass_'+meta.row+'" row="'+meta.row+'" title="modification mass" name="modMasses[]" type="number" step="'+stepSize+'" required value='+data+' autocomplete=off>';
+						return '<input class="form-control stepInput" id="modMass_'+meta.row+'" row="'+meta.row+'" title="modification mass" name="modMasses[]" type="text" required value='+data+' autocomplete=off>';
 					},
 					"targets": 2,
 				},
 				{
 					"render": function ( data, type, row, meta ) {
-						for (var i = 0; i < self.model.userModifications.length; i++) {
-							if(self.model.userModifications[i].id == row.id){
-								data = self.model.userModifications[i].aminoAcids;
-								var found = true;
-							}
-						}
-						if (!found){
+						//check knownModifications first
+						if(self.model.knownModifications['modifications'] !== undefined){
 							for (var i = 0; i < self.model.knownModifications['modifications'].length; i++) {
 								if(self.model.knownModifications['modifications'][i].id == row.id){
 									data = data.split(",");
 									data = _.union(data, self.model.knownModifications['modifications'][i].aminoAcids);
 									data.sort();
 									data = data.join("");
-
+									var found = true;
+								}
+							}
+						}
+						//then check JSONdata annotation
+						if (!found && self.model.annotationData.modifications){
+							aminoAcids = "";
+							for (var i = 0; i < self.model.annotationData.modifications.length; i++) {
+								if(self.model.annotationData.modifications[i].id == row.id){
+									aminoAcids += self.model.annotationData.modifications[i].aminoacid;
 								}
 							}
 						}
@@ -545,19 +566,15 @@ var SpectrumSettingsView = CLMSUI.utils.BaseFrameView.extend({
 		if (this.model.JSONdata.annotation.custom !== undefined)
 			this.customConfigInput[0][0].value = this.model.JSONdata.annotation.custom.join("\n");
 
-		this.updateStepSize($(this.toleranceValue[0][0]));
-		this.updateStepSize($(this.crossLinkerModMass[0][0]));
+		// this.updateStepSize($(this.toleranceValue[0][0]));
+		// this.updateStepSize($(this.crossLinkerModMass[0][0]));
 	},
 
 	cancel: function(){
 		$(this.wrapper[0]).hide();
 		document.getElementById('highlightColor').jscolor.hide();
-		//reset the model by copying the original model
-		var model_copy = jQuery.extend({}, this.model.otherModel);
-		model_copy.otherModel = this.model.otherModel;
-		this.model = model_copy;
-		this.render();
-		// window.SettingsView.render();
+		this.model.resetModel();
+		// this.render();
 
 	},
 
@@ -565,21 +582,22 @@ var SpectrumSettingsView = CLMSUI.utils.BaseFrameView.extend({
 		$('#customCfgHelp').toggle();
 	},
 
-	updateStepSizeKeyUp: function(e){
-		this.updateStepSize($(e.target));
-	},
-
-	updateStepSize: function($target){
-		// var $target = $(e.target);
-		//update stepsize
-		if ($target.prop('value').toString().split('.')[1])
-			var stepSize = '0.'+'0'.repeat($target.prop('value').toString().split('.')[1].length - 1) + '1';
-		else {
-			var stepSize = 1;
-		}
-		$target.attr('step', stepSize);
-		$target.attr('value', $target.prop('value'));
-	},
+	// updateStepSizeKeyUp: function(e){
+	// 	this.updateStepSize($(e.target));
+	// },
+	//
+	// updateStepSize: function($target){
+	// 	// var $target = $(e.target);
+	// 	//update stepsize
+	// 	if ($target.prop('value').toString().split('.')[1])
+	// 		var stepSize = '0.'+'0'.repeat($target.prop('value').toString().split('.')[1].length - 1) + '1';
+	// 	else {
+	// 		//min stepsize to 0.1 -- can't read out 0. from target value
+	// 		var stepSize = 0.1;
+	// 	}
+	// 	$target.attr('step', stepSize);
+	// 	$target.attr('value', $target.prop('value'));
+	// },
 
 	changeTab: function(e) {
 		var activeTab = $(e.currentTarget).data('tab');

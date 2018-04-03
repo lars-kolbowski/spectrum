@@ -27,6 +27,7 @@ var SpectrumView = Backbone.View.extend({
 		this.listenTo(this.model, 'change', this.render);
 		this.listenTo(this.model, "changed:Zoom", this.updateRange);
 		this.listenTo(window, 'resize', _.debounce(this.resize));
+		this.listenTo(CLMSUI.vent, 'resize:spectrum', this.resize);
 		this.listenTo(this.model, 'changed:ColorScheme', this.updateColors);
 		this.listenTo(this.model, 'changed:HighlightColor', this.updateHighlightColors);
 		this.listenTo(this.model, 'changed:Highlights', this.updateHighlights);
@@ -218,7 +219,7 @@ var SpectrumView = Backbone.View.extend({
 	},
 	downloadSVG:function(){
 		var svgSel = d3.select(this.el).selectAll("svg");
-		var svgArr = [svgSel.node()];
+		var svgArr = svgSel[0];
 		var svgStrings = CLMSUI.svgUtils.capture (svgArr);
 		var svgXML = CLMSUI.svgUtils.makeXMLStr (new XMLSerializer(), svgStrings[0]);
 
@@ -247,8 +248,9 @@ var SpectrumView = Backbone.View.extend({
 			})
 		}
 
-		var svg_name = pepStrs.join("-") + "_z=" + charge + ".svg";
-
+		var svg_name = pepStrs.join("-") + "_z=" + charge;
+		svg_name += svgSel.node().id;
+		svg_name += ".svg";
 		download (svgXML, 'application/svg', svg_name);
 	},
 
@@ -276,9 +278,11 @@ var SpectrumView = Backbone.View.extend({
 	},
 
 	enableRevertAnnotation: function(){
-		$(this.el).css('background-color', 'rgb(210, 224, 255)');
-		$('#revertAnnotation').addClass('btn-1a');
-		$('#revertAnnotation').removeClass('disabled');
+		if(this.model.get('database') || !this.model.get('standalone')){
+			$(this.el).css('background-color', 'rgb(210, 224, 255)');
+			$('#revertAnnotation').addClass('btn-1a');
+			$('#revertAnnotation').removeClass('disabled');
+		}
 	},
 
 	disableRevertAnnotation: function(){
