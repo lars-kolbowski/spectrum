@@ -37,10 +37,11 @@ var QCwrapperView = Backbone.View.extend({
 
 		var defaultOptions = {
 			splitIds: ['#mainPlotDiv', '#QCdiv'],
+			showOnStartUp: true,
 		};
 		this.options = _.extend(defaultOptions, viewOptions);
 
-		CLMSUI.plotSplit = Split(this.options.splitIds, {
+		this.plotSplit = Split(this.options.splitIds, {
 			sizes: [75, 25],
 			minSize: [250, 150],
 			gutterSize: 5,
@@ -49,7 +50,7 @@ var QCwrapperView = Backbone.View.extend({
 		});
 
 		this.dock = 'bottom';
-		this.isVisible = true;
+		// this.isVisible = true;
 
 		this.headerDiv = d3.select(this.el.getElementsByClassName("subViewHeader")[0]);
 		this.contentDiv = d3.select(this.el.getElementsByClassName("subViewContent")[0]);
@@ -65,7 +66,7 @@ var QCwrapperView = Backbone.View.extend({
 		plotSelector.append("span")
 			.attr("type", "text")
 			.attr("class", "btn btn-1a")
-			.html('Select plots<i class="fa fa-chevron-down" aria-hidden="true"></i>')
+			.html('<i class="fa fa-chevron-down" aria-hidden="true"></i>')
 		;
 		var plotSelectorDropdown = plotSelector.append("div").attr("class", "multiSelect_dropdown-content mutliSelect");
 		var plotSelectorList = plotSelectorDropdown.append("ul");
@@ -107,6 +108,7 @@ var QCwrapperView = Backbone.View.extend({
 		this.dockBottomBtn = rightControls.append('i')
 			.attr('class', 'fa fa-window-maximize pointer dockBottom')
 			.attr('aria-hidden', 'true')
+			.attr('style', 'display:none;')
 			.attr('title', 'dock to bottom')
 		;
 		this.dockRightBtn = rightControls.append('i')
@@ -130,6 +132,9 @@ var QCwrapperView = Backbone.View.extend({
 			.attr('aria-hidden', 'true')
 			.attr('title', 'hide QC plots')
 		;
+
+		if(!this.options.showOnStartUp)
+			this.minView();
 	},
 
 	downloadQCSVG: function(){
@@ -138,10 +143,10 @@ var QCwrapperView = Backbone.View.extend({
 
 	splitHorizontal: function(){
 		try{
-			CLMSUI.plotSplit.destroy();
+			this.plotSplit.destroy();
 		}
 		catch(err){}
-		CLMSUI.plotSplit = Split(this.options.splitIds, {
+		this.plotSplit = Split(this.options.splitIds, {
 			sizes: [75, 25],
 			minSize: [500, 220],
 			gutterSize: 4,
@@ -152,10 +157,10 @@ var QCwrapperView = Backbone.View.extend({
 
 	splitVertical: function(){
 		try{
-			CLMSUI.plotSplit.destroy();
+			this.plotSplit.destroy();
 		}
 		catch(err){}
-		CLMSUI.plotSplit = Split(this.options.splitIds, {
+		this.plotSplit = Split(this.options.splitIds, {
 			sizes: [75, 25],
 			minSize: [250, 200],
 			gutterSize: 4,
@@ -165,7 +170,8 @@ var QCwrapperView = Backbone.View.extend({
 	},
 
 	showView: function(){
-		this.isVisible = true;
+		// this.isVisible = true;
+		CLMSUI.vent.trigger('show:QC', true);
 		$(this.controlsDiv[0]).show();
 		$(this.dockQCbtn[0]).hide();
 		$(this.minQCbtn[0]).show();
@@ -184,7 +190,8 @@ var QCwrapperView = Backbone.View.extend({
 	},
 
 	minView: function(){
-		this.isVisible = false;
+		// this.isVisible = false;
+		CLMSUI.vent.trigger('show:QC', false);
 		if(this.dock == 'left' || this.dock == 'right'){
 			$(this.el).parent().css('flex-direction', 'column');
 			$(this.el).removeClass('right');
@@ -195,8 +202,8 @@ var QCwrapperView = Backbone.View.extend({
 		$(this.dockQCbtn[0]).show();
 		$(this.minQCbtn[0]).hide();
 		$(this.contentDiv[0]).hide();
-		if(CLMSUI.plotSplit)
-			CLMSUI.plotSplit.destroy();
+		if(this.plotSplit)
+			this.plotSplit.destroy();
 		CLMSUI.vent.trigger('resize:spectrum');
 	},
 
@@ -223,6 +230,8 @@ var QCwrapperView = Backbone.View.extend({
 
 	dockRight: function(){
 		this.dock = 'right';
+		$(this.dockBottomBtn[0]).show();
+		$(this.dockRightBtn[0]).hide();
 		this.dockSide();
 		$(this.el).addClass('right');
 		$(this.el).removeClass('left');
@@ -230,6 +239,8 @@ var QCwrapperView = Backbone.View.extend({
 	},
 
 	dockBottom: function(){
+		$(this.dockBottomBtn[0]).hide();
+		$(this.dockRightBtn[0]).show();
 		this.title.text("Quality control plots");
 		this.dock = 'bottom';
 		$(this.el).parent().css('flex-direction', 'column');
