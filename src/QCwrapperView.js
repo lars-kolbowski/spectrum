@@ -36,7 +36,7 @@ var QCwrapperView = Backbone.View.extend({
 	initialize: function(viewOptions) {
 
 		var defaultOptions = {
-			splitIds: ['#mainPlotDiv', '#QCdiv'],
+			splitIds: ['#spectrumMainPlotDiv', '#QCdiv'],
 			showOnStartUp: true,
 		};
 		this.options = _.extend(defaultOptions, viewOptions);
@@ -223,7 +223,7 @@ var QCwrapperView = Backbone.View.extend({
 // 		this.dockSide();
 // 		$(this.el).addClass('left');
 // 		$(this.el).removeClass('right');
-// // 		$('#mainPlotDiv').css('order', 5);
+// // 		$('#spectrumMainPlotDiv').css('order', 5);
 //
 //  		$('.gutter-horizontal').css('order', -1);
 // 	},
