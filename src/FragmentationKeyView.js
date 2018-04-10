@@ -815,7 +815,13 @@ var FragmentationKeyView = Backbone.View.extend({
 
 	resize: function(){
 			var parentDivWidth = $(this.el).width();
-			var fragKeyWidth = $(".fragKey")[0].getBBox().width;
+		var fragKeyWidth;
+		try {
+			fragKeyWidth = $(".fragKey")[0].getBBox().width;
+		} catch (e) {
+			fragKeyWidth = {x: 0, y: 0, width: 0, height: 0};
+		}
+		//var fragKeyWidth = $(".fragKey")[0].getBoundingClientRect().width;
 		if (parentDivWidth < fragKeyWidth+40)
 			this.fragKeyWrapper.attr("transform", "scale("+parentDivWidth/(fragKeyWidth+40)+")")
 		else
