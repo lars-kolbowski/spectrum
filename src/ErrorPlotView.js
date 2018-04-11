@@ -86,6 +86,7 @@ var ErrorPlotView = Backbone.View.extend({
 
 	//ToDo: duplicate with SpectrumView2 downloadSVG function
 	downloadSVG: function(){
+		
 		if(this.isVisible){
 			var svgSel = d3.select(this.el).selectAll("svg");
 			var svgArr = svgSel[0];
@@ -120,7 +121,7 @@ var ErrorPlotView = Backbone.View.extend({
 			var svg_name = pepStrs.join("-") + "_z=" + charge;
 			svg_name += svgSel.node().id;
 			svg_name += ".svg";
-			download (svgXML, 'application/svg', svg_name);
+			download (svgXML, 'application/svg', svg_name, true);
 		};
 	},
 
