@@ -10,7 +10,6 @@ var SpectrumView = Backbone.View.extend({
 		'click #measuringTool': 'measuringTool',
 		'click #moveLabels': 'moveLabels',
 		'click #downloadSVG': 'downloadSVG',
-		'click #toggleView' : 'toggleView',
 		'click #toggleSettings' : 'toggleSettings',
 		'click #revertAnnotation' : 'revertAnnotation',
 		'click #toggleSpecList' : 'toggleSpecList',
@@ -22,7 +21,8 @@ var SpectrumView = Backbone.View.extend({
 				//~ .append("svg").style("width", "100%").style("height", "100%");
 
 		//create graph
-		this.graph = new Graph (this.svg, this.model, {xlabel:"m/z", ylabelLeft:"Intensity", ylabelRight:"% of base Peak"});
+		var graphOptions = {xlabel:"m/z", ylabelLeft:"Intensity", ylabelRight:"% of base Peak"};
+		this.graph = new Graph (this.svg, this.model, graphOptions);
 
 		this.listenTo(this.model, 'change', this.render);
 		this.listenTo(this.model, "changed:Zoom", this.updateRange);
@@ -84,8 +84,7 @@ var SpectrumView = Backbone.View.extend({
 	},
 
 	lockZoom: function(){
-		if (!this.model.showSpectrum)
-			return
+
 		if ($('#lockZoom').is(':checked')) {
 			$('#lock')[0].innerHTML = "&#128274";
 			$('#rangeSubmit').prop('disabled', true);
@@ -104,34 +103,34 @@ var SpectrumView = Backbone.View.extend({
 
 	},
 
-	toggleView: function(){
-		if (this.model.showSpectrum){
-			$('#toggleView')[0].innerHTML = "Spectrum";
-			$('#lock').css("cursor", "not-allowed");
-			$('#moveLabels').prop('disabled', true);
-			$('#measuringTool').prop('disabled', true);
-			$('#reset').prop('disabled', true);
-			$('#rangeSubmit').prop('disabled', true);
-			$('#xleft').prop('disabled', true);
-			$('#xright').prop('disabled', true);
-
-			this.model.lockZoom = true;
-			this.model.showSpectrum = false;
-			this.graph.hide();
-		}
-		else{
-			$('#toggleView')[0].innerHTML = "error/int";
-			$('#lock').css("cursor", "pointer");
-			$('#moveLabels').prop('disabled', false);
-			$('#measuringTool').prop('disabled', false);
-			$('#reset').prop('disabled', false);
-			$('#rangeSubmit').prop('disabled', false);
-			$('#xleft').prop('disabled', false);
-			$('#xright').prop('disabled', false);
-			this.model.showSpectrum = true;
-			this.graph.show();
-		}
-	},
+	// toggleView: function(){
+	// 	if (this.model.showSpectrum){
+	// 		$('#toggleView')[0].innerHTML = "Spectrum";
+	// 		$('#lock').css("cursor", "not-allowed");
+	// 		$('#moveLabels').prop('disabled', true);
+	// 		$('#measuringTool').prop('disabled', true);
+	// 		$('#reset').prop('disabled', true);
+	// 		$('#rangeSubmit').prop('disabled', true);
+	// 		$('#xleft').prop('disabled', true);
+	// 		$('#xright').prop('disabled', true);
+	//
+	// 		this.model.lockZoom = true;
+	// 		this.model.showSpectrum = false;
+	// 		this.graph.hide();
+	// 	}
+	// 	else{
+	// 		$('#toggleView')[0].innerHTML = "error/int";
+	// 		$('#lock').css("cursor", "pointer");
+	// 		$('#moveLabels').prop('disabled', false);
+	// 		$('#measuringTool').prop('disabled', false);
+	// 		$('#reset').prop('disabled', false);
+	// 		$('#rangeSubmit').prop('disabled', false);
+	// 		$('#xleft').prop('disabled', false);
+	// 		$('#xright').prop('disabled', false);
+	// 		this.model.showSpectrum = true;
+	// 		this.graph.show();
+	// 	}
+	// },
 
 	toggleSettings: function(event){
 		event.stopPropagation();

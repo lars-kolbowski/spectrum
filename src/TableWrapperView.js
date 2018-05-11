@@ -34,7 +34,7 @@ var TableWrapperView = Backbone.View.extend({
 		};
 		this.options = _.extend(defaultOptions, viewOptions);
 
-		this.listenTo(CLMSUI.vent, 'loadSpectrum', this.updateNav);
+		this.listenTo(CLMSUI.vent, 'updateAltCount', this.updateNav);
 		this.listenTo(CLMSUI.vent, 'toggleTableView', this.toggleView);
 
 		var d3el = d3.select(this.el);
@@ -117,11 +117,10 @@ var TableWrapperView = Backbone.View.extend({
 		window.trigger('resize');
 	},
 
-	updateNav: function(rowdata){
-		if(rowdata['alt_count'] > 1){
-
+	updateNav: function(alt_count){
+		if(alt_count > 1){
 			$('#nav-altListTable').removeClass('disabled');
-			$('#altExpNum').text("(" + rowdata['alt_count'] + ")");
+			$('#altExpNum').text("(" + (parseInt(alt_count)-1) + ")");
 			// window.TableWrapper.altListTable.DataTable.ajax.url( "/php/getAltList.php?id=" + mzid + "&db=" + window.SpectrumModel.get('database')+"&tmp=" + window.SpectrumModel.get('tmpDB')).load();
 		}
 		else{

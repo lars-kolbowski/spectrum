@@ -28,7 +28,7 @@ Graph = function(targetSvg, model, options) {
 	this.model = model;
 
 	this.margin = {
-		"top":	options.title  ? 130 : 110,
+		"top":	options.title  ? 140 : 120,
 		"right":  options.ylabelRight ? 60 : 45,
 		"bottom": options.xlabel ? 50 : 20,
 		"left":   options.ylabelLeft ? 65 : 30

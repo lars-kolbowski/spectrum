@@ -34,11 +34,12 @@ var FragmentationKeyView = Backbone.View.extend({
 		this.fragKeyWrapper = this.svg.append("g");
 
 		this.margin = {
-			"top":    20,
-			"right":  20,
-			"bottom": 40,
+			"top":    25,
+			// "right":  20,
+			// "bottom": 40,
 			"left":   40
 		};
+		this.xStep = 23;
 		//this.highlights = this.fragKeyWrapper.append("g").attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
 		this.g =  this.fragKeyWrapper.append("g").attr("class", "fragKey").attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
 
@@ -134,20 +135,18 @@ var FragmentationKeyView = Backbone.View.extend({
 						this.annotations[pepId][fragments[i].range[r].to].b.push(fragments[i]);
 				}
 			};
-			console.log(this.annotations);
+// 			console.log(this.annotations);
 
 			this.drawFragmentationEvents(0);
 			if(this.peptides[1])
 				this.drawFragmentationEvents(1);
 		}
 
-			this.xStep = 22;
-
-			// the letters
-			this.drawPeptides();
+		// the letters
+		this.drawPeptides();
 		// this.drawPeptide( 0, 20, 5);
 		// if(this.peptides[1])
-			//this.drawPeptide( 1, 71, 83);
+		//this.drawPeptide( 1, 71, 83);
 
 
 		//CL line svg elements

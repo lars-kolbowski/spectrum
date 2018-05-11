@@ -86,7 +86,6 @@ var ErrorPlotView = Backbone.View.extend({
 
 	//ToDo: duplicate with SpectrumView2 downloadSVG function
 	downloadSVG: function(){
-		
 		if(this.isVisible){
 			var svgSel = d3.select(this.el).selectAll("svg");
 			var svgArr = svgSel[0];
@@ -314,8 +313,6 @@ var ErrorPlotView = Backbone.View.extend({
 	},
 
 	showTooltip: function(x, y, data){
-		if (this.model.showSpectrum)
-			return
 
 		var contents = [["charge", data.charge], ["error", data.error.toFixed(3)], [this.options.xData, data.x.toFixed(this.model.showDecimals)]];
 
