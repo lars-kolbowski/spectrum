@@ -21,14 +21,9 @@
 
 var CLMSUI = CLMSUI || {};
 
-var SpectrumSettingsView = CLMSUI.utils.BaseFrameView.extend({
+var SpectrumSettingsView = Backbone.View.extend({
 
-	events: function() {
-		var parentEvents = CLMSUI.utils.BaseFrameView.prototype.events;
-		if (_.isFunction(parentEvents)) {
-				parentEvents = parentEvents();
-		}
-		return _.extend ({}, parentEvents, {
+	events : {
 		'click #lossyChkBx': 'showLossy',
 		'click #absErrChkBx': 'absErrToggle',
 		'change #colorSelector': 'changeColorScheme',
@@ -42,7 +37,6 @@ var SpectrumSettingsView = CLMSUI.utils.BaseFrameView.extend({
 		'submit #settingsForm' : 'applyData',
 		// 'keyup .stepInput' : 'updateStepSizeKeyUp',
 		'change .ionSelectChkbox': 'updateIons'
-		});
 	},
 
 	identifier: "Spectrum Settings",
@@ -127,7 +121,7 @@ var SpectrumSettingsView = CLMSUI.utils.BaseFrameView.extend({
 		var rightDiv = dataFlexRow.append("div").attr("class", "settingsDataRight");
 
 		var ionSelector = rightDiv.append("label").attr("class", "flex-row").text("Fragment Ions: ")
-			.append("div").attr("class", "multiSelect_dropdown flex-grow")
+			.append("div").attr("class", "xispec_multiSelect_dropdown flex-grow")
 		;
 		ionSelector.append("input")
 			.attr("type", "text")
@@ -135,7 +129,7 @@ var SpectrumSettingsView = CLMSUI.utils.BaseFrameView.extend({
 			.attr("id", "ionSelection")
 			.attr("readonly", "")
 		;
-		var ionSelectorDropdown = ionSelector.append("div").attr("class", "multiSelect_dropdown-content mutliSelect");
+		var ionSelectorDropdown = ionSelector.append("div").attr("class", "xispec_multiSelect_dropdown-content mutliSelect");
 		var ionSelectorList = ionSelectorDropdown.append("ul").attr("id", 'ionList');
 		var ionOptions = [
 			{value: "peptide", text: "Peptide Ion"},

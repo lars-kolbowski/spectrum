@@ -1,0 +1,87 @@
+#spectrumControls {
+    display: table-row;
+}
+
+#spectrumControls div {
+    /* padding-bottom: 0.3em; */
+    /* border-bottom: 1px solid grey; */
+}
+
+#spectrumControls label {
+    display: inline-block;
+    padding-left: 0.4em;
+    padding-right: 0.4em;
+    margin-left: 3px;
+    margin-right: 3px;
+}
+
+#spectrumControls input {
+    vertical-align: middle;
+    line-height: normal;
+    text-align: center;
+}
+
+#spectrumControls form {
+    display: inline-block;
+    border-left: 1px solid white;
+    border-right: 1px solid white;
+    margin-bottom: 0px;
+}
+
+#spectrumControls form > * {
+    margin-right: 0.3em;
+    vertical-align: middle;
+}
+
+.plotsDiv {
+    display: flex;
+    flex-direction: column;
+    flex-grow:  1;
+    flex-shrink:  0;
+    height: calc(100% - 35px);
+    position: relative;
+}
+
+#spectrumMainPlotDiv {
+    display: flex;
+    flex-flow: column;
+    flex-grow: 1;
+    min-height: 150px;
+}
+
+.validationControls {
+	padding:5px;
+	background: white;
+/*
+    display: table-row;
+*/
+}
+
+#spectrumSVG {
+    width: 100%;
+    height: 100%;
+    flex-grow: 1;
+}
+
+#measureTooltip {
+    position: absolute;
+    /*max-width: 8em;*/
+    text-align:center;
+    pointer-events:none; /*let mouse events pass through*/
+    /*transition: opacity 0.3s;*/
+    color: black;
+    background: rgba(230,230,230,0.4);
+    padding: 0.2em;
+    border: 1px solid rgba(128,128,128,0.5);
+    line-height: normal;
+}
+
+#alternatives {
+	margin-left: 10px;
+    padding: 10px;
+    height:200px;
+}
+
+.scrollHolder {
+    color: #888;
+}
