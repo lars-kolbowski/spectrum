@@ -34,7 +34,7 @@ var SpectrumSettingsView = Backbone.View.extend({
 		'change #peakHighlightMode' : 'changePeakHighlightMode',
 		'click #toggleCustomCfgHelp' : 'toggleCustomCfgHelp',
 		'click #settingsCustomCfgApply' : 'applyCustomCfg',
-		'submit #settingsForm' : 'applyData',
+		'submit #xispec_settingsForm' : 'applyData',
 		// 'keyup .stepInput' : 'updateStepSizeKeyUp',
 		'change .ionSelectChkbox': 'updateIons'
 	},
@@ -85,17 +85,17 @@ var SpectrumSettingsView = Backbone.View.extend({
 		// add active class to first tab-button
 		this.menu.select('button').classed('active', true);
 
-		var mainDiv = this.wrapper.append("div").attr("id", "settings_main");
+		var mainDiv = this.wrapper.append("div").attr("id", "xispec_settings_main");
 
 		//data ToDo: change to more BBlike data handling
-		var dataTab = mainDiv.append("div").attr("class", "settings-tab flex-column").attr("id", "settings_data");
+		var dataTab = mainDiv.append("div").attr("class", "xispec_settings-tab xispec_flex-column").attr("id", "settings_data");
 
-		var dataForm = dataTab.append("form").attr("id", "settingsForm").attr("method", "post").attr("class", "flex-column");
+		var dataForm = dataTab.append("form").attr("id", "xispec_settingsForm").attr("method", "post").attr("class", "xispec_flex-column");
 
-		// var dataFlexColumn = dataForm.append("div").attr("class", "flex-column");
+		// var dataFlexColumn = dataForm.append("div").attr("class", "xispec_flex-column");
 
-		var peptideLabel = dataForm.append("label").attr("class", "flex-row").text("Peptide Sequence: ")
-		this.peptideViewEl = peptideLabel.append('div').attr('class', 'flex-grow').append("input")
+		var peptideLabel = dataForm.append("label").attr("class", "xispec_flex-row").text("Peptide Sequence: ")
+		this.peptideViewEl = peptideLabel.append('div').attr('class', 'xispec_flex-grow').append("input")
 			.attr("type", "text")
 			.attr("required", "")
 			.attr("autofocus", "")
@@ -105,11 +105,11 @@ var SpectrumSettingsView = Backbone.View.extend({
 		;
 		this.pepInputView = new PepInputView({model: this.model, el: this.peptideViewEl[0] });
 
-		var dataFlexRow = dataForm.append("div").attr("class", "flex-row midDataDiv");
+		var dataFlexRow = dataForm.append("div").attr("class", "xispec_flex-row xispec_midDataDiv");
 
 		var leftDiv = dataFlexRow.append("div").attr("class", "settingsDataLeft");
 
-		this.peaklist = leftDiv.append("label").attr("class", "flex-column").attr("style", "height: 100%").text("Peak list (m/z\tintensity): ").append("textarea")
+		this.peaklist = leftDiv.append("label").attr("class", "xispec_flex-column").attr("style", "height: 100%").text("Peak list (m/z\tintensity): ").append("textarea")
 			.attr("required", "")
 			.attr("id", "settingsPeaklist")
 			.attr("type", "text")
@@ -120,8 +120,8 @@ var SpectrumSettingsView = Backbone.View.extend({
 
 		var rightDiv = dataFlexRow.append("div").attr("class", "settingsDataRight");
 
-		var ionSelector = rightDiv.append("label").attr("class", "flex-row").text("Fragment Ions: ")
-			.append("div").attr("class", "xispec_multiSelect_dropdown flex-grow")
+		var ionSelector = rightDiv.append("label").attr("class", "xispec_flex-row").text("Fragment Ions: ")
+			.append("div").attr("class", "xispec_multiSelect_dropdown xispec_flex-grow")
 		;
 		ionSelector.append("input")
 			.attr("type", "text")
@@ -155,12 +155,12 @@ var SpectrumSettingsView = Backbone.View.extend({
 			.text(function(d) { return d.text; })
 		;
 
-		this.precursorZ = rightDiv.append("label").attr("class", "flex-row").text("Precursor charge state: ").append('div').attr('class', 'flex-grow')
+		this.precursorZ = rightDiv.append("label").attr("class", "xispec_flex-row").text("Precursor charge state: ").append('div').attr('class', 'xispec_flex-grow')
 			.append("input").attr("type", "number").attr("placeholder", "Charge").attr("autocomplete", "off").attr("name", "preCharge").attr("min", "1").attr("required", "")
 		;
 
-		var toleranceWrapper = rightDiv.append("label").attr("class", "flex-row").text("MS2 tolerance: ");
-		this.toleranceValue = toleranceWrapper.append('div').attr('class', 'flex-grow').append("input")
+		var toleranceWrapper = rightDiv.append("label").attr("class", "xispec_flex-row").text("MS2 tolerance: ");
+		this.toleranceValue = toleranceWrapper.append('div').attr('class', 'xispec_flex-grow').append("input")
 			.attr("type", "text")
 			// .attr("type", "number")
 			.attr("placeholder", "tolerance")
@@ -180,9 +180,9 @@ var SpectrumSettingsView = Backbone.View.extend({
 		this.toleranceUnit.append("option").attr("value", "ppm").text("ppm");
 		this.toleranceUnit.append("option").attr("value", "Da").text("Da");
 
-		this.crossLinkerModMassWrapper = rightDiv.append("label").attr("class", "flex-row").text("Cross-linker mod mass: ");
+		this.crossLinkerModMassWrapper = rightDiv.append("label").attr("class", "xispec_flex-row").text("Cross-linker mod mass: ");
 
-		this.crossLinkerModMass = this.crossLinkerModMassWrapper.append('div').attr('class', 'flex-grow')
+		this.crossLinkerModMass = this.crossLinkerModMassWrapper.append('div').attr('class', 'xispec_flex-grow')
 			.append("input")
 				.attr("placeholder", "CL mod mass")
 				.attr("autocomplete", "off")
@@ -207,7 +207,7 @@ var SpectrumSettingsView = Backbone.View.extend({
 
 		//appearance
 		var appearanceTab = mainDiv.append("div")
-			.attr("class", "settings-tab flex-column")
+			.attr("class", "xispec_settings-tab xispec_flex-column")
 			.attr("id", "settings_appearance")
 			.style("display", "none")
 		;
@@ -258,7 +258,7 @@ var SpectrumSettingsView = Backbone.View.extend({
 
 
 		//custom config
-		var customConfigTab = mainDiv.append("div").attr("class", "settings-tab flex-column").attr("id", "settings_custom_config").style("display", "none");
+		var customConfigTab = mainDiv.append("div").attr("class", "xispec_settings-tab xispec_flex-column").attr("id", "settings_custom_config").style("display", "none");
 		customConfigTab.append('div').attr('id', 'toggleCustomCfgHelp').attr('class', 'pointer').text('Help ').append('i').attr("class", "fa fa-question-circle").attr("aria-hidden", "true");
 		customConfigTab.append("textarea")
 			.attr("id", "customCfgHelp")
@@ -328,8 +328,8 @@ var SpectrumSettingsView = Backbone.View.extend({
 		}
 		var self = this;
 		var formData = new FormData($(form)[0]);
-		$('#settingsForm').hide();
-		var spinner = new Spinner({scale: 5}).spin (d3.select("#settings_main").node());
+		$('#xispec_settingsForm').hide();
+		var spinner = new Spinner({scale: 5}).spin (d3.select("#xispec_settings_main").node());
 
 		$.ajax({
 			url: self.model.baseDir+"php/formToJson.php",
@@ -346,7 +346,7 @@ var SpectrumSettingsView = Backbone.View.extend({
 				self.model.otherModel.changedAnnotation = true;
 				self.model.otherModel.trigger("changed:annotation");
 				spinner.stop();
-				$('#settingsForm').show();
+				$('#xispec_settingsForm').show();
 			}
 		});
 
@@ -595,7 +595,7 @@ var SpectrumSettingsView = Backbone.View.extend({
 
 	changeTab: function(e) {
 		var activeTab = $(e.currentTarget).data('tab');
-		$('.settings-tab').hide();
+		$('.xispec_settings-tab').hide();
 		this.menu.selectAll('button').classed('active', false);
 		$('#settings_'+activeTab).show();
 		$(e.target).addClass('active');

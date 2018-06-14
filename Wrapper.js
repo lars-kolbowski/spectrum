@@ -37,7 +37,7 @@ xiSPEC.init = function(targetDiv) {
 	this.SettingsSpectrumModel.otherModel = this.SpectrumModel;
 
 	var _html = ""
-		+"<div class='dynDiv' id='settingsWrapper'>"
+		+"<div class='dynDiv' id='xispec_settingsWrapper'>"
 		+"	<div class='dynDiv_moveParentDiv'>"
 		+"		<span class='dynTitle'>Settings</span>"
 		+"		<i class='fa fa-times-circle settingsCancel' id='closeSettings'></i>"
@@ -71,11 +71,11 @@ xiSPEC.init = function(targetDiv) {
 		+"      <svg id='spectrumSVG'></svg>"
 		+"      <div id='measureTooltip'></div>"
 		+"  </div>"
-		+"  <div id='QCdiv'>"
-		+"      <div class='subViewHeader'></div>"
-		+"      <div class='subViewContent'>"
-		+"          <div class='subViewContent-plot' id='subViewContent-left'><svg id='errIntSVG' class='errSVG'></svg></div>"
-		+"          <div class='subViewContent-plot' id='subViewContent-right'><svg id='errMzSVG' class='errSVG'></svg></div>"
+		+"  <div id='xispec_QCdiv'>"
+		+"      <div class='xispec_subViewHeader'></div>"
+		+"      <div class='xispec_subViewContent'>"
+		+"          <div class='xispec_subViewContent-plot' id='xispec_subViewContent-left'><svg id='errIntSVG' class='xispec_errSVG'></svg></div>"
+		+"          <div class='xispec_subViewContent-plot' id='xispec_subViewContent-right'><svg id='errMzSVG' class='xispec_errSVG'></svg></div>"
 		+"      </div>"
 		+"  </div>"
 		+"</div>"
@@ -95,17 +95,17 @@ xiSPEC.init = function(targetDiv) {
 	this.Spectrum = new SpectrumView({model: this.SpectrumModel, el:"#spectrumPanel"});
 	this.FragmentationKey = new FragmentationKeyView({model: this.SpectrumModel, el:"#spectrumMainPlotDiv"});
 	this.InfoView = new PrecursorInfoView ({model: this.SpectrumModel, el:"#spectrumPanel"});
-	this.QCwrapper = new QCwrapperView({el: '#QCdiv'});
+	this.QCwrapper = new QCwrapperView({el: '#xispec_QCdiv'});
 	this.ErrorIntensityPlot = new ErrorPlotView({
 		model: this.SpectrumModel,
-		el:"#subViewContent-left",
+		el:"#xispec_subViewContent-left",
 		xData: 'Intensity',
 		margin: {top: 10, right: 30, bottom: 20, left: 65},
 		svg: "#errIntSVG",
 	});
 	this.ErrorMzPlot = new ErrorPlotView({
 		model: this.SpectrumModel,
-		el:"#subViewContent-right",
+		el:"#xispec_subViewContent-right",
 		xData: 'm/z',
 		margin: {top: 10, right: 30, bottom: 20, left: 65},
 		svg: "#errMzSVG",
@@ -114,7 +114,7 @@ xiSPEC.init = function(targetDiv) {
 
 	this.SettingsView = new SpectrumSettingsView({
 		model: this.SettingsSpectrumModel,
-		el:"#settingsWrapper",
+		el:"#xispec_settingsWrapper",
 		showCustomCfg: false,
 	});
 
@@ -129,7 +129,7 @@ xiSPEC.setData = function(data){
 };
 
 xiSPEC.sanityChecks = function(data){
-	
+
 	// ToDo: create sanityChecks
 	// if(data.sequence2 !== undefined){
 	// 	if(data.linkPos1 === undefined || data.linkPos2 === undefined){

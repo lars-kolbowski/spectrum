@@ -1,9 +1,4 @@
-
-#settings-appearance{
-    border-left: 1px solid white;
-}
-
-#settingsWrapper{
+#xispec_settingsWrapper{
     display: none;
     z-index: 2;
     right: 5%;
@@ -17,28 +12,28 @@
     border: 1px solid #333;
 }
 
-#settings_main .form-control{
+#xispec_settings_main .form-control{
   display: inline-block;
   background-color: #fff;
   /* flex-grow: 1; */
 }
 
-#settings_main .settings-tab{
+#xispec_settings_main .xispec_settings-tab{
   flex-grow: 1;
 }
 
-#settings_main #settingsForm{
+#xispec_settings_main #xispec_settingsForm{
   flex-grow: 1;
 }
 
-#settings_main .flex-column{
+#xispec_settings_main .xispec_flex-column{
    display: -webkit-flex;
    display: flex;
    -webkit-flex-direction: column;
    flex-direction: column;
 }
 
-#settings_main .flex-row{
+#xispec_settings_main .xispec_flex-row{
    display: -webkit-flex;
    display: flex;
    -webkit-flex-direction: row;
@@ -47,20 +42,20 @@
    justify-content: flex-start;
 }
 
-#settings_main .flex-grow {
+#xispec_settings_main .xispec_flex-grow {
     flex-grow: 1;
     margin-left: 5px;
 }
 
-#settings_main .flex-grow input{
+#xispec_settings_main .xispec_flex-grow input{
     width: 100%;
 }
 
-#settings_main .midDataDiv{
+#xispec_settings_main .xispec_midDataDiv{
   flex-grow: 1;
 }
 
-#settings_main .label {
+#xispec_settings_main .label {
     font-size: 0.9em;
     cursor: pointer;
     text-transform: uppercase;
@@ -73,7 +68,7 @@
     line-height: 3.5em;
 }
 
-#settings_main .settings-bottom{
+#xispec_settings_main .settings-bottom{
   margin-bottom: 20px;
   text-align: center;
   font-size: 1.5em;
@@ -101,7 +96,7 @@
     color: #fff;
 }
 
-#settings_main{
+#xispec_settings_main{
     padding-top: 10px;
     padding-left: 10px;
     padding-right: 10px;
@@ -111,11 +106,11 @@
     height: 100%;
 }
 
-#settings_main .label .form-control{
+#xispec_settings_main .label .form-control{
   height: 2.5em;
 }
 
-#settings_main #settingsPeaklist{
+#xispec_settings_main #settingsPeaklist{
   height:100%;
 }
 
@@ -171,17 +166,17 @@
     color: #333;
 }
 
-#settings_main .invisible {
+#xispec_settings_main .invisible {
     visibility: hidden;
     display: none;
 }
 
-#settings_main .userModified{
+#xispec_settings_main .userModified{
     background-color: #a0bbde !important;
     font-weight: bold !important;
 }
 
-#settings_main #ionList input{
+#xispec_settings_main #ionList input{
     width: unset;
 }
 

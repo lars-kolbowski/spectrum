@@ -25,18 +25,18 @@ var QCwrapperView = Backbone.View.extend({
 
 	events : {
 		'click .toggle' : 'toggleView',
-		'click #minQC' : 'minView',
-		'click #dockQC' : 'showView',
-		'click .dockRight' : 'dockRight',
-		'click .dockBottom' : 'dockBottom',
-		'change .plotSelectChkbox': 'updatePlots',
-		'click #downloadQCSVG': 'downloadQCSVG',
+		'click #xispec_minQC' : 'minView',
+		'click #xispec_dockQC' : 'showView',
+		'click .xispec_dockRight' : 'dockRight',
+		'click .xispec_dockBottom' : 'dockBottom',
+		'change .xispec_plotSelectChkbox': 'updatePlots',
+		'click #xispec_downloadQCSVG': 'downloadQCSVG',
 	},
 
 	initialize: function(viewOptions) {
 
 		var defaultOptions = {
-			splitIds: ['#spectrumMainPlotDiv', '#QCdiv'],
+			splitIds: ['#spectrumMainPlotDiv', '#xispec_QCdiv'],
 			showOnStartUp: true,
 		};
 		this.options = _.extend(defaultOptions, viewOptions);
@@ -52,8 +52,8 @@ var QCwrapperView = Backbone.View.extend({
 		this.dock = 'bottom';
 		// this.isVisible = true;
 
-		this.headerDiv = d3.select(this.el.getElementsByClassName("subViewHeader")[0]);
-		this.contentDiv = d3.select(this.el.getElementsByClassName("subViewContent")[0]);
+		this.headerDiv = d3.select(this.el.getElementsByClassName("xispec_subViewHeader")[0]);
+		this.contentDiv = d3.select(this.el.getElementsByClassName("xispec_subViewContent")[0]);
 
 		this.title = this.headerDiv.append("span")
 			.text('Quality control plots')
@@ -78,7 +78,7 @@ var QCwrapperView = Backbone.View.extend({
 			.enter()
 			.append("li").append("label")
 			.append("input")
-				.attr("class", "plotSelectChkbox")
+				.attr("class", "xispec_plotSelectChkbox")
 				.attr("type", "checkbox")
 				.attr("checked", "checked")
 				.attr("id", function(d) { return d.text; })
@@ -92,27 +92,27 @@ var QCwrapperView = Backbone.View.extend({
 		var downloadButton = this.controlsDiv.append('i')
 		 	.attr("class", "btn btn-1a btn-topNav fa fa-download pointer")
 			.attr("aria-hidden", "true")
-			.attr("id", "downloadQCSVG")
+			.attr("id", "xispec_downloadQCSVG")
 			.attr("title", "download SVG(s)")
 		;
 
 		var rightControls = this.controlsDiv.append('div')
-			.attr('class', 'rightControls')
+			.attr('class', 'xispec_rightControls')
 		;
 
-		// this.dockLeftBtn = rightControls.append('i')
-		// 	.attr('class', 'fa fa-window-maximize pointer dockLeft')
+		// this.xispec_dockLeftBtn = rightControls.append('i')
+		// 	.attr('class', 'fa fa-window-maximize pointer xispec_dockLeft')
 		// 	.attr('aria-hidden', 'true')
 		// 	.attr('title', 'dock to left')
 		// ;
 		this.dockBottomBtn = rightControls.append('i')
-			.attr('class', 'fa fa-window-maximize pointer dockBottom')
+			.attr('class', 'fa fa-window-maximize pointer xispec_dockBottom')
 			.attr('aria-hidden', 'true')
 			.attr('style', 'display:none;')
 			.attr('title', 'dock to bottom')
 		;
 		this.dockRightBtn = rightControls.append('i')
-			.attr('class', 'fa fa-window-maximize pointer dockRight')
+			.attr('class', 'fa fa-window-maximize pointer xispec_dockRight')
 			.attr('aria-hidden', 'true')
 			.attr('title', 'dock to right')
 		;
@@ -121,14 +121,14 @@ var QCwrapperView = Backbone.View.extend({
 
 		this.dockQCbtn = this.headerDiv.append('i')
 			.attr('class', 'fa fa-angle-double-up pointer minMax')
-			.attr('id', 'dockQC')
+			.attr('id', 'xispec_dockQC')
 			.attr('aria-hidden', 'true')
 			.attr('title', 'show QC plots')
 			.attr('style', 'display: none;')
 		;
 		this.minQCbtn = this.headerDiv.append('i')
 			.attr('class', 'fa fa-angle-double-down pointer minMax')
-			.attr('id', 'minQC')
+			.attr('id', 'xispec_minQC')
 			.attr('aria-hidden', 'true')
 			.attr('title', 'hide QC plots')
 		;
@@ -194,8 +194,8 @@ var QCwrapperView = Backbone.View.extend({
 		CLMSUI.vent.trigger('show:QC', false);
 		if(this.dock == 'left' || this.dock == 'right'){
 			$(this.el).parent().css('flex-direction', 'column');
-			$(this.el).removeClass('right');
-			$(this.el).removeClass('left');
+			$(this.el).removeClass('xispec_QCdiv-right');
+			$(this.el).removeClass('xispec_QCdiv-left');
 			$(this.contentDiv[0]).css('flex-direction', 'row');
 		}
 		$(this.controlsDiv[0]).hide();
@@ -233,8 +233,8 @@ var QCwrapperView = Backbone.View.extend({
 		$(this.dockBottomBtn[0]).show();
 		$(this.dockRightBtn[0]).hide();
 		this.dockSide();
-		$(this.el).addClass('right');
-		$(this.el).removeClass('left');
+		$(this.el).addClass('xispec_QCdiv-right');
+		$(this.el).removeClass('xispec_QCdiv-left');
 // 		$('.gutter-horizontal').css('order', 0);
 	},
 
@@ -244,8 +244,8 @@ var QCwrapperView = Backbone.View.extend({
 		this.title.text("Quality control plots");
 		this.dock = 'bottom';
 		$(this.el).parent().css('flex-direction', 'column');
-		$(this.el).removeClass('left');
-		$(this.el).removeClass('right');
+		$(this.el).removeClass('xispec_QCdiv-left');
+		$(this.el).removeClass('xispec_QCdiv-right');
 		$(this.contentDiv[0]).css('flex-direction', 'row');
 		this.splitVertical();
 		CLMSUI.vent.trigger('resize:spectrum');
