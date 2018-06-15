@@ -22,7 +22,7 @@
 var TableWrapperView = Backbone.View.extend({
 
 	events : {
-		'click .closeTable' : 'hideView',
+		'click .xispec_closeTable' : 'hideView',
 		'click .nav-tabs a[data-toggle=tab]' : 'changeTab',
 	},
 
@@ -40,7 +40,7 @@ var TableWrapperView = Backbone.View.extend({
 		var d3el = d3.select(this.el);
 
 		var closeButton = d3el.append("i")
-			.attr("class", "fa fa-times-circle closeTable")
+			.attr("class", "fa fa-times-circle xispec_closeTable")
 			.attr("id", "specListClose")
 		;
 
@@ -66,7 +66,7 @@ var TableWrapperView = Backbone.View.extend({
 			.attr("id", "tab-specListTable")
 		;
 		var specListWrapper = specListTab.append("div")
-			.attr("class", "listWrapper")
+			.attr("class", "xispec_listWrapper")
 			.attr("id", "specListWrapper")
 		;
 		this.specListTable = new specListTableView({
@@ -81,7 +81,7 @@ var TableWrapperView = Backbone.View.extend({
 			.attr("id", "tab-altListTable")
 		;
 		var altListWrapper = altListTab.append("div")
-			.attr("class", "listWrapper")
+			.attr("class", "xispec_listWrapper")
 			.attr("id", "altListWrapper")
 		;
 		this.altListTable = new altListTableView({

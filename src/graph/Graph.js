@@ -84,16 +84,7 @@ Graph = function(targetSvg, model, options) {
 	else{
 		// target = this.g.node().parentNode.parentNode; //this would get you #spectrumPanel
 		this.tooltip = d3.select("body").append("span")
-			.style("font-size", "small")
-			.style("padding", "0 5px")
-			.style("border-radius", "6px")
-			.attr("class", "tooltip")
-			.style("background-color", "black")
-			.style("color", "#ccc")
-			.style("pointer-events", "none")
-			.style("position", "absolute")
-			.style("opacity", 0)
-			.style("z-index", 1);
+			.attr("class", "xispec_tooltip")
 	}
 
 	this.highlights = this.innerSVG.append("g").attr("class", "peakHighlights");
@@ -136,7 +127,7 @@ Graph = function(targetSvg, model, options) {
 	this.measureTooltipText['to'] = this.measureTooltip.append("text");
 	this.measureTooltipText['match'] = this.measureTooltip.append("text");
 	this.measureTooltipText['masses'] = this.measureTooltip.append("g")
-		.attr("class", "measureMasses")
+		.attr("class", "xispec_measureMasses")
 	;
 
 	// add Chart Title

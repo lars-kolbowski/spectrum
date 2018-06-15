@@ -7,12 +7,17 @@
     height: 500px;
     min-width: 500px;
     min-height: 490px;
-    /* overflow-y: auto; */
     font-size: 10pt;
     border: 1px solid #333;
 }
 
-#xispec_settings_main .form-control{
+#xispec_settingsWrapper * {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+#xispec_settings_main .xispec_form-control{
   display: inline-block;
   background-color: #fff;
   /* flex-grow: 1; */
@@ -55,7 +60,7 @@
   flex-grow: 1;
 }
 
-#xispec_settings_main .label {
+#xispec_settings_main .xispec_label {
     font-size: 0.9em;
     cursor: pointer;
     text-transform: uppercase;
@@ -68,31 +73,33 @@
     line-height: 3.5em;
 }
 
-#xispec_settings_main .settings-bottom{
+#xispec_settings_main .xispec_settings-bottom{
   margin-bottom: 20px;
   text-align: center;
   font-size: 1.5em;
+  text-align: center;
+  margin-top: 10px;
+  bottom: 10px;
+  width: 95%;
 }
 
-.settings_menu{
+.xispec_settings_menu{
     font-size: 1.5em;
     margin: -6px 0px;
-    /* border-top: 1px solid #ccc; */
 }
-
-.settings_menu .btn{
+.xispec_settings_menu .xispec_btn{
   margin: 0px -5px 0px 0px;
   padding-left: 18px;
-  /* border-left: 1px solid white; */
   border-right: 1px solid white;
   border-top: 1px solid white;
   border-radius: 2px 10px 0 0;
-  /* background: rgba(192,206,224,1); */
+  position: relative;
+  background: #666;
 }
-.settings_menu .active{
-  background: rgba(192,206,224,1);
+.xispec_settings_menu .xispec_active{
+  background: #333!important;
 }
-.settings_menu .active:hover {
+.xispec_settings_menu .xispec_active:hover {
     color: #fff;
 }
 
@@ -106,11 +113,11 @@
     height: 100%;
 }
 
-#xispec_settings_main .label .form-control{
+#xispec_settings_main .xispec_label .xispec_form-control{
   height: 2.5em;
 }
 
-#xispec_settings_main #settingsPeaklist{
+#xispec_settings_main #xispec_settingsPeaklist{
   height:100%;
 }
 
@@ -118,7 +125,7 @@
   cursor: pointer;
 }
 
-.resetMod{
+.xispec_resetMod{
     background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAFaUlEQVRoQ+1YaWwUZRh+3plp60pJC4GIZUEgsXigRgvqD0BqW2oLpYWkaLiCoYjUNlgx9fphDcSDCBVbSitVCRCRJYQA5ehFEfihUjRqUFoTqhzVKpRyuWW7O6+Z0iHDdnZnZncIEJhkszPf937P8b3fNUO4xS+6xfXjjoEbncE7Gbg9MjBzixNeKsWmaVl2G76+QyjbJQqSmA+mJQCi5a+n2c5nO6DawxEztibIjAoACWqZb+NU2/lsB0S2K1qSopaAOB+AqB0y3q+ybOezFTBy1tYsMJUAcOqNdY/HE4vN08/ZOQ9sMeCYucUpQyoFIdNAnJuBzQK4snND1gE7jIRnINslRkVF5RFhqTJJLQpqInCFu9PzKTZP91lsezU8LAN3z95eAcJLoZL3tKv6j6NewPrUS6HghGUA2S6xj8ORx4SlZD0DGr3ciAiefKkys82qifAM9LA5cnY5Ra9cCrDRHAh2emwBkH5hbcZRKyZsMaAS9p27IwtEJRRgFTIURmg+Lw0ahc9GdxnG9gTYakDBHJjrir7cGb2E0HsfAKga4NRg4ghY3PHFpBU3zIBKHJNTlSAyVbBmJz77+STql7M7HSyvAjAsgMhzXRFS/MXy1H/MmLA9A9eQZrvE/jHRyo7cfRZqr0zv5oudt/M+gUjZB4boi6TK9sq0+TfeQI+C/jm7nERUemZN2tXT6ID5O+MZdDjA/iFD9A09U55xysjE9c2AAfvABbvfB+MtvTBmIeP0mtSqm9qAc96e/h4Jf+plgcFv/1uR9sFNbUARd8+CPXtBSNQRurGt/LkZthiIW1gzhYE0EF8dcsTU1il5l7eXpJ83IglWf+/C6jIAC3Vijvy1OnWUEbapORCXW90BIKYXGFNe6+qJypIY8jU4t/odRvdh0P/qbC1LdRgBmzIw+JWakwAG9zaADafKJs42IglW78ytWQ/CLJ2YUydXTdR9r9DGmjIwJL/2ezDG6JD8dqI05aFwDAzJq/0VwIO9MAiHTpSkPGmEbcrA0PzaTQCm64DJDocjtmnZ2AtGRHr1IwsP9nW73crwFHTqXcdLUp43wjVlYFh+/Vwm/lIPjIk/Ob4ypcCISK9+2KLaYjC9qtuW6cU/SpLWGuGaMhC/uGFAl9f3t/9Leg84AzShZWXSfiMybf3wRfXjAd4H6J6wfRGSOKh5eeJpI0xTBhSQEQX1O8CYrAtI1CJBTm4uTj5mRKjUxxfUjfBCqAPzcH08VB0rTsowg2XawPBFdY+KgvBjgPGqcF0i8Ou/FyeVByO+v6D+ZQZ9DKBPgDjZJ8uPt6xM/tlWA1d6bu86Jhgtm/uJaTsL8qFIt/CD0s7jkJ8gWRjDxFMAjA8mjBjrm4ufnWNGvBJjOgNK8CNvHuh3ucv3LcDx5ghIvhLHeqvMtRDdSqg5ShKf/uXDcWfN4Vs0oIA+8FpdPAvidwTEmiUJMG+uKWagg3ziU0dXjGu2gmspAyrwyMKG0QLTNgBxVsgCTFiluFUGZzYtS2y0iheSAYVkZOHBOAG+bQSMtkJKvRkbvSxmNi0b22oFR40N2YACMKGoQTrtpvkAvaucjAMK0GdpA/N7Axy8Zl9RojcU8ZYncSCSh4saosVOaQ6DpwJ4BoSIALHK55JviGmr7y7vuiNFiRdDFW5LBvTIE96ojfFIkY8RUxwRdc8RZm5l4tZIr+enwx+l3Hxfp8PtxXDahzUHwiG2q+1tbUAxr/60C4KZTuGeDCj/evemE2SGTBWpHAe0ov2fAxnSivEXqxpQ/5Wjh7ZM+xxkHwzs11+8VrR6r1emNaPc+wtVnrXi1Hv/Mm15SAb8G6kZ0+ttf9Ha4WXU8yEPpf8BwRqnQJnMMukAAAAASUVORK5CYII=);
     height: 16px;
     width: 16px;
@@ -128,40 +135,45 @@
     cursor: pointer;
 }
 
-.settingsDataLeft{
+.xispec_settingsDataLeft{
     display: inline;
     margin-right: 2%;
     flex-grow: 5;
     flex-basis: 340px;
 }
 
-.settingsDataRight{
+.xispec_settingsDataRight{
     flex-grow: 1;
 }
-#modificationTable_wrapper{
+
+#xispec_modificationTable .xispec_form-control{
+    height: 2.3em;
+    font-size: 1em;
+}
+
+#xispec_modificationTable_wrapper{
   width: 100%;
   height: auto;
 }
 
-#modificationTable_wrapperOuter{
+#xispec_modificationTable_wrapperOuter{
   width: 100%;
   height: auto;
   margin-top: 15px;
 }
 
-#settingsCustomCfg-input{
+#xispec_settingsCustomCfg-input{
   height: 440px;
   width: 100%;
-  /* margin: 0px 20% 0px 6px; */
 }
 
-#settings {
+#xispec_settings {
     position: absolute;
     top: 20%;
     left: 20%;
 }
 
-#ionSelection {
+#xispec_ionSelection {
     background-color: #FFF;
     color: #333;
 }
@@ -171,24 +183,16 @@
     display: none;
 }
 
-#xispec_settings_main .userModified{
+#xispec_settings_main .xispec_userModified{
     background-color: #a0bbde !important;
     font-weight: bold !important;
 }
 
-#xispec_settings_main #ionList input{
+#xispec_settings_main #xispec_ionList input{
     width: unset;
 }
 
-.settings-bottom{
-  text-align: center;
-  margin-top: 10px;
-  bottom: 10px;
-  /* position: absolute; */
-  width: 95%;
-}
-
-#settingsPeaklist{
+#xispec_settingsPeaklist{
   height: 170px;
   min-height: 140px;
   min-width: 220px;
@@ -198,13 +202,65 @@
   padding-top: 8px;
 }
 
-#customCfgHelp{
+#xispec_customCfgHelp{
   display: none;
   height: 500px;
   margin-bottom: 1em;
   white-space: nowrap;
 }
 
-#toggleCustomCfgHelp{
+#xispec_toggleCustomCfgHelp{
   margin: 0.2em 0em;
+}
+
+
+/*tables*/
+#xispec_modificationTable {
+    width:100%;
+    font-size: 0.9em;
+    left: auto;
+    position: relative;
+    margin-left: auto;
+    margin-right: auto;
+    border-collapse: collapse;
+    background-color: rgba(255, 255, 255, 1);
+    text-align: left;
+    border-collapse: separate;
+}
+#xispec_modificationTable thead{
+    margin-top:10px;
+    margin-bottom:10px;
+}
+#xispec_modificationTable th{
+    padding-left:5px;
+    padding-right:5px;
+    vertical-align: middle;
+    height: 30px;
+}
+#xispec_modificationTable td{
+    padding-left:5px;
+    padding-right:5px;
+    vertical-align: middle;
+    text-align: left;
+}
+#xispec_modificationTable th:first-child{
+    padding-left:10px;
+}
+#xispec_modificationTable th:last-child{
+    padding-right:10px;
+}
+#xispec_modificationTable td:first-child{
+    padding-left:10px;
+}
+#xispec_modificationTable td:last-child{
+    padding-right:10px;
+}
+#xispec_modificationTable tbody tr:hover td, tbody tr:hover td a, .spectrumShown{
+    color: #fff;
+    background-color: #091D42;
+    -webkit-transition: all 200ms ease;
+    -moz-transition: all 200ms ease;
+    -ms-transition: all 200ms ease;
+    -o-transition: all 200ms ease;
+    transition: all 200ms ease;
 }

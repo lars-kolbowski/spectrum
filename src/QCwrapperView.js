@@ -36,7 +36,7 @@ var QCwrapperView = Backbone.View.extend({
 	initialize: function(viewOptions) {
 
 		var defaultOptions = {
-			splitIds: ['#spectrumMainPlotDiv', '#xispec_QCdiv'],
+			splitIds: ['#xispec_spectrumMainPlotDiv', '#xispec_QCdiv'],
 			showOnStartUp: true,
 		};
 		this.options = _.extend(defaultOptions, viewOptions);
@@ -65,7 +65,7 @@ var QCwrapperView = Backbone.View.extend({
 		;
 		plotSelector.append("span")
 			.attr("type", "text")
-			.attr("class", "btn btn-1a")
+			.attr("class", "xispec_btn xispec_btn-1a")
 			.html('<i class="fa fa-chevron-down" aria-hidden="true"></i>')
 		;
 		var plotSelectorDropdown = plotSelector.append("div").attr("class", "xispec_multiSelect_dropdown-content mutliSelect");
@@ -90,7 +90,7 @@ var QCwrapperView = Backbone.View.extend({
 		;
 
 		var downloadButton = this.controlsDiv.append('i')
-		 	.attr("class", "btn btn-1a btn-topNav fa fa-download pointer")
+		 	.attr("class", "xispec_btn xispec_btn-1a xispec_btn-topNav fa fa-download pointer")
 			.attr("aria-hidden", "true")
 			.attr("id", "xispec_downloadQCSVG")
 			.attr("title", "download SVG(s)")
@@ -100,18 +100,18 @@ var QCwrapperView = Backbone.View.extend({
 			.attr('class', 'xispec_rightControls')
 		;
 
-		// this.xispec_dockLeftBtn = rightControls.append('i')
+		// this.xispec_dockLeftxispec_btn = rightControls.append('i')
 		// 	.attr('class', 'fa fa-window-maximize pointer xispec_dockLeft')
 		// 	.attr('aria-hidden', 'true')
 		// 	.attr('title', 'dock to left')
 		// ;
-		this.dockBottomBtn = rightControls.append('i')
+		this.dockBottomxispec_btn = rightControls.append('i')
 			.attr('class', 'fa fa-window-maximize pointer xispec_dockBottom')
 			.attr('aria-hidden', 'true')
 			.attr('style', 'display:none;')
 			.attr('title', 'dock to bottom')
 		;
-		this.dockRightBtn = rightControls.append('i')
+		this.dockRightxispec_btn = rightControls.append('i')
 			.attr('class', 'fa fa-window-maximize pointer xispec_dockRight')
 			.attr('aria-hidden', 'true')
 			.attr('title', 'dock to right')
@@ -119,14 +119,14 @@ var QCwrapperView = Backbone.View.extend({
 
 		// <i class="fa fa-window-maximize" aria-hidden="true"></i>
 
-		this.dockQCbtn = this.headerDiv.append('i')
+		this.dockQCxispec_btn = this.headerDiv.append('i')
 			.attr('class', 'fa fa-angle-double-up pointer minMax')
 			.attr('id', 'xispec_dockQC')
 			.attr('aria-hidden', 'true')
 			.attr('title', 'show QC plots')
 			.attr('style', 'display: none;')
 		;
-		this.minQCbtn = this.headerDiv.append('i')
+		this.minQCxispec_btn = this.headerDiv.append('i')
 			.attr('class', 'fa fa-angle-double-down pointer minMax')
 			.attr('id', 'xispec_minQC')
 			.attr('aria-hidden', 'true')
@@ -173,8 +173,8 @@ var QCwrapperView = Backbone.View.extend({
 		// this.isVisible = true;
 		CLMSUI.vent.trigger('show:QC', true);
 		$(this.controlsDiv[0]).show();
-		$(this.dockQCbtn[0]).hide();
-		$(this.minQCbtn[0]).show();
+		$(this.dockQCxispec_btn[0]).hide();
+		$(this.minQCxispec_btn[0]).show();
 		$(this.contentDiv[0]).show();
 		if (this.dock == 'left' || this.dock == 'right'){
 			this.splitHorizontal();
@@ -199,8 +199,8 @@ var QCwrapperView = Backbone.View.extend({
 			$(this.contentDiv[0]).css('flex-direction', 'row');
 		}
 		$(this.controlsDiv[0]).hide();
-		$(this.dockQCbtn[0]).show();
-		$(this.minQCbtn[0]).hide();
+		$(this.dockQCxispec_btn[0]).show();
+		$(this.minQCxispec_btn[0]).hide();
 		$(this.contentDiv[0]).hide();
 		if(this.plotSplit)
 			this.plotSplit.destroy();
@@ -223,15 +223,15 @@ var QCwrapperView = Backbone.View.extend({
 // 		this.dockSide();
 // 		$(this.el).addClass('left');
 // 		$(this.el).removeClass('right');
-// // 		$('#spectrumMainPlotDiv').css('order', 5);
+// // 		$('#xispec_spectrumMainPlotDiv').css('order', 5);
 //
 //  		$('.gutter-horizontal').css('order', -1);
 // 	},
 
 	dockRight: function(){
 		this.dock = 'right';
-		$(this.dockBottomBtn[0]).show();
-		$(this.dockRightBtn[0]).hide();
+		$(this.dockBottomxispec_btn[0]).show();
+		$(this.dockRightxispec_btn[0]).hide();
 		this.dockSide();
 		$(this.el).addClass('xispec_QCdiv-right');
 		$(this.el).removeClass('xispec_QCdiv-left');
@@ -239,8 +239,8 @@ var QCwrapperView = Backbone.View.extend({
 	},
 
 	dockBottom: function(){
-		$(this.dockBottomBtn[0]).hide();
-		$(this.dockRightBtn[0]).show();
+		$(this.dockBottomxispec_btn[0]).hide();
+		$(this.dockRightxispec_btn[0]).show();
 		this.title.text("Quality control plots");
 		this.dock = 'bottom';
 		$(this.el).parent().css('flex-direction', 'column');

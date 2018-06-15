@@ -167,7 +167,7 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 			.attr("x2", this.x- tailX)
 			.attr("y2", y + tailY)
 			.style("cursor", "pointer")
-			.attr("class", "fragBar");
+			.attr("class", "xispec_fragBar");
 
 
 		var ion = "";
@@ -288,7 +288,7 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 			.attr("x2", this.x + tailX)
 			.attr("y2", y - barHeight - tailY)
 			.style("cursor", "pointer")
-			.attr("class", "fragBar");
+			.attr("class", "xispec_fragBar");
 
 		var ion = "";
 		for (var i = 0; i < fragments.y.length; i++) {
@@ -356,7 +356,7 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 		.attr("y2", y - barHeight)
 		.style("cursor", "pointer")
 		.style("pointer-events", "none")
-		.attr("class", "fragBar");
+		.attr("class", "xispec_fragBar");
 
 	//if all fragments are lossy
 	if ((fragments.y.length == 0 || ylossy) && (fragments.b.length == 0 || blossy)){

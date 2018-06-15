@@ -4,10 +4,10 @@
   padding-left: 0.5em;
   border-top: 1px solid black;
   border-bottom: 1px solid white;
-  background: rgb(9, 29, 66);
+  background: rgba(117, 0, 0, 1);
 }
 
-.xispec_subViewHeader .btn{
+.xispec_subViewHeader .xispec_btn{
   padding: 0px 6px;
   font-size: smaller;
 }

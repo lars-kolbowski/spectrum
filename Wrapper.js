@@ -16,6 +16,9 @@ var CLMSUI = CLMSUI || {};
 CLMSUI.vent = {};
 _.extend (CLMSUI.vent, Backbone.Events);
 
+_.extend(window, Backbone.Events);
+window.onresize = function() { window.trigger('resize') };
+
 xiSPEC.init = function(targetDiv) {
 	// targetDiv could be div itself or id of div - lets deal with that
 	if (typeof targetDiv === "string"){
@@ -37,38 +40,36 @@ xiSPEC.init = function(targetDiv) {
 	this.SettingsSpectrumModel.otherModel = this.SpectrumModel;
 
 	var _html = ""
-		+"<div class='dynDiv' id='xispec_settingsWrapper'>"
-		+"	<div class='dynDiv_moveParentDiv'>"
-		+"		<span class='dynTitle'>Settings</span>"
+		+"<div class='xispec_dynDiv' id='xispec_settingsWrapper'>"
+		+"	<div class='xispec_dynDiv_moveParentDiv'>"
+		+"		<span class='xispec_dynTitle'>Settings</span>"
 		+"		<i class='fa fa-times-circle settingsCancel' id='closeSettings'></i>"
 		+"	</div>"
-		+"	<div class='dynDiv_resizeDiv_tl draggableCorner'></div>"
-		+"	<div class='dynDiv_resizeDiv_tr draggableCorner'></div>"
-		+"	<div class='dynDiv_resizeDiv_bl draggableCorner'></div>"
-		+"	<div class='dynDiv_resizeDiv_br draggableCorner'></div>"
+		+"	<div class='xispec_dynDiv_resizeDiv_tl draggableCorner'></div>"
+		+"	<div class='xispec_dynDiv_resizeDiv_tr draggableCorner'></div>"
+		+"	<div class='xispec_dynDiv_resizeDiv_bl draggableCorner'></div>"
+		+"	<div class='xispec_dynDiv_resizeDiv_br draggableCorner'></div>"
 		+"</div>"
-		+"<div id='spectrumControls'>"
-		+'<i class="btn btn-1a btn-topNav fa fa-download" aria-hidden="true" id="downloadSVG" title="download SVG" style="cursor: pointer;"></i>'
-		+'<label class="btn" title="toggle moveable labels on/off">Move Labels<input class="pointer" id="moveLabels" type="checkbox"></label>'
-		+"<button id='clearHighlights'>Clear Highlights</button>"
-		+"<label class='movePeakLabels'>Move Labels<input id='moveLabels' type='checkbox'></label>"
-		+'<label class="btn" title="toggle measure mode on/off">Measure<input class="pointer" id="measuringTool" type="checkbox"></label>'
+		+"<div id='xispec_spectrumControls'>"
+		+'<i class="xispec_btn xispec_btn-1a xispec_btn-topNav fa fa-download" aria-hidden="true" id="downloadSVG" title="download SVG" style="cursor: pointer;"></i>'
+		+"<label class='xispec_btn'>Move Labels<input id='moveLabels' type='checkbox'></label>"
+		+'<label class="xispec_btn" title="toggle measure mode on/off">Measure<input class="pointer" id="measuringTool" type="checkbox"></label>'
 		+'<form id="setrange">'
-		+'	<label class="btn" title="m/z range" style="cursor: default;">m/z:</label>'
-		+'	<label class="btn" for="lockZoom" title="Lock current zoom level" id="lock" class="btn">🔓</label><input id="lockZoom" type="checkbox" style="display: none;">'
+		+'	<label class="xispec_btn" title="m/z range" style="cursor: default;">m/z:</label>'
+		+'	<label class="xispec_btn" for="lockZoom" title="Lock current zoom level" id="lock" class="xispec_btn">🔓</label><input id="lockZoom" type="checkbox" style="display: none;">'
 		+'	<input type="text" id="xleft" size="5" title="m/z range from:">'
 		+'	<span>-</span>'
 		+'	<input type="text" id="xright" size="5" title="m/z range to:">'
-		+'	<input type="submit" id="rangeSubmit" value="Set" class="btn btn-1 btn-1a" style="display: none;">'
+		+'	<input type="submit" id="rangeSubmit" value="Set" class="xispec_btn xispec_btn-1 xispec_btn-1a" style="display: none;">'
 		+'	<span id="range-error"></span>'
-		+'	<button id="reset" title="Reset to initial zoom level" class="btn btn-1 btn-1a">Reset Zoom</button>'
+		+'	<button id="reset" title="Reset to initial zoom level" class="xispec_btn xispec_btn-1 xispec_btn-1a">Reset Zoom</button>'
 		+'</form>'
-		+"<button id='toggleSettings' title='Show Settings' class='btn btn-1a btn-topNav'>&#9881;</button>"
+		+"<button id='toggleSettings' title='Show Settings' class='xispec_btn xispec_btn-1a xispec_btn-topNav'>&#9881;</button>"
 		+"</div>"
 		+"</div>"
-		+"<div class='plotsDiv'>"
-		+"  <div id='spectrumMainPlotDiv'>"
-		+"      <svg id='spectrumSVG'></svg>"
+		+"<div class='xispec_plotsDiv'>"
+		+"  <div id='xispec_spectrumMainPlotDiv'>"
+		+"      <svg id='xispec_spectrumSVG'></svg>"
 		+"      <div id='measureTooltip'></div>"
 		+"  </div>"
 		+"  <div id='xispec_QCdiv'>"
@@ -86,15 +87,15 @@ xiSPEC.init = function(targetDiv) {
 		// .classed ("xiSPECwrapper", true)
 		.append("div")
 		// .attr ("class", "verticalFlexContainer")
-		.attr ("id", 'spectrumPanel')
+		.attr ("id", 'xispec_spectrumPanel')
 		// http://stackoverflow.com/questions/90178/make-a-div-fill-the-height-of-the-remaining-screen-space?rq=1
 		//.style ("display", "table")
 		.html (_html)
 	;
 
-	this.Spectrum = new SpectrumView({model: this.SpectrumModel, el:"#spectrumPanel"});
-	this.FragmentationKey = new FragmentationKeyView({model: this.SpectrumModel, el:"#spectrumMainPlotDiv"});
-	this.InfoView = new PrecursorInfoView ({model: this.SpectrumModel, el:"#spectrumPanel"});
+	this.Spectrum = new SpectrumView({model: this.SpectrumModel, el:"#xispec_spectrumPanel"});
+	this.FragmentationKey = new FragmentationKeyView({model: this.SpectrumModel, el:"#xispec_spectrumMainPlotDiv"});
+	this.InfoView = new PrecursorInfoView ({model: this.SpectrumModel, el:"#xispec_spectrumPanel"});
 	this.QCwrapper = new QCwrapperView({el: '#xispec_QCdiv'});
 	this.ErrorIntensityPlot = new ErrorPlotView({
 		model: this.SpectrumModel,

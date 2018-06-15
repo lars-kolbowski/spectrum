@@ -1,0 +1,77 @@
+.xispec_closeTable{
+    font-size: 1.4em;
+    margin-right: 2px;
+    margin-top: 2px;
+    margin-bottom: -27px;
+}
+
+.xispec_listWrapper{
+    padding: 1px 10px;
+    color: #000;
+    overflow-x: auto;
+}
+
+#specListTable {
+  width: 100%;
+  text-align:center;
+}
+#specListTable tr {
+    cursor: pointer;
+    white-space: nowrap;
+}
+.uniprotAccession{
+  color: #333;
+}
+.dataTable a {
+    color: #000;
+    text-decoration: underline;
+}
+#altListTable tr {
+    cursor: pointer;
+}
+#altListTable_wrapper .listToolbar {
+    margin-top: 0.5em;
+}
+
+#specListColSelect input{
+  margin: 2px!important;
+}
+
+.listToolbar{
+    color: #fff;
+    float: left;
+    display: flex;
+    font-size: 1.2em;
+    margin-left: 5px;
+}
+.listToolbar input{
+    vertical-align: middle;
+    margin-bottom: 5px;
+}
+.listToolbar .xispec_btn{
+    padding: 2px 8px;
+    margin: 5px 0px 2px 3px;
+}
+
+.paginate_button a{
+    color: #000;
+}
+.paginate_button.active{
+  background-color: #333;
+}
+.paginate_button.active a{
+  color: #999;
+}
+.paginate_button:hover a{
+  color: #fff;
+}
+.paginate_button.disabled a{
+  color: #fff;
+  cursor: default;
+}
+.paginate_button.disabled a:hover{
+  text-decoration: none;
+}
+.paginate_button {
+  background-color: #fff;
+}
