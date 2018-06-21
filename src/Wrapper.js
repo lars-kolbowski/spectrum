@@ -19,9 +19,10 @@ _.extend (CLMSUI.vent, Backbone.Events);
 _.extend(window, Backbone.Events);
 window.onresize = function() { window.trigger('resize') };
 
-xiSPEC.init = function(targetDiv) {
+xiSPEC.init = function(targetDiv, baseDir, xiAnnotatorBaseURL) {
 	// targetDiv could be div itself or id of div - lets deal with that
 	if (typeof targetDiv === "string"){
+		if(targetDiv.charAt(0) == "#") targetDiv = targetDiv.substr(1);
 		this.targetDiv = document.getElementById(targetDiv);
 	} else {
 		this.targetDiv = targetDiv;
@@ -29,10 +30,14 @@ xiSPEC.init = function(targetDiv) {
 
 	d3.select(this.targetDiv).selectAll("*").remove();
 
+	if (baseDir === undefined) baseDir = "/";
+	if (xiAnnotatorBaseURL === undefined) xiAnnotatorBaseURL = "http://xi3.bio.ed.ac.uk/xiAnnotator/";
+
+
 	//init models
 	var model_vars = {
-		// baseDir: "/",
-		xiAnnotatorBaseURL: "http://xi3.bio.ed.ac.uk/xiAnnotator/",
+		baseDir: baseDir,
+		xiAnnotatorBaseURL: xiAnnotatorBaseURL,
 	};
 	this.SpectrumModel = new AnnotatedSpectrumModel(model_vars);
 	this.SettingsSpectrumModel = new AnnotatedSpectrumModel(model_vars);
