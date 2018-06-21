@@ -75,13 +75,13 @@ xiSPEC.init = function(targetDiv, baseDir, xiAnnotatorBaseURL) {
 		+"<div class='xispec_plotsDiv'>"
 		+"  <div id='xispec_spectrumMainPlotDiv'>"
 		+"      <svg id='xispec_spectrumSVG'></svg>"
-		+"      <div id='measureTooltip'></div>"
+		+"      <div id='xispec_measureTooltip'></div>"
 		+"  </div>"
 		+"  <div id='xispec_QCdiv'>"
 		+"      <div class='xispec_subViewHeader'></div>"
 		+"      <div class='xispec_subViewContent'>"
-		+"          <div class='xispec_subViewContent-plot' id='xispec_subViewContent-left'><svg id='errIntSVG' class='xispec_errSVG'></svg></div>"
-		+"          <div class='xispec_subViewContent-plot' id='xispec_subViewContent-right'><svg id='errMzSVG' class='xispec_errSVG'></svg></div>"
+		+"          <div class='xispec_subViewContent-plot' id='xispec_subViewContent-left'><svg id='xispec_errIntSVG' class='xispec_errSVG'></svg></div>"
+		+"          <div class='xispec_subViewContent-plot' id='xispec_subViewContent-right'><svg id='xispec_errMzSVG' class='xispec_errSVG'></svg></div>"
 		+"      </div>"
 		+"  </div>"
 		+"</div>"
@@ -107,14 +107,14 @@ xiSPEC.init = function(targetDiv, baseDir, xiAnnotatorBaseURL) {
 		el:"#xispec_subViewContent-left",
 		xData: 'Intensity',
 		margin: {top: 10, right: 30, bottom: 20, left: 65},
-		svg: "#errIntSVG",
+		svg: "#xispec_errIntSVG",
 	});
 	this.ErrorMzPlot = new ErrorPlotView({
 		model: this.SpectrumModel,
 		el:"#xispec_subViewContent-right",
 		xData: 'm/z',
 		margin: {top: 10, right: 30, bottom: 20, left: 65},
-		svg: "#errMzSVG",
+		svg: "#xispec_errMzSVG",
 	});
 	CLMSUI.vent.trigger('show:QC', true);
 
