@@ -247,7 +247,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 			var clearHighlights = []
 			if(this.sticky.length != 0){
 
-				
+
 				for(f = 0; f < this.sticky.length; f++){
 					if (fragments.indexOf(this.sticky[f]) == -1)
 						clearHighlights.push(this.sticky[f]);
@@ -294,14 +294,8 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 	},
 
 	changeLinkPos: function(newLinkSites){
-		if(this.get("JSONrequest") !== undefined){
-			json_req = this.get("JSONrequest");
-			for (var i = 0; i < newLinkSites.length; i++) {
-				json_req.LinkSite[i].linkSite = newLinkSites[i]-1;
-			}
-			this.request_annotation(json_req);
-		}
-		else if (this.match !== undefined){
+		//ToDo: 3 different ways of changing dependent of use case...
+		if (this.match !== undefined){
 			var newmatch = $.extend(true, {}, this.match);	//clone object so linkpos change is not cached
 			newmatch.linkPos1 = newLinkSites[0];
 			newmatch.linkPos2 = newLinkSites[1];
@@ -312,6 +306,13 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 			else if (this.match.oldLinkPos[0] == newLinkSites[0] && this.match.oldLinkPos[1] == newLinkSites[1])
 				newmatch.oldLinkPos = undefined;
 			CLMSUI.loadSpectra(newmatch, this.randId, this);
+		}
+		else if(this.get("JSONrequest") !== undefined){
+			json_req = this.get("JSONrequest");
+			for (var i = 0; i < newLinkSites.length; i++) {
+				json_req.LinkSite[i].linkSite = newLinkSites[i]-1;
+			}
+			this.request_annotation(json_req);
 		}
 		else{
 			for (var i = 0; i < newLinkSites.length; i++) {
@@ -330,23 +331,8 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 
 
 	changeMod: function(oldPos, newPos, oldPepIndex, newPepIndex){
-		if(this.get("JSONrequest") !== undefined){
-			json_req = this.get("JSONrequest");
-			//standalone
-			var myNew = json_req.Peptides[newPepIndex].sequence[newPos];
-			var myOld = this.JSONdata.Peptides[oldPepIndex].sequence[oldPos];
-
-			myNew.Modification = myOld.Modification;
-			json_req.Peptides[oldPepIndex].sequence[oldPos].Modification = "";
-
-			if (myNew.aminoAcid != myOld.aminoAcid){
-				var annotationMod = $.grep(json_req.annotation.modifications, function(e){ return e.id == myNew.Modification; });
-				if (annotationMod[0].aminoAcids.indexOf(myNew.aminoAcid) === -1)
-					annotationMod[0].aminoAcids.push(myNew.aminoAcid);
-			}
-			this.request_annotation(json_req);
-		}
-		else if (this.match !== undefined){
+		//ToDo: 3 different ways of changing dependent of use case...
+		if (this.match !== undefined){
 			//CLMSUI integrated
 			this.JSONdata.Peptides[newPepIndex].sequence[newPos].Modification = this.JSONdata.Peptides[oldPepIndex].sequence[oldPos].Modification;
 			this.JSONdata.Peptides[oldPepIndex].sequence[oldPos].Modification = "";
@@ -369,6 +355,22 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 			newmatch.matchedPeptides[1].seq_mods = pepSeq2;
 
 			CLMSUI.loadSpectra(newmatch, this.randId, this);
+		}
+		else if(this.get("JSONrequest") !== undefined){
+			json_req = this.get("JSONrequest");
+			//standalone
+			var myNew = json_req.Peptides[newPepIndex].sequence[newPos];
+			var myOld = this.JSONdata.Peptides[oldPepIndex].sequence[oldPos];
+
+			myNew.Modification = myOld.Modification;
+			json_req.Peptides[oldPepIndex].sequence[oldPos].Modification = "";
+
+			if (myNew.aminoAcid != myOld.aminoAcid){
+				var annotationMod = $.grep(json_req.annotation.modifications, function(e){ return e.id == myNew.Modification; });
+				if (annotationMod[0].aminoAcids.indexOf(myNew.aminoAcid) === -1)
+					annotationMod[0].aminoAcids.push(myNew.aminoAcid);
+			}
+			this.request_annotation(json_req);
 		}
 		else{
 			//Preview
