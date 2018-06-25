@@ -53,6 +53,7 @@ xiSPEC.init = function(
 		+"	<div class='xispec_dynDiv_resizeDiv_br draggableCorner'></div>"
 		+"</div>"
 		+"<div id='xispec_spectrumControls'>"
+		+"<span id='xispec_extra_spectrumControls_before'><span>"
 		+'<i class="xispec_btn xispec_btn-1a xispec_btn-topNav fa fa-download" aria-hidden="true" id="downloadSVG" title="download SVG" style="cursor: pointer;"></i>'
 		+"<label class='xispec_btn'>Move Labels<input id='moveLabels' type='checkbox'></label>"
 		+'<label class="xispec_btn" title="toggle measure mode on/off">Measure<input class="pointer" id="measuringTool" type="checkbox"></label>'
@@ -66,7 +67,9 @@ xiSPEC.init = function(
 		+'	<span id="range-error"></span>'
 		+'	<button id="reset" title="Reset to initial zoom level" class="xispec_btn xispec_btn-1 xispec_btn-1a">Reset Zoom</button>'
 		+'</form>'
-		+"<button id='toggleSettings' title='Show Settings' class='xispec_btn xispec_btn-1a xispec_btn-topNav'>&#9881;</button>"
+		+'<i id="toggleSettings" title="Show/Hide Settings" class="xispec_btn xispec_btn-1a xispec_btn-topNav fa fa-cog" aria-hidden="true"></i>'
+		+"<span id='xispec_extra_spectrumControls_after'><span>"
+		+'<a href="http://spectrumviewer.org/help.php" target="_blank"><i title="Help" class="xispec_btn xispec_btn-1a xispec_btn-topNav fa fa-question" aria-hidden="true"></i></a>'
 		+"</div>"
 		+"</div>"
 		+"<div class='xispec_plotsDiv'>"
