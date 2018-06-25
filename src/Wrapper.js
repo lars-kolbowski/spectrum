@@ -19,7 +19,10 @@ _.extend (CLMSUI.vent, Backbone.Events);
 _.extend(window, Backbone.Events);
 window.onresize = function() { window.trigger('resize') };
 
-xiSPEC.init = function(targetDiv, baseDir, xiAnnotatorBaseURL) {
+xiSPEC.init = function(
+	targetDiv,
+	model_variables
+) {
 	// targetDiv could be div itself or id of div - lets deal with that
 	if (typeof targetDiv === "string"){
 		if(targetDiv.charAt(0) == "#") targetDiv = targetDiv.substr(1);
@@ -30,17 +33,11 @@ xiSPEC.init = function(targetDiv, baseDir, xiAnnotatorBaseURL) {
 
 	d3.select(this.targetDiv).selectAll("*").remove();
 
-	if (baseDir === undefined) baseDir = "/";
-	if (xiAnnotatorBaseURL === undefined) xiAnnotatorBaseURL = "http://xi3.bio.ed.ac.uk/xiAnnotator/";
-
+	if (model_variables === undefined)	model_variables = {};
 
 	//init models
-	var model_vars = {
-		baseDir: baseDir,
-		xiAnnotatorBaseURL: xiAnnotatorBaseURL,
-	};
-	this.SpectrumModel = new AnnotatedSpectrumModel(model_vars);
-	this.SettingsSpectrumModel = new AnnotatedSpectrumModel(model_vars);
+	this.SpectrumModel = new AnnotatedSpectrumModel(model_variables);
+	this.SettingsSpectrumModel = new AnnotatedSpectrumModel(model_variables);
 	this.SpectrumModel.otherModel = this.SettingsSpectrumModel;
 	this.SettingsSpectrumModel.otherModel = this.SpectrumModel;
 
