@@ -123,6 +123,7 @@
 }
 
 .xispec_btn-topNav{
+    position: relative;
     top: 3px;
     font-size: 1.2em;
     padding: 3px 4px;
