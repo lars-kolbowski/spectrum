@@ -22,7 +22,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 			this.getKnownModifications(this.xiAnnotatorBaseURL + "annotate/knownModifications");
 		else{
 			if(this.database)
-				this.getKnownModifications(this.baseDir + "php/getModifications.php?db=" + this.get('database'));
+				this.getKnownModifications(this.baseDir + "php/getModifications.php?db=" + this.get('database')+'&tmp='+this.get('tmpDB'));
 			else
 				this.knownModifications = {};
 		}
