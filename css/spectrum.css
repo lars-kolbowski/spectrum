@@ -90,6 +90,7 @@
 /* xispec_btn */
 .xispec_btn {
     border: none;
+    background-color: inherit!important;
     font-family: inherit;
     color: #fff;
     background: 0 0;/*#091D42;*/

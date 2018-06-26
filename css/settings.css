@@ -71,6 +71,7 @@
     vertical-align: middle;
     padding: 5px 0px;
     line-height: 3.5em;
+    background-color:  inherit;
 }
 
 #xispec_settings_main .xispec_settings-bottom{
@@ -114,7 +115,7 @@
 }
 
 #xispec_settings_main .xispec_label .xispec_form-control{
-  height: 2.5em;
+  height: 2.9em;
 }
 
 #xispec_settings_main #xispec_settingsPeaklist{
@@ -241,7 +242,6 @@
     padding-left:5px;
     padding-right:5px;
     vertical-align: middle;
-    text-align: left;
 }
 #xispec_modificationTable th:first-child{
     padding-left:10px;
