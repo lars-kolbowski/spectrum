@@ -11,7 +11,7 @@ var SpectrumView = Backbone.View.extend({
 		'click #moveLabels': 'moveLabels',
 		'click #downloadSVG': 'downloadSVG',
 		'click #toggleSettings' : 'toggleSettings',
-		'click #revertAnnotation' : 'revertAnnotation',
+		'click #xispec_revertAnnotation' : 'revertAnnotation',
 		'click #toggleSpecList' : 'toggleSpecList',
 	  },
 
@@ -279,13 +279,13 @@ var SpectrumView = Backbone.View.extend({
 	enableRevertAnnotation: function(){
 		if(this.model.get('database') || !this.model.get('standalone')){
 			$(this.el).css('background-color', 'rgb(210, 224, 255)');
-			$('#revertAnnotation').addClass('btn-1a');
+			$('#revertAnnotation').addClass('xispec_btn-1a');
 			$('#revertAnnotation').removeClass('disabled');
 		}
 	},
 
 	disableRevertAnnotation: function(){
-		$('#revertAnnotation').removeClass('btn-1a');
+		$('#revertAnnotation').removeClass('xispec_btn-1a');
 		$('#revertAnnotation').addClass('disabled');
 	},
 });

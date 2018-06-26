@@ -101,17 +101,9 @@ var FragmentationKeyView = Backbone.View.extend({
 			}
 		}
 
-		this.tooltip = d3.select(this.el).append("span")
-			.style("font-size", "small")
-			//.style("height", "20px")
-			.style("padding", "0 5px")
-			.style("border-radius", "6px")
-			.attr("class", "tooltip")
-			.style("background-color", "black")
-			.style("color", "#ccc")
-			.style("pointer-events", "none")
-			.style("position", "absolute")
-			.style("opacity", 0);
+		this.tooltip = d3.select("body").append("span")
+			.attr("class", "xispec_tooltip")
+		;
 
 
 		this.align_peptides_to_CL();
