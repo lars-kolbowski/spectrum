@@ -264,3 +264,90 @@
     -o-transition: all 200ms ease;
     transition: all 200ms ease;
 }
+/* DynDiv 0.5 by Markus Bordihn (markusbordihn.de) */
+.xispec_dynTitle {
+    position: relative;
+    left: 30px;
+    top: 2px;
+    letter-spacing: 0.5px;
+    font-size: 0.9em;
+    color: white;
+}
+.xispec_dynDiv{
+    padding-top: 30px;
+    background: #333;
+    overflow: hidden;
+    color:#fff;
+    position:fixed;
+    pointer-events:all;
+    border: 1px solid white;
+    border-radius: 5px;
+}
+
+.xispec_dynDiv_moveDiv {
+ cursor: move;
+ position: absolute;
+ overflow: hidden;
+}
+
+.xispec_dynDiv_resizeDiv_tl,.xispec_dynDiv_resizeDiv_tr,.xispec_dynDiv_resizeDiv_bl,.xispec_dynDiv_resizeDiv_br {
+ width: 10px;
+ height: 10px;
+ background: #750000;
+ border: 1px solid #000;
+ position: absolute;
+}
+
+.xispec_dynDiv_resizeDiv_tl {
+ top: -1px;
+ left: -1px;
+ cursor: nw-resize;
+}
+
+.xispec_dynDiv_resizeDiv_tr {
+ top: -1px;
+ right: -1px;
+ cursor: ne-resize;
+}
+
+.xispec_dynDiv_resizeDiv_bl {
+ bottom: -1px;
+ left: -1px;
+ cursor: sw-resize;
+}
+
+.xispec_dynDiv_resizeDiv_br {
+ bottom: -1px;
+ right: -1px;
+ cursor: se-resize;
+}
+
+.xispec_dynDiv_moveParentDiv {
+ width: 100%;
+ margin: auto;
+ height: auto;
+ font-size: 1.5em;
+ position: absolute;
+ top: -1px;
+ left: -1px;
+ background: #750000;
+ border: 1px solid #fff;
+ border-left: 0;
+ border-right: 0;
+ padding: 0;
+ overflow: hidden;
+ white-space:nowrap;
+ cursor: move;
+}
+
+.xispec_dynDiv_minmaxDiv {
+ position: absolute;
+ top: 1px;
+ right: 15px;
+ width: 15px;
+ height: 15px;
+ background: #750000;
+ font-size: 15px;
+ padding: 0;
+ margin: 0;
+}
