@@ -1,49 +1,117 @@
 var AnnotatedSpectrumModel = Backbone.Model.extend({
 
+	defaults: function() {
+    return {
+      baseDir:  './',
+	  xiAnnotatorBaseURL: 'http://xi3.bio.ed.ac.uk/xiAnnotator/',
+	  standalone: true,
+	  database: false,
+    };
+  },
+
 	initialize: function(){
-		this.getKnownModifications();
-		//this.sticky = Array();
-		//this.highlights = Array();
+
+		var self = this;
+		this.xiAnnotatorBaseURL = this.get('xiAnnotatorBaseURL');
+		this.baseDir = this.get('baseDir');
+
+		this.standalone = this.get('standalone');
+		this.database = this.get('database');
+		if(!this.standalone)
+			this.getKnownModifications(this.xiAnnotatorBaseURL + "annotate/knownModifications");
+		else{
+			if(this.database)
+				this.getKnownModifications(this.baseDir + "php/getModifications.php?db=" + this.get('database')+'&tmp='+this.get('tmpDB'));
+			else
+				this.knownModifications = {};
+		}
+
+		this.showDecimals = 2;
 		this.moveLabels = false;
 		this.measureMode = false;
+		this.showAllFragmentsHighlight = true;
+
+		this.pepStrs = [];
+		this.pepStrsMods = [];
+		this.userModifications = [];
+		this.fragmentIons = [];
+		this.peakList = [];
+		this.precursorCharge = null;
+		//ToDo: reimplement userModifications
+		// if (!_.isUndefined(Cookies.get('customMods')))
+		// 	this.userModifications = JSON.parse(Cookies.get('customMods'));
+
+		$.getJSON(self.baseDir + 'json/aaMasses.json', function(data) {
+    		self.aaMasses = data
+		});
+
+		//ToDo: change JSONdata gets called 3 times for some reason?
+		// define event triggers and listeners better
 		this.on("change:JSONdata", function(){
 			var json = this.get("JSONdata");
-			if (typeof json !== 'undefined')
+			if (typeof json !== 'undefined'){
 				this.setData();
+			}
 			else
 				this.trigger("cleared");
 		});
-		this.on("change:clModMass", function(){
-			if(this.peptides !== undefined && this.knownModifications !== undefined)
-				this.calcPrecursorMass();
-		});
 
-		//really necessary?
-		this.on("change:charge", function(){
-			this.charge = parseInt(this.get("charge"));
-			this.trigger("changed:charge");
-		});	
-
-		this.on("change:modifications", function(){
-			this.updateKnownModifications();
-			if(this.peptides !== undefined)
-				this.calcPrecursorMass();
-		});
+		// //used for manual data input -- calcPrecursorMass disable for now
+		// this.on("change:clModMass", function(){
+		// 	if(this.peptides !== undefined && this.knownModifications !== undefined)
+		// 		this.calcPrecursorMass();
+		// });
+		// this.on("change:charge", function(){
+		// 	this.precursorCharge = parseInt(this.get("charge"));
+		// 	this.trigger("changed:charge");
+		// });
+		// this.on("change:modifications", function(){
+		// 	this.updateKnownModifications();
+		// 	if(this.peptides !== undefined && this.knownModifications !== undefined)
+		// 		this.calcPrecursorMass();
+		// });
 
 	},
 
 	setData: function(){
+		this.changedAnnotation = false;
+
+		if (this.get("JSONdata") == null){
+			this.trigger("changed:data");
+			return;
+		}
+
 		$("#measuringTool").prop("checked", false);
-		$("#moveLabels").prop("checked", false);			
+		$("#moveLabels").prop("checked", false);
 		this.sticky = Array();
 		this.highlights = Array();
-		this.JSONdata = this.get("JSONdata");
+		var JSONdata = this.get("JSONdata");
 		this.match = this.get("match");
 		this.randId = this.get("randId");
-		//console.log(this.JSONdata);
+		//console.log(JSONdata);
+		this.annotationData = JSONdata.annotation || {};
+
+		if (this.annotationData.fragementTolerance !== undefined){
+			this.MSnTolerance = {
+				"value": parseFloat(this.annotationData.fragementTolerance.split(" ")[0]),
+				"unit": this.annotationData.fragementTolerance.split(" ")[1]
+			};
+		}
+
+		this.fragmentIons = this.annotationData.ions || [];
+		this.peakList = JSONdata.peaks || [];
+		this.precursorCharge = this.annotationData.precursorCharge || this.get("charge");
+		var crossLinker = this.annotationData['cross-linker'];
+		if (this.annotationData['cross-linker'] !== undefined)
+			this.crossLinkerModMass = crossLinker.modMass;
+
 		this.pepStrs = [];
 		this.pepStrsMods = [];
-		this.peptides = this.JSONdata.Peptides;
+		this.peptides = JSONdata.Peptides;
+		if(this.peptides.length == 1)
+			this.isLinear = true;
+		else
+			this.isLinear = false;
 		for(i=0; i < this.peptides.length; i++){
 			this.pepStrs[i] = "";
 			this.pepStrsMods[i] = "";
@@ -52,10 +120,10 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 				this.pepStrsMods[i] += this.peptides[i].sequence[j].aminoAcid + this.peptides[i].sequence[j].Modification;
 			}
 		}
-		if (this.JSONdata.fragments !== undefined){
+		if (JSONdata.fragments !== undefined){
 			this.fragments = [];
-			for (var i = 0; i < this.JSONdata.fragments.length; i++) {
-				this.fragments[i] = this.JSONdata.fragments[i];
+			for (var i = 0; i < JSONdata.fragments.length; i++) {
+				this.fragments[i] = JSONdata.fragments[i];
 				this.fragments[i].id = i;
 			};
 		};
@@ -67,33 +135,44 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		this.p2color = this.cmap[7];
 		this.p2color_cluster = this.cmap[5];
 		this.p2color_loss = this.cmap[6];
-		this.lossFragBarColour = "#cccccc";
-		this.highlightColour = "yellow";
-		this.highlightWidth = 10;
+		this.peakColour = "#a6a6a6";
+		this.highlightColour = "#FFFF00";
+		this.highlightWidth = 8;
 
+		// this.calcPrecursorMass();
 
-		this.calcPrecursorMass();
-		if (window.modTable !== undefined)
-			modTable.ajax.url( "forms/convertMods.php?peps="+encodeURIComponent(this.pepStrsMods.join(";"))).load();
 		this.trigger("changed:data");
-		
-		if (this.JSONdata.peaks !== undefined)
+
+		if (JSONdata.peaks !== undefined)
 			this.setGraphData();
 
 	},
 
+	peaksToMGF: function(){
+		var output = "";
+		for (var i = 0; i < this.peakList.length; i++) {
+			output += this.peakList[i].mz + "	";
+			output += this.peakList[i].intensity + "\n";
+		}
+		return output;
+	},
+
 	clear: function(){
-		this.JSONdata = null;
+		// JSONdata = null;
+		this.set("JSONdata", null);
+		// this.setData();
+		// this.peptides = [];
 		this.sticky = Array();
 		Backbone.Model.prototype.clear.call(this);
 	},
 
 	setGraphData: function(){
 
+		var peaks = this.get("JSONdata").peaks;
+
 		var xmin = Number.POSITIVE_INFINITY;
 		var xmax = Number.NEGATIVE_INFINITY;
 		var tmp;
-		var peaks = this.JSONdata.peaks;
 		for (var i=peaks.length-1; i>=0; i--) {
 		    tmp = peaks[i].mz;
 		    if (tmp < xmin) xmin = tmp;
@@ -102,13 +181,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 
 		this.xmaxPrimary = xmax + 50;
 		this.xminPrimary = xmin - 50;
-
-		this.xmax = this.xmaxPrimary;
-		this.xmin = this.xminPrimary;
-
 		var ymax = Number.NEGATIVE_INFINITY;
-		var tmp;
-		var peaks = this.JSONdata.peaks;
 		for (var i=peaks.length-1; i>=0; i--) {
 		    tmp = peaks[i].intensity;
 		    if (tmp > ymax) ymax = tmp;
@@ -116,13 +189,19 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 
 		//this.ymaxPrimary = ymax / 0.9;
 		this.ymaxPrimary = ymax;
-		//this.ymax = d3.max(this.points, function(d){return d.y;});
-		this.ymin = 0;//d3.min(this.points, function(d){return d.y;});
+
+		if (!this.lockZoom){
+			this.xmax = this.xmaxPrimary;
+			this.xmin = this.xminPrimary;
+			this.ymax = this.ymaxPrimary;
+			this.ymin = 0;
+		}
+
 	},
 
 	setZoom: function(domain){
-		this.xmin = domain[0].toFixed(1);
-		this.xmax = domain[1].toFixed(1);
+		this.xmin = domain[0].toFixed(0);
+		this.xmax = domain[1].toFixed(0);
 		this.trigger("changed:Zoom");
 	},
 
@@ -160,33 +239,40 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 			}
 		}
 		else{
+			var clearHighlights = []
 			if(this.sticky.length != 0){
-				var oldsticky = this.sticky;
-				this.sticky = Array();
-				this.clearHighlight(oldsticky);
+
+
+				for(f = 0; f < this.sticky.length; f++){
+					if (fragments.indexOf(this.sticky[f]) == -1)
+						clearHighlights.push(this.sticky[f]);
+				}
+				this.sticky = [];
 			}
 			for(f = 0; f < fragments.length; f++)
 				this.sticky.push(fragments[f]);
+
+			this.clearHighlight(clearHighlights);
 		}
 	},
 
 	changeColorScheme: function(scheme){
 		switch(scheme) {
-			case "RdBu": 
+			case "RdBu":
 				this.cmap = colorbrewer.RdBu[8];
 				break;
-			case "BrBG": 
+			case "BrBG":
 				this.cmap = colorbrewer.BrBG[8];
 				break;
-			case "PiYG": 
+			case "PiYG":
 				this.cmap = colorbrewer.PiYG[8];
 				break;
-			case "PRGn": 
+			case "PRGn":
 				this.cmap = colorbrewer.PRGn[8];
 				break;
-			case "PuOr": 
+			case "PuOr":
 				this.cmap = colorbrewer.PuOr[8];
-				break;			
+				break;
 		}
 		this.p1color = this.cmap[0];
 		this.p1color_cluster = this.cmap[2];
@@ -197,9 +283,15 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		this.trigger("changed:ColorScheme");
 	},
 
+	changeHighlightColor: function(color){
+		this.highlightColour = color;
+		this.trigger("changed:HighlightColor");
+	},
 
 	changeLinkPos: function(newLinkSites){
 
+		var JSONdata = this.get("JSONdata");
+		//ToDo: 3 different ways of changing dependent of use case...
 		if (this.match !== undefined){
 			var newmatch = $.extend(true, {}, this.match);	//clone object so linkpos change is not cached
 			newmatch.linkPos1 = newLinkSites[0];
@@ -210,43 +302,120 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 			//if the newlinkpos are the original ones delete oldLinkPos
 			else if (this.match.oldLinkPos[0] == newLinkSites[0] && this.match.oldLinkPos[1] == newLinkSites[1])
 				newmatch.oldLinkPos = undefined;
-			CLMSUI.loadSpectra(newmatch, this.randId, this);			
+			CLMSUI.loadSpectra(newmatch, this.randId, this);
+		}
+		else if(this.get("JSONrequest") !== undefined){
+			json_req = this.get("JSONrequest");
+			for (var i = 0; i < newLinkSites.length; i++) {
+				json_req.LinkSite[i].linkSite = newLinkSites[i]-1;
+			}
+			this.request_annotation(json_req);
 		}
 		else{
 			for (var i = 0; i < newLinkSites.length; i++) {
-				if (this.JSONdata.LinkSite[i] === undefined){
-					this.JSONdata.LinkSite[i] = {id: 0, linkSite: newLinkSites[i], peptideId: i}		
+				if (JSONdata.LinkSite[i] === undefined){
+					JSONdata.LinkSite[i] = {id: 0, linkSite: newLinkSites[i], peptideId: i}
 				}
 				else
-					this.JSONdata.LinkSite[i].linkSite = newLinkSites[i];
+					JSONdata.LinkSite[i].linkSite = newLinkSites[i];
 			}
-			this.setData();	
-		}	
+			this.setData();
+		}
 
+		this.trigger("changed:annotation");
+		this.changedAnnotation = true;
 	},
 
 
-	changeMod: function(oldPos, newPos, pepIndex){
+	changeMod: function(oldPos, newPos, oldPepIndex, newPepIndex){
+		var JSONdata = this.get("JSONdata");
+		//ToDo: 3 different ways of changing dependent of use case...
+		if (this.match !== undefined){
+			//CLMSUI integrated
+			JSONdata.Peptides[newPepIndex].sequence[newPos].Modification = JSONdata.Peptides[oldPepIndex].sequence[oldPos].Modification;
+			JSONdata.Peptides[oldPepIndex].sequence[oldPos].Modification = "";
 
-		this.JSONdata.Peptides[pepIndex].sequence[newPos].Modification = this.JSONdata.Peptides[pepIndex].sequence[oldPos].Modification;
-		this.JSONdata.Peptides[pepIndex].sequence[oldPos].Modification = "";
+			var pepSeq1 = "";
+			for (var i = 0; i < JSONdata.Peptides[0].sequence.length; i++) {
+				pepSeq1 += JSONdata.Peptides[0].sequence[i].aminoAcid;
+				pepSeq1 += JSONdata.Peptides[0].sequence[i].Modification;
+			};
 
-		//this.setData();			
-		var pepSeq = ""
-		for (var i = 0; i < this.JSONdata.Peptides[pepIndex].sequence.length; i++) {
-			pepSeq += this.JSONdata.Peptides[pepIndex].sequence[i].aminoAcid;
-			pepSeq += this.JSONdata.Peptides[pepIndex].sequence[i].Modification;
+			var pepSeq2 = "";
+			for (var i = 0; i < JSONdata.Peptides[1].sequence.length; i++) {
+				pepSeq2 += JSONdata.Peptides[1].sequence[i].aminoAcid;
+				pepSeq2 += JSONdata.Peptides[1].sequence[i].Modification;
+			};
+
+			var newmatch = $.extend(true, {}, this.match);	//clone object
+
+			newmatch.matchedPeptides[0].seq_mods = pepSeq1;
+			newmatch.matchedPeptides[1].seq_mods = pepSeq2;
+
+			CLMSUI.loadSpectra(newmatch, this.randId, this);
+		}
+		else if(this.get("JSONrequest") !== undefined){
+			json_req = this.get("JSONrequest");
+			//standalone
+			var myNew = json_req.Peptides[newPepIndex].sequence[newPos];
+			var myOld = JSONdata.Peptides[oldPepIndex].sequence[oldPos];
+
+			myNew.Modification = myOld.Modification;
+			json_req.Peptides[oldPepIndex].sequence[oldPos].Modification = "";
+
+			if (myNew.aminoAcid != myOld.aminoAcid){
+				var annotationMod = $.grep(json_req.annotation.modifications, function(e){ return e.id == myNew.Modification; });
+				if (annotationMod[0].aminoAcids.indexOf(myNew.aminoAcid) === -1)
+					annotationMod[0].aminoAcids.push(myNew.aminoAcid);
+			}
+			this.request_annotation(json_req);
+		}
+		else{
+			//Preview
+			JSONdata.Peptides[newPepIndex].sequence[newPos].Modification = JSONdata.Peptides[oldPepIndex].sequence[oldPos].Modification;
+			JSONdata.Peptides[oldPepIndex].sequence[oldPos].Modification = "";
+			this.setData();
 		}
 
-		var newmatch = $.extend(true, {}, this.match);	//clone object
-		if (pepIndex == 0)
-			newmatch.pepSeq1raw = pepSeq;
-		if (pepIndex == 1)
-			newmatch.pepSeq2raw = pepSeq;
-		CLMSUI.loadSpectra(newmatch, this.randId, this);
+		this.trigger("changed:annotation");
+		this.changedAnnotation = true;
+	},
+
+	matchMassToAA: function(mass) {
+		var self = this;
+		var aaArray = this.aaMasses.filter(function(d){
+
+			if (Math.abs(mass - d.monoisotopicMass) < 0.01)
+				return true;
+			// if(self.MSnTolerance.unit == "ppm"){
+			// 	var uplim = d.monoisotopicMass + peak * self.MSnTolerance.value * 1e-6;
+			// 	var lowlim = d.monoisotopicMass - peak * self.MSnTolerance.value * 1e-6;
+			// 	if(delta < uplim && delta > lowlim)
+			// 		return true;
+			// }
+			//TODO: matchMass for Da error type
+			// if(self.MSnTolerance.unit == "Da"){
+			// 	var uplim = d.monoisotopicMass + self.MSnTolerance.value;
+			// 	var lowlim = d.monoisotopicMass - self.MSnTolerance.value;
+			// 	if(delta < uplim && delta > lowlim)
+			// 		return d.aminoAcid;
+			// }
+		}).map(function(d){return d.aminoAcid});
+		aaStr = aaArray.join();
+		return aaStr;
 	},
 
 	checkForValidModification: function(mod, aminoAcid){
+
+		for (var i = 0; i < this.userModifications.length; i++) {
+			if(this.userModifications[i].id == mod){
+				if ($.inArray(aminoAcid, this.userModifications[i].aminoAcids) != -1 || this.userModifications[i].aminoAcids == [])
+					return true;
+				else
+					return false;
+			}
+		}
+
 		for (var i = 0; i < this.knownModifications['modifications'].length; i++) {
 			if(this.knownModifications['modifications'][i].id == mod){
 				if ($.inArray(aminoAcid, this.knownModifications['modifications'][i].aminoAcids) != -1)
@@ -258,91 +427,224 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 	},
 
 	calcPrecursorMass: function(){
-		//if(this.knownModifications === undefined)
-		//	this.getKnownModifications();
+
+		var JSONdata = this.get("JSONdata");
+
+		// // don't calculate the mass if JSONdata is empty
+		// if (JSONdata === null){
+		// 	this.mass = null
+		// 	return
+		// }
+		// don't calculate the mass if it's already defined by xiAnnotator
+		if (this.annotationData !== undefined)
+			if (this.annotationData.precursorMZ !== undefined && this.annotationData.precursorMZ !== -1)
+				return;
+
+		if(this.annotationData.modifications === undefined)
+			return;
+
 		var aastr = "ARNDCEQGHILKMFPSTWYV";
 		var mA = new Array();
-		mA[aastr.indexOf("A")] = 71.0788;
-		mA[aastr.indexOf("R")] = 156.1876;
-		mA[aastr.indexOf("N")] = 114.1039;
-		mA[aastr.indexOf("D")] = 115.0886;
-		mA[aastr.indexOf("C")] = 103.1448;
-		mA[aastr.indexOf("E")] = 129.1155;
-		mA[aastr.indexOf("Q")] = 128.1308;
-		mA[aastr.indexOf("G")] = 57.0520;
-		mA[aastr.indexOf("H")] = 137.1412;
-		mA[aastr.indexOf("I")] = 113.1595;
-		mA[aastr.indexOf("L")] = 113.1595;
-		mA[aastr.indexOf("K")] = 128.1742;
-		mA[aastr.indexOf("M")] = 131.1986;
-		mA[aastr.indexOf("F")] = 147.1766;
-		mA[aastr.indexOf("P")] = 97.1167;
-		mA[aastr.indexOf("S")] = 87.0782;
-		mA[aastr.indexOf("T")] = 101.1051;
-		mA[aastr.indexOf("W")] = 186.2133;
-		mA[aastr.indexOf("Y")] = 163.1760;
-		mA[aastr.indexOf("V")] = 99.1326;
+		mA[aastr.indexOf("A")] = 71.03711;
+		mA[aastr.indexOf("R")] = 156.10111;
+		mA[aastr.indexOf("N")] = 114.04293;
+		mA[aastr.indexOf("D")] = 115.02694;
+		mA[aastr.indexOf("C")] = 103.00919;
+		mA[aastr.indexOf("E")] = 129.04259;
+		mA[aastr.indexOf("Q")] = 128.05858;
+		mA[aastr.indexOf("G")] = 57.02146;
+		mA[aastr.indexOf("H")] = 137.05891;
+		mA[aastr.indexOf("I")] = 113.08406;
+		mA[aastr.indexOf("L")] = 113.08406;
+		mA[aastr.indexOf("K")] = 128.09496;
+		mA[aastr.indexOf("M")] = 131.04049;
+		mA[aastr.indexOf("F")] = 147.06841;
+		mA[aastr.indexOf("P")] = 97.05276;
+		mA[aastr.indexOf("S")] = 87.03203;
+		mA[aastr.indexOf("T")] = 101.04768;
+		mA[aastr.indexOf("W")] = 186.07931;
+		mA[aastr.indexOf("Y")] = 163.06333;
+		mA[aastr.indexOf("V")] = 99.06841;
 
-		var massArr = new Array();		
-		var h2o = 18.01528;
+		var massArr = new Array();
+		var h2o = 18.010565;
 
 		for (var i = 0; i < this.peptides.length; i++) {
 			// if (this.modifications === undefined){
 			// 	this.modifications = new Object();
-			// 	this.modifications.data = this.JSONdata.annotation.modifications;
+			// 	this.modifications.data = JSONdata.annotation.modifications;
 			// }
 			massArr[i] = h2o;
 			for (var j = 0; j < this.peptides[i].sequence.length; j++) {
 				var AA = this.peptides[i].sequence[j].aminoAcid;
-				massArr[i] += mA[aastr.indexOf(AA.charAt(i))];	
+				massArr[i] += mA[aastr.indexOf(AA)];
 				//mod
 				var mod = this.peptides[i].sequence[j].Modification;
-				for (var k = 0; k < this.knownModifications['modifications'].length; k++) {
-					if (this.knownModifications['modifications'][k].id == mod)
-						massArr[i] += this.knownModifications['modifications'][k].mass;
-				}		
+				if(mod != ""){
+					for (var k = 0; k < this.annotationData.modifications.length; k++) {
+						if (this.annotationData.modifications[k].id == mod)
+						massArr[i] += this.annotationData.modifications[k].massDifference;
+					}
+				}
 			}
 		}
 
 		var totalMass = 0;
-		if(this.get("clModMass") !== undefined){
-			for (var i = 0; i < massArr.length; i++) {
-				totalMass += massArr[i];
-			}
-			totalMass += parseInt(this.get("clModMass"));
-			this.mass = [totalMass];
+		var clModMass = 0;
+		if(this.get("clModMass") !== undefined)
+			var clModMass = parseInt(this.get("clModMass"));
+		else if (this.annotationData['cross-linker'] !== undefined)
+			var clModMass = this.annotationData['cross-linker'].modMass;
+
+		for (var i = 0; i < massArr.length; i++) {
+			totalMass += massArr[i];
 		}
-		else{
-			this.mass = massArr;
+		// NOT Multilink future proof
+		if(JSONdata.LinkSite.length > 1){
+			if (JSONdata.LinkSite[0].linkSite != -1 && JSONdata.LinkSite[1].linkSite != -1)
+				totalMass += clModMass;
 		}
-		console.log(this.mass);
+		this.calc_precursor_mass = totalMass;
 		this.trigger("changed:mass");
 	},
 
-	getKnownModifications: function(){
+	getKnownModifications: function(modifications_url){
 		var self = this;
 		var response = $.ajax({
 			type: "GET",
 			datatype: "json",
 			async: false,
-			url: "../spectrum/php/getKnownMods.php",
+			url: modifications_url,
 			success: function(data) {
-				self.knownModifications = JSON.parse(JSON.parse(data));
-			}
-		});	
+				self.knownModifications = data;
+			},
+			error: function(xhr, status, error){
+				alert("xiAnnotator could not be reached. Please try again later!");
+			},
+		});
 	},
 
-	updateKnownModifications: function(){
-		customMods = this.get("modifications").data;
-		for (var i = 0; i < customMods.length; i++) {
-			for (var j = 0; j < this.knownModifications['modifications'].length; j++) {
-				if(this.knownModifications['modifications'][j].id == customMods[i].id){
-					this.knownModifications['modifications'][j].mass = customMods[i].mass;
-					this.knownModifications['modifications'][j].aminoAcids = customMods[i].aminoAcids;
-				}
-			}				
-		}	
 
-	
-	}
+	// not used anymore - was used for merging knownModifications from xiDB with mods from db
+// 	updateKnownModifications: function(){
+// 		var self = this;
+// 		if(this.annotationData.modifications){
+// 			this.annotationData.modifications.forEach(function(annotation_mod){
+// 				var overlap = self.knownModifications["modifications"].filter(function(km){ return annotation_mod.id == km.id;});
+// 				if (overlap.length > 0){
+// 					overlap.forEach(function(overlap_mod){
+// 						overlap_mod.mass = annotation_mod.massDifference;
+// 						if(overlap_mod.aminoAcids.indexOf(annotation_mod.aminoacid) == -1)
+// 							overlap_mod.aminoAcids.push(annotation_mod.aminoacid);
+// // 						overlap_mod.aminoAcids = annotation_mod.aminoAcids;
+// 					});
+// 				}
+// 				else{
+// 					// mass in the modification array corresponds to massDifference from xiAnnotator
+// 					var new_mod = new Object;
+// 					new_mod['mass'] = annotation_mod['massDifference'];
+// 					new_mod['aminoAcids'] = [annotation_mod['aminoacid']];
+// 					new_mod['id'] = annotation_mod['id'];
+// 					self.knownModifications["modifications"].push(new_mod);
+// 				}
+
+// 			})
+// 		}
+// 	},
+
+	updateUserModifications: function(mod, saveToCookie){	// IE 11 borks at new es5/6 syntax, saveCookie=true
+
+		if (saveToCookie === undefined) {
+			saveToCookie = true;
+		}
+		var userMod = this.userModifications.filter(function(m){ return mod.id == m.id;});
+		if (userMod.length > 0){
+			userMod.forEach(function(overlap_mod){
+				overlap_mod.mass = mod.mass;
+				overlap_mod.aminoAcids = mod.aminoAcids;
+			});
+// 			userMod[0].mass = mod.mass;
+// 			userMod[0].aminoAcids = mod.aminoAcids;
+		}
+		else
+			this.userModifications.push(mod);
+		if (saveToCookie)
+			this.saveUserModificationsToCookie();
+	},
+
+	saveUserModificationsToCookie: function(){
+		var cookie = JSON.stringify(this.userModifications);
+		Cookies.set('customMods', cookie);
+	},
+
+	delUserModification: function(modId, saveToCookie){	// IE 11 borks at new es5/6 syntax, saveCookie=true
+
+		if (saveToCookie === undefined) {
+			saveToCookie = true;
+		}
+		var userModIndex = this.userModifications.findIndex(function(m){ return modId == m.id;});
+		if (userModIndex != -1){
+			this.userModifications.splice(userModIndex, 1);
+		}
+		else
+			console.log("Error modification "+modId+"could not be found!");
+		if (saveToCookie)
+			this.saveUserModificationsToCookie();
+	},
+
+	request_annotation: function(json_request, originalMatch){
+
+		// ToDo: necessary?
+		this.userModifications = [];
+		this.otherModel.userModifications = [];
+
+		if (originalMatch === undefined) originalMatch = false;
+
+		if (originalMatch) this.originalMatchRequest = json_request;
+
+		this.trigger('request_annotation:pending');
+		console.log("annotation request:", json_request);
+		var self = this;
+		var response = $.ajax({
+			type: "POST",
+			headers: {
+			    'Accept': 'application/json',
+			    'Content-Type': 'application/json'
+			},
+			data: JSON.stringify(json_request),
+			async: false,
+			url: self.xiAnnotatorBaseURL + "annotate/FULL",
+			success: function(data) {
+				//ToDo: Error handling -> https://github.com/Rappsilber-Laboratory/xi3-issue-tracker/issues/330
+				console.log("annotation response:", data);
+				self.set({"JSONdata": data, "JSONrequest": json_request});
+
+				if (self.otherModel !== undefined){
+					var json_data_copy = jQuery.extend({}, data);
+					self.otherModel.set({"JSONdata": json_data_copy, "JSONrequest": json_request});
+					self.otherModel.trigger("change:JSONdata");
+				}
+				self.trigger('request_annotation:done');
+			}
+		});
+	},
+
+	revert_annotation: function(){
+// 		this.userModifications = [];
+// 		this.otherModel.userModifications = [];
+		if(!this.changedAnnotation)
+			return
+		else {
+			this.request_annotation(this.originalMatchRequest);
+		}
+	},
+
+	resetModel: function(){
+
+		var json_data_copy = jQuery.extend({}, this.otherModel.get("JSONdata"));
+		var json_request_copy =  jQuery.extend({}, this.otherModel.get("JSONrequest"));
+		this.set({"JSONdata": json_data_copy, "JSONrequest": json_request_copy});
+		this.trigger("change:JSONdata");
+
+	},
 });

@@ -22,7 +22,7 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 	this.FragKey = FragKey;
 	this.peptideId = peptideId;
 	this.peptide = FragKey.model.peptides[peptideId];
-	
+
 	this.fragments = [];
 	this.b = [];
 	this.y = [];
@@ -43,8 +43,8 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 		var color = this.FragKey.model.p2color;
 
 
-
-	var xStep = 22;
+	var xStep = FragKey.xStep;
+	// var xStep = 23;
 
 	this.x = (xStep * (index+offset)) + (xStep / 2);
 	if (this.peptideId == 0)
@@ -57,7 +57,8 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 
 	//svg elements
 	this.g = this.FragKey.g.append('g');
-	var group = this.g
+  
+/*	var group = this.g
 		.on("mouseover", function() {
 			var evt = d3.event;
 			if(!self.FragKey.changeMod && !self.FragKey.changeCL){
@@ -84,7 +85,7 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 					}
 				}
 			}
-			startHighlight();
+			//startHighlight();
 		})
 		.on("mouseout", function() {
 			endHighlight();
@@ -99,48 +100,81 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 			var evt = d3.event;
 			self.FragKey.model.updateStickyHighlight(self.fragments, evt.ctrlKey);
 		})
-	;
+	;*/
 
-	function startHighlight(){
+	function startHighlight(fragments){
+
 		if (!self.FragKey.changeCL && !self.FragKey.changeMod)
-			self.FragKey.model.addHighlight(self.fragments);	
+			self.FragKey.model.addHighlight(fragments);
 	}
-	function endHighlight(){
+	function endHighlight(fragments){
 		if (!self.FragKey.changeCL && !self.FragKey.changeMod)
-			self.FragKey.model.clearHighlight(self.fragments);	
+			self.FragKey.model.clearHighlight(fragments);
 	}
 	// # bions; either normal or lossy; have different colors
 	if (fragments.b.length != 0){ // really a, b, or c , see get_fragment_annotation()
-	
-		var highlightPath = "M" + this.x+ "," + (y - barHeight) 
-							+" L" + this.x+ "," +  y 
-							+ " L" + (this.x- tailX) + "," + (y + tailY);
-			
-		this.bHighlight = this.g.append("path")
+
+		if(fragments.y.length == 0)	//highlight full length of the fragbar
+			var highlightPath = "M" + this.x+ "," + (y - barHeight)
+								+" L" + this.x+ "," +  y
+								+ " L" + (this.x- tailX) + "," + (y + tailY);
+
+		else ////highlight half length of the fragbar
+			var highlightPath = "M" + this.x+ "," + (y - barHeight/2)
+								+" L" + this.x+ "," +  y
+								+ " L" + (this.x- tailX) + "," + (y + tailY);
+
+		this.bgroup = this.g.append("g")
+			.on("mouseover", function() {
+				var evt = d3.event;
+				if(!self.FragKey.changeMod && !self.FragKey.changeCL){
+					if (evt.ctrlKey){
+						self.fragBar.style("cursor", "copy");
+						self.bTail.style("cursor", "copy");
+						self.bHighlight.style("cursor", "copy");
+					}
+					else{
+						self.fragBar.style("cursor", "pointer");
+						self.bTail.style("cursor", "pointer");
+						self.bHighlight.style("cursor", "pointer");
+					}
+				}
+				startHighlight(self.b);
+			})
+			.on("mouseout", function() {
+				endHighlight(self.b);
+			})
+			.on("touchstart", function() {
+				startHighlight(self.b);
+			})
+			.on("touchend", function() {
+				endHighlight(self.b);
+			})
+			.on("click", function() {
+				var evt = d3.event;
+				self.FragKey.model.updateStickyHighlight(self.b, evt.ctrlKey);
+			});
+
+		this.bHighlight = this.bgroup.append("path")
 			.attr("d", highlightPath)
 			.attr("stroke", this.FragKey.model.highlightColour)
 			.attr("stroke-width", this.FragKey.model.highlightWidth)
-			.attr("opacity", 0)						
-			//.attr("peptide", this.peptide)
-			.style("cursor", "pointer")
-			//.attr("fragKeyIndex", index);
-		
-					
-		this.bTail = this.g.append("line")
+			.attr("opacity", 0)
+			.style("cursor", "pointer");
+
+		this.bTail = this.bgroup.append("line")
 			.attr("x1", this.x)
 			.attr("y1", y)
 			.attr("x2", this.x- tailX)
 			.attr("y2", y + tailY)
-			//.attr("peptide", this.peptide)
-			//.attr("fragKeyIndex", index)
 			.style("cursor", "pointer")
-			.attr("class", "fragBar");
+			.attr("class", "xispec_fragBar");
 
 
 		var ion = "";
 		for (var i = 0; i < fragments.b.length; i++) {
 			if(fragments.b[i].type.indexOf("AIon") != -1)
-				ion = "a"+this.bfrag_index;		
+				ion = "a"+this.bfrag_index;
 			else if(fragments.b[i].type.indexOf("BIon") != -1)
 				ion = "b"+this.bfrag_index;
 			else if(fragments.b[i].type.indexOf("CIon") != -1)
@@ -151,19 +185,19 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 //Idea for multiple texts, could be to crowded
 /*		this.bTexts = []	//Array of d3 selections
 		bions = []
-		for (var i = 0; i < fragments.b.length; i++) {		
+		for (var i = 0; i < fragments.b.length; i++) {
 			if(fragments.b[i].type.indexOf("AIon") != -1 && bions.indexOf("a"+this.bfrag_index) == -1)
-				bions.push("a"+this.bfrag_index);		
+				bions.push("a"+this.bfrag_index);
 			if(fragments.b[i].type.indexOf("BIon") != -1 && bions.indexOf("b"+this.bfrag_index) == -1)
-				bions.push("b"+this.bfrag_index);		
+				bions.push("b"+this.bfrag_index);
 			if(fragments.b[i].type.indexOf("CIon") != -1 && bions.indexOf("c"+this.bfrag_index) == -1)
-				bions.push("c"+this.bfrag_index);		
+				bions.push("c"+this.bfrag_index);
 		}
 
 		for (var i = 0; i < bions.length; i++) {
 			bText = this.g.append("text")
 			.attr("x", this.x - 7)
-			.attr("y", y + 15)			
+			.attr("y", y + 15)
 			.style("font-size", "0.6em")
 			.style("fill", color)
 			.style("cursor", "default")
@@ -176,13 +210,13 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 
 		this.bText = this.g.append("text")
 			.attr("x", this.x - 7)
-			.attr("y", y + 15)			
+			.attr("y", y + 15)
 			.style("font-size", "0.6em")
 			.style("fill", color)
 			.style("cursor", "default")
 			//.attr("text-anchor", "middle")
 			.text(ion)
-			.attr("opacity", 0);	
+			.attr("opacity", 0);
 
 		//check if only lossy fragments
 		var blossy = true;
@@ -191,66 +225,97 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 				blossy = false;
 		};
 		if (blossy){
-			this.bTail.attr("stroke", this.FragKey.model.lossFragBarColour);
+			this.bTail.attr("stroke", this.FragKey.model.peakColour);
 		}
 		else {
 			this.bTail.attr("stroke", "black");
 		}
-			
 	}
 
 	// # yions; either normal or lossy; have different colors
 	if (fragments.y.length != 0){
-		var highlightPath = "M" + this.x + "," + y 
-							+" L" + this.x + "," +  (y - barHeight) 
-							+ " L" + (this.x + tailX) + "," + (y  - barHeight - tailY);
-			
-		this.yHighlight = this.g.append("path")
+		if(fragments.b.length == 0)	//highlight full length of the fragbar
+			var highlightPath = "M" + this.x + "," + y
+								+" L" + this.x + "," +  (y - barHeight)
+								+ " L" + (this.x + tailX) + "," + (y  - barHeight - tailY);
+		else
+			var highlightPath = "M" + this.x + "," + (y - barHeight/2)
+								+" L" + this.x + "," +  (y - barHeight)
+								+ " L" + (this.x + tailX) + "," + (y  - barHeight - tailY);
+
+		this.ygroup = this.g.append("g")
+			.on("mouseover", function() {
+				var evt = d3.event;
+				if(!self.FragKey.changeMod && !self.FragKey.changeCL){
+					if (evt.ctrlKey){
+						self.fragBar.style("cursor", "copy");
+						self.yTail.style("cursor", "copy");
+						self.yHighlight.style("cursor", "copy");
+					}
+					else{
+						self.fragBar.style("cursor", "pointer");
+						self.yTail.style("cursor", "pointer");
+						self.yHighlight.style("cursor", "pointer");
+					}
+				}
+				startHighlight(self.y);
+			})
+			.on("mouseout", function() {
+				endHighlight(self.y);
+			})
+			.on("touchstart", function() {
+				startHighlight(self.y);
+			})
+			.on("touchend", function() {
+				endHighlight(self.y);
+			})
+			.on("click", function() {
+				var evt = d3.event;
+				self.FragKey.model.updateStickyHighlight(self.y, evt.ctrlKey);
+			});
+
+
+		this.yHighlight = this.ygroup.append("path")
 			.attr("d", highlightPath)
 			.attr("stroke", this.FragKey.model.highlightColour)
 			.attr("stroke-width", this.FragKey.model.highlightWidth)
 			.attr("opacity", 0)
-			//.attr("peptide", this.peptide)
 			.style("cursor", "pointer")
-			//.attr("fragKeyIndex", index);
-		
-		
-		this.yTail = this.g.append("line")
+
+		this.yTail = this.ygroup.append("line")
 			.attr("x1", this.x)
 			.attr("y1", y - barHeight)
 			.attr("x2", this.x + tailX)
 			.attr("y2", y - barHeight - tailY)
-			//.attr("peptide", this.peptide)
-			//.attr("fragKeyIndex", index)
 			.style("cursor", "pointer")
-			.attr("class", "fragBar");
+			.attr("class", "xispec_fragBar");
 
 		var ion = "";
-		for (var i = 0; i < fragments.y.length; i++) {		
+		for (var i = 0; i < fragments.y.length; i++) {
 			if(fragments.y[i].type.indexOf("XIon") != -1)
-				ion = "x"+this.yfrag_index;		
+				ion = "x"+this.yfrag_index;
 			else if(fragments.y[i].type.indexOf("YIon") != -1)
 				ion = "y"+this.yfrag_index;
 			else if(fragments.y[i].type.indexOf("ZIon") != -1)
 				ion = "z"+this.yfrag_index;
 		}
-		
+
 //Idea for multiple texts, could be to crowded
 /*		this.yTexts = []	//Array of d3 selections
 		yions = []
-		for (var i = 0; i < fragments.y.length; i++) {		
+		for (var i = 0; i < fragments.y.length; i++) {
 			if(fragments.y[i].type.indexOf("XIon") != -1 && yions.indexOf("x"+this.yfrag_index) == -1)
-				yions.push("x"+this.yfrag_index);		
+				yions.push("x"+this.yfrag_index);
 			if(fragments.y[i].type.indexOf("YIon") != -1 && yions.indexOf("y"+this.yfrag_index) == -1)
-				yions.push("y"+this.yfrag_index);		
+				yions.push("y"+this.yfrag_index);
 			if(fragments.y[i].type.indexOf("ZIon") != -1 && yions.indexOf("z"+this.yfrag_index) == -1)
-				yions.push("z"+this.yfrag_index);		
+				yions.push("z"+this.yfrag_index);
 		}
 
 		for (var i = 0; i < yions.length; i++) {
 			yText = this.g.append("text")
 			.attr("x", this.x - 2)
-			.attr("y", y - barHeight - 7)			
+			.attr("y", y - barHeight - 7)
 			.style("font-size", "0.6em")
 			.style("fill", color)
 			.style("cursor", "default")
@@ -262,7 +327,7 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 
 		this.yText = this.g.append("text")
 			.attr("x", this.x - 2)
-			.attr("y", y - barHeight - 7)			
+			.attr("y", y - barHeight - 10)
 			.style("font-size", "0.6em")
 			.style("fill", color)
 			.style("cursor", "default")
@@ -277,7 +342,7 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 				ylossy = false;
 		};
 		if (ylossy){
-			this.yTail.attr("stroke", this.FragKey.model.lossFragBarColour);
+			this.yTail.attr("stroke", this.FragKey.model.peakColour);
 		}
 		else {
 			this.yTail.attr("stroke", "black");
@@ -289,19 +354,20 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 		.attr("y1", y)
 		.attr("x2", this.x)
 		.attr("y2", y - barHeight)
-		//.attr("peptide", this.peptide)
-		//.attr("fragKeyIndex", index)
 		.style("cursor", "pointer")
-		.attr("class", "fragBar");
+		.style("pointer-events", "none")
+		.attr("class", "xispec_fragBar");
 
-	//if all fragments are lossy 	
+	//if all fragments are lossy
 	if ((fragments.y.length == 0 || ylossy) && (fragments.b.length == 0 || blossy)){
-		this.fragBar.attr("stroke", this.FragKey.model.lossFragBarColour);
+		this.fragBar.attr("stroke", this.FragKey.model.peakColour);
 	}
 	else {
 		this.fragBar.attr("stroke", "black");
 	}
-			
+
+
+
 }
 
 KeyFragment.prototype.highlight = function(show, fragments){
@@ -314,7 +380,7 @@ KeyFragment.prototype.highlight = function(show, fragments){
 				if (fragments[f].type.indexOf("BIon") != -1)
 					this.bText.text("b" + this.bfrag_index)
 				if (fragments[f].type.indexOf("CIon") != -1)
-					this.bText.text("c" + this.bfrag_index)	
+					this.bText.text("c" + this.bfrag_index)
 				//if (fragments[f].type.indexOf("AIon") != -1 || fragments[f].type.indexOf("BIon") != -1 || fragments[f].type.indexOf("CIon") != -1)
 				this.bText.attr("opacity", 1);
 			}
@@ -325,7 +391,7 @@ KeyFragment.prototype.highlight = function(show, fragments){
 				if (fragments[f].type.indexOf("YIon") != -1)
 					this.yText.text("y" + this.yfrag_index)
 				if (fragments[f].type.indexOf("ZIon") != -1)
-					this.yText.text("z" + this.yfrag_index)	
+					this.yText.text("z" + this.yfrag_index)
 				//if (fragments[f].type.indexOf("XIon") != -1 || fragments[f].type.indexOf("YIon") != -1 || fragments[f].type.indexOf("ZIon") != -1)
 				this.yText.attr("opacity", 1);
 			}
@@ -337,9 +403,9 @@ KeyFragment.prototype.highlight = function(show, fragments){
 			this.yText.attr("opacity", 0);
 		}
 		if (this.bHighlight){
-			this.bHighlight.attr("opacity", 0);	
+			this.bHighlight.attr("opacity", 0);
 			this.bText.attr("opacity", 0);
-		}	
+		}
 	}
 }
 
