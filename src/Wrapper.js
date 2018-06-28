@@ -44,7 +44,7 @@ xiSPEC.init = function(
 	var _html = ""
 		+"<div class='xispec_dynDiv' id='xispec_settingsWrapper'>"
 		+"	<div class='xispec_dynDiv_moveParentDiv'>"
-		+"		<span class='xispec_dynTitle'>Settings</span>"
+		+"		<span class='xispec_dynTitle'>Spectrum settings</span>"
 		+"		<i class='fa fa-times-circle settingsCancel' id='closeSettings'></i>"
 		+"	</div>"
 		+"	<div class='xispec_dynDiv_resizeDiv_tl draggableCorner'></div>"
