@@ -524,10 +524,10 @@ var SpectrumSettingsView = Backbone.View.extend({
 
 		var displayModified = function (row){
 			row.addClass('userModified');
-			row.find(".resetMod").css("visibility", "visible");
+			row.find(".xispec_resetMod").css("visibility", "visible");
 		}
 
-		$('#xispec_modificationTable').on('click', '.resetMod', function() {
+		$('#xispec_modificationTable').on('click', '.xispec_resetMod', function() {
 			var modId = $(this).parent()[0].innerText;
 			self.model.delUserModification(modId, false);
 			self.modTable.ajax.reload();
