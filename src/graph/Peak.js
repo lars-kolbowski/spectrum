@@ -68,8 +68,6 @@ function Peak (id, graph){
 	this.lineLabelGroup = this.graph.peaksSVG.append('g');
 	this.lineGroup = this.lineLabelGroup.append('g');
 
-	this.linegroup = this.g.append('g');
-
 	if (this.fragments.length > 0) {
 		this.highlightLine = this.lineGroup.append('line')
 								.attr("stroke", this.graph.model.highlightColour)
