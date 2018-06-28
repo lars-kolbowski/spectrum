@@ -57,6 +57,7 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 
 	//svg elements
 	this.g = this.FragKey.g.append('g');
+  
 /*	var group = this.g
 		.on("mouseover", function() {
 			var evt = d3.event;
@@ -280,7 +281,6 @@ function KeyFragment (fragments, index, offset, peptideId, FragKey) {
 			.attr("stroke-width", this.FragKey.model.highlightWidth)
 			.attr("opacity", 0)
 			.style("cursor", "pointer")
-
 
 		this.yTail = this.ygroup.append("line")
 			.attr("x1", this.x)

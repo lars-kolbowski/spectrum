@@ -258,7 +258,6 @@ Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 	this.ylabelLeft.attr("transform","translate(" + -50 + " " + height/2+") rotate(-90)");
 	this.ylabelRight.attr("transform","translate(" + (width+45) + " " + height/2+") rotate(-90)");
 
-
 	self.redraw()();
 }
 

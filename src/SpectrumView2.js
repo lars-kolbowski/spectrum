@@ -101,7 +101,6 @@ var SpectrumView = Backbone.View.extend({
 			this.model.lockZoom = false;
 			this.graph.enableZoom();
 		}
-
 	},
 
 	// toggleView: function(){

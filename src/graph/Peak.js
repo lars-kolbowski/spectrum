@@ -68,6 +68,8 @@ function Peak (id, graph){
 	this.lineLabelGroup = this.graph.peaksSVG.append('g');
 	this.lineGroup = this.lineLabelGroup.append('g');
 
+	this.linegroup = this.g.append('g');
+
 	if (this.fragments.length > 0) {
 		this.highlightLine = this.lineGroup.append('line')
 								.attr("stroke", this.graph.model.highlightColour)
@@ -80,7 +82,6 @@ function Peak (id, graph){
 
 		//set the dom events for it
 		var self = this;
-
 
 		this.lineGroup
 			.on("mouseover", function() {
@@ -217,7 +218,6 @@ function Peak (id, graph){
 				fragments = self.fragments;
 			self.graph.model.updateStickyHighlight(fragments, ctrl);
 		};
-
 
 	  	//create frag labels
 	  	//labeldrag
