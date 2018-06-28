@@ -212,7 +212,7 @@ var SpectrumSettingsView = Backbone.View.extend({
 			.style("display", "none")
 		;
 
-		var colorSchemeSelector = appearanceTab.append("label").attr("class", "xispec_btn").text("Color scheme: ")
+		var colorSchemeSelector = appearanceTab.append("label").text("Color scheme: ")
 			.append("select").attr("id", 'colorSelector').attr("class", 'xispec_form-control pointer')
 		;
 		var colOptions = [
@@ -230,7 +230,7 @@ var SpectrumSettingsView = Backbone.View.extend({
 			.text (function(d) { return d.text; })
 		;
 
-		var highlightColorSelector = appearanceTab.append("label").attr("class", "xispec_btn").text("Highlight Color: ")
+		var highlightColorSelector = appearanceTab.append("label").text("Highlight Color: ")
 			.append("input")
 				.attr("class", "jscolor pointer")
 				.attr("id", "highlightColor")
@@ -240,19 +240,19 @@ var SpectrumSettingsView = Backbone.View.extend({
 		;
 		jscolor.installByClassName("jscolor");
 
-		var highlightingModeChkBx = appearanceTab.append("label").attr("class", "xispec_btn").text("Hide not selected fragments.")
+		var highlightingModeChkBx = appearanceTab.append("label").text("Hide not selected fragments.")
 			.append("input").attr("type", "checkbox").attr("id", "peakHighlightMode")
 		;
 
-		var lossyChkBx = appearanceTab.append("label").attr("class", "xispec_btn").text("Show neutral loss labels")
+		var lossyChkBx = appearanceTab.append("label").text("Show neutral loss labels")
 			.append("input").attr("type", "checkbox").attr("id", "lossyChkBx")
 		;
 
-		this.decimals = appearanceTab.append("label").attr("class", "xispec_btn").text("Number of decimals to display: ")
+		this.decimals = appearanceTab.append("label").text("Number of decimals to display: ")
 			.append("input").attr("type", "number").attr("id", "settingsDecimals").attr("min", "1").attr("max", "10").attr("autocomplete", "off")
 		;
 
-		this.absoluteError = appearanceTab.append("label").attr("class", "xispec_btn").text("Absolute error values (QC): ")
+		this.absoluteError = appearanceTab.append("label").text("Absolute error values (QC): ")
 			.append("input").attr("type", "checkbox").attr("id", "absErrChkBx")
 		;
 

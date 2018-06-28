@@ -54,7 +54,7 @@ xiSPEC.init = function(
 		+"</div>"
 		+"<div id='xispec_spectrumControls'>"
 		+"<span id='xispec_extra_spectrumControls_before'></span>"
-		+'<i class="xispec_btn xispec_btn-1a xispec_btn-topNav fa fa-download" aria-hidden="true" id="downloadSVG" title="download SVG" style="cursor: pointer;"></i>'
+		+'<i class="xispec_btn xispec_btn-1a xispec_btn-topNav fa fa-download" aria-hidden="true" id="xispec_dl_spectrum_SVG" title="download SVG" style="cursor: pointer;"></i>'
 		+"<label class='xispec_btn'>Move Labels<input id='moveLabels' type='checkbox'></label>"
 		+'<label class="xispec_btn" title="toggle measure mode on/off">Measure<input class="pointer" id="measuringTool" type="checkbox"></label>'
 		+'<form id="setrange">'

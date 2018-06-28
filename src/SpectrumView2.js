@@ -9,7 +9,7 @@ var SpectrumView = Backbone.View.extend({
 		'click #clearHighlights' : 'clearHighlights',
 		'click #measuringTool': 'measuringTool',
 		'click #moveLabels': 'moveLabels',
-		'click #downloadSVG': 'downloadSVG',
+		'click #xispec_dl_spectrum_SVG': 'downloadSVG',
 		'click #toggleSettings' : 'toggleSettings',
 		'click #xispec_revertAnnotation' : 'revertAnnotation',
 		'click #toggleSpecList' : 'toggleSpecList',

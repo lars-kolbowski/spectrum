@@ -71,7 +71,6 @@
     vertical-align: middle;
     padding: 5px 0px;
     line-height: 3.5em;
-    background-color:  inherit;
 }
 
 #xispec_settings_main .xispec_settings-bottom{
@@ -264,6 +263,10 @@
     -o-transition: all 200ms ease;
     transition: all 200ms ease;
 }
+#settingsDataApply{
+    display: inline;
+}
+
 /* DynDiv 0.5 by Markus Bordihn (markusbordihn.de) */
 .xispec_dynTitle {
     position: relative;
@@ -290,11 +293,27 @@
  overflow: hidden;
 }
 
+
+.draggableCorner {
+    width:20px;
+    height:20px;
+    background: #750000;
+    border:none;
+    background-image: url("../images/tl.png");
+}
+
+/* just need 1 background image and rotate it for corner orientations */
+.xispec_dynDiv_resizeDiv_tr {
+    transform: rotate(90deg);
+}
+.xispec_dynDiv_resizeDiv_bl {
+    transform: rotate(270deg);
+}
+.xispec_dynDiv_resizeDiv_br {
+    transform: rotate(180deg);
+}
+
 .xispec_dynDiv_resizeDiv_tl,.xispec_dynDiv_resizeDiv_tr,.xispec_dynDiv_resizeDiv_bl,.xispec_dynDiv_resizeDiv_br {
- width: 10px;
- height: 10px;
- background: #750000;
- border: 1px solid #000;
  position: absolute;
 }
 

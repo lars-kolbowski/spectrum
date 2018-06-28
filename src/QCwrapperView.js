@@ -30,7 +30,7 @@ var QCwrapperView = Backbone.View.extend({
 		'click .xispec_dockRight' : 'dockRight',
 		'click .xispec_dockBottom' : 'dockBottom',
 		'change .xispec_plotSelectChkbox': 'updatePlots',
-		'click #xispec_downloadQCSVG': 'downloadQCSVG',
+		'click #xispec_dl_QC_SVG': 'downloadQCSVG',
 	},
 
 	initialize: function(viewOptions) {
@@ -92,7 +92,7 @@ var QCwrapperView = Backbone.View.extend({
 		var downloadButton = this.controlsDiv.append('i')
 		 	.attr("class", "xispec_btn xispec_btn-1a xispec_btn-topNav fa fa-download pointer")
 			.attr("aria-hidden", "true")
-			.attr("id", "xispec_downloadQCSVG")
+			.attr("id", "xispec_dl_QC_SVG")
 			.attr("title", "download SVG(s)")
 		;
 
