@@ -54,8 +54,11 @@ var SpectrumSettingsView = Backbone.View.extend({
 
 		this.listenTo(CLMSUI.vent, 'spectrumSettingsShow', this.bringToTop);
 		this.listenTo(CLMSUI.vent, 'spectrumSettingsToggle', this.toggleView);
-		this.listenTo(this.model, 'change', this.render);
+// 		this.listenTo(this.model, 'change', this.render);
 		this.listenTo(this.model, 'change:JSONdata', this.render);
+
+		this.isVisible = false;
+
 		this.wrapper = d3.select(this.el);
 
 		//borrowed from CLMSUI.BaseframeView
@@ -312,6 +315,8 @@ var SpectrumSettingsView = Backbone.View.extend({
 	},
 
 	toggleView: function(){
+		this.isVisible = (this.isVisible ? false : true);
+		this.render();
 		$(this.el).toggle();
 		this.modTable.draw();
 	},
@@ -533,6 +538,8 @@ var SpectrumSettingsView = Backbone.View.extend({
 
 	render: function() {
 
+		if (!this.isVisible) return;
+
 		this.pepInputView.render();
 		this.modTable.ajax.url( this.model.baseDir + "php/convertModsToJSON.php?peps="+encodeURIComponent(this.model.pepStrsMods.join(";"))).load();
 		//ions
@@ -565,11 +572,10 @@ var SpectrumSettingsView = Backbone.View.extend({
 	},
 
 	cancel: function(){
+		this.isVisible = false;
 		$(this.wrapper[0]).hide();
 		document.getElementById('highlightColor').jscolor.hide();
 		this.model.resetModel();
-		// this.render();
-
 	},
 
 	toggleCustomCfgHelp: function(){
