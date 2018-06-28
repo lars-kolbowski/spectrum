@@ -203,8 +203,8 @@ xiSPEC.convert_to_json_request = function (data) {
 	annotationRequest.annotation.modifications = data.modifications;
 	annotationRequest.annotation.ions = ions;
     annotationRequest.annotation["cross-linker"] = {'modMass': data.crossLinkerModMass}; // yuk
-    annotationRequest.annotation.precursorMZ = data.precursorMZ;
-    annotationRequest.annotation.precursorCharge = data.precursorCharge;
+    annotationRequest.annotation.precursorMZ = +data.precursorMZ;
+    annotationRequest.annotation.precursorCharge = +data.precursorCharge;
 	annotationRequest.annotation.custom = [];
 
     console.log("request", annotationRequest);
