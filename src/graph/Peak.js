@@ -19,14 +19,14 @@
 //		graph/Peak.js
 
 function Peak (id, graph){
-	var peak = graph.model.JSONdata.peaks[id];
+	var peak = graph.model.get("JSONdata").peaks[id];
 	this.id = id;
 	this.x = peak.mz;
 	this.y = peak.intensity;
 	this.IsotopeClusters = [];
 	this.labels = [];
 	for (i=0; i<peak.clusterIds.length; i++){
-		cluster = graph.model.JSONdata.clusters[peak.clusterIds[i]]
+		cluster = graph.model.get("JSONdata").clusters[peak.clusterIds[i]]
 		cluster.id = peak.clusterIds[i]
 		this.IsotopeClusters.push(cluster);
 	}
@@ -135,7 +135,7 @@ function Peak (id, graph){
 					for (var i = 0; i < self.clusterIds.length; i++) {
 						if(fragments[f].clusterIds.indexOf(self.clusterIds[i]) != -1){
 							index = fragments[f].clusterIds.indexOf(self.clusterIds[i])
-							cluster = graph.model.JSONdata.clusters[self.clusterIds[i]]
+							cluster = graph.model.get("JSONdata").clusters[self.clusterIds[i]]
 						}
 					}
 

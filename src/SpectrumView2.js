@@ -44,7 +44,7 @@ var SpectrumView = Backbone.View.extend({
 		$(this.el).css('background-color', '#fff');
 		this.graph.clear();
 		this.lockZoom();
-		if (this.model.JSONdata)
+		if (this.model.get("JSONdata"))
 			this.graph.setData();
 		// this.hideSpinner();
 	},
@@ -222,11 +222,11 @@ var SpectrumView = Backbone.View.extend({
 		var svgStrings = CLMSUI.svgUtils.capture (svgArr);
 		var svgXML = CLMSUI.svgUtils.makeXMLStr (new XMLSerializer(), svgStrings[0]);
 
-		var charge = this.model.JSONdata.annotation.precursorCharge;
+		var charge = this.model.get("JSONdata").annotation.precursorCharge;
 		var pepStrs = this.model.pepStrsMods;
-		var linkSites = Array(this.model.JSONdata.LinkSite.length);
+		var linkSites = Array(this.model.get("JSONdata").LinkSite.length);
 
-		this.model.JSONdata.LinkSite.forEach(function(ls){
+		this.model.get("JSONdata").LinkSite.forEach(function(ls){
 			linkSites[ls.peptideId] = ls.linkSite;
 		});
 

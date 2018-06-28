@@ -55,7 +55,7 @@ var FragmentationKeyView = Backbone.View.extend({
 
 	render: function() {
 		this.clear();
-		if (this.model.JSONdata)
+		if (this.model.get("JSONdata"))
 			this.setData();
 		this.resize();
 	},
@@ -65,12 +65,12 @@ var FragmentationKeyView = Backbone.View.extend({
 		var self = this;
 
 		var pepCount = self.model.peptides.length;
-		this.linkPos = self.model.JSONdata.LinkSite;
+		this.linkPos = self.model.get("JSONdata").LinkSite;
 		this.changeCL = false;
 		this.changeMod = false;
 		this.pepModsArray = [];
 		this.peptideStrs = self.model.pepStrs;	//contains the aa sequences of the peptides in string form without modifications
-		var fragments = self.model.JSONdata.fragments;
+		var fragments = self.model.get("JSONdata").fragments;
 		this.annotations = [];
 		this.peptides = [];
 		for (var i = 0; i < this.peptideStrs.length; i++) {

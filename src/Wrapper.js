@@ -227,7 +227,6 @@ xiSPEC.arrayifyPeptide = function (seq_mods) {
     var offset = 1;
 	var result;
     while (result = re.exec(seq_mods)) {
-		console.log(result);
         peptide.sequence[result.index - offset]["Modification"] = result[0];
 		offset += result[0].length;
     }

@@ -170,9 +170,9 @@ Graph.prototype.setData = function(){
 	this.peaks = new Array();
 	this.pep1 = this.model.pep1;
 	this.pep2 = this.model.pep2;
-	if (this.model.JSONdata) {
-		for (var i = 0; i < this.model.JSONdata.peaks.length; i++){
-				var peak = this.model.JSONdata.peaks[i];
+	if (this.model.get("JSONdata")) {
+		for (var i = 0; i < this.model.get("JSONdata").peaks.length; i++){
+				var peak = this.model.get("JSONdata").peaks[i];
 			this.peaks.push(new Peak(i, this));
 		}
 

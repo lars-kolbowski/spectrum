@@ -353,7 +353,7 @@ var SpectrumSettingsView = Backbone.View.extend({
 		this.model.saveUserModificationsToCookie();
 		return false;
 
-		//window.SpectrumModel.request_annotation(window.SettingsSpectrumModel.JSONdata);
+		//window.SpectrumModel.request_annotation(window.SettingsSpectrummodel.get("JSONdata"));
 	},
 
 	//ToDo: improve error handling to be more informative - display outside of console
@@ -536,7 +536,7 @@ var SpectrumSettingsView = Backbone.View.extend({
 		this.pepInputView.render();
 		this.modTable.ajax.url( this.model.baseDir + "php/convertModsToJSON.php?peps="+encodeURIComponent(this.model.pepStrsMods.join(";"))).load();
 		//ions
-		this.model.JSONdata.annotation.ions.forEach(function(ion){
+		this.model.get("JSONdata").annotation.ions.forEach(function(ion){
 			$('#'+ion.type).attr('checked', true);
 		});
 		var ionSelectionArr = new Array();
@@ -546,10 +546,10 @@ var SpectrumSettingsView = Backbone.View.extend({
 		$('#xispec_ionSelection').val(ionSelectionArr.join(", "));
 
 		this.peaklist[0][0].value = this.model.peaksToMGF();
-		this.precursorZ[0][0].value  = this.model.JSONdata.annotation.precursorCharge;
-		this.toleranceValue[0][0].value  = this.model.JSONdata.annotation.fragementTolerance.split(' ')[0];
-		this.toleranceUnit[0][0].value = this.model.JSONdata.annotation.fragementTolerance.split(" ")[1];
-		this.crossLinkerModMass[0][0].value = this.model.JSONdata.annotation['cross-linker'].modMass;
+		this.precursorZ[0][0].value  = this.model.get("JSONdata").annotation.precursorCharge;
+		this.toleranceValue[0][0].value  = this.model.get("JSONdata").annotation.fragementTolerance.split(' ')[0];
+		this.toleranceUnit[0][0].value = this.model.get("JSONdata").annotation.fragementTolerance.split(" ")[1];
+		this.crossLinkerModMass[0][0].value = this.model.get("JSONdata").annotation['cross-linker'].modMass;
 		this.decimals[0][0].value = this.model.showDecimals;
 
 		if(this.model.isLinear)
@@ -557,8 +557,8 @@ var SpectrumSettingsView = Backbone.View.extend({
 		else
 			$(this.crossLinkerModMassWrapper[0][0]).show();
 
-		if (this.model.JSONdata.annotation.custom !== undefined)
-			this.customConfigInput[0][0].value = this.model.JSONdata.annotation.custom.join("\n");
+		if (this.model.get("JSONdata").annotation.custom !== undefined)
+			this.customConfigInput[0][0].value = this.model.get("JSONdata").annotation.custom.join("\n");
 
 		// this.updateStepSize($(this.toleranceValue[0][0]));
 		// this.updateStepSize($(this.crossLinkerModMass[0][0]));
