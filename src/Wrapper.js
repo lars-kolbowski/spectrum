@@ -130,7 +130,7 @@ xiSPEC.init = function(
 xiSPEC.setData = function(data){
 
 	var json_request = this.convert_to_json_request(data);
-	this.SpectrumModel.request_annotation(json_request);
+	this.SpectrumModel.request_annotation(json_request, true);
 
 };
 

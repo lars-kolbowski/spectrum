@@ -593,8 +593,16 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 			this.saveUserModificationsToCookie();
 	},
 
-	request_annotation: function(json_request){
-// 		json_request.annotation.custom = json_request.annotation.custom.concat(this.customSettings);
+	request_annotation: function(json_request, originalMatch){
+
+		// ToDo: necessary?
+		this.userModifications = [];
+		this.otherModel.userModifications = [];
+
+		if (originalMatch === undefined) originalMatch = false;
+
+		if (originalMatch) this.originalMatchRequest = json_request;
+
 		this.trigger('request_annotation:pending');
 		console.log("annotation request:", json_request);
 		var self = this;
@@ -608,10 +616,9 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 			async: false,
 			url: self.xiAnnotatorBaseURL + "annotate/FULL",
 			success: function(data) {
-				//ToDo: Error handling -> talked to Lutz, he will implement transfer of error message as json
+				//ToDo: Error handling -> https://github.com/Rappsilber-Laboratory/xi3-issue-tracker/issues/330
 				console.log("annotation response:", data);
 				self.set({"JSONdata": data, "JSONrequest": json_request});
-				//self.setData();
 
 				if (self.otherModel !== undefined){
 					var json_data_copy = jQuery.extend({}, data);
@@ -623,23 +630,13 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		});
 	},
 
-	loadSpectrum: function(rowData, original){
-
-		if (original === undefined) original = true;
-		if (original) this.originalMatch = rowData;
-
-		this.userModifications = [];
-		this.otherModel.userModifications = [];
-		this.create_annotation_request(rowData);
-	},
-
 	revert_annotation: function(){
-		this.userModifications = [];
-		this.otherModel.userModifications = [];
+// 		this.userModifications = [];
+// 		this.otherModel.userModifications = [];
 		if(!this.changedAnnotation)
 			return
 		else {
-			this.create_annotation_request(this.originalMatch);
+			this.request_annotation(this.originalMatchRequest);
 		}
 	},
 
@@ -651,85 +648,4 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		this.trigger("change:JSONdata");
 
 	},
-
-	create_annotation_request: function(rowData){
-		// ToDo: large parts are duplication of xiSPEC.convert_to_json_request
-
-		var peptides = [];
-		var linkSites = [];
-		peptides[0] = xiSPEC.arrayifyPeptide(rowData.pep1);
-		linkSites[0] = {"id":0, "peptideId":0, "linkSite": rowData.linkpos1};
-		if (rowData.pep2) {
-			peptides[1] = xiSPEC.arrayifyPeptide(rowData.pep2);
-			linkSites[1] = {"id":0, "peptideId":1, "linkSite": rowData.linkpos2}
-		}
-
-		var annotationRequest = {};
-		annotationRequest.Peptides = peptides;
-		annotationRequest.LinkSite = linkSites;
-
-		annotationRequest.annotation = {};
-		var fragTolArr = rowData.frag_tol.split(" ");
-		annotationRequest.annotation.fragmentTolerance = {"tolerance":+fragTolArr[0], "unit":fragTolArr[1]};
-
-		annotationRequest.annotation.modifications = this.knownModifications.modifications;
-
-		var ionTypes = rowData.ion_types.split(";");
-		var ionTypeCount = ionTypes.length;
-		var ions = [];
-		for (var it = 0; it < ionTypeCount; it++) {
-		    var ionType = ionTypes[it];
-		    ions.push({"type": (ionType.charAt(0).toUpperCase() + ionType.slice(1) + "Ion")});
-		}
-		annotationRequest.annotation.ions = ions;
-
-		var crossLinker = {};
-		var crossLinkerModMass = 0.0;
-		if (rowData.crosslinker_modmass1) crossLinkerModMass += parseFloat(rowData.crosslinker_modmass1);
-		if (rowData.crosslinker_modmass2) crossLinkerModMass += parseFloat(rowData.crosslinker_modmass2);
-		crossLinker.modMass = crossLinkerModMass;
-		annotationRequest.annotation["cross-linker"] = crossLinker; //yuk
-
-		annotationRequest.annotation.precursorCharge = +rowData.charge;
-		annotationRequest.annotation.precursorMZ = +rowData.exp_mz;
-		annotationRequest.annotation.custom = [""];
-
-		var self = this;
-		$.ajax({
-			url:  this.get('baseDir') + '/php/getPeakList.php?spectrum_id='+rowData.spectrum_id + "&db=" + this.get('database')+"&tmp=" + this.get('tmpDB'),
-			type: 'GET',
-			async: false,
-			cache: false,
-			contentType: false,
-			processData: false,
-			success: function (returndata) {
-
-				annotationRequest.peaks = JSON.parse(returndata);
-				self.requestId = rowData.identification_id;
-				self.request_annotation(annotationRequest);
-			}
-		});
-	},
-
-// 	arrayifyPeptide: function (seq_mods) {
-// 		var peptide = {};
-// 		peptide.sequence = [];
-//
-// 		var seq_AAonly = seq_mods.replace(/[^A-Z]/g, '')
-// 		var seq_length = seq_AAonly.length;
-//
-// 		for (var i = 0; i < seq_length; i++) {
-// 			peptide.sequence[i] = {"aminoAcid":seq_AAonly[i], "Modification":"" }
-// 		}
-//
-// 		var re = /[^A-Z]+/g;
-// 		var offset = 1;
-// 		var result;
-// 		while (result = re.exec(seq_mods)) {
-// // 			console.log(result);
-// 			peptide.sequence[result.index - offset]["Modification"] = result[0];
-// 			offset += result[0].length;
-// 		}
-// 		return peptide;
-// 	},
 });
