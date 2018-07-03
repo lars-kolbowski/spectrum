@@ -4,28 +4,32 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
     return {
       baseDir:  './',
 	  xiAnnotatorBaseURL: 'http://xi3.bio.ed.ac.uk/xiAnnotator/',
-	  standalone: true,
+	  standalone: true, //ToDo: remove?
 	  database: false,
+	  knownModifications: [],
+	  knownModificationsURL: false,
     };
   },
 
 	initialize: function(){
 
 		var self = this;
-		this.xiAnnotatorBaseURL = this.get('xiAnnotatorBaseURL');
-		this.baseDir = this.get('baseDir');
 
-		this.standalone = this.get('standalone');
-		this.database = this.get('database');
-
-		if(!this.standalone)
-			this.getKnownModifications(this.xiAnnotatorBaseURL + "annotate/knownModifications");
-		else{
-			if(this.database)
-				this.getKnownModifications(this.baseDir + "php/getModifications.php?db=" + this.get('database')+'&tmp='+this.get('tmpDB'));
-			else
-				this.knownModifications = [];
+		if(this.get('knownModificationsURL') !== false){
+			this.getKnownModifications(this.get('knownModificationsURL'));
 		}
+		else{
+			this.knownModifications = [];
+		}
+
+		// if(!this.get('standalone'))
+		// 	this.getKnownModifications(this.get('xiAnnotatorBaseURL') + "annotate/knownModifications");
+		// else{
+		// 	if(this.get('database'))
+		// 		this.getKnownModifications(this.get('baseDir') + "php/getModifications.php?db=" + this.get('database')+'&tmp='+this.get('tmpDB'));
+		// 	else
+		// 		this.knownModifications = [];
+		// }
 
 		this.showDecimals = 2;
 		this.moveLabels = false;
@@ -42,7 +46,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		// if (!_.isUndefined(Cookies.get('customMods')))
 		// 	this.userModifications = JSON.parse(Cookies.get('customMods'));
 
-		$.getJSON(self.baseDir + 'json/aaMasses.json', function(data) {
+		$.getJSON(self.get('baseDir') + 'json/aaMasses.json', function(data) {
     		self.aaMasses = data
 		});
 
@@ -83,7 +87,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		}
 
 		// knownModifications for standalone
-		if(!this.database && this.get("JSONdata").annotation != undefined){
+		if(this.knownModifications.length == 0 && this.get("JSONdata").annotation != undefined){
 			this.knownModifications = this.get("JSONrequest").annotation.modifications.map(function(mod){
 				 var obj = {};
 				 obj.id = mod.id;
@@ -547,34 +551,6 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		});
 	},
 
-
-	// not used anymore - was used for merging knownModifications from xiDB with mods from db
-// 	updateKnownModifications: function(){
-// 		var self = this;
-// 		if(this.annotationData.modifications){
-// 			this.annotationData.modifications.forEach(function(annotation_mod){
-// 				var overlap = self.knownModifications["modifications"].filter(function(km){ return annotation_mod.id == km.id;});
-// 				if (overlap.length > 0){
-// 					overlap.forEach(function(overlap_mod){
-// 						overlap_mod.mass = annotation_mod.massDifference;
-// 						if(overlap_mod.aminoAcids.indexOf(annotation_mod.aminoacid) == -1)
-// 							overlap_mod.aminoAcids.push(annotation_mod.aminoacid);
-// // 						overlap_mod.aminoAcids = annotation_mod.aminoAcids;
-// 					});
-// 				}
-// 				else{
-// 					// mass in the modification array corresponds to massDifference from xiAnnotator
-// 					var new_mod = new Object;
-// 					new_mod['mass'] = annotation_mod['massDifference'];
-// 					new_mod['aminoAcids'] = [annotation_mod['aminoacid']];
-// 					new_mod['id'] = annotation_mod['id'];
-// 					self.knownModifications["modifications"].push(new_mod);
-// 				}
-
-// 			})
-// 		}
-// 	},
-
 	updateModification: function(update_mod){
 		var found = false;
 		for (var i=0; i < this.knownModifications.length; i++) {
@@ -663,7 +639,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 			},
 			data: JSON.stringify(json_request),
 			async: false,
-			url: self.xiAnnotatorBaseURL + "annotate/FULL",
+			url: self.get('xiAnnotatorBaseURL') + "annotate/FULL",
 			success: function(data) {
 				//ToDo: Error handling -> https://github.com/Rappsilber-Laboratory/xi3-issue-tracker/issues/330
 				console.log("annotation response:", data);

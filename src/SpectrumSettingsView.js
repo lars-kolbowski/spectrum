@@ -347,7 +347,7 @@ var SpectrumSettingsView = Backbone.View.extend({
 		var spinner = new Spinner({scale: 5}).spin (d3.select("#xispec_settings_main").node());
 
 		$.ajax({
-			url: self.model.baseDir+"php/formToJson.php",
+			url: self.model.get('baseDir')+"php/formToJson.php",
 			type: 'POST',
 			data: formData,
 			async: false,
