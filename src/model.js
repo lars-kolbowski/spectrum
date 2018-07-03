@@ -17,13 +17,14 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 
 		this.standalone = this.get('standalone');
 		this.database = this.get('database');
+
 		if(!this.standalone)
 			this.getKnownModifications(this.xiAnnotatorBaseURL + "annotate/knownModifications");
 		else{
 			if(this.database)
 				this.getKnownModifications(this.baseDir + "php/getModifications.php?db=" + this.get('database')+'&tmp='+this.get('tmpDB'));
 			else
-				this.knownModifications = {};
+				this.knownModifications = [];
 		}
 
 		this.showDecimals = 2;
@@ -80,6 +81,20 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 			this.trigger("changed:data");
 			return;
 		}
+
+		// knownModifications for standalone
+		if(!this.database && this.get("JSONdata").annotation != undefined){
+			this.knownModifications = this.get("JSONrequest").annotation.modifications.map(function(mod){
+				 var obj = {};
+				 obj.id = mod.id;
+				 obj.mass = parseFloat(mod.mass);
+				 obj.aminoAcids = mod.aminoAcids;
+				 obj.changed = false;
+				 obj.userMod = true;
+				 return obj;
+			 });
+		}
+
 
 		$("#measuringTool").prop("checked", false);
 		$("#moveLabels").prop("checked", false);
@@ -407,18 +422,19 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 
 	checkForValidModification: function(mod, aminoAcid){
 
-		for (var i = 0; i < this.userModifications.length; i++) {
-			if(this.userModifications[i].id == mod){
-				if ($.inArray(aminoAcid, this.userModifications[i].aminoAcids) != -1 || this.userModifications[i].aminoAcids == [])
-					return true;
-				else
-					return false;
-			}
-		}
+		// for (var i = 0; i < this.userModifications.length; i++) {
+		// 	if(this.userModifications[i].id == mod){
+		// 		if ($.inArray(aminoAcid, this.userModifications[i].aminoAcids) != -1 || this.userModifications[i].aminoAcids == [])
+		// 			return true;
+		// 		else
+		// 			return false;
+		// 	}
+		// }
 
-		for (var i = 0; i < this.knownModifications['modifications'].length; i++) {
-			if(this.knownModifications['modifications'][i].id == mod){
-				if ($.inArray(aminoAcid, this.knownModifications['modifications'][i].aminoAcids) != -1)
+		for (var i = 0; i < this.knownModifications.length; i++) {
+			if(this.knownModifications[i].id == mod){
+				var knownMod_aminoAcids = this.knownModifications[i].aminoAcids;
+				if (knownMod_aminoAcids.indexOf('*') != -1 || knownMod_aminoAcids.indexOf(aminoAcid) != -1)
 					return true;
 				else
 					return false;
@@ -509,6 +525,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 	},
 
 	getKnownModifications: function(modifications_url){
+
 		var self = this;
 		var response = $.ajax({
 			type: "GET",
@@ -516,7 +533,13 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 			async: false,
 			url: modifications_url,
 			success: function(data) {
-				self.knownModifications = data;
+				for (var i = 0; i < data.modifications.length; i++) {
+					data.modifications[i].changed = false;
+					data.modifications[i].userMod = false;
+					// data.modifications[i].original = false;
+				}
+				self.knownModifications = data.modifications;
+
 			},
 			error: function(xhr, status, error){
 				alert("xiAnnotator could not be reached. Please try again later!");
@@ -552,45 +575,72 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 // 		}
 // 	},
 
-	updateUserModifications: function(mod, saveToCookie){	// IE 11 borks at new es5/6 syntax, saveCookie=true
+	updateModification: function(update_mod){
+		var found = false;
+		for (var i=0; i < this.knownModifications.length; i++) {
+			if (this.knownModifications[i].id === update_mod.id) {
+				found = true;
+				// if it's not a changed mod save before overwriting
+				if(!this.knownModifications[i].changed && !this.knownModifications[i].userMod){
+					this.knownModifications[i].changed = true;
+					this.knownModifications[i].original = {
+						mass: this.knownModifications[i].mass,
+						aminoAcids: this.knownModifications[i].aminoAcids
+						};
+				}
+				this.knownModifications[i].mass = update_mod.mass;
+				this.knownModifications[i].aminoAcids = update_mod.aminoAcids;
+				return this.knownModifications[i];
+			}
+		}
 
-		if (saveToCookie === undefined) {
-			saveToCookie = true;
+		if (!found){
+			update_mod.userMod = true;
+			this.knownModifications.push(update_mod);
+			return update_mod;
 		}
-		var userMod = this.userModifications.filter(function(m){ return mod.id == m.id;});
-		if (userMod.length > 0){
-			userMod.forEach(function(overlap_mod){
-				overlap_mod.mass = mod.mass;
-				overlap_mod.aminoAcids = mod.aminoAcids;
-			});
-// 			userMod[0].mass = mod.mass;
-// 			userMod[0].aminoAcids = mod.aminoAcids;
-		}
-		else
-			this.userModifications.push(mod);
-		if (saveToCookie)
-			this.saveUserModificationsToCookie();
 	},
 
-	saveUserModificationsToCookie: function(){
-		var cookie = JSON.stringify(this.userModifications);
-		Cookies.set('customMods', cookie);
+	resetModification: function(updateModId){
+		for (var i=0; i < this.knownModifications.length; i++) {
+			if (this.knownModifications[i].id === updateModId) {
+				if(this.knownModifications[i].changed){
+					this.knownModifications[i].changed = false;
+					this.knownModifications[i].mass = this.knownModifications[i].original.mass;
+					this.knownModifications[i].aminoAcids = this.knownModifications[i].original.aminoAcids;
+					this.knownModifications[i].original = undefined;
+				}
+				break;
+			}
+		}
+
 	},
 
-	delUserModification: function(modId, saveToCookie){	// IE 11 borks at new es5/6 syntax, saveCookie=true
-
-		if (saveToCookie === undefined) {
-			saveToCookie = true;
+	reset_all_modifications: function(){
+		for (var i=0; i < this.knownModifications.length; i++) {
+			this.resetModification(this.knownModifications[i].id);
 		}
-		var userModIndex = this.userModifications.findIndex(function(m){ return modId == m.id;});
-		if (userModIndex != -1){
-			this.userModifications.splice(userModIndex, 1);
-		}
-		else
-			console.log("Error modification "+modId+"could not be found!");
-		if (saveToCookie)
-			this.saveUserModificationsToCookie();
 	},
+
+	// saveUserModificationsToCookie: function(){
+	// 	var cookie = JSON.stringify(this.userModifications);
+	// 	Cookies.set('customMods', cookie);
+	// },
+
+	// delUserModification: function(modId, saveToCookie){	// IE 11 borks at new es5/6 syntax, saveCookie=true
+	//
+	// 	if (saveToCookie === undefined) {
+	// 		saveToCookie = true;
+	// 	}
+	// 	var userModIndex = this.userModifications.findIndex(function(m){ return modId == m.id;});
+	// 	if (userModIndex != -1){
+	// 		this.userModifications.splice(userModIndex, 1);
+	// 	}
+	// 	else
+	// 		console.log("Error modification "+modId+"could not be found!");
+	// 	if (saveToCookie)
+	// 		this.saveUserModificationsToCookie();
+	// },
 
 	request_annotation: function(json_request, originalMatch){
 
@@ -635,6 +685,8 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		if(!this.changedAnnotation)
 			return
 		else {
+			this.reset_all_modifications();
+			this.otherModel.reset_all_modifications();
 			this.request_annotation(this.originalMatchRequest);
 		}
 	},
