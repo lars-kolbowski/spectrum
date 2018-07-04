@@ -3,7 +3,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 	defaults: function() {
     return {
       baseDir:  './',
-	  xiAnnotatorBaseURL: 'http://xi3.bio.ed.ac.uk/xiAnnotator/',
+	  xiAnnotatorBaseURL: 'https://xi3.bio.ed.ac.uk/xiAnnotator/',
 	  knownModifications: [],
 	  knownModificationsURL: false,
     };
