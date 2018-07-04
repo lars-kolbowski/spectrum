@@ -4,8 +4,6 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
     return {
       baseDir:  './',
 	  xiAnnotatorBaseURL: 'http://xi3.bio.ed.ac.uk/xiAnnotator/',
-	  standalone: true, //ToDo: remove?
-	  database: false,
 	  knownModifications: [],
 	  knownModificationsURL: false,
     };
@@ -19,17 +17,8 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 			this.getKnownModifications(this.get('knownModificationsURL'));
 		}
 		else{
-			this.knownModifications = [];
+			this.knownModifications = this.get('knownModifications');
 		}
-
-		// if(!this.get('standalone'))
-		// 	this.getKnownModifications(this.get('xiAnnotatorBaseURL') + "annotate/knownModifications");
-		// else{
-		// 	if(this.get('database'))
-		// 		this.getKnownModifications(this.get('baseDir') + "php/getModifications.php?db=" + this.get('database')+'&tmp='+this.get('tmpDB'));
-		// 	else
-		// 		this.knownModifications = [];
-		// }
 
 		this.showDecimals = 2;
 		this.moveLabels = false;
@@ -89,17 +78,17 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		var JSONrequest = this.get("JSONrequest");
 
 		// knownModifications for standalone
-		if(!this.database && JSONrequest && JSONrequest.annotation && JSONrequest.annotation.modifications){
-			this.knownModifications = JSONrequest.annotation.modifications.map(function(mod){
-				 var obj = {};
-				 obj.id = mod.id;
-				 obj.mass = parseFloat(mod.mass);
-				 obj.aminoAcids = mod.aminoAcids;
-				 obj.changed = false;
-				 obj.userMod = true;
-				 return obj;
-			 });
-		}
+		// if(!this.database && JSONrequest && JSONrequest.annotation && JSONrequest.annotation.modifications){
+		// 	this.knownModifications = JSONrequest.annotation.modifications.map(function(mod){
+		// 		 var obj = {};
+		// 		 obj.id = mod.id;
+		// 		 obj.mass = parseFloat(mod.mass);
+		// 		 obj.aminoAcids = mod.aminoAcids;
+		// 		 obj.changed = false;
+		// 		 obj.userMod = true;
+		// 		 return obj;
+		// 	 });
+		// }
 
 
 		$("#measuringTool").prop("checked", false);
@@ -107,9 +96,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		this.sticky = Array();
 		this.highlights = Array();
 		var JSONdata = this.get("JSONdata");
-		this.match = this.get("match");
-		this.randId = this.get("randId");
-		//console.log(JSONdata);
+
 		this.annotationData = JSONdata.annotation || {};
 
 		if (this.annotationData.fragementTolerance !== undefined){
@@ -179,10 +166,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 	},
 
 	clear: function(){
-		// JSONdata = null;
 		this.set("JSONdata", null);
-		// this.setData();
-		// this.peptides = [];
 		this.sticky = Array();
 		Backbone.Model.prototype.clear.call(this);
 	},
