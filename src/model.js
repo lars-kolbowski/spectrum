@@ -83,7 +83,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		}
 
 		// knownModifications for standalone
-		if(!this.database && this.get("JSONdata").annotation != undefined){
+		if(!this.database && this.get("JSONrequest") !== undefined){
 			this.knownModifications = this.get("JSONrequest").annotation.modifications.map(function(mod){
 				 var obj = {};
 				 obj.id = mod.id;
