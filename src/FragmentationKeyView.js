@@ -185,8 +185,8 @@ var FragmentationKeyView = Backbone.View.extend({
 					self.tooltip.transition()
 							.duration(200)
 							.style("opacity", .9);
-					self.tooltip.style("left", (d3.event.layerX + 15) + "px")
-							.style("top", (d3.event.layerY) + "px");
+					self.tooltip.style("left", (d3.event.pageX + 15) + "px")
+							.style("top", (d3.event.pageY) + "px");
 				}
 			});
 
@@ -264,8 +264,8 @@ var FragmentationKeyView = Backbone.View.extend({
 					self.tooltip.transition()
 							.duration(200)
 							.style("opacity", .9);
-					self.tooltip.style("left", (d3.event.layerX + 15) + "px")
-							.style("top", (d3.event.layerY) + "px");
+					self.tooltip.style("left", (d3.event.pageX + 15) + "px")
+							.style("top", (d3.event.pageY) + "px");
 				});
 				this.origCL.on("mouseout", function(){
 					self.origCLHighlight.attr("opacity", 0);
