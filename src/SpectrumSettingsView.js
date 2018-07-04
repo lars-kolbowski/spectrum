@@ -498,7 +498,7 @@ var SpectrumSettingsView = Backbone.View.extend({
 								}
 							}
 						}
-						data = parseFloat(data.toFixed(10).toString()); // limit to 10 decimal places and get rid of tailing zeroes
+						data = parseFloat(parseFloat(data).toFixed(10).toString()); // limit to 10 decimal places and get rid of tailing zeroes
 						if(data.toString().indexOf('.') !== -1)
 							var stepSize = '0.'+'0'.repeat(data.toString().split('.')[1].length - 1) + 1;
 						else
@@ -647,7 +647,6 @@ var SpectrumSettingsView = Backbone.View.extend({
 				] ).draw( false );
 			});
 		}
-
 	},
 
 	cancel: function(){
