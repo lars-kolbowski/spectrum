@@ -77,18 +77,18 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 
 		var JSONrequest = this.get("JSONrequest");
 
-		// knownModifications for standalone
-		// if(!this.database && JSONrequest && JSONrequest.annotation && JSONrequest.annotation.modifications){
-		// 	this.knownModifications = JSONrequest.annotation.modifications.map(function(mod){
-		// 		 var obj = {};
-		// 		 obj.id = mod.id;
-		// 		 obj.mass = parseFloat(mod.mass);
-		// 		 obj.aminoAcids = mod.aminoAcids;
-		// 		 obj.changed = false;
-		// 		 obj.userMod = true;
-		// 		 return obj;
-		// 	 });
-		// }
+		// if knownModifications are not set get them from the JSONrequest
+		if(this.knownModifications.length == 0 && JSONrequest && JSONrequest.annotation && JSONrequest.annotation.modifications){
+			this.knownModifications = JSONrequest.annotation.modifications.map(function(mod){
+				 var obj = {};
+				 obj.id = mod.id;
+				 obj.mass = parseFloat(mod.mass);
+				 obj.aminoAcids = mod.aminoAcids;
+				 obj.changed = false;
+				 obj.userMod = true;
+				 return obj;
+			 });
+		}
 
 
 		$("#measuringTool").prop("checked", false);
