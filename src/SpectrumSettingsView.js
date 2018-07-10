@@ -580,9 +580,11 @@ var SpectrumSettingsView = Backbone.View.extend({
 		this.pepInputView.render();
 
 		this.renderModTable();
+
 		//ions
+		$('.ionSelectChkbox:checkbox').prop('checked', false);
 		this.model.get("JSONdata").annotation.ions.forEach(function(ion){
-			$('#'+ion.type).attr('checked', true);
+			$('#'+ion.type).prop('checked', true);
 		});
 		var ionSelectionArr = new Array();
 		$('.ionSelectChkbox:checkbox:checked').each(function(){
