@@ -425,42 +425,43 @@ var SpectrumSettingsView = Backbone.View.extend({
 
 
 		//modifications
-		var inputMods = this.extractModsFromPepStr(this.model.pepStrsMods.join(''));
+		if(formData['mods[]']){
+			var inputMods = this.extractModsFromPepStr(this.model.pepStrsMods.join(''));
 
-		if(formData['mods[]'][0] === undefined){
-			var formDataMods = new Array(formData['mods[]']);
-			var formDataSpecificities = new Array(formData['modSpecificities[]'])
-		}
-		else{
-			var formDataMods = formData['mods[]'];
-			var formDataSpecificities = formData['modSpecificities[]'];
-		}
-
-		for (var i = 0; i < formDataMods.length; i++) {
-			var formDataAminoAcidsArr = formDataSpecificities[i].value.split('');
-
-			var inputMod = inputMods.filter(function(mod){ return mod.id == formDataMods[i].value})[0];
-			var inputAminoAcidsArr = inputMod.aminoAcids.split('');
-
-			if(formDataAminoAcidsArr.indexOf('*') != -1){
-				console.log('ok', formDataMods[i].value);
-				// return true;
+			if(formData['mods[]'][0] === undefined){
+				var formDataMods = new Array(formData['mods[]']);
+				var formDataSpecificities = new Array(formData['modSpecificities[]'])
 			}
 			else{
-				for (var j = 0; j < inputAminoAcidsArr.length; j++) {
-					if (formDataAminoAcidsArr.indexOf(inputAminoAcidsArr[j]) == -1){
-						console.log('not ok', formDataMods[i].value);
-						alert('Invalid modification specificity for: ' + formDataMods[i].value);
-						return false;
-					}
-					// else{
-					// 	console.log('ok', formDataMods[i].value);
-					// 	return true;
-					// };
+				var formDataMods = formData['mods[]'];
+				var formDataSpecificities = formData['modSpecificities[]'];
+			}
+
+			for (var i = 0; i < formDataMods.length; i++) {
+				var formDataAminoAcidsArr = formDataSpecificities[i].value.split('');
+
+				var inputMod = inputMods.filter(function(mod){ return mod.id == formDataMods[i].value})[0];
+				var inputAminoAcidsArr = inputMod.aminoAcids.split('');
+
+				if(formDataAminoAcidsArr.indexOf('*') != -1){
+					console.log('ok', formDataMods[i].value);
+					// return true;
+				}
+				else{
+					for (var j = 0; j < inputAminoAcidsArr.length; j++) {
+						if (formDataAminoAcidsArr.indexOf(inputAminoAcidsArr[j]) == -1){
+							console.log('not ok', formDataMods[i].value);
+							alert('Invalid modification specificity for: ' + formDataMods[i].value);
+							return false;
+						}
+						// else{
+						// 	console.log('ok', formDataMods[i].value);
+						// 	return true;
+						// };
+					};
 				};
 			};
 		};
-
 		return true;
 
 	},
