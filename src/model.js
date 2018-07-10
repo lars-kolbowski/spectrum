@@ -25,6 +25,18 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		this.measureMode = false;
 		this.showAllFragmentsHighlight = true;
 
+		this.notUpperCase = "/[^A-Z]/g"; //change to global var
+		this.cmap = colorbrewer.RdBu[8];
+		this.p1color = this.cmap[0];
+		this.p1color_cluster = this.cmap[2];
+		this.p1color_loss = this.cmap[1];
+		this.p2color = this.cmap[7];
+		this.p2color_cluster = this.cmap[5];
+		this.p2color_loss = this.cmap[6];
+		this.peakColour = "#a6a6a6";
+		this.highlightColour = "#FFFF00";
+		this.highlightWidth = 8;
+
 		this.pepStrs = [];
 		this.pepStrsMods = [];
 		this.userModifications = [];
@@ -135,17 +147,6 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 				this.fragments[i].id = i;
 			};
 		};
-		this.notUpperCase = "/[^A-Z]/g"; //change to global var
-		this.cmap = colorbrewer.RdBu[8];
-		this.p1color = this.cmap[0];
-		this.p1color_cluster = this.cmap[2];
-		this.p1color_loss = this.cmap[1];
-		this.p2color = this.cmap[7];
-		this.p2color_cluster = this.cmap[5];
-		this.p2color_loss = this.cmap[6];
-		this.peakColour = "#a6a6a6";
-		this.highlightColour = "#FFFF00";
-		this.highlightWidth = 8;
 
 		// this.calcPrecursorMass();
 
