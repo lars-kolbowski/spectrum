@@ -607,6 +607,8 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 
 	request_annotation: function(json_request, originalMatch){
 
+		json_request['annotation']['custom'] = this.customConfig;
+		if (!this.keepCustomConfig) this.customConfig = '';
 		// ToDo: necessary?
 		this.userModifications = [];
 		this.otherModel.userModifications = [];
