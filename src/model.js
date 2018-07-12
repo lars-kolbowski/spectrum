@@ -607,17 +607,6 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		json_request['annotation']['custom'] = this.customConfig;
 		if (!this.keepCustomConfig) this.customConfig = '';
 
-		// var self = this;
-		// json_request.annotation.modifications.forEach(function(mod){
-		// 	var match = self.knownModifications.filter(function(km){ return km.id == mod.id});
-		//
-		// 	var km_index = self.knownModifications.map(function(e) { return e.id; }).indexOf(mod.id)
-		// 	if (km_index != -1){
-		// 		self.knownModifications.splice(km_index)
-		// 	}
-		// 	self.knownModifications.push(mod);
-		// });
-
 
 		this.trigger('request_annotation:pending');
 		console.log("annotation request:", json_request);
