@@ -369,8 +369,8 @@ var FragmentationKeyView = Backbone.View.extend({
 						changeCrossLink(d);
 					}
 					//change the mod if changeMod is active and it's a valid modification for this aa
-					//if(self.changeMod !== false && self.validModChange){
-					if(self.changeMod !== false){
+					if(self.changeMod !== false && self.validModChange){
+// 					if(self.changeMod !== false){
 						changeMod(d);
 					}
 				})

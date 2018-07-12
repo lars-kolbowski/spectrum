@@ -39,7 +39,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 
 		this.pepStrs = [];
 		this.pepStrsMods = [];
-		this.userModifications = [];
+// 		this.userModifications = [];
 		this.fragmentIons = [];
 		this.peakList = [];
 		this.precursorCharge = null;
@@ -413,15 +413,6 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 
 	checkForValidModification: function(mod, aminoAcid){
 
-		// for (var i = 0; i < this.userModifications.length; i++) {
-		// 	if(this.userModifications[i].id == mod){
-		// 		if ($.inArray(aminoAcid, this.userModifications[i].aminoAcids) != -1 || this.userModifications[i].aminoAcids == [])
-		// 			return true;
-		// 		else
-		// 			return false;
-		// 	}
-		// }
-
 		for (var i = 0; i < this.knownModifications.length; i++) {
 			if(this.knownModifications[i].id == mod){
 				var knownMod_aminoAcids = this.knownModifications[i].aminoAcids;
@@ -607,15 +598,26 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 
 	request_annotation: function(json_request, originalMatch){
 
+		if (originalMatch === undefined) originalMatch = false;
+		if (originalMatch){
+			this.originalMatchRequest = json_request;
+			this.reset_all_modifications();
+		}
+
 		json_request['annotation']['custom'] = this.customConfig;
 		if (!this.keepCustomConfig) this.customConfig = '';
-		// ToDo: necessary?
-		this.userModifications = [];
-		this.otherModel.userModifications = [];
 
-		if (originalMatch === undefined) originalMatch = false;
+		// var self = this;
+		// json_request.annotation.modifications.forEach(function(mod){
+		// 	var match = self.knownModifications.filter(function(km){ return km.id == mod.id});
+		//
+		// 	var km_index = self.knownModifications.map(function(e) { return e.id; }).indexOf(mod.id)
+		// 	if (km_index != -1){
+		// 		self.knownModifications.splice(km_index)
+		// 	}
+		// 	self.knownModifications.push(mod);
+		// });
 
-		if (originalMatch) this.originalMatchRequest = json_request;
 
 		this.trigger('request_annotation:pending');
 		console.log("annotation request:", json_request);
