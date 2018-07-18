@@ -302,7 +302,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 			CLMSUI.loadSpectra(newmatch, this.randId, this);
 		}
 		else if(this.get("JSONrequest") !== undefined){
-			json_req = this.get("JSONrequest");
+			json_req = $.extend(true, {}, this.get("JSONrequest"));
 			for (var i = 0; i < newLinkSites.length; i++) {
 				json_req.LinkSite[i].linkSite = newLinkSites[i]-1;
 			}
@@ -352,7 +352,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 			CLMSUI.loadSpectra(newmatch, this.randId, this);
 		}
 		else if(this.get("JSONrequest") !== undefined){
-			json_req = this.get("JSONrequest");
+			json_req = $.extend(true, {}, this.get("JSONrequest"));
 			//standalone
 			var myNew = json_req.Peptides[newPepIndex].sequence[newPos];
 			var myOld = JSONdata.Peptides[oldPepIndex].sequence[oldPos];
@@ -567,7 +567,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 
 		if (originalMatch === undefined) originalMatch = false;
 		if (originalMatch){
-			this.originalMatchRequest = json_request;
+			this.originalMatchRequest = $.extend(true, {}, json_request);
 			this.reset_all_modifications();
 		}
 
