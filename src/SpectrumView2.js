@@ -24,6 +24,8 @@ var SpectrumView = Backbone.View.extend({
 		var graphOptions = {xlabel:"m/z", ylabelLeft:"Intensity", ylabelRight:"% of base Peak"};
 		this.graph = new Graph (this.svg, this.model, graphOptions);
 
+		$(this.el).css('background-color', '#fff');
+
 		this.listenTo(this.model, 'change', this.render);
 		this.listenTo(this.model, "changed:Zoom", this.updateRange);
 		this.listenTo(window, 'resize', _.debounce(this.resize));
@@ -276,11 +278,11 @@ var SpectrumView = Backbone.View.extend({
 	enableRevertAnnotation: function(){
 		$(this.el).css('background-color', 'rgb(210, 224, 255)');
 		$('#xispec_revertAnnotation').addClass('xispec_btn-1a');
-		$('#xispec_revertAnnotation').removeClass('disabled');
+		$('#xispec_revertAnnotation').removeClass('xispec_disabled');
 	},
 
 	disableRevertAnnotation: function(){
 		$('#xispec_revertAnnotation').removeClass('xispec_btn-1a');
-		$('#xispec_revertAnnotation').addClass('disabled');
+		$('#xispec_revertAnnotation').addClass('xispec_disabled');
 	},
 });
