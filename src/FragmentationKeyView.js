@@ -51,6 +51,10 @@ var FragmentationKeyView = Backbone.View.extend({
 		this.listenTo(window, 'resize', _.debounce(this.resize));
 		this.listenTo(CLMSUI.vent, 'resize:spectrum', this.resize);
 
+		this.tooltip = d3.select("body").append("span")
+			.attr("class", "xispec_tooltip")
+		;
+
 	},
 
 	render: function() {
@@ -101,10 +105,7 @@ var FragmentationKeyView = Backbone.View.extend({
 			}
 		}
 
-		this.tooltip = d3.select("body").append("span")
-			.attr("class", "xispec_tooltip")
-		;
-
+		this.tooltip.style("opacity", 0);
 
 		this.align_peptides_to_CL();
 
