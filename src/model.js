@@ -574,6 +574,11 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		json_request['annotation']['custom'] = this.customConfig;
 		if (!this.keepCustomConfig) this.customConfig = '';
 
+		if (json_request.annotation.requestID)
+			this.lastRequestedID = json_request.annotation.requestID;
+		// else {
+		// 	this.lastRequestedID = -1;
+		// }
 
 		this.trigger('request_annotation:pending');
 		console.log("annotation request:", json_request);
@@ -585,19 +590,22 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 			    'Content-Type': 'application/json'
 			},
 			data: JSON.stringify(json_request),
-			async: false,
+			// async: false,
 			url: self.get('xiAnnotatorBaseURL') + "annotate/FULL",
 			success: function(data) {
-				//ToDo: Error handling -> https://github.com/Rappsilber-Laboratory/xi3-issue-tracker/issues/330
-				console.log("annotation response:", data);
-				self.set({"JSONdata": data, "JSONrequest": json_request});
+				if (data && data.annotation && data.annotation.requestID && data.annotation.requestID === self.lastRequestedID) {
+					//ToDo: Error handling -> https://github.com/Rappsilber-Laboratory/xi3-issue-tracker/issues/330
+					console.log("annotation response:", data);
+					self.set({"JSONdata": data, "JSONrequest": json_request});
 
-				if (self.otherModel !== undefined){
-					var json_data_copy = jQuery.extend({}, data);
-					self.otherModel.set({"JSONdata": json_data_copy, "JSONrequest": json_request});
-					self.otherModel.trigger("change:JSONdata");
+					if (self.otherModel !== undefined){
+						var json_data_copy = jQuery.extend({}, data);
+						self.otherModel.set({"JSONdata": json_data_copy, "JSONrequest": json_request});
+						self.otherModel.trigger("change:JSONdata");
+					}
+					self.trigger('request_annotation:done');
 				}
-				self.trigger('request_annotation:done');
+
 			}
 		});
 	},
