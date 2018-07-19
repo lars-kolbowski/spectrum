@@ -46,9 +46,14 @@ var FragmentationKeyView = Backbone.View.extend({
 		this.listenTo(this.model, 'destroy', this.remove);
 		this.listenTo(this.model, 'changed:Highlights', this.updateHighlights);
 		this.listenTo(this.model, 'changed:ColorScheme', this.updateColors);
-		this.listenTo(this.model, 'changed:HighlightColor', this.updateHighlightColors);
+		this.listenTo(this.model, 'changed:HighlightColor', this.updateColors);
+// 		this.listenTo(this.model, 'changed:HighlightColor', this.updateHighlightColors);
 		this.listenTo(window, 'resize', _.debounce(this.resize));
 		this.listenTo(CLMSUI.vent, 'resize:spectrum', this.resize);
+
+		this.tooltip = d3.select("body").append("span")
+			.attr("class", "xispec_tooltip")
+		;
 
 	},
 
@@ -100,10 +105,7 @@ var FragmentationKeyView = Backbone.View.extend({
 			}
 		}
 
-		this.tooltip = d3.select("body").append("span")
-			.attr("class", "xispec_tooltip")
-		;
-
+		this.tooltip.style("opacity", 0);
 
 		this.align_peptides_to_CL();
 
@@ -200,6 +202,12 @@ var FragmentationKeyView = Backbone.View.extend({
 			});
 
 			this.CL.on("click", function() {
+				self.tooltip.text("Now click on an amino acid to complete");
+				self.tooltip.transition()
+						.duration(200)
+						.style("opacity", .9);
+				self.tooltip.style("left", (d3.event.pageX + 15) + "px")
+						.style("top", (d3.event.pageY) + "px");
 				if (!self.changeMod){
 					self.tooltip.style("opacity", 0);
 					self.CLlineHighlight.attr("opacity", 1);
@@ -366,21 +374,30 @@ var FragmentationKeyView = Backbone.View.extend({
 				.attr('class', "pepLetterG")
 				.on("click", function(d, i) {
 					if(self.changeCL != false){
+						self.tooltip.transition()
+							.duration(500)
+							.style("opacity", 0);
 						changeCrossLink(d);
 					}
 					//change the mod if changeMod is active and it's a valid modification for this aa
-					//if(self.changeMod !== false && self.validModChange){
-					if(self.changeMod !== false){
+					if(self.changeMod !== false && self.validModChange){
+						self.tooltip.transition()
+							.duration(500)
+							.style("opacity", 0);
 						changeMod(d);
 					}
 				})
 				.on("mouseover", function(d, i) {
-					if(self.changeMod !== false){	//if changeMod is active
-						changeModStartHighlight(this, d);
-					};
+					if(self.changeMod !== false || self.changeCL !== false){
+						self.tooltip.style("left", (d3.event.pageX + 15) + "px")
+							.style("top", (d3.event.pageY) + "px");
+						if(self.changeMod !== false){	//if changeMod is active
+							changeModStartHighlight(this, d);
+						};
 
-					if(self.changeCL != false){
-						changeCLHighlight(this, d);
+						if(self.changeCL != false){
+							changeCLHighlight(this, d);
+						}
 					}
 				})
 				.on("mouseout", function(d) {
@@ -612,13 +629,13 @@ var FragmentationKeyView = Backbone.View.extend({
 
 				})
 				.on("click", function(d) {
+					self.tooltip.text("Now click on an amino acid to complete");
+					self.tooltip.style("left", (d3.event.pageX + 15) + "px")
+							.style("top", (d3.event.pageY) + "px");
+
 					d3.selectAll("text.pepLetterHighlight").style("opacity", 0);
 					d3.selectAll("g.modLetterG").style("cursor", "default");
 					if (!self.changeMod  && !self.changeCL){
-
-						self.tooltip.transition()
-							.duration(500)
-							.style("opacity", 0);
 
 						if (!_.isUndefined(self.CLline))
 							self.CLline.style("cursor", "not-allowed");
@@ -776,31 +793,33 @@ var FragmentationKeyView = Backbone.View.extend({
 	},
 
 	updateColors: function(){
-		var lines = this.fraglines;
-		for(l = 0; l < lines.length; l++){
-			if (lines[l].peptideId == 0){
-				if (lines[l].bText) lines[l].bText.style("fill", this.model.p1color);
-				if (lines[l].yText) lines[l].yText.style("fill", this.model.p1color);
-			}
-			else if (lines[l].peptideId == 1){
-				if (lines[l].bText) lines[l].bText.style("fill", this.model.p2color);
-				if (lines[l].yText) lines[l].yText.style("fill", this.model.p2color);
-			}
-		}
-		this.colorLetters("all");
+// 		var lines = this.fraglines;
+// 		for(l = 0; l < lines.length; l++){
+// 			if (lines[l].peptideId == 0){
+// 				if (lines[l].bText) lines[l].bText.style("fill", this.model.p1color);
+// 				if (lines[l].yText) lines[l].yText.style("fill", this.model.p1color);
+// 			}
+// 			else if (lines[l].peptideId == 1){
+// 				if (lines[l].bText) lines[l].bText.style("fill", this.model.p2color);
+// 				if (lines[l].yText) lines[l].yText.style("fill", this.model.p2color);
+// 			}
+// 		}
+// 		this.colorLetters("all");
+		this.render();
+		this.updateHighlights();
 	},
 
-	updateHighlightColors: function(){
+// 	updateHighlightColors: function(){
 
-		for (var i = 0; i < this.fraglines.length; i++) {
+// 		for (var i = 0; i < this.fraglines.length; i++) {
 
-			if (this.fraglines[i].bHighlight !== undefined)
-				this.fraglines[i].bHighlight.attr("stroke", this.model.highlightColour);
-			if (this.fraglines[i].yHighlight !== undefined)
-				this.fraglines[i].yHighlight.attr("stroke", this.model.highlightColour);
-		}
+// 			if (this.fraglines[i].bHighlight !== undefined)
+// 				this.fraglines[i].bHighlight.attr("stroke", this.model.highlightColour);
+// 			if (this.fraglines[i].yHighlight !== undefined)
+// 				this.fraglines[i].yHighlight.attr("stroke", this.model.highlightColour);
+// 		}
 
-	},
+// 	},
 
 	resize: function(){
 			var parentDivWidth = $(this.el).width();

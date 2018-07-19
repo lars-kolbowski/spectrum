@@ -23,6 +23,8 @@ xiSPEC.init = function(
 	targetDiv,
 	model_variables
 ) {
+	if (model_variables === undefined)	model_variables = {};
+
 	// targetDiv could be div itself or id of div - lets deal with that
 	if (typeof targetDiv === "string"){
 		if(targetDiv.charAt(0) == "#") targetDiv = targetDiv.substr(1);
@@ -32,8 +34,6 @@ xiSPEC.init = function(
 	}
 
 	d3.select(this.targetDiv).selectAll("*").remove();
-
-	if (model_variables === undefined)	model_variables = {};
 
 	//init models
 	this.SpectrumModel = new AnnotatedSpectrumModel(model_variables);
@@ -128,8 +128,28 @@ xiSPEC.init = function(
 };
 
 xiSPEC.setData = function(data){
+	// EXAMPLE:
+	// xiSPEC.setData({
+	// sequence1: "KQTALVELVK",
+    // sequence2: "QNCcarbamidomethylELFEQLGEYKFQNALLVR",
+    // linkPos1: 1,
+    // linkPos2: 13,
+	// 	crossLinkerModMass: 0,
+	//	modifications: [{id: 'carbamidomethyl', mass: 57.021464, aminoAcids: ['C']}],
+	//	precursorCharge: 3,
+	//	fragmentTolerance: {"tolerance": '20.0', 'unit': 'ppm'},
+	//	ionTypes: "peptide;b;y",
+	//	precursorMz: 1012.1,
+	//	peaklist: [[mz, int], [mz, int], ...],
+	//	requestId: 1,
+	// }
+
+
+	// if (!ignoreResultUnlessLastRequested || (json && json.annotation && json.annotation.requestId && json.annotation.requestId === CLMSUI.loadSpectra.lastRequestedID)) {
+// 	if (data.annotation && data.annotation.requestId && json.annotation.requestId === CLMSUI.loadSpectra.lastRequestedID)) {
 
 	var json_request = this.convert_to_json_request(data);
+
 	this.SpectrumModel.request_annotation(json_request, true);
 
 };
@@ -164,6 +184,9 @@ xiSPEC.convert_to_json_request = function (data) {
 	}
 	if(data.fragmentTolerance === undefined){
 		data.fragmentTolerance = {"tolerance": '20.0', 'unit': 'ppm'};
+	}
+	if(data.requestID === undefined){
+		data.requestID = -1;
 	}
 
 
@@ -206,6 +229,7 @@ xiSPEC.convert_to_json_request = function (data) {
     annotationRequest.annotation.precursorMZ = +data.precursorMZ;
     annotationRequest.annotation.precursorCharge = +data.precursorCharge;
 	annotationRequest.annotation.custom = [];
+	annotationRequest.annotation.requestID = data.requestID.toString();
 
     console.log("request", annotationRequest);
 	return annotationRequest;
@@ -231,4 +255,39 @@ xiSPEC.arrayifyPeptide = function (seq_mods) {
 		offset += result[0].length;
     }
     return peptide;
-}
+};
+
+xiSPEC.matchMassToAA = function(mass, tolerance) {
+
+	if (tolerance === undefined) tolerance = 0.01;
+
+	var aminoAcids = [
+		{"aminoAcid": "A", "monoisotopicMass": 71.03711},
+		{"aminoAcid": "R", "monoisotopicMass": 156.10111},
+		{"aminoAcid": "N", "monoisotopicMass": 114.04293},
+		{"aminoAcid": "D", "monoisotopicMass": 115.02694},
+		{"aminoAcid": "C", "monoisotopicMass": 103.00919},
+		{"aminoAcid": "E", "monoisotopicMass": 129.04259},
+		{"aminoAcid": "Q", "monoisotopicMass": 128.05858},
+		{"aminoAcid": "G", "monoisotopicMass": 57.02146},
+		{"aminoAcid": "H", "monoisotopicMass": 137.05891},
+		{"aminoAcid": "I", "monoisotopicMass": 113.08406},
+		{"aminoAcid": "L", "monoisotopicMass": 113.08406},
+		{"aminoAcid": "K", "monoisotopicMass": 128.09496},
+		{"aminoAcid": "M", "monoisotopicMass": 131.04049},
+		{"aminoAcid": "F", "monoisotopicMass": 147.06841},
+		{"aminoAcid": "P", "monoisotopicMass": 97.05276},
+		{"aminoAcid": "S", "monoisotopicMass": 87.03203},
+		{"aminoAcid": "T", "monoisotopicMass": 101.04768},
+		{"aminoAcid": "W", "monoisotopicMass": 186.07931},
+		{"aminoAcid": "Y", "monoisotopicMass": 163.06333},
+		{"aminoAcid": "V", "monoisotopicMass": 99.06841}
+	]
+
+	var aaArray = aminoAcids.filter(function(d){
+		if (Math.abs(mass - d.monoisotopicMass) < tolerance)
+			return true;
+	}).map(function(d){return d.aminoAcid});
+
+	return aaArray.join();
+};
