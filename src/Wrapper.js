@@ -68,6 +68,7 @@ xiSPEC.init = function(
 		+'	<button id="reset" title="Reset to initial zoom level" class="xispec_btn xispec_btn-1 xispec_btn-1a">Reset Zoom</button>'
 		+'</form>'
 		+'<i id="toggleSettings" title="Show/Hide Settings" class="xispec_btn xispec_btn-1a xispec_btn-topNav fa fa-cog" aria-hidden="true"></i>'
+		+'<i id="xispec_revertAnnotation" title="revert to original annotation" class="xispec_btn xispec_btn-topNav fa fa-undo disabled"  aria-hidden="true"></i>'
 		+"<span id='xispec_extra_spectrumControls_after'></span>"
 		+'<a href="http://spectrumviewer.org/help.php" target="_blank"><i title="Help" class="xispec_btn xispec_btn-1a xispec_btn-topNav fa fa-question" aria-hidden="true"></i></a>'
 		+"</div>"

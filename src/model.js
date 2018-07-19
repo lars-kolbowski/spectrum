@@ -24,6 +24,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		this.moveLabels = false;
 		this.measureMode = false;
 		this.showAllFragmentsHighlight = true;
+		this.changedAnnotation = false;
 
 		this.cmap = colorbrewer.RdBu[8];
 		this.p1color = this.cmap[0];
@@ -71,7 +72,6 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 	},
 
 	setData: function(){
-		this.changedAnnotation = false;
 
 		if (this.get("JSONdata") == null){
 			this.trigger("changed:data");
@@ -316,7 +316,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 			json_req = $.extend(true, {}, this.get("JSONrequest"));
 			//standalone
 			var myNew = json_req.Peptides[newPepIndex].sequence[newPos];
-			var myOld = JSONdata.Peptides[oldPepIndex].sequence[oldPos];
+			var myOld = this.get("JSONdata").Peptides[oldPepIndex].sequence[oldPos];
 
 			myNew.Modification = myOld.Modification;
 			json_req.Peptides[oldPepIndex].sequence[oldPos].Modification = "";
@@ -528,6 +528,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 
 		if (originalMatch === undefined) originalMatch = false;
 		if (originalMatch){
+			this.changedAnnotation = false;
 			this.originalMatchRequest = $.extend(true, {}, json_request);
 			this.reset_all_modifications();
 		}
