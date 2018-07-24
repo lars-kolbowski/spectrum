@@ -378,7 +378,8 @@ var SpectrumSettingsView = Backbone.View.extend({
 			processData: false,
 			success: function (response) {
 				var json = JSON.parse(response);
-				json['annotation']['custom'] = self.model.otherModel.customConfig;
+// 				json['annotation']['custom'] = self.model.otherModel.customConfig;
+				json['annotation']['custom'] = self.model.otherModel.annotationData.custom;
 				json['annotation']['precursorMZ'] = self.model.otherModel.precursor.matchMz;
 				json['annotation']['requestID'] = self.model.otherModel.lastRequestedID + Date.now();
 				self.model.otherModel.request_annotation(json);
