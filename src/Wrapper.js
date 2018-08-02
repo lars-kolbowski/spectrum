@@ -38,6 +38,8 @@ xiSPEC.init = function(options) {
 		xiAnnotatorBaseURL: options.xiAnnotatorBaseURL,
 		knownModifications: options.knownModifications,
 		knownModificationsURL: options.knownModificationsURL,
+		database: options.database,
+		tmpDB: options.tmpDB
 	};
 
 	// options.targetDiv could be div itself or id of div - lets deal with that
