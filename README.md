@@ -89,7 +89,7 @@ var data = {
       precursorCharge: precursorCharge,         // charge state of the precursor
       fragmentTolerance: fragmentTolerance;,    // tolerance for fragment annotation in the MS2 scan
       ionTypes: ionTypes,                       // ion types to annotate
-      peakList: peakList                        // an array of peaks
+      peakList: peakList                        // array of peaks
    }
    
 xiSPEC.setData(data);
@@ -108,11 +108,11 @@ modifications: Array of modification definitions with id, mass and amino acid sp
 ];
 ```
 
-precursorMz: The m/z of the precursor ion.
+precursorMz: The m/z of the precursor ion. (optional)
 
 precursorCharge: Charge state of the precursor ion.
 
-fragmentTolerance: MS2 tolerance for annotating fragment peaks (in ppm or Da). e.g. ```{"tolerance": '20.0', 'unit': 'ppm'}```
+fragmentTolerance: MS2 tolerance for annotating fragment peaks (in ppm or Da). e.g. ```{"tolerance": '10.0', 'unit': 'ppm'}```
 
 ionTypes: Fragment ion types to annotate separated by semicolon e.g. ```"peptide;a;b;c;x;y;z"```
 
