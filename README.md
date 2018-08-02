@@ -80,9 +80,10 @@ To set the data call the setData function with the spectra data:
 ```
 var data = {
       sequence1: sequence1,                     // sequence of peptide 1 incl. modifications
-      sequence2: sequence2,                     // sequence of peptide 2 incl. modifications
-      linkPos1: linkPos1,                       // cross-linked residue on peptide 1
-      linkPos2: linkPos2,                       // cross-linked residue on peptide 2
+      sequence2: sequence2,                     // sequence of peptide 2 incl. modifications (for cross-linked peptide)
+      linkPos1: linkPos1,                       // cross-linked residue on peptide 1 (for cross-linked peptide)
+      linkPos2: linkPos2,                       // cross-linked residue on peptide 2 (for cross-linked peptide)
+      crossLinkerModMass: crossLinkerModMass    // modification mass of the cross-linker (for cross-linked peptide)
       modifications: modifications,             // modification definitions
       precursorMz: precursorMz,                 // m/z of the precursor
       precursorCharge: precursorCharge,         // charge state of the precursor
@@ -96,7 +97,9 @@ xiSPEC.setData(data);
 
 sequence1/2: Peptide sequence for peptide 1/2 in one letter amino acid code (uppercase) with modifications following the amino acid and consisting of the following characters: a-z:0-9.()\-
 
-linkPos1/2: Position of cross-linked residue for peptide 1/2 (starting with 1 for the first amino acid)
+linkPos1/2: Position of cross-linked residue for peptide 1/2 (0-based)
+
+crossLinkerModMass: Modification Mass of the cross-linker.
 
 modifications: Array of modification definitions with id, mass and amino acid specificity e.g.
 ```
