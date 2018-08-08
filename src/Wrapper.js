@@ -107,12 +107,8 @@ xiSPEC.init = function(options) {
 	;
 
 	d3.select(options.targetDiv)
-		// .classed ("xiSPECwrapper", true)
 		.append("div")
-		// .attr ("class", "verticalFlexContainer")
 		.attr ("id", 'xispec_spectrumPanel')
-		// http://stackoverflow.com/questions/90178/make-a-div-fill-the-height-of-the-remaining-screen-space?rq=1
-		//.style ("display", "table")
 		.html (_html)
 	;
 
@@ -187,6 +183,11 @@ xiSPEC.sanityChecks = function(data){
 	// }
 
 	return true;
+};
+
+xiSPEC.clear = function(){
+	this.SpectrumModel.clear();
+	this.SettingsSpectrumModel.clear();
 };
 
 xiSPEC.convert_to_json_request = function (data) {

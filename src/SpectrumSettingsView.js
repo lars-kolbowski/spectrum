@@ -380,7 +380,7 @@ var SpectrumSettingsView = Backbone.View.extend({
 			success: function (response) {
 				var json = JSON.parse(response);
 // 				json['annotation']['custom'] = self.model.otherModel.customConfig;
-				json['annotation']['custom'] = self.model.otherModel.annotationData.custom;
+				json['annotation']['custom'] = self.model.otherModel.get("JSONdata").annotation.custom;
 				json['annotation']['precursorMZ'] = self.model.otherModel.precursor.matchMz;
 				json['annotation']['requestID'] = self.model.otherModel.lastRequestedID + Date.now();
 				self.model.otherModel.request_annotation(json);
@@ -608,7 +608,7 @@ var SpectrumSettingsView = Backbone.View.extend({
 
 		//ions
 		$('.ionSelectChkbox:checkbox').prop('checked', false);
-		this.model.get("JSONdata").annotation.ions.forEach(function(ion){
+		this.model.fragmentIons.forEach(function(ion){
 			$('#'+ion.type).prop('checked', true);
 		});
 		var ionSelectionArr = new Array();
@@ -619,9 +619,9 @@ var SpectrumSettingsView = Backbone.View.extend({
 
 		this.peaklist[0][0].value = this.model.peaksToMGF();
 		this.precursorZ[0][0].value  = this.model.precursor.charge;
-		this.toleranceValue[0][0].value  = this.model.get("JSONdata").annotation.fragementTolerance.split(' ')[0];
-		this.toleranceUnit[0][0].value = this.model.get("JSONdata").annotation.fragementTolerance.split(" ")[1];
-		this.crossLinkerModMass[0][0].value = this.model.get("JSONdata").annotation['cross-linker'].modMass;
+		this.toleranceValue[0][0].value  = this.model.MSnTolerance.value;
+		this.toleranceUnit[0][0].value = this.model.MSnTolerance.unit;
+		this.crossLinkerModMass[0][0].value = this.model.crossLinkerModMass;
 		this.decimals[0][0].value = this.model.showDecimals;
 
 		if(this.model.isLinear)
@@ -629,8 +629,8 @@ var SpectrumSettingsView = Backbone.View.extend({
 		else
 			$(this.crossLinkerModMassWrapper[0][0]).show();
 
-		if (this.model.get("JSONdata").annotation.custom !== undefined)
-			this.customConfigInput[0][0].value = this.model.get("JSONdata").annotation.custom.join("\n");
+		if (this.model.customConfig !== undefined)
+			this.customConfigInput[0][0].value = this.model.customConfig.join("\n");
 
 		// this.updateStepSize($(this.toleranceValue[0][0]));
 		// this.updateStepSize($(this.crossLinkerModMass[0][0]));

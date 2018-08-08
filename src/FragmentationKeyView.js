@@ -510,7 +510,7 @@ var FragmentationKeyView = Backbone.View.extend({
 			function get_mod_mass(fullModName){
 				if (fullModName === undefined)
 					return;
-				var mod = self.model.annotationData.modifications.filter(function(m){
+				var mod = self.model.get("JSONdata").annotation.modifications.filter(function(m){
 					return m.id == fullModName;
 				});
 				if (mod.length < 1){

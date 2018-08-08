@@ -131,10 +131,10 @@ var ErrorPlotView = Backbone.View.extend({
 
 	render: function() {
 
+		this.clear();
 		if (this.model.get("JSONdata") === undefined || this.model.get("JSONdata") === null || !this.isVisible || !this.wrapperVisible)
 			return;
 
-		this.clear();
 		//get Data
 		var fragments = this.model.fragments;
 

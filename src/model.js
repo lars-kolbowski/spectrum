@@ -44,6 +44,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		this.peakList = [];
 		this.precursor = {}
 		this.precursor.charge = null;
+		this.customConfig = [];
 
 		//ToDo: change JSONdata gets called 3 times for some reason?
 		// define event triggers and listeners better
@@ -102,19 +103,18 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		this.highlights = Array();
 		var JSONdata = this.get("JSONdata");
 
-		this.annotationData = JSONdata.annotation || {};
-
-		if (this.annotationData.fragementTolerance !== undefined){
+		if (JSONdata.annotation.fragementTolerance !== undefined){
 			this.MSnTolerance = {
-				"value": parseFloat(this.annotationData.fragementTolerance.split(" ")[0]),
-				"unit": this.annotationData.fragementTolerance.split(" ")[1]
+				"value": parseFloat(JSONdata.annotation.fragementTolerance.split(" ")[0]),
+				"unit": JSONdata.annotation.fragementTolerance.split(" ")[1]
 			};
 		}
 
-		this.fragmentIons = this.annotationData.ions || [];
+		this.fragmentIons = JSONdata.annotation.ions || [];
+		this.customConfig = JSONdata.annotation.custom || [];
 		this.peakList = JSONdata.peaks || [];
-		var crossLinker = this.annotationData['cross-linker'];
-		if (this.annotationData['cross-linker'] !== undefined)
+		var crossLinker = JSONdata.annotation['cross-linker'];
+		if (JSONdata.annotation['cross-linker'] !== undefined)
 			this.crossLinkerModMass = crossLinker.modMass;
 
 		this.pepStrs = [];
@@ -164,9 +164,24 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 	},
 
 	clear: function(){
-		this.set("JSONdata", null);
 		this.sticky = Array();
-		Backbone.Model.prototype.clear.call(this);
+		this.precursor = {};
+		this.crossLinkerModMass = null;
+		this.fragmentIons = Array();
+		this.fragments = Array();
+		this.originalMatchRequest = {};
+
+		this.pepStrs = [];
+		this.pepStrsMods = [];
+		this.fragmentIons = [];
+		this.peakList = [];
+		this.precursor = {}
+		this.precursor.charge = null;
+		this.MSnTolerance = {};
+		this.customConfig = [];
+
+		this.set("JSONdata", null);
+		// Backbone.Model.prototype.clear.call(this);
 	},
 
 	setGraphData: function(){
@@ -362,7 +377,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 
 		var JSONdata = this.get("JSONdata");
 
-		var modifications = this.annotationData.modifications || {};
+		var modifications = JSONdata.annotation.modifications;
 
 		var aastr = "ARNDCEQGHILKMFPSTWYV";
 		var mA = new Array();
@@ -410,8 +425,8 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		var clModMass = 0;
 		if(this.get("clModMass") !== undefined)
 			var clModMass = parseInt(this.get("clModMass"));
-		else if (this.annotationData['cross-linker'] !== undefined)
-			var clModMass = this.annotationData['cross-linker'].modMass;
+		else if (JSONdata.annotation['cross-linker'] !== undefined)
+			var clModMass = JSONdata.annotation['cross-linker'].modMass;
 
 		for (var i = 0; i < massArr.length; i++) {
 			totalMass += massArr[i];
@@ -585,6 +600,8 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 	},
 
 	resetModel: function(){
+
+		if (this.otherModel.get("JSONdata") == null) return;
 
 		// used to reset SettingsModel
 		var json_data_copy = jQuery.extend({}, this.otherModel.get("JSONdata"));
