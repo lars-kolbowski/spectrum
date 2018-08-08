@@ -155,14 +155,15 @@ xiSPEC.setData = function(data){
 	// sequence2: "QNCcarbamidomethylELFEQLGEYKFQNALLVR",
 	// linkPos1: 1,
 	// linkPos2: 13,
-	// 	crossLinkerModMass: 0,
-	//	modifications: [{id: 'carbamidomethyl', mass: 57.021464, aminoAcids: ['C']}],
-	//	precursorCharge: 3,
-	//	fragmentTolerance: {"tolerance": '20.0', 'unit': 'ppm'},
-	//	ionTypes: "peptide;b;y",
-	//	precursorMz: 1012.1,
-	//	peakList: [[mz, int], [mz, int], ...],
-	//	requestId: 1,
+	// crossLinkerModMass: 0,
+	// modifications: [{id: 'carbamidomethyl', mass: 57.021464, aminoAcids: ['C']}],
+	// losses: [{ id: 'H2O', specificity: ['D', 'S', 'T', 'E', 'CTerm'], mass: 18.01056027}],
+	// precursorCharge: 3,
+	// fragmentTolerance: {"tolerance": '20.0', 'unit': 'ppm'},
+	// ionTypes: "peptide;b;y",
+	// precursorMz: 1012.1,
+	// peakList: [[mz, int], [mz, int], ...],
+	// requestId: 1,
 	// }
 
 
@@ -202,6 +203,9 @@ xiSPEC.convert_to_json_request = function (data) {
 	}
 	if(data.modifications === undefined){
 		data.modifications = [];
+	}
+	if(data.losses === undefined){
+		data.losses === [];
 	}
 	if(data.fragmentTolerance === undefined){
 		data.fragmentTolerance = {"tolerance": '10.0', 'unit': 'ppm'};
@@ -249,6 +253,7 @@ xiSPEC.convert_to_json_request = function (data) {
 	annotationRequest.annotation["cross-linker"] = {'modMass': data.crossLinkerModMass}; // yuk
 	annotationRequest.annotation.precursorMZ = +data.precursorMZ;
 	annotationRequest.annotation.precursorCharge = +data.precursorCharge;
+	annotationRequest.annotation.losses = data.losses;
 	annotationRequest.annotation.requestID = data.requestID.toString();
 	annotationRequest.annotation.custom = data.customConfig;
 

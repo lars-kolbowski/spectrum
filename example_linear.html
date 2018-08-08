@@ -70,6 +70,7 @@
 			precursorCharge: precursorCharge,
 			fragmentTolerance: fragmentTolerance,
 			ionTypes: ionTypes,
+			losses: losses,
 			peakList: peaks
 		}
 
@@ -84,6 +85,7 @@
 	var fragmentTolerance = {"tolerance": '10.0', 'unit': 'ppm'};
 	var ionTypes = "peptide;b;y";
 	var precursorCharge = 3;
+	var losses = [{ id: 'H2O', specificity: ['D', 'S', 'T', 'E', 'CTerm'], mass: 18.01056027}];
 	var peaks = [
 		[110.071464539, 28063.6230469],
 		[118.083854675, 2084.98925781],
