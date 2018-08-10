@@ -119,10 +119,11 @@ var SpectrumControlsView = Backbone.View.extend({
 			.attr('title', 'm/z range to:')
 		;
 
-		// var mzRangeSubmit = setRangeForm.append('input')
-		// 	.attr('id', 'rangeSubmit')
-		// 	.attr('type', 'submit')
-		// ;
+		var mzRangeSubmit = setRangeForm.append('input')
+			.attr('id', 'xispec_mzRangeSubmit')
+			.attr('type', 'submit')
+			.attr('style', 'display:none;')
+		;
 
 		var mzRangeError = setRangeForm.append('span').attr('id', 'xispec_range-error');
 
@@ -138,7 +139,6 @@ var SpectrumControlsView = Backbone.View.extend({
 			.attr('aria-hidden', 'true')
 			.attr('id', 'xispec_toggleSettings')
 			.attr('title', 'Show/Hide Settings')
-			// .attr('style', 'cursor: pointer;')
 		;
 
 		var reverAnnotationButton = this.wrapper.append('i')
@@ -146,7 +146,6 @@ var SpectrumControlsView = Backbone.View.extend({
 			.attr('aria-hidden', 'true')
 			.attr('id', 'xispec_revertAnnotation')
 			.attr('title', 'revert to original annotation')
-			// .attr('style', 'cursor: pointer;')
 		;
 
 		var extra_controls_after = this.wrapper.append('span')
@@ -161,9 +160,8 @@ var SpectrumControlsView = Backbone.View.extend({
 			.attr('class', 'xispec_btn xispec_btn-1a xispec_btn-topNav fa fa-question')
 			.attr('aria-hidden', 'true')
 			.attr('title', 'Help')
-			// .attr('style', 'cursor: pointer;')
 		;
-		// +'	<input type="submit" id="rangeSubmit" class="xispec_btn xispec_btn-1 xispec_btn-1a" style="display: none;">'
+
 
 	},
 
@@ -182,14 +180,14 @@ var SpectrumControlsView = Backbone.View.extend({
 	lockZoom: function(){
 		if ($('#xispec_lockZoom').is(':checked')) {
 			$('#xispec_lock')[0].innerHTML = "&#128274";
-			// $('#rangeSubmit').prop('disabled', true);
+			$('#xispec_mzRangeSubmit').prop('disabled', true);
 			$('#xispec_xleft').prop('disabled', true);
 			$('#xispec_xright').prop('disabled', true);
 			this.model.set('lockZoom', true);
 			// this.graph.disableZoom();
 		} else {
 			$('#xispec_lock')[0].innerHTML = "&#128275";
-			// $('#rangeSubmit').prop('disabled', false);
+			$('#xispec_mzRangeSubmit').prop('disabled', false);
 			$('#xispec_xleft').prop('disabled', false);
 			$('#xispec_xright').prop('disabled', false);
 			this.model.set('lockZoom', false);
