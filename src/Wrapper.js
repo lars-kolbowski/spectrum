@@ -100,10 +100,10 @@ xiSPEC.init = function(options) {
 		.attr ("id", 'xispec_spectrumPanel')
 		.html (_html)
 	;
-	this.SpectrumControls = new SpectrumControlsView({model: this.SpectrumModel, el:"#xispec_spectrumControls"});
-	this.Spectrum = new SpectrumView({model: this.SpectrumModel, el:"#xispec_spectrumPanel"});
-	this.FragmentationKey = new FragmentationKeyView({model: this.SpectrumModel, el:"#xispec_spectrumMainPlotDiv"});
-	this.InfoView = new PrecursorInfoView ({model: this.SpectrumModel, el:"#xispec_spectrumPanel"});
+	this.SpectrumControls = new SpectrumControlsView({model: this.SpectrumModel, el: "#xispec_spectrumControls"});
+	this.Spectrum = new SpectrumView({model: this.SpectrumModel, el: "#xispec_spectrumSVG"});
+	this.FragmentationKey = new FragmentationKeyView({model: this.SpectrumModel, el: "#xispec_spectrumSVG"});
+	this.InfoView = new PrecursorInfoView ({model: this.SpectrumModel, el: "#xispec_spectrumSVG"});
 	this.QCwrapper = new QCwrapperView({
 		el: '#xispec_QCdiv',
 		showQualityControl: options.showQualityControl,

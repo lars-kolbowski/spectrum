@@ -29,7 +29,9 @@ d3.selection.prototype.moveToFront = function() {
 var FragmentationKeyView = Backbone.View.extend({
 
 	initialize: function() {
-		this.svg = d3.select(this.el.getElementsByTagName("svg")[0]);
+		// this.svg = d3.select(this.el.getElementsByTagName("svg")[0]);
+		this.svg = d3.select(this.el);
+		
 		this.fragKeyWrapper = this.svg.append("g");
 
 		this.margin = {

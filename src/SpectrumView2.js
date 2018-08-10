@@ -29,8 +29,8 @@ var SpectrumView = Backbone.View.extend({
 
 	initialize: function() {
 		this.spinner = new Spinner({scale: 5});
-		this.svg = d3.select(this.el.getElementsByTagName("svg")[0]);//d3.select(this.el)
-				//~ .append("svg").style("width", "100%").style("height", "100%");
+		// this.svg = d3.select(this.el.getElementsByTagName("svg")[0]);
+		this.svg = d3.select(this.el);
 
 		//create graph
 		var graphOptions = {xlabel:"m/z", ylabelLeft:"Intensity", ylabelRight:"% of base Peak"};
