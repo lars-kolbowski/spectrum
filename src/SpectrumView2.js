@@ -41,7 +41,6 @@ var SpectrumView = Backbone.View.extend({
 		this.listenTo(window, 'resize', _.debounce(this.resize));
 
 		this.listenTo(this.model, 'change:JSONdata', this.render);
-		this.listenTo(this.model, 'change:mzRange', this.resize);
 		this.listenTo(this.model, 'change:lockZoom', this.lockZoom);
 		this.listenTo(this.model, 'change:measureMode', this.measuringTool);
 		this.listenTo(this.model, 'change:moveLabels', this.moveLabels);
