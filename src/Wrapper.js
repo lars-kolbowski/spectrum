@@ -11,10 +11,11 @@
 "use strict";
 
 var xiSPEC = {};
+var xiSPEC = xiSPEC || {};
 var CLMSUI = CLMSUI || {};
 // http://stackoverflow.com/questions/11609825/backbone-js-how-to-communicate-between-views
-CLMSUI.vent = {};
-_.extend (CLMSUI.vent, Backbone.Events);
+xiSPEC.vent = {};
+_.extend (xiSPEC.vent, Backbone.Events);
 
 _.extend(window, Backbone.Events);
 window.onresize = function() { window.trigger('resize') };
@@ -33,14 +34,21 @@ xiSPEC.init = function(options) {
 
 	options = _.extend(defaultOptions, options);
 
-	var model_options = {
-		baseDir: options.baseDir,
-		xiAnnotatorBaseURL: options.xiAnnotatorBaseURL,
-		knownModifications: options.knownModifications,
-		knownModificationsURL: options.knownModificationsURL,
-		database: options.database,
-		tmpDB: options.tmpDB
-	};
+	// remove non-model options
+	var model_options = jQuery.extend({}, options)
+	delete model_options.targetDiv;
+	delete model_options.showCustomConfig;
+	delete model_options.showQualityControl;
+
+
+	// var model_options = {
+	// 	baseDir: options.baseDir,
+	// 	xiAnnotatorBaseURL: options.xiAnnotatorBaseURL,
+	// 	knownModifications: options.knownModifications,
+	// 	knownModificationsURL: options.knownModificationsURL,
+	// 	database: options.database,
+	// 	tmpDB: options.tmpDB
+	// };
 
 	// options.targetDiv could be div itself or id of div - lets deal with that
 	if (typeof options.targetDiv === "string"){
@@ -69,27 +77,8 @@ xiSPEC.init = function(options) {
 		+"	<div class='xispec_dynDiv_resizeDiv_bl draggableCorner'></div>"
 		+"	<div class='xispec_dynDiv_resizeDiv_br draggableCorner'></div>"
 		+"</div>"
-		+"<div id='xispec_spectrumControls'>"
-		+"<span id='xispec_extra_spectrumControls_before'></span>"
-		+'<i class="xispec_btn xispec_btn-1a xispec_btn-topNav fa fa-download" aria-hidden="true" id="xispec_dl_spectrum_SVG" title="download SVG" style="cursor: pointer;"></i>'
-		+"<label class='xispec_btn'>Move Labels<input id='moveLabels' type='checkbox'></label>"
-		+'<label class="xispec_btn" title="toggle measure mode on/off">Measure<input class="pointer" id="measuringTool" type="checkbox"></label>'
-		+'<form id="setrange">'
-		+'	<label class="xispec_btn" title="m/z range" style="cursor: default;">m/z:</label>'
-		+'	<label class="xispec_btn" for="lockZoom" title="Lock current zoom level" id="lock" class="xispec_btn">🔓</label><input id="lockZoom" type="checkbox" style="display: none;">'
-		+'	<input type="text" id="xleft" size="5" title="m/z range from:">'
-		+'	<span>-</span>'
-		+'	<input type="text" id="xright" size="5" title="m/z range to:">'
-		+'	<input type="submit" id="rangeSubmit" value="Set" class="xispec_btn xispec_btn-1 xispec_btn-1a" style="display: none;">'
-		+'	<span id="range-error"></span>'
-		+'	<button id="reset" title="Reset to initial zoom level" class="xispec_btn xispec_btn-1 xispec_btn-1a">Reset Zoom</button>'
-		+'</form>'
-		+'<i id="toggleSettings" title="Show/Hide Settings" class="xispec_btn xispec_btn-1a xispec_btn-topNav fa fa-cog" aria-hidden="true"></i>'
-		+'<i id="xispec_revertAnnotation" title="revert to original annotation" class="xispec_btn xispec_btn-topNav fa fa-undo xispec_disabled"  aria-hidden="true"></i>'
-		+"<span id='xispec_extra_spectrumControls_after'></span>"
-		+'<a href="http://spectrumviewer.org/help.php" target="_blank"><i title="Help" class="xispec_btn xispec_btn-1a xispec_btn-topNav fa fa-question" aria-hidden="true"></i></a>'
-		+"</div>"
-		+"</div>"
+		+"<div id='xispec_spectrumControls'></div>"
+		// +"</div>"
 		+"<div class='xispec_plotsDiv'>"
 		+"  <div id='xispec_spectrumMainPlotDiv'>"
 		+"	  <svg id='xispec_spectrumSVG'></svg>"
@@ -111,7 +100,7 @@ xiSPEC.init = function(options) {
 		.attr ("id", 'xispec_spectrumPanel')
 		.html (_html)
 	;
-
+	this.SpectrumControls = new SpectrumControlsView({model: this.SpectrumModel, el:"#xispec_spectrumControls"});
 	this.Spectrum = new SpectrumView({model: this.SpectrumModel, el:"#xispec_spectrumPanel"});
 	this.FragmentationKey = new FragmentationKeyView({model: this.SpectrumModel, el:"#xispec_spectrumMainPlotDiv"});
 	this.InfoView = new PrecursorInfoView ({model: this.SpectrumModel, el:"#xispec_spectrumPanel"});
@@ -133,7 +122,7 @@ xiSPEC.init = function(options) {
 		margin: {top: 10, right: 30, bottom: 20, left: 65},
 		svg: "#xispec_errMzSVG",
 	});
-	CLMSUI.vent.trigger('show:QC', true);
+	xiSPEC.vent.trigger('show:QC', true);
 
 	this.SettingsView = new SpectrumSettingsView({
 		model: this.SettingsSpectrumModel,
