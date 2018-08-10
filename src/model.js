@@ -197,8 +197,8 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 			if (tmp > xmax) xmax = tmp;
 		}
 
-		this.xmaxPrimary = xmax + 50;
-		this.xminPrimary = xmin - 50;
+		this.xmaxPrimary = (xmax + 50).toFixed(0);
+		this.xminPrimary = (xmin - 50).toFixed(0);
 		var ymax = Number.NEGATIVE_INFINITY;
 		for (var i=peaks.length-1; i>=0; i--) {
 			tmp = peaks[i].intensity;
@@ -222,6 +222,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 
 	resetZoom: function(){
 		this.set('mzRange', [this.xminPrimary, this.xmaxPrimary]);
+		this.trigger('resetZoom');
 	},
 
 	addHighlight: function(fragments){

@@ -184,14 +184,12 @@ var SpectrumControlsView = Backbone.View.extend({
 			$('#xispec_xleft').prop('disabled', true);
 			$('#xispec_xright').prop('disabled', true);
 			this.model.set('lockZoom', true);
-			// this.graph.disableZoom();
 		} else {
 			$('#xispec_lock')[0].innerHTML = "&#128275";
 			$('#xispec_mzRangeSubmit').prop('disabled', false);
 			$('#xispec_xleft').prop('disabled', false);
 			$('#xispec_xright').prop('disabled', false);
 			this.model.set('lockZoom', false);
-			// this.graph.enableZoom();
 		}
 	},
 

@@ -52,7 +52,7 @@ var SpectrumView = Backbone.View.extend({
 		this.listenTo(xiSPEC.vent, 'resize:spectrum', this.resize);
 		this.listenTo(xiSPEC.vent, 'clearSpectrumHighlights', this.clearHighlights);
 
-
+		this.listenTo(this.model, 'resetZoom', this.resetZoom);
 		this.listenTo(this.model, 'changed:Highlights', this.updateHighlights);
 		this.listenTo(this.model, 'changed:lossyShown', this.showLossy);
 		this.listenTo(this.model, 'request_annotation:pending', this.showSpinner);
