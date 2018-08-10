@@ -168,19 +168,16 @@ Graph = function(targetSvg, model, options) {
 Graph.prototype.setData = function(){
 	//create peaks array with Peaks
 	this.peaks = new Array();
-	this.pep1 = this.model.pep1;
-	this.pep2 = this.model.pep2;
 	if (this.model.get("JSONdata")) {
 		for (var i = 0; i < this.model.get("JSONdata").peaks.length; i++){
 				var peak = this.model.get("JSONdata").peaks[i];
 			this.peaks.push(new Peak(i, this));
 		}
 
-		this.model.peaks = this.peaks;
 		this.updatePeakColors();
 	}
-	if(this.model.lockZoom){
-		this.resize(this.model.xmin, this.model.xmax, this.model.ymin, this.model.ymax);
+	if(this.model.get('lockZoom')){
+		this.resize(this.model.get('mzRange')[0], this.model.get('mzRange')[1], this.model.ymin, this.model.ymax);
 		this.disableZoom();
 	}
 	else{
