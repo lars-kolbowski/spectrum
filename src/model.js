@@ -188,23 +188,14 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 
 		var peaks = this.get("JSONdata").peaks;
 
-		var xmin = Number.POSITIVE_INFINITY;
-		var xmax = Number.NEGATIVE_INFINITY;
-		var tmp;
-		for (var i=peaks.length-1; i>=0; i--) {
-			tmp = peaks[i].mz;
-			if (tmp < xmin) xmin = tmp;
-			if (tmp > xmax) xmax = tmp;
-		}
+		var xDataArr = peaks.map(function(p){ return p.mz; })
+		var xmax = Math.max.apply(Math, xDataArr);
+		var xmin = Math.min.apply(Math, xDataArr);
+		this.xmaxPrimary = parseInt((xmax + 50).toFixed(0));
+		this.xminPrimary = parseInt((xmin - 50).toFixed(0));
 
-		this.xmaxPrimary = (xmax + 50).toFixed(0);
-		this.xminPrimary = (xmin - 50).toFixed(0);
-		var ymax = Number.NEGATIVE_INFINITY;
-		for (var i=peaks.length-1; i>=0; i--) {
-			tmp = peaks[i].intensity;
-			if (tmp > ymax) ymax = tmp;
-		}
-
+		var yDataArr = peaks.map(function(p){ return p.intensity; })
+		var ymax = Math.max.apply(Math, yDataArr);
 		//this.ymaxPrimary = ymax / 0.9;
 		this.ymaxPrimary = ymax;
 
@@ -217,7 +208,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 	},
 
 	setZoom: function(domain){
-		this.set('mzRange', [domain[0].toFixed(0), domain[1].toFixed(0)]);
+		this.set('mzRange', [domain[0], domain[1]]);
 	},
 
 	resetZoom: function(){

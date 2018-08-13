@@ -173,8 +173,8 @@ var SpectrumControlsView = Backbone.View.extend({
 
 	updateRange: function(){
 		var mzRange = this.model.get('mzRange');
-		$("#xispec_xleft").val(mzRange[0]);
-		$("#xispec_xright").val(mzRange[1]);
+		$("#xispec_xleft").val(mzRange[0].toFixed(0));
+		$("#xispec_xright").val(mzRange[1].toFixed(0));
 	},
 
 	lockZoom: function(){
@@ -215,12 +215,10 @@ var SpectrumControlsView = Backbone.View.extend({
 		}
 		else{
 			$("#xispec_range-error").hide();
-			this.model.set('mzRange', [xl, xr]);
-			// this.graph.resize(xl, xr, this.model.ymin, this.model.ymax);
+			this.model.set('mzRange', [parseInt(xl), parseInt(xr)]);
 		}
 
 	},
-
 
 	resetZoom: function(){
 		this.model.resetZoom();

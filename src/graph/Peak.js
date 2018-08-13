@@ -511,11 +511,11 @@ Peak.prototype.updateY = function(){
 			.attr("y1", yScale(this.y))
 			.attr("y2", yScale(0));
 		var yStep = 15;
-		var self = this;
+		var gap = this.graph.options.invert ? -10 : 5;
 
 		for (var i = 0; i < labelCount; i++) {
-			this.labels[i][0].setAttribute("y",  yScale(self.y) - 5 - (yStep * i));
-			this.labelHighlights[i][0].setAttribute("y",  yScale(self.y) - 5 - (yStep * i));
+			this.labels[i][0].setAttribute("y",  yScale(this.y) - gap - (yStep * i));
+			this.labelHighlights[i][0].setAttribute("y",  yScale(this.y) - gap - (yStep * i));
 		}
 
 		//this.labels.attr("y", function(d,i) { return yScale(self.y) - 5 - (yStep * i); });

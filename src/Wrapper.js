@@ -40,16 +40,6 @@ xiSPEC.init = function(options) {
 	delete model_options.showCustomConfig;
 	delete model_options.showQualityControl;
 
-
-	// var model_options = {
-	// 	baseDir: options.baseDir,
-	// 	xiAnnotatorBaseURL: options.xiAnnotatorBaseURL,
-	// 	knownModifications: options.knownModifications,
-	// 	knownModificationsURL: options.knownModificationsURL,
-	// 	database: options.database,
-	// 	tmpDB: options.tmpDB
-	// };
-
 	// options.targetDiv could be div itself or id of div - lets deal with that
 	if (typeof options.targetDiv === "string"){
 		if(options.targetDiv.charAt(0) == "#") options.targetDiv = options.targetDiv.substr(1);
@@ -78,7 +68,6 @@ xiSPEC.init = function(options) {
 		+"	<div class='xispec_dynDiv_resizeDiv_br draggableCorner'></div>"
 		+"</div>"
 		+"<div id='xispec_spectrumControls'></div>"
-		// +"</div>"
 		+"<div class='xispec_plotsDiv'>"
 		+"  <div id='xispec_spectrumMainPlotDiv'>"
 		+"	  <svg id='xispec_spectrumSVG'></svg>"
@@ -100,10 +89,28 @@ xiSPEC.init = function(options) {
 		.attr ("id", 'xispec_spectrumPanel')
 		.html (_html)
 	;
-	this.SpectrumControls = new SpectrumControlsView({model: this.SpectrumModel, el: "#xispec_spectrumControls"});
-	this.Spectrum = new SpectrumView({model: this.SpectrumModel, el: "#xispec_spectrumSVG"});
-	this.FragmentationKey = new FragmentationKeyView({model: this.SpectrumModel, el: "#xispec_spectrumSVG"});
-	this.InfoView = new PrecursorInfoView ({model: this.SpectrumModel, el: "#xispec_spectrumSVG"});
+	this.SpectrumControls = new SpectrumControlsView({
+		model: this.SpectrumModel,
+		el: "#xispec_spectrumControls"}
+	);
+	this.Spectrum = new SpectrumView({
+		model: this.SpectrumModel,
+		el: "#xispec_spectrumSVG"
+	});
+	this.Spectrum2 = new SpectrumView({
+		model: this.SpectrumModel,
+		el: "#xispec_spectrumSVG",
+		invert: true,
+		hidden: true
+	});
+	this.FragmentationKey = new FragmentationKeyView({
+		model: this.SpectrumModel,
+		el: "#xispec_spectrumSVG"
+	});
+	this.InfoView = new PrecursorInfoView ({
+		model: this.SpectrumModel,
+		el: "#xispec_spectrumSVG"
+	});
 	this.QCwrapper = new QCwrapperView({
 		el: '#xispec_QCdiv',
 		showQualityControl: options.showQualityControl,

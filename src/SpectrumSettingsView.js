@@ -27,6 +27,7 @@ var SpectrumSettingsView = Backbone.View.extend({
 	events : {
 		'click #lossyChkBx': 'showLossy',
 		'click #absErrChkBx': 'absErrToggle',
+		'click #butterflyChkBx': 'butterflyToggle',
 		'change #colorSelector': 'changeColorScheme',
 		'click .settingsTab' : 'changeTab',
 		'click .settingsCancel' : 'cancel',
@@ -277,6 +278,9 @@ var SpectrumSettingsView = Backbone.View.extend({
 			.append("input").attr("type", "checkbox").attr("id", "absErrChkBx")
 		;
 
+		var butterfly = appearanceTab.append("label").text("Butterfly: ")
+			.append("input").attr("type", "checkbox").attr("id", "butterflyChkBx")
+		;
 
 		//custom config
 		var customConfigTab = mainDiv.append("div").attr("class", "xispec_settings-tab xispec_flex-column").attr("id", "settings_custom_config").style("display", "none");
@@ -765,10 +769,15 @@ var SpectrumSettingsView = Backbone.View.extend({
 	},
 
 	absErrToggle: function(e) {
-		var model = this.model.otherModel; //apply changes directly for now
 		var $target = $(e.target);
 		var selected = $target.is(':checked');
 		xiSPEC.vent.trigger('QCabsErr', selected);
+	},
+
+	butterflyToggle: function(e) {
+		var $target = $(e.target);
+		var selected = $target.is(':checked');
+		xiSPEC.vent.trigger('butterflyToggle', selected);
 	},
 
 	changeColorScheme: function(e){
