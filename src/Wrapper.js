@@ -53,8 +53,15 @@ xiSPEC.init = function(options) {
 	//init models
 	this.SpectrumModel = new AnnotatedSpectrumModel(model_options);
 	this.SettingsSpectrumModel = new AnnotatedSpectrumModel(model_options);
-	this.SpectrumModel.otherModel = this.SettingsSpectrumModel;
-	this.SettingsSpectrumModel.otherModel = this.SpectrumModel;
+	this.originalSpectrumModel = new AnnotatedSpectrumModel(model_options);
+	this.originalSpectrumModel.set('lockZoom', true);
+	this.originalSpectrumModel.listenTo(
+		this.SpectrumModel,
+		'change:mzRange',
+		 function(spectrumModel){
+			this.setZoom(spectrumModel.get('mzRange'));
+		}
+	);
 
 	var _html = ""
 		+"<div class='xispec_dynDiv' id='xispec_settingsWrapper'>"
@@ -95,10 +102,10 @@ xiSPEC.init = function(options) {
 	);
 	this.Spectrum = new SpectrumView({
 		model: this.SpectrumModel,
-		el: "#xispec_spectrumSVG"
+		el: "#xispec_spectrumSVG",
 	});
-	this.Spectrum2 = new SpectrumView({
-		model: this.SpectrumModel,
+	this.originalSpectrum = new SpectrumView({
+		model: this.originalSpectrumModel,
 		el: "#xispec_spectrumSVG",
 		invert: true,
 		hidden: true
@@ -133,6 +140,7 @@ xiSPEC.init = function(options) {
 
 	this.SettingsView = new SpectrumSettingsView({
 		model: this.SettingsSpectrumModel,
+		displayModel: this.SpectrumModel,
 		el:"#xispec_settingsWrapper",
 		showCustomCfg: options.showCustomConfig,
 	});
@@ -163,10 +171,67 @@ xiSPEC.setData = function(data){
 // 	if (data.annotation && data.annotation.requestId && json.annotation.requestId === CLMSUI.loadSpectra.lastRequestedID)) {
 
 	var json_request = this.convert_to_json_request(data);
+
 	// this.SpectrumModel.customConfig = data.customConfig;
-	this.SpectrumModel.request_annotation(json_request, true);
+	this.originalMatchRequest = $.extend(true, {}, json_request); //ToDo: necessary?
+	this.SpectrumModel.set('changedAnnotation', false);
+	// this.changedAnnotation
+	// this.vent.trigger('changedAnnotation', false);
+	this.SpectrumModel.reset_all_modifications();
+	this.request_annotation(json_request, true);
 
 };
+
+xiSPEC.request_annotation = function(json_request, originalMatchRequest){
+
+	// if (this.keepCustomConfig) {
+	// 	json_request['annotation']['custom'] = this.customConfig;
+	// }
+
+	if (json_request.annotation.requestID)
+		this.lastRequestedID = json_request.annotation.requestID;
+
+
+	this.SpectrumModel.trigger('request_annotation:pending');
+	console.log("annotation request:", json_request);
+	var self = this;
+	var response = $.ajax({
+		type: "POST",
+		headers: {
+			'Accept': 'application/json',
+			'Content-Type': 'application/json'
+		},
+		data: JSON.stringify(json_request),
+		url: self.SpectrumModel.get('xiAnnotatorBaseURL') + "annotate/FULL",
+		success: function(data) {
+			if (data && data.annotation && data.annotation.requestID && data.annotation.requestID === self.lastRequestedID) {
+				//ToDo: Error handling -> https://github.com/Rappsilber-Laboratory/xi3-issue-tracker/issues/330
+				console.log("annotation response:", data);
+
+				if(originalMatchRequest){
+					self.originalSpectrumModel.set({"JSONdata": data, "JSONrequest": json_request});
+				}
+
+				self.SpectrumModel.set({"JSONdata": data, "JSONrequest": json_request});
+				self.SettingsSpectrumModel.set({"JSONdata": data, "JSONrequest": json_request});
+				self.SettingsSpectrumModel.trigger("change:JSONdata");
+				self.SpectrumModel.trigger('request_annotation:done');
+			}
+
+		}
+	});
+},
+
+xiSPEC.revertAnnotation = function(){
+	if(!this.SpectrumModel.get('changedAnnotation'))
+		return;
+	else {
+		this.SpectrumModel.reset_all_modifications();
+		this.SettingsSpectrumModel.reset_all_modifications();
+		this.request_annotation(this.originalMatchRequest);
+		this.SpectrumModel.set('changedAnnotation', false);
+	}
+},
 
 xiSPEC.sanityChecks = function(data){
 

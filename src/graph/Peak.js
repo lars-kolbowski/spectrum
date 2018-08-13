@@ -511,7 +511,7 @@ Peak.prototype.updateY = function(){
 			.attr("y1", yScale(this.y))
 			.attr("y2", yScale(0));
 		var yStep = 15;
-		var gap = this.graph.options.invert ? -10 : 5;
+		var gap = this.graph.options.invert ? -8 : 5;
 
 		for (var i = 0; i < labelCount; i++) {
 			this.labels[i][0].setAttribute("y",  yScale(this.y) - gap - (yStep * i));

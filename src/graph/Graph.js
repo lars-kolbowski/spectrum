@@ -210,7 +210,7 @@ Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 	this.x.domain([xmin, xmax])
 		.range([0, width]);
 
-	// y-scale (inverted domain)
+	// y-scale
 	if (this.options.invert){
 		this.y.domain([0, ymax]).nice()
 			.range([0, height]).nice();
@@ -223,9 +223,6 @@ Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 		this.y_right.domain([0, ymax]).nice()
 			.range([height, 0]).nice();
 	}
-
-	//y0 = d3.scale.linear().range([height, 0]);
-	//this.y_right = d3.scale.linear().range([height, 0]);
 
 	var yTicks = height / 40;
 	var xTicks = width / 100;
@@ -242,17 +239,17 @@ Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 	;
 	this.xaxisRect.attr("width", width);
 
-	var xAxisOrient = this.options.invert ? "top" : "bottom";
-	this.xAxis = d3.svg.axis().scale(this.x).ticks(xTicks).orient(xAxisOrient);
-	// this.xAxis = d3.svg.axis().scale(this.x).ticks(xTicks).orient("bottom");
+	// var xAxisOrient = this.options.invert ? "top" : "bottom";
+	// this.xAxis = d3.svg.axis().scale(this.x).ticks(xTicks).orient(xAxisOrient);
+	this.xAxis = d3.svg.axis().scale(this.x).ticks(xTicks).orient("bottom");
 
-	if(this.options.invert){
-		this.xaxisSVG.call(this.xAxis);
-	}
-	else{
+	// if(this.options.invert){
+	// 	this.xaxisSVG.call(this.xAxis);
+	// }
+	// else{
 		this.xaxisSVG.attr("transform", "translate(0," + height + ")")
 			.call(this.xAxis);
-	}
+	// }
 
 
 	this.g.selectAll('.axis line, .axis path')
@@ -264,7 +261,9 @@ Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 	this.plot.attr("width", width)
 		.attr("height", height);
 
-	this.xaxisRect.attr("width",width).attr("y", height).attr("height", this.margin.bottom);
+	var xAxisRectYpos = this.options.butterfly ? height * 2 : height;
+
+	this.xaxisRect.attr("width",width).attr("y", xAxisRectYpos).attr("height", this.margin.bottom);
 	this.dragZoomHighlight.attr("height", height);
 
 	this.zoom = d3.behavior.zoom().x(this.x).on("zoom", this.redraw());

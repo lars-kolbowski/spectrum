@@ -34,7 +34,7 @@ You need to include the following files:
 
     <!-- Spectrum viewer .js files -->
     <script type="text/javascript" src="src/Wrapper.js"></script>
-    <script type="text/javascript" src="src/model.js"></script>
+    <script type="text/javascript" src="src/AnnotatedSpectrumModel.js"></script>
     <script type="text/javascript" src="src/SpectrumControlsView.js"></script>
     <script type="text/javascript" src="src/SpectrumView2.js"></script>
     <script type="text/javascript" src="src/FragmentationKeyView.js"></script>

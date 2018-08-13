@@ -234,7 +234,7 @@ var SpectrumControlsView = Backbone.View.extend({
 
 	revertAnnotation: function(){
 		if(this.model.get('changedAnnotation')){
-			this.model.revertAnnotation();
+			xiSPEC.revertAnnotation();
 		};
 	},
 

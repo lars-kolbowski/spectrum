@@ -33,7 +33,8 @@ var SpectrumView = Backbone.View.extend({
 			hidden: false,
 			xlabel: "m/z",
 			ylabelLeft: "Intensity",
-			ylabelRight: "% of base Peak"
+			ylabelRight: "% of base Peak",
+			butterfly: false,
 		};
 
 		this.options = _.extend(defaultOptions, viewOptions);
@@ -87,8 +88,10 @@ var SpectrumView = Backbone.View.extend({
 			this.graph.show();
 		}
 
-		if (this.model.get("JSONdata"))
+		if (this.model.get("JSONdata")){
 			this.graph.setData();
+			this.graph.margin.top = this.model.isLinear ? 10 : 50;
+		}
 		// this.hideSpinner();
 		return this;
 	},
