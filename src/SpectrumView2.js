@@ -213,7 +213,7 @@ var SpectrumView = Backbone.View.extend({
 	},
 
 	downloadSVG: function(){
-		var svgSel = d3.select(this.el).selectAll("svg");
+		var svgSel = d3.select(this.el);
 		var svgArr = svgSel[0];
 		var svgStrings = CLMSUI.svgUtils.capture (svgArr);
 		var svgXML = CLMSUI.svgUtils.makeXMLStr (new XMLSerializer(), svgStrings[0]);
