@@ -280,7 +280,7 @@ var SpectrumSettingsView = Backbone.View.extend({
 			.append("input").attr("type", "checkbox").attr("id", "absErrChkBx")
 		;
 
-		var butterfly = appearanceTab.append("label").text("Butterfly: ")
+		var butterfly = appearanceTab.append("label").text("Butterfly plot with original Spectrum: ")
 			.append("input").attr("type", "checkbox").attr("id", "butterflyChkBx")
 		;
 
@@ -788,7 +788,6 @@ var SpectrumSettingsView = Backbone.View.extend({
 	butterflyToggle: function(e) {
 		var $target = $(e.target);
 		var selected = $target.is(':checked');
-// 		xiSPEC.butterflyToggle(selected);
 		xiSPEC.vent.trigger('butterflyToggle', selected);
 	},
 
