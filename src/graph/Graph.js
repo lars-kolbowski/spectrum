@@ -193,6 +193,10 @@ Graph.prototype.setData = function(){
 
 Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 
+	if(this.options.hidden){
+		return;
+	}
+
 	//reset measureTool
 	if(this.model.get('measureMode'))
 		this.measureClear();
