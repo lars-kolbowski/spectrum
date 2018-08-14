@@ -39,6 +39,7 @@ xiSPEC.init = function(options) {
 	delete model_options.targetDiv;
 	delete model_options.showCustomConfig;
 	delete model_options.showQualityControl;
+	delete model_options.xiAnnotatorBaseURL;
 
 	// options.targetDiv could be div itself or id of div - lets deal with that
 	if (typeof options.targetDiv === "string"){
@@ -49,6 +50,8 @@ xiSPEC.init = function(options) {
 	}
 
 	d3.select(options.targetDiv).selectAll("*").remove();
+
+	this.xiAnnotatorBaseURL = options.xiAnnotatorBaseURL;
 
 	//init models
 	this.SpectrumModel = new AnnotatedSpectrumModel(model_options);
@@ -113,6 +116,11 @@ xiSPEC.init = function(options) {
 	this.FragmentationKey = new FragmentationKeyView({
 		model: this.SpectrumModel,
 		el: "#xispec_spectrumSVG"
+	});
+	this.originalFragmentationKey = new FragmentationKeyView({
+		model: this.originalSpectrumModel,
+		el: "#xispec_spectrumSVG",
+		position: bottom
 	});
 	this.InfoView = new PrecursorInfoView ({
 		model: this.SpectrumModel,
@@ -202,7 +210,7 @@ xiSPEC.request_annotation = function(json_request, originalMatchRequest){
 			'Content-Type': 'application/json'
 		},
 		data: JSON.stringify(json_request),
-		url: self.SpectrumModel.get('xiAnnotatorBaseURL') + "annotate/FULL",
+		url: this.xiAnnotatorBaseURL + "annotate/FULL",
 		success: function(data) {
 			if (data && data.annotation && data.annotation.requestID && data.annotation.requestID === self.lastRequestedID) {
 				//ToDo: Error handling -> https://github.com/Rappsilber-Laboratory/xi3-issue-tracker/issues/330
