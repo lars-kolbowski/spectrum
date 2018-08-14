@@ -57,9 +57,17 @@ xiSPEC.init = function(options) {
 	this.SpectrumModel = new AnnotatedSpectrumModel(model_options);
 	this.SettingsSpectrumModel = new AnnotatedSpectrumModel(model_options);
 	this.originalSpectrumModel = new AnnotatedSpectrumModel(model_options);
-	this.originalSpectrumModel.set('lockZoom', true);
+
 	this.originalSpectrumModel.listenTo(
 		this.SpectrumModel,
+		'change:mzRange',
+		 function(spectrumModel){
+			this.setZoom(spectrumModel.get('mzRange'));
+		}
+	);
+
+	this.SpectrumModel.listenTo(
+		this.originalSpectrumModel,
 		'change:mzRange',
 		 function(spectrumModel){
 			this.setZoom(spectrumModel.get('mzRange'));
