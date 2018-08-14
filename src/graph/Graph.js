@@ -174,9 +174,13 @@ Graph.prototype.setData = function(){
 				var peak = this.model.get("JSONdata").peaks[i];
 			this.peaks.push(new Peak(i, this));
 		}
-
 		this.updatePeakColors();
 	}
+
+	this.margin.top = this.model.isLinear ? 80 : 140;
+
+	this.g.attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
+
 	if(this.model.get('lockZoom')){
 		this.resize(this.model.get('mzRange')[0], this.model.get('mzRange')[1], this.model.ymin, this.model.ymax);
 		this.disableZoom();

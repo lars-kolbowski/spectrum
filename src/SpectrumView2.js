@@ -90,7 +90,6 @@ var SpectrumView = Backbone.View.extend({
 
 		if (this.model.get("JSONdata")){
 			this.graph.setData();
-			this.graph.margin.top = this.model.isLinear ? 10 : 50;
 		}
 		// this.hideSpinner();
 		return this;
