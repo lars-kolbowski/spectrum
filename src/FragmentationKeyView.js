@@ -28,8 +28,14 @@ d3.selection.prototype.moveToFront = function() {
 
 var FragmentationKeyView = Backbone.View.extend({
 
-	initialize: function() {
-		this.svg = d3.select(this.el.getElementsByTagName("svg")[0]);
+	initialize: function(viewOptions) {
+		var defaultOptions = {
+			invert: false,
+			hidden: false
+		};
+		this.options = _.extend(defaultOptions, viewOptions);
+
+		this.svg = d3.select(this.el);
 		this.fragKeyWrapper = this.svg.append("g");
 
 		this.margin = {
@@ -40,16 +46,20 @@ var FragmentationKeyView = Backbone.View.extend({
 		};
 		this.xStep = 23;
 		//this.highlights = this.fragKeyWrapper.append("g").attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
+
 		this.g =  this.fragKeyWrapper.append("g").attr("class", "fragKey").attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
+
+		if(this.options.hidden) this.g.attr("visibility", "hidden");
+
 
 		this.listenTo(this.model, 'change', this.render);
 		this.listenTo(this.model, 'destroy', this.remove);
 		this.listenTo(this.model, 'changed:Highlights', this.updateHighlights);
 		this.listenTo(this.model, 'changed:ColorScheme', this.updateColors);
-		this.listenTo(this.model, 'changed:HighlightColor', this.updateColors);
-// 		this.listenTo(this.model, 'changed:HighlightColor', this.updateHighlightColors);
+		this.listenTo(this.model, 'change:highlightColor', this.updateColors);
 		this.listenTo(window, 'resize', _.debounce(this.resize));
-		this.listenTo(CLMSUI.vent, 'resize:spectrum', this.resize);
+		this.listenTo(xiSPEC.vent, 'resize:spectrum', this.resize);
+		this.listenTo(xiSPEC.vent, 'butterflyToggle', this.butterflyToggle);
 
 		this.tooltip = d3.select("body").append("span")
 			.attr("class", "xispec_tooltip")
@@ -58,6 +68,15 @@ var FragmentationKeyView = Backbone.View.extend({
 	},
 
 	render: function() {
+
+		if(this.options.hidden){
+			this.hide();
+			return this;
+		}
+		else{
+			this.show();
+		}
+
 		this.clear();
 		if (this.model.get("JSONdata"))
 			this.setData();
@@ -155,7 +174,7 @@ var FragmentationKeyView = Backbone.View.extend({
 				.attr("y1", 25)
 				.attr("x2", this.xStep * (CLpos - 1))
 				.attr("y2", 55)
-				.attr("stroke", self.model.highlightColour)
+				.attr("stroke", self.model.get('highlightColor'))
 				.attr("stroke-width", 10)
 				.attr("opacity", 0)
 				.style("cursor", "pointer");
@@ -166,7 +185,7 @@ var FragmentationKeyView = Backbone.View.extend({
 				.attr("x2", this.xStep * (CLpos - 1))
 				.attr("y2", 55)
 				.attr("stroke", "black")
-				.attr("stroke-width", 1.5)
+				.attr("stroke-width", 2.3)
 				.style("cursor", "pointer");
 
 			//line for changing
@@ -176,14 +195,14 @@ var FragmentationKeyView = Backbone.View.extend({
 				.attr("x2", this.xStep * (CLpos - 1))
 				.attr("y2", 55)
 				.attr("stroke", "black")
-				.attr("stroke-width", 1.5)
+				.attr("stroke-width", 2.3)
 				.attr("opacity", 0)
 				.style("cursor", "pointer");
 
 			this.CL.on("mouseover", function() {
 				if (!self.changeMod  && !self.changeCL){
 					self.CLlineHighlight.attr("opacity", 0.8);
-					self.tooltip.text("Click to change cross-link position");
+					self.tooltip.text("Cross-link: Click to change position");
 					self.tooltip.transition()
 							.duration(200)
 							.style("opacity", .9);
@@ -227,78 +246,13 @@ var FragmentationKeyView = Backbone.View.extend({
 		var changeModLetterG = this.g.append("g")
 		this.changeModLetterHighlight = changeModLetterG.append("text")
 			.attr("text-anchor", "middle")
-			.attr("stroke", self.model.highlightColour)
+			.attr("stroke", self.model.get('highlightColor'))
 			.style("font-size", "0.7em")
 			.attr("stroke-width", "2px")
 		this.changeModLetter = changeModLetterG.append("text")
 			.attr("text-anchor", "middle")
 			.style("font-size", "0.7em")
 			.style("cursor", "default");
-
-		//changeInfo
-		//ToDo: make cleaner
-		if(this.model.match !== undefined){
-			if (this.model.match.oldLinkPos !== undefined){
-					var linkPos = [];
-					for (var i = 0; i < this.peptides.length; i++) {
-						linkPos.push(this.model.match.oldLinkPos[i])
-						var j = 0;
-						while(this.peptides[i][j] == "#") {
-								linkPos[i] += 1
-								j++;
-						}
-					}
-					this.origCL = this.g.append("g");
-					this.origCLHighlight = this.origCL.append("line")
-					.attr("x1", this.xStep * (linkPos[0] - 1))
-					.attr("y1", 25)
-					.attr("x2", this.xStep * (linkPos[1] - 1))
-					.attr("y2", 55)
-					.attr("stroke", this.model.highlightColour)
-					.attr("stroke-width", 5)
-					.attr("opacity", 0)
-					.style("cursor", "pointer");
-					this.origCLline = this.origCL.append("line")
-					.attr("x1", this.xStep * (linkPos[0] - 1))
-					.attr("y1", 25)
-					.attr("x2", this.xStep * (linkPos[1] - 1))
-					.attr("y2", 55)
-					.attr("stroke", "lightgrey")
-					.attr("opacity", 1)
-					.style("cursor", "pointer");
-				this.origCL.on("mouseover", function(){
-					self.origCLHighlight.attr("opacity", 1);
-					self.tooltip.text("Revert to original cross-link position");
-					self.tooltip.transition()
-							.duration(200)
-							.style("opacity", .9);
-					self.tooltip.style("left", (d3.event.pageX + 15) + "px")
-							.style("top", (d3.event.pageY) + "px");
-				});
-				this.origCL.on("mouseout", function(){
-					self.origCLHighlight.attr("opacity", 0);
-					self.tooltip.transition()
-						.duration(500)
-						.style("opacity", 0);
-				});
-				this.origCL.on("click", function(){
-					self.tooltip.transition()
-							.duration(500)
-							.style("opacity", 0);
-					self.model.changeLinkPos([self.model.match.oldLinkPos[0], self.model.match.oldLinkPos[1]]);
-				});
-				// //get position
-				// var x = 0
-				// for (var i = 0; i < this.pepLetters.length; i++) {
-				// 		if(parseInt(this.pepLetters[i][this.pepLetters[i].length-1][0][0].getAttribute("x")) > x)
-				// 			x = parseInt(this.pepLetters[i][this.pepLetters[i].length-1][0][0].getAttribute("x"));
-				// }
-				// this.changeInfo = this.g.append('g');
-				// var scoreInfo = this.changeInfo.append('text')
-				// 	.text("link was changed")
-				// 	.attr("x", x+20);
-			}
-		}
 
 	},
 
@@ -415,8 +369,8 @@ var FragmentationKeyView = Backbone.View.extend({
 				.attr("text-anchor", "middle")
 				.attr("fill", pep.color)
 				.attr("class", 'pepLetterHighlight')
-				.attr("stroke-width", "2px")
-				.attr("stroke", self.model.highlightColour)
+				.attr("stroke-width", 3)
+				.attr("stroke", self.model.get('highlightColor'))
 				.attr("opacity", 0)
 				.style("cursor", "default")
 				.text(function(d) {
@@ -575,7 +529,7 @@ var FragmentationKeyView = Backbone.View.extend({
 			function get_mod_mass(fullModName){
 				if (fullModName === undefined)
 					return;
-				var mod = self.model.annotationData.modifications.filter(function(m){
+				var mod = self.model.get("JSONdata").annotation.modifications.filter(function(m){
 					return m.id == fullModName;
 				});
 				if (mod.length < 1){
@@ -596,9 +550,10 @@ var FragmentationKeyView = Backbone.View.extend({
 						var pepIndex = this.__data__.pepIndex;
 						var pos = this.__data__.pos;
 						var modMass = this.__data__.modMass;
-						var tooltipHTML = "Click to change the position";
+						var tooltipHTML = "";
 						if (modMass !== undefined)
-							tooltipHTML += "</br>mod mass: " + modMass;
+							tooltipHTML += "Modification mass: " + modMass + "</br>";
+						tooltipHTML += "Click to change the position";
 
 						d3.select(self.pepLetterHighlights[pepIndex][0][pos]).style("opacity", 1);
 						d3.select(this).select("text.modLetterHighlight").style("opacity", 1); //highlight modLetter
@@ -665,7 +620,7 @@ var FragmentationKeyView = Backbone.View.extend({
 				.attr("class", "modLetterHighlight")
 				.attr("y", pep.y[1])
 				.attr("text-anchor", "middle")
-				.attr("stroke", self.model.highlightColour)
+				.attr("stroke", self.model.get('highlightColor'))
 				.style("font-size", "0.7em")
 				.text(function(d){ return d.shortMod;})
 				.attr("stroke-width", "2px")
@@ -756,8 +711,8 @@ var FragmentationKeyView = Backbone.View.extend({
 
 	greyLetters: function(){
 		for (var i = 0; i < this.pepLetters.length; i++) {
-			this.pepLetters[i].attr("fill", this.model.peakColour);
-			this.modLetters[i].attr("fill", this.model.peakColour);
+			this.pepLetters[i].attr("fill", this.model.get('peakColor'));
+			this.modLetters[i].attr("fill", this.model.get('peakColor'));
 		}
 	},
 
@@ -814,26 +769,33 @@ var FragmentationKeyView = Backbone.View.extend({
 // 		for (var i = 0; i < this.fraglines.length; i++) {
 
 // 			if (this.fraglines[i].bHighlight !== undefined)
-// 				this.fraglines[i].bHighlight.attr("stroke", this.model.highlightColour);
+// 				this.fraglines[i].bHighlight.attr("stroke", this.model.get('highlightColor'));
 // 			if (this.fraglines[i].yHighlight !== undefined)
-// 				this.fraglines[i].yHighlight.attr("stroke", this.model.highlightColour);
+// 				this.fraglines[i].yHighlight.attr("stroke", this.model.get('highlightColor'));
 // 		}
 
 // 	},
 
 	resize: function(){
-			var parentDivWidth = $(this.el).width();
-		var fragKeyWidth;
+
+		var $el = $(this.el)
+		var parentWidth = $el.width();
+		var parentHeight = $el.height();
+
+		var fragKeyWidth, fragKeyHeight;
 		try {
 			fragKeyWidth = $(".fragKey")[0].getBBox().width;
+			fragKeyHeight = $(".fragKey")[0].getBBox().height;
 		} catch (e) {
-			fragKeyWidth = {x: 0, y: 0, width: 0, height: 0};
+			fragKeyWidth = 0;
+			fragKeyHeight = 0;
 		}
-		//var fragKeyWidth = $(".fragKey")[0].getBoundingClientRect().width;
-		if (parentDivWidth < fragKeyWidth+40)
-			this.fragKeyWrapper.attr("transform", "scale("+parentDivWidth/(fragKeyWidth+40)+")")
-		else
-			this.fragKeyWrapper.attr("transform", "scale(1)")
+
+		var scale = (parentWidth < fragKeyWidth + this.margin.left) ? parentWidth / (fragKeyWidth + this.margin.left) : 1;
+		var top = (this.options.invert) ? parentHeight - fragKeyHeight - 15 : 0;
+
+		this.fragKeyWrapper.attr("transform", "scale(" + scale + "), translate(0," + top + ")");
+
 	},
 
 	// clearHighlights: function(){
@@ -849,6 +811,23 @@ var FragmentationKeyView = Backbone.View.extend({
 		this.linkPos = [];
 		this.g.selectAll("*").remove();
 		//this.highlights.selectAll("*").remove();
+	},
+
+	butterflyToggle: function(toggle){
+		// this.graph.options.butterfly = toggle;
+		if(this.options.invert){
+			this.options.hidden = !toggle;
+			this.render();
+		}
+		this.resize();
+	},
+
+	hide: function(){
+		this.g.attr("visibility", "hidden");
+	},
+
+	show: function(){
+		this.g.attr("visibility", "visible");
 	}
 
 });

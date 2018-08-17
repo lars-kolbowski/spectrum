@@ -37,7 +37,7 @@ var QCwrapperView = Backbone.View.extend({
 
 		var defaultOptions = {
 			splitIds: ['#xispec_spectrumMainPlotDiv', '#xispec_QCdiv'],
-			showOnStartUp: true,
+			showQualityControl: "bottom",
 		};
 		this.options = _.extend(defaultOptions, viewOptions);
 
@@ -46,7 +46,7 @@ var QCwrapperView = Backbone.View.extend({
 			minSize: [250, 150],
 			gutterSize: 5,
 			direction: 'vertical',
-			onDragEnd: function(){ CLMSUI.vent.trigger('resize:spectrum'); }
+			onDragEnd: function(){ xiSPEC.vent.trigger('resize:spectrum'); }
 		});
 
 		this.dock = 'bottom';
@@ -133,12 +133,19 @@ var QCwrapperView = Backbone.View.extend({
 			.attr('title', 'hide QC plots')
 		;
 
-		if(!this.options.showOnStartUp)
+		if(this.options.showQualityControl == 'bottom'){
+			this.dockBottom();
+		}
+		else if (this.options.showQualityControl == 'side') {
+			this.dockRight();
+		}
+		else if (this.options.showQualityControl == 'min') {
 			this.minView();
+		}
 	},
 
 	downloadQCSVG: function(){
-		CLMSUI.vent.trigger('downloadQCSVG');
+		xiSPEC.vent.trigger('downloadQCSVG');
 	},
 
 	splitHorizontal: function(){
@@ -151,7 +158,7 @@ var QCwrapperView = Backbone.View.extend({
 			minSize: [500, 220],
 			gutterSize: 4,
 			direction: 'horizontal',
-			onDragEnd: function(){ CLMSUI.vent.trigger('resize:spectrum'); }
+			onDragEnd: function(){ xiSPEC.vent.trigger('resize:spectrum'); }
 		});
 	},
 
@@ -165,13 +172,13 @@ var QCwrapperView = Backbone.View.extend({
 			minSize: [250, 200],
 			gutterSize: 4,
 			direction: 'vertical',
-			onDragEnd: function(){ CLMSUI.vent.trigger('resize:spectrum'); }
+			onDragEnd: function(){ xiSPEC.vent.trigger('resize:spectrum'); }
 		});
 	},
 
 	showView: function(){
 		// this.isVisible = true;
-		CLMSUI.vent.trigger('show:QC', true);
+		xiSPEC.vent.trigger('show:QC', true);
 		$(this.controlsDiv[0]).show();
 		$(this.dockQCxispec_btn[0]).hide();
 		$(this.minQCxispec_btn[0]).show();
@@ -186,12 +193,12 @@ var QCwrapperView = Backbone.View.extend({
 		else{
 			this.splitVertical();
 		}
-		CLMSUI.vent.trigger('resize:spectrum');
+		xiSPEC.vent.trigger('resize:spectrum');
 	},
 
 	minView: function(){
 		// this.isVisible = false;
-		CLMSUI.vent.trigger('show:QC', false);
+		xiSPEC.vent.trigger('show:QC', false);
 		if(this.dock == 'left' || this.dock == 'right'){
 			$(this.el).parent().css('flex-direction', 'column');
 			$(this.el).removeClass('xispec_QCdiv-right');
@@ -204,7 +211,7 @@ var QCwrapperView = Backbone.View.extend({
 		$(this.contentDiv[0]).hide();
 		if(this.plotSplit)
 			this.plotSplit.destroy();
-		CLMSUI.vent.trigger('resize:spectrum');
+		xiSPEC.vent.trigger('resize:spectrum');
 	},
 
 	dockSide: function(){
@@ -212,7 +219,7 @@ var QCwrapperView = Backbone.View.extend({
 		$(this.el).parent().css('flex-direction', 'row');
 		$(this.contentDiv[0]).css('flex-direction', 'column');
 		this.splitHorizontal();
-		CLMSUI.vent.trigger('resize:spectrum');
+		xiSPEC.vent.trigger('resize:spectrum');
 	},
 
 // dockLeft breaks splitting
@@ -248,14 +255,14 @@ var QCwrapperView = Backbone.View.extend({
 		$(this.el).removeClass('xispec_QCdiv-right');
 		$(this.contentDiv[0]).css('flex-direction', 'row');
 		this.splitVertical();
-		CLMSUI.vent.trigger('resize:spectrum');
+		xiSPEC.vent.trigger('resize:spectrum');
 	},
 
 	updatePlots: function(e){
 		var plotId = $(e.target).attr('id');
 		var checked = $(e.target).is('checked');
-		CLMSUI.vent.trigger('QCPlotToggle', plotId);
-		CLMSUI.vent.trigger('resize:spectrum');
+		xiSPEC.vent.trigger('QCPlotToggle', plotId);
+		xiSPEC.vent.trigger('resize:spectrum');
 	}
 
 });

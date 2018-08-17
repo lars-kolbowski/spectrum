@@ -70,8 +70,8 @@ function Peak (id, graph){
 
 	if (this.fragments.length > 0) {
 		this.highlightLine = this.lineGroup.append('line')
-								.attr("stroke", this.graph.model.highlightColour)
-								.attr("stroke-width", this.graph.model.highlightWidth)
+								.attr("stroke", this.graph.model.get('highlightColor'))
+								.attr("stroke-width", this.graph.model.get('highlightWidth'))
 								.attr("opacity","0")
 								.attr("stroke-opacity", "0.7")
 								.attr("x1", 0)
@@ -130,22 +130,28 @@ function Peak (id, graph){
 			var fragCount = fragments.length;
 			for (var f = 0; f < fragCount; f++){
 					//get right cluster for peak
-					index = 0;
+// 					var index = 0;
 					for (var i = 0; i < self.clusterIds.length; i++) {
 						if(fragments[f].clusterIds.indexOf(self.clusterIds[i]) != -1){
-							index = fragments[f].clusterIds.indexOf(self.clusterIds[i])
-							cluster = graph.model.get("JSONdata").clusters[self.clusterIds[i]]
+							var index = fragments[f].clusterIds.indexOf(self.clusterIds[i])
+							var cluster = graph.model.get("JSONdata").clusters[self.clusterIds[i]]
 						}
 					}
-
-					charge = cluster.charge;
-					error = fragments[f].clusterInfo[index].error.toFixed(2)+" "+fragments[f].clusterInfo[index].errorUnit;
+					var matchedMissingMonoIsotopic = fragments[f].clusterInfo[index].matchedMissingMonoIsotopic;
+					var charge = cluster.charge;
+					var error = fragments[f].clusterInfo[index].error.toFixed(self.graph.model.showDecimals)+" "+fragments[f].clusterInfo[index].errorUnit;
 					var chargeStr = "";
 					for (var i = 0; i < charge; i++){
 						chargeStr += "+";
 					}
 					header.push(fragments[f].name + chargeStr);
-					contents.push([fragments[f].name + " (" + fragments[f].sequence + ")", "charge: " + charge + ", error: " + error]);
+
+					var fragName = fragments[f].name + " (" + fragments[f].sequence + ")";
+					var fragInfo = "charge: " + charge + ", error: " + error;
+					if (matchedMissingMonoIsotopic) fragInfo += ", missing monoisotopic peak";
+
+					var fragmentBodyText = [fragName, fragInfo];
+					contents.push(fragmentBodyText);
 			};
 
 
@@ -345,7 +351,7 @@ function Peak (id, graph){
 					.style("stroke-width", "6px")
 					.style("font-size", "0.8em")
 					.attr("class", "xispec_peakAnnotHighlight")
-					.attr("stroke", this.graph.model.highlightColour);
+					.attr("stroke", this.graph.model.get('highlightColor'));
 
 				label.append("text")
 					.text(function(d) {return d.name;})
@@ -387,7 +393,7 @@ function Peak (id, graph){
 	}
 
 
-	this.colour = this.graph.model.peakColour;
+	this.colour = this.graph.model.get('peakColor');
 	if (this.fragments.length > 0){
 
 		var lossy = true;
@@ -505,11 +511,11 @@ Peak.prototype.updateY = function(){
 			.attr("y1", yScale(this.y))
 			.attr("y2", yScale(0));
 		var yStep = 15;
-		var self = this;
+		var gap = this.graph.options.invert ? -8 : 5;
 
 		for (var i = 0; i < labelCount; i++) {
-			this.labels[i][0].setAttribute("y",  yScale(self.y) - 5 - (yStep * i));
-			this.labelHighlights[i][0].setAttribute("y",  yScale(self.y) - 5 - (yStep * i));
+			this.labels[i][0].setAttribute("y",  yScale(this.y) - gap - (yStep * i));
+			this.labelHighlights[i][0].setAttribute("y",  yScale(this.y) - gap - (yStep * i));
 		}
 
 		//this.labels.attr("y", function(d,i) { return yScale(self.y) - 5 - (yStep * i); });
@@ -542,7 +548,7 @@ Peak.prototype.showLabels = function(lossyOverride){
 }
 
 Peak.prototype.updateColor = function(){
-	this.colour = this.graph.model.peakColour;
+	this.colour = this.graph.model.get('peakColor');
 	if (this.fragments.length > 0){
 		if (this.fragments[0].peptideId == 0) {
 			if (this.fragments[0].class == "non-lossy")
@@ -576,7 +582,7 @@ Peak.prototype.updateColor = function(){
 		this.labels.filter(filter_p1).filter(filter_lossy).attr("fill", this.graph.model.p1color_loss);
 		this.labels.filter(filter_p2).filter(filter_nonLossy).attr("fill", this.graph.model.p2color);
 		this.labels.filter(filter_p2).filter(filter_lossy).attr("fill", this.graph.model.p2color_loss);
-		
+
 	}
 
 }
