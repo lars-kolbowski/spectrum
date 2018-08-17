@@ -58,6 +58,23 @@ xiSPEC.init = function(options) {
 	this.SettingsSpectrumModel = new AnnotatedSpectrumModel(model_options);
 	this.originalSpectrumModel = new AnnotatedSpectrumModel(model_options);
 
+	//ToDo: make extra spectrum controls model with mzRange, moveLabels, measureMode?
+	//sync moveLabels and measureMode
+	this.originalSpectrumModel.listenTo(
+		this.SpectrumModel,
+		'change:moveLabels',
+		 function(spectrumModel){
+			this.set('moveLabels', spectrumModel.get('moveLabels'));
+		}
+	);
+	this.originalSpectrumModel.listenTo(
+		this.SpectrumModel,
+		'change:measureMode',
+		 function(spectrumModel){
+			this.set('measureMode', spectrumModel.get('measureMode'));
+		}
+	);
+	//sync mzRange
 	this.originalSpectrumModel.listenTo(
 		this.SpectrumModel,
 		'change:mzRange',
@@ -65,7 +82,6 @@ xiSPEC.init = function(options) {
 			this.setZoom(spectrumModel.get('mzRange'));
 		}
 	);
-
 	this.SpectrumModel.listenTo(
 		this.originalSpectrumModel,
 		'change:mzRange',
