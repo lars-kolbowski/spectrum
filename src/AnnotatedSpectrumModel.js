@@ -1,9 +1,29 @@
+//		a spectrum viewer
+//
+//      Copyright  2015 Rappsilber Laboratory, Edinburgh University
+//
+// 		Licensed under the Apache License, Version 2.0 (the "License");
+// 		you may not use this file except in compliance with the License.
+// 		You may obtain a copy of the License at
+//
+// 		http://www.apache.org/licenses/LICENSE-2.0
+//
+//   	Unless required by applicable law or agreed to in writing, software
+//   	distributed under the License is distributed on an "AS IS" BASIS,
+//   	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//   	See the License for the specific language governing permissions and
+//   	limitations under the License.
+//
+//		authors: Lars Kolbowski
+//
+//
+//		AnnotatedSpectrumModel.js
+
 var AnnotatedSpectrumModel = Backbone.Model.extend({
 
 	defaults: function() {
 	return {
 	  baseDir:  './',
-	  xiAnnotatorBaseURL: 'https://xi3.bio.ed.ac.uk/xiAnnotator/',
 	  knownModifications: [],
 	  knownModificationsURL: false,
 	  highlightColor: '#FFFF00',
@@ -169,7 +189,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		this.crossLinkerModMass = null;
 		this.fragmentIons = Array();
 		this.fragments = Array();
-		this.originalMatchRequest = {};
+		// this.originalMatchRequest = {};
 
 		this.pepStrs = [];
 		this.pepStrsMods = [];
@@ -188,23 +208,14 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 
 		var peaks = this.get("JSONdata").peaks;
 
-		var xmin = Number.POSITIVE_INFINITY;
-		var xmax = Number.NEGATIVE_INFINITY;
-		var tmp;
-		for (var i=peaks.length-1; i>=0; i--) {
-			tmp = peaks[i].mz;
-			if (tmp < xmin) xmin = tmp;
-			if (tmp > xmax) xmax = tmp;
-		}
+		var xDataArr = peaks.map(function(p){ return p.mz; })
+		var xmax = Math.max.apply(Math, xDataArr);
+		var xmin = Math.min.apply(Math, xDataArr);
+		this.xmaxPrimary = parseInt((xmax + 50).toFixed(0));
+		this.xminPrimary = parseInt((xmin - 50).toFixed(0));
 
-		this.xmaxPrimary = (xmax + 50).toFixed(0);
-		this.xminPrimary = (xmin - 50).toFixed(0);
-		var ymax = Number.NEGATIVE_INFINITY;
-		for (var i=peaks.length-1; i>=0; i--) {
-			tmp = peaks[i].intensity;
-			if (tmp > ymax) ymax = tmp;
-		}
-
+		var yDataArr = peaks.map(function(p){ return p.intensity; })
+		var ymax = Math.max.apply(Math, yDataArr);
 		//this.ymaxPrimary = ymax / 0.9;
 		this.ymaxPrimary = ymax;
 
@@ -216,8 +227,8 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 
 	},
 
-	setZoom: function(domain){
-		this.set('mzRange', [domain[0].toFixed(0), domain[1].toFixed(0)]);
+	setZoom: function(arr){
+		this.set('mzRange', [arr[0], arr[1]]);
 	},
 
 	resetZoom: function(){
@@ -310,7 +321,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 			for (var i = 0; i < newLinkSites.length; i++) {
 				json_req.LinkSite[i].linkSite = newLinkSites[i]-1;
 			}
-			this.request_annotation(json_req);
+			xiSPEC.request_annotation(json_req);
 		}
 		else{
 			for (var i = 0; i < newLinkSites.length; i++) {
@@ -343,7 +354,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 				if (annotationMod[0].aminoAcids.indexOf(myNew.aminoAcid) === -1)
 					annotationMod[0].aminoAcids.push(myNew.aminoAcid);
 			}
-			this.request_annotation(json_req);
+			xiSPEC.request_annotation(json_req);
 		}
 		else{
 			//Preview
@@ -533,78 +544,4 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 	// 		this.saveUserModificationsToCookie();
 	// },
 
-	request_annotation: function(json_request, originalMatch){
-
-		if (originalMatch === undefined) originalMatch = false;
-		if (originalMatch){
-			this.set('changedAnnotation', false);
-			this.originalMatchRequest = $.extend(true, {}, json_request);
-			this.reset_all_modifications();
-		}
-
-		// if (this.keepCustomConfig) {
-		// 	json_request['annotation']['custom'] = this.customConfig;
-		// }
-
-		if (json_request.annotation.requestID)
-			this.lastRequestedID = json_request.annotation.requestID;
-		// else {
-		// 	this.lastRequestedID = -1;
-		// }
-
-		this.trigger('request_annotation:pending');
-		console.log("annotation request:", json_request);
-		var self = this;
-		var response = $.ajax({
-			type: "POST",
-			headers: {
-				'Accept': 'application/json',
-				'Content-Type': 'application/json'
-			},
-			data: JSON.stringify(json_request),
-			// async: false,
-			url: self.get('xiAnnotatorBaseURL') + "annotate/FULL",
-			success: function(data) {
-				if (data && data.annotation && data.annotation.requestID && data.annotation.requestID === self.lastRequestedID) {
-					//ToDo: Error handling -> https://github.com/Rappsilber-Laboratory/xi3-issue-tracker/issues/330
-					console.log("annotation response:", data);
-					self.set({"JSONdata": data, "JSONrequest": json_request});
-
-					if (self.otherModel !== undefined){
-						var json_data_copy = jQuery.extend({}, data);
-						self.otherModel.set({"JSONdata": json_data_copy, "JSONrequest": json_request});
-						self.otherModel.trigger("change:JSONdata");
-					}
-					self.trigger('request_annotation:done');
-				}
-
-			}
-		});
-	},
-
-	revertAnnotation: function(){
-// 		this.userModifications = [];
-// 		this.otherModel.userModifications = [];
-		if(!this.get('changedAnnotation'))
-			return;
-		else {
-			this.reset_all_modifications();
-			this.otherModel.reset_all_modifications();
-			this.request_annotation(this.originalMatchRequest);
-			this.set('changedAnnotation', false);
-		}
-	},
-
-	resetModel: function(){
-
-		if (this.otherModel.get("JSONdata") == null) return;
-
-		// used to reset SettingsModel
-		var json_data_copy = jQuery.extend({}, this.otherModel.get("JSONdata"));
-		var json_request_copy =  jQuery.extend({}, this.otherModel.get("JSONrequest"));
-		this.knownModifications = jQuery.extend(true, [], this.otherModel.knownModifications);
-		this.set({"JSONdata": json_data_copy, "JSONrequest": json_request_copy});
-		this.trigger("change:JSONdata");
-
-	},
 });

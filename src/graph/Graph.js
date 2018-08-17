@@ -26,14 +26,15 @@ Graph = function(targetSvg, model, options) {
 	this.y = d3.scale.linear();
 	this.y_right = d3.scale.linear();
 	this.model = model;
-
+	this.options = options;
 	this.margin = {
 		"top":	options.title  ? 140 : 120,
 		"right":  options.ylabelRight ? 60 : 45,
 		"bottom": options.xlabel ? 50 : 20,
 		"left":   options.ylabelLeft ? 65 : 30
 	};
-	this.g =  targetSvg.append("g")
+
+	this.g = targetSvg.append("g")
 				.attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")")
 				.attr("class", "spectrum")
 				.attr("id", "spectrumGraph");
@@ -107,7 +108,7 @@ Graph = function(targetSvg, model, options) {
 		.attr("stroke", "Red");
 	this.measureDistance = this.measuringTool.append("text")
 		.attr("text-anchor", "middle")
-		.attr("pointer-events", "none")
+		.attr("pointer-events", "none");
 
 	this.measureTooltip = this.measuringTool.append("g")
 		.attr("style", "text-anchor: middle;")
@@ -173,9 +174,13 @@ Graph.prototype.setData = function(){
 				var peak = this.model.get("JSONdata").peaks[i];
 			this.peaks.push(new Peak(i, this));
 		}
-
 		this.updatePeakColors();
 	}
+
+	this.margin.top = this.model.isLinear ? 80 : 140;
+
+	this.g.attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
+
 	if(this.model.get('lockZoom')){
 		this.resize(this.model.get('mzRange')[0], this.model.get('mzRange')[1], this.model.ymin, this.model.ymax);
 		this.disableZoom();
@@ -187,66 +192,93 @@ Graph.prototype.setData = function(){
 }
 
 Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
-	var self = this;
+
+	if(this.options.hidden){
+		return;
+	}
+
 	//reset measureTool
 	if(this.model.get('measureMode'))
 		this.measureClear();
 	//see https://gist.github.com/mbostock/3019563
-	var cx = self.g.node().parentNode.parentNode.clientWidth;
-	//somewhere around here I think we need to subtract the height of the FragKey?
-	// ...the graph is not fitting entirely within its SVG element
-	var fragKeyHeight = 100;//can tidy this up somehow
-	var cy = self.g.node().parentNode.parentNode.clientHeight;// - fragKeyHeight;
+	var cx = this.g.node().parentNode.parentNode.clientWidth;
+	var cy = this.g.node().parentNode.parentNode.clientHeight;
 
-	//self.g.attr("width", cx).attr("height", cy);
-	var width = cx - self.margin.left - self.margin.right;
-	var height = cy - self.margin.top  - self.margin.bottom;
-	self.x.domain([xmin, xmax])
+	var width = cx - this.margin.left - this.margin.right;
+	var height = cy - this.margin.top  - this.margin.bottom;
+
+	if(this.options.butterfly){
+		var margin = (this.model.isLinear) ? 20 : 45;
+		height = (height / 2) - margin;
+		if(this.options.invert){
+			var top = this.margin.top + height;
+			this.g.attr("transform", "translate(" + this.margin.left + "," + top + ")");
+		}
+	}
+
+	this.x.domain([xmin, xmax])
 		.range([0, width]);
-	// y-scale (inverted domain)
-	self.y.domain([0, ymax]).nice()
-		.range([height, 0]).nice();
-	self.y_right.domain([0, ymax]).nice()
-		.range([height, 0]).nice();
-	//y0 = d3.scale.linear().range([height, 0]);
-	//self.y_right = d3.scale.linear().range([height, 0]);
+
+	// y-scale
+	if (this.options.invert){
+		this.y.domain([0, ymax]).nice()
+			.range([0, height]).nice();
+		this.y_right.domain([0, ymax]).nice()
+			.range([0, height]).nice();
+	}
+	else{
+		this.y.domain([0, ymax]).nice()
+			.range([height, 0]).nice();
+		this.y_right.domain([0, ymax]).nice()
+			.range([height, 0]).nice();
+	}
 
 	var yTicks = height / 40;
 	var xTicks = width / 100;
 
 	this.yTicks = yTicks;
 
-	self.yAxisLeft = d3.svg.axis().scale(self.y).ticks(yTicks).orient("left").tickFormat(d3.format("s"));
-	self.yAxisRight = d3.svg.axis().scale(self.y_right).ticks(yTicks).orient("right").tickFormat(d3.format("s"));
+	this.yAxisLeft = d3.svg.axis().scale(this.y).ticks(yTicks).orient("left").tickFormat(d3.format("s"));
+	this.yAxisRight = d3.svg.axis().scale(this.y_right).ticks(yTicks).orient("right").tickFormat(d3.format("s"));
 
-	self.yAxisLeftSVG.call(self.yAxisLeft);
-	self.yAxisRightSVG
+	this.yAxisLeftSVG.call(this.yAxisLeft);
+	this.yAxisRightSVG
 		.attr("transform", "translate(" + width + " ,0)")
-		.call(self.yAxisRight)
+		.call(this.yAxisRight)
 	;
-	self.xaxisRect.attr("width", width);
+	this.xaxisRect.attr("width", width);
 
-	self.xAxis = d3.svg.axis().scale(self.x).ticks(xTicks).orient("bottom");
+	// var xAxisOrient = this.options.invert ? "top" : "bottom";
+	// this.xAxis = d3.svg.axis().scale(this.x).ticks(xTicks).orient(xAxisOrient);
+	this.xAxis = d3.svg.axis().scale(this.x).ticks(xTicks).orient("bottom");
 
-	self.xaxisSVG.attr("transform", "translate(0," + height + ")")
-		.call(self.xAxis);
+	// if(this.options.invert){
+	// 	this.xaxisSVG.call(this.xAxis);
+	// }
+	// else{
+		this.xaxisSVG.attr("transform", "translate(0," + height + ")")
+			.call(this.xAxis);
+	// }
+
 
 	this.g.selectAll('.axis line, .axis path')
-			.style({'stroke': 'Black', 'fill': 'none', 'stroke-width': '1.2px'});
+		.style({'stroke': 'Black', 'fill': 'none', 'stroke-width': '1.2px'});
 
 	//~ this.g.selectAll('.tick')
 		//~ .attr("pointer-events", "none");
 
-	self.plot.attr("width", width)
+	this.plot.attr("width", width)
 		.attr("height", height);
 
-	self.xaxisRect.attr("width",width).attr("y", height).attr("height", self.margin.bottom);
-	self.dragZoomHighlight.attr("height", height);
+	var xAxisRectYpos = this.options.butterfly ? height * 2 : height;
 
-	self.zoom = d3.behavior.zoom().x(self.x).on("zoom", self.redraw());
-	self.zoom.scaleExtent([0, self.model.xmaxPrimary]);
-	self.plot.call(self.zoom);
-	//self.innerSVG.call(self.zoom);
+	this.xaxisRect.attr("width",width).attr("y", xAxisRectYpos).attr("height", this.margin.bottom);
+	this.dragZoomHighlight.attr("height", height);
+
+	this.zoom = d3.behavior.zoom().x(this.x).on("zoom", this.redraw());
+	this.zoom.scaleExtent([0, this.model.xmaxPrimary]);
+	this.plot.call(this.zoom);
+	//this.innerSVG.call(this.zoom);
 
 	if (this.title) {
 		this.title.attr("x", width/2);
@@ -255,7 +287,7 @@ Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 	this.ylabelLeft.attr("transform","translate(" + -50 + " " + height/2+") rotate(-90)");
 	this.ylabelRight.attr("transform","translate(" + (width+45) + " " + height/2+") rotate(-90)");
 
-	self.redraw()();
+	this.redraw()();
 }
 
 Graph.prototype.disableZoom = function(){
@@ -337,18 +369,21 @@ Graph.prototype.measure = function(on){
 			self.measuringToolVLineStart
 				.attr("x1", self.x(self.measureStartPeak.x))
 				.attr("x2", self.x(self.measureStartPeak.x))
-				.attr("y1", self.y(self.measureStartPeak.y))
-				.attr("y2", 0);
+				.attr("y1", self.y(self.model.ymaxPrimary))
+				.attr("y2", self.y(self.measureStartPeak.y))
+			;
 			self.measuringToolLine
 				.attr("x1", self.x(self.measureStartPeak.x))
 				.attr("x2", coords[0])
 				.attr("y1", coords[1])
-				.attr("y2", coords[1]);
+				.attr("y2", coords[1])
+			;
 			self.measuringToolVLineEnd
 				.attr("x1", coords[0])
 				.attr("x2", coords[0])
 				.attr("y1", self.y(0))
-				.attr("y2", 0);
+				.attr("y2", self.y(self.model.ymaxPrimary))
+			;
 		}
 
 		function measureMove() {
@@ -375,32 +410,43 @@ Graph.prototype.measure = function(on){
 
 			//draw vertical end Line
 			if(endPeak){
-
 				//set end of the measuringTool to endPeak
 				self.measuringToolVLineEnd
 					.attr("x1", self.x(endPeak.x))
 					.attr("x2", self.x(endPeak.x))
 					.attr("y1", self.y(endPeak.y))
-					.attr("y2", 0);
+					.attr("y2", self.y(self.model.ymaxPrimary))
+				;
 			}
 			else{
 				self.measuringToolVLineEnd
 					.attr("x1", coords[0])
 					.attr("x2", coords[0])
 					.attr("y1", self.y(0))
-					.attr("y2", 0);
+					.attr("y2", self.y(self.model.ymaxPrimary))
+				;
 			}
 
 			//draw horizontal line
 			var measureStartX = parseFloat(self.measuringToolVLineStart.attr("x1"));
 			var measureEndX = parseFloat(self.measuringToolVLineEnd.attr("x1"));
-			if (coords[1] < 0)
-				var y = 0;
-			else if (coords[1] > self.y(0))
-				var y  = self.y(0);
-			else
-				var y = coords[1];
 
+			if(self.options.invert){
+				if (coords[1] > self.y(self.model.ymaxPrimary))
+					var y = self.y(self.model.ymaxPrimary);
+				else if (coords[1] < self.y(0))
+					var y  = self.y(0);
+				else
+					var y = coords[1];
+			}
+			else{
+				if (coords[1] < self.y(self.model.ymaxPrimary))
+					var y = self.y(self.model.ymaxPrimary);
+				else if (coords[1] > self.y(0))
+					var y  = self.y(0);
+				else
+					var y = coords[1];
+			}
 
 			self.measuringToolLine
 				.attr("x2", measureEndX)

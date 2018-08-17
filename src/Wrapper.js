@@ -39,16 +39,7 @@ xiSPEC.init = function(options) {
 	delete model_options.targetDiv;
 	delete model_options.showCustomConfig;
 	delete model_options.showQualityControl;
-
-
-	// var model_options = {
-	// 	baseDir: options.baseDir,
-	// 	xiAnnotatorBaseURL: options.xiAnnotatorBaseURL,
-	// 	knownModifications: options.knownModifications,
-	// 	knownModificationsURL: options.knownModificationsURL,
-	// 	database: options.database,
-	// 	tmpDB: options.tmpDB
-	// };
+	delete model_options.xiAnnotatorBaseURL;
 
 	// options.targetDiv could be div itself or id of div - lets deal with that
 	if (typeof options.targetDiv === "string"){
@@ -60,11 +51,44 @@ xiSPEC.init = function(options) {
 
 	d3.select(options.targetDiv).selectAll("*").remove();
 
+	this.xiAnnotatorBaseURL = options.xiAnnotatorBaseURL;
+
 	//init models
 	this.SpectrumModel = new AnnotatedSpectrumModel(model_options);
 	this.SettingsSpectrumModel = new AnnotatedSpectrumModel(model_options);
-	this.SpectrumModel.otherModel = this.SettingsSpectrumModel;
-	this.SettingsSpectrumModel.otherModel = this.SpectrumModel;
+	this.originalSpectrumModel = new AnnotatedSpectrumModel(model_options);
+
+	//ToDo: make extra spectrum controls model with mzRange, moveLabels, measureMode?
+	//sync moveLabels and measureMode
+	this.originalSpectrumModel.listenTo(
+		this.SpectrumModel,
+		'change:moveLabels',
+		 function(spectrumModel){
+			this.set('moveLabels', spectrumModel.get('moveLabels'));
+		}
+	);
+	this.originalSpectrumModel.listenTo(
+		this.SpectrumModel,
+		'change:measureMode',
+		 function(spectrumModel){
+			this.set('measureMode', spectrumModel.get('measureMode'));
+		}
+	);
+	//sync mzRange
+	this.originalSpectrumModel.listenTo(
+		this.SpectrumModel,
+		'change:mzRange',
+		 function(spectrumModel){
+			this.setZoom(spectrumModel.get('mzRange'));
+		}
+	);
+	this.SpectrumModel.listenTo(
+		this.originalSpectrumModel,
+		'change:mzRange',
+		 function(spectrumModel){
+			this.setZoom(spectrumModel.get('mzRange'));
+		}
+	);
 
 	var _html = ""
 		+"<div class='xispec_dynDiv' id='xispec_settingsWrapper'>"
@@ -78,7 +102,6 @@ xiSPEC.init = function(options) {
 		+"	<div class='xispec_dynDiv_resizeDiv_br draggableCorner'></div>"
 		+"</div>"
 		+"<div id='xispec_spectrumControls'></div>"
-		// +"</div>"
 		+"<div class='xispec_plotsDiv'>"
 		+"  <div id='xispec_spectrumMainPlotDiv'>"
 		+"	  <svg id='xispec_spectrumSVG'></svg>"
@@ -100,10 +123,34 @@ xiSPEC.init = function(options) {
 		.attr ("id", 'xispec_spectrumPanel')
 		.html (_html)
 	;
-	this.SpectrumControls = new SpectrumControlsView({model: this.SpectrumModel, el: "#xispec_spectrumControls"});
-	this.Spectrum = new SpectrumView({model: this.SpectrumModel, el: "#xispec_spectrumSVG"});
-	this.FragmentationKey = new FragmentationKeyView({model: this.SpectrumModel, el: "#xispec_spectrumSVG"});
-	this.InfoView = new PrecursorInfoView ({model: this.SpectrumModel, el: "#xispec_spectrumSVG"});
+	this.SpectrumControls = new SpectrumControlsView({
+		model: this.SpectrumModel,
+		el: "#xispec_spectrumControls"}
+	);
+	this.Spectrum = new SpectrumView({
+		model: this.SpectrumModel,
+		el: "#xispec_spectrumSVG",
+	});
+	this.originalSpectrum = new SpectrumView({
+		model: this.originalSpectrumModel,
+		el: "#xispec_spectrumSVG",
+		invert: true,
+		hidden: true
+	});
+	this.FragmentationKey = new FragmentationKeyView({
+		model: this.SpectrumModel,
+		el: "#xispec_spectrumSVG"
+	});
+	this.originalFragmentationKey = new FragmentationKeyView({
+		model: this.originalSpectrumModel,
+		el: "#xispec_spectrumSVG",
+		invert: true,
+		hidden: true,
+	});
+	this.InfoView = new PrecursorInfoView ({
+		model: this.SpectrumModel,
+		el: "#xispec_spectrumSVG"
+	});
 	this.QCwrapper = new QCwrapperView({
 		el: '#xispec_QCdiv',
 		showQualityControl: options.showQualityControl,
@@ -126,6 +173,7 @@ xiSPEC.init = function(options) {
 
 	this.SettingsView = new SpectrumSettingsView({
 		model: this.SettingsSpectrumModel,
+		displayModel: this.SpectrumModel,
 		el:"#xispec_settingsWrapper",
 		showCustomCfg: options.showCustomConfig,
 	});
@@ -156,10 +204,65 @@ xiSPEC.setData = function(data){
 // 	if (data.annotation && data.annotation.requestId && json.annotation.requestId === CLMSUI.loadSpectra.lastRequestedID)) {
 
 	var json_request = this.convert_to_json_request(data);
+
 	// this.SpectrumModel.customConfig = data.customConfig;
-	this.SpectrumModel.request_annotation(json_request, true);
+	this.originalMatchRequest = $.extend(true, {}, json_request); //ToDo: necessary?
+	this.SpectrumModel.set('changedAnnotation', false);
+	this.SpectrumModel.reset_all_modifications();
+	this.request_annotation(json_request, true);
 
 };
+
+xiSPEC.request_annotation = function(json_request, originalMatchRequest){
+
+	// if (this.keepCustomConfig) {
+	// 	json_request['annotation']['custom'] = this.customConfig;
+	// }
+
+	if (json_request.annotation.requestID)
+		this.lastRequestedID = json_request.annotation.requestID;
+
+
+	this.SpectrumModel.trigger('request_annotation:pending');
+	console.log("annotation request:", json_request);
+	var self = this;
+	var response = $.ajax({
+		type: "POST",
+		headers: {
+			'Accept': 'application/json',
+			'Content-Type': 'application/json'
+		},
+		data: JSON.stringify(json_request),
+		url: this.xiAnnotatorBaseURL + "annotate/FULL",
+		success: function(data) {
+			if (data && data.annotation && data.annotation.requestID && data.annotation.requestID === self.lastRequestedID) {
+				//ToDo: Error handling -> https://github.com/Rappsilber-Laboratory/xi3-issue-tracker/issues/330
+				console.log("annotation response:", data);
+
+				if(originalMatchRequest){
+					self.originalSpectrumModel.set({"JSONdata": data, "JSONrequest": json_request});
+				}
+
+				self.SpectrumModel.set({"JSONdata": data, "JSONrequest": json_request});
+				self.SettingsSpectrumModel.set({"JSONdata": data, "JSONrequest": json_request});
+				self.SettingsSpectrumModel.trigger("change:JSONdata");
+				self.SpectrumModel.trigger('request_annotation:done');
+			}
+
+		}
+	});
+},
+
+xiSPEC.revertAnnotation = function(){
+	if(!this.SpectrumModel.get('changedAnnotation'))
+		return;
+	else {
+		this.SpectrumModel.reset_all_modifications();
+		this.SettingsSpectrumModel.reset_all_modifications();
+		this.request_annotation(this.originalMatchRequest);
+		this.SpectrumModel.set('changedAnnotation', false);
+	}
+},
 
 xiSPEC.sanityChecks = function(data){
 

@@ -28,10 +28,14 @@ d3.selection.prototype.moveToFront = function() {
 
 var FragmentationKeyView = Backbone.View.extend({
 
-	initialize: function() {
-		// this.svg = d3.select(this.el.getElementsByTagName("svg")[0]);
+	initialize: function(viewOptions) {
+		var defaultOptions = {
+			invert: false,
+			hidden: false
+		};
+		this.options = _.extend(defaultOptions, viewOptions);
+
 		this.svg = d3.select(this.el);
-		
 		this.fragKeyWrapper = this.svg.append("g");
 
 		this.margin = {
@@ -42,7 +46,11 @@ var FragmentationKeyView = Backbone.View.extend({
 		};
 		this.xStep = 23;
 		//this.highlights = this.fragKeyWrapper.append("g").attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
+
 		this.g =  this.fragKeyWrapper.append("g").attr("class", "fragKey").attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
+
+		if(this.options.hidden) this.g.attr("visibility", "hidden");
+
 
 		this.listenTo(this.model, 'change', this.render);
 		this.listenTo(this.model, 'destroy', this.remove);
@@ -51,6 +59,7 @@ var FragmentationKeyView = Backbone.View.extend({
 		this.listenTo(this.model, 'change:highlightColor', this.updateColors);
 		this.listenTo(window, 'resize', _.debounce(this.resize));
 		this.listenTo(xiSPEC.vent, 'resize:spectrum', this.resize);
+		this.listenTo(xiSPEC.vent, 'butterflyToggle', this.butterflyToggle);
 
 		this.tooltip = d3.select("body").append("span")
 			.attr("class", "xispec_tooltip")
@@ -59,6 +68,15 @@ var FragmentationKeyView = Backbone.View.extend({
 	},
 
 	render: function() {
+
+		if(this.options.hidden){
+			this.hide();
+			return this;
+		}
+		else{
+			this.show();
+		}
+
 		this.clear();
 		if (this.model.get("JSONdata"))
 			this.setData();
@@ -759,18 +777,25 @@ var FragmentationKeyView = Backbone.View.extend({
 // 	},
 
 	resize: function(){
-			var parentDivWidth = $(this.el).width();
-		var fragKeyWidth;
+
+		var $el = $(this.el)
+		var parentWidth = $el.width();
+		var parentHeight = $el.height();
+
+		var fragKeyWidth, fragKeyHeight;
 		try {
 			fragKeyWidth = $(".fragKey")[0].getBBox().width;
+			fragKeyHeight = $(".fragKey")[0].getBBox().height;
 		} catch (e) {
-			fragKeyWidth = {x: 0, y: 0, width: 0, height: 0};
+			fragKeyWidth = 0;
+			fragKeyHeight = 0;
 		}
-		//var fragKeyWidth = $(".fragKey")[0].getBoundingClientRect().width;
-		if (parentDivWidth < fragKeyWidth+40)
-			this.fragKeyWrapper.attr("transform", "scale("+parentDivWidth/(fragKeyWidth+40)+")")
-		else
-			this.fragKeyWrapper.attr("transform", "scale(1)")
+
+		var scale = (parentWidth < fragKeyWidth + this.margin.left) ? parentWidth / (fragKeyWidth + this.margin.left) : 1;
+		var top = (this.options.invert) ? parentHeight - fragKeyHeight - 15 : 0;
+
+		this.fragKeyWrapper.attr("transform", "scale(" + scale + "), translate(0," + top + ")");
+
 	},
 
 	// clearHighlights: function(){
@@ -786,6 +811,23 @@ var FragmentationKeyView = Backbone.View.extend({
 		this.linkPos = [];
 		this.g.selectAll("*").remove();
 		//this.highlights.selectAll("*").remove();
+	},
+
+	butterflyToggle: function(toggle){
+		// this.graph.options.butterfly = toggle;
+		if(this.options.invert){
+			this.options.hidden = !toggle;
+			this.render();
+		}
+		this.resize();
+	},
+
+	hide: function(){
+		this.g.attr("visibility", "hidden");
+	},
+
+	show: function(){
+		this.g.attr("visibility", "visible");
 	}
 
 });
