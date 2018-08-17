@@ -31,7 +31,8 @@ var FragmentationKeyView = Backbone.View.extend({
 	initialize: function(viewOptions) {
 		var defaultOptions = {
 			invert: false,
-			hidden: false
+			hidden: false,
+			disabled: false,
 		};
 		this.options = _.extend(defaultOptions, viewOptions);
 
@@ -86,6 +87,8 @@ var FragmentationKeyView = Backbone.View.extend({
 	setData: function(){
 
 		var self = this;
+
+		this.cursor = this.options.disabled ? 'default' : 'pointer';
 
 		var pepCount = self.model.peptides.length;
 		this.linkPos = self.model.get("JSONdata").LinkSite;
@@ -177,7 +180,7 @@ var FragmentationKeyView = Backbone.View.extend({
 				.attr("stroke", self.model.get('highlightColor'))
 				.attr("stroke-width", 10)
 				.attr("opacity", 0)
-				.style("cursor", "pointer");
+				.style("cursor", this.cursor);
 			// the the link line
 			this.CLline = this.CL.append("line")
 				.attr("x1", this.xStep * (CLpos - 1))
@@ -186,7 +189,7 @@ var FragmentationKeyView = Backbone.View.extend({
 				.attr("y2", 55)
 				.attr("stroke", "black")
 				.attr("stroke-width", 2.3)
-				.style("cursor", "pointer");
+				.style("cursor", this.cursor);
 
 			//line for changing
 			this.changeCLline = this.CL.append("line")
@@ -197,10 +200,10 @@ var FragmentationKeyView = Backbone.View.extend({
 				.attr("stroke", "black")
 				.attr("stroke-width", 2.3)
 				.attr("opacity", 0)
-				.style("cursor", "pointer");
+				.style("cursor", this.cursor);
 
 			this.CL.on("mouseover", function() {
-				if (!self.changeMod  && !self.changeCL){
+				if (!self.options.disabled && !self.changeMod  && !self.changeCL){
 					self.CLlineHighlight.attr("opacity", 0.8);
 					self.tooltip.text("Cross-link: Click to change position");
 					self.tooltip.transition()
@@ -212,7 +215,7 @@ var FragmentationKeyView = Backbone.View.extend({
 			});
 
 			this.CL.on("mouseout", function() {
-				if (!self.changeMod  && !self.changeCL){
+				if (!self.options.disabled && !self.changeMod  && !self.changeCL){
 					self.CLlineHighlight.attr("opacity", 0);
 					self.tooltip.transition()
 						.duration(500)
@@ -221,6 +224,8 @@ var FragmentationKeyView = Backbone.View.extend({
 			});
 
 			this.CL.on("click", function() {
+				if(self.options.disabled)
+					return;
 				self.tooltip.text("Now click on an amino acid to complete");
 				self.tooltip.transition()
 						.duration(200)
@@ -543,7 +548,7 @@ var FragmentationKeyView = Backbone.View.extend({
 			var modLetterG = modLettersG.enter()
 				.append('g')
 				.attr('class', "modLetterG")
-				.style("cursor", "pointer")
+				.style("cursor", self.cursor)
 				.on("mouseover", function() {
 					if (!self.changeMod  && !self.changeCL){
 						//highlight pepLetter
@@ -553,7 +558,8 @@ var FragmentationKeyView = Backbone.View.extend({
 						var tooltipHTML = "";
 						if (modMass !== undefined)
 							tooltipHTML += "Modification mass: " + modMass + "</br>";
-						tooltipHTML += "Click to change the position";
+						if (!self.options.disabled)
+							tooltipHTML += "Click to change the position";
 
 						d3.select(self.pepLetterHighlights[pepIndex][0][pos]).style("opacity", 1);
 						d3.select(this).select("text.modLetterHighlight").style("opacity", 1); //highlight modLetter
@@ -584,6 +590,8 @@ var FragmentationKeyView = Backbone.View.extend({
 
 				})
 				.on("click", function(d) {
+					if(self.options.disabled)
+						return;
 					self.tooltip.text("Now click on an amino acid to complete");
 					self.tooltip.style("left", (d3.event.pageX + 15) + "px")
 							.style("top", (d3.event.pageY) + "px");

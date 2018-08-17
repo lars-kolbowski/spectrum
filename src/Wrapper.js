@@ -146,6 +146,7 @@ xiSPEC.init = function(options) {
 		el: "#xispec_spectrumSVG",
 		invert: true,
 		hidden: true,
+		disabled: true,
 	});
 	this.InfoView = new PrecursorInfoView ({
 		model: this.SpectrumModel,
