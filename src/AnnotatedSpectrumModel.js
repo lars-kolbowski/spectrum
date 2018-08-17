@@ -65,6 +65,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		this.precursor = {}
 		this.precursor.charge = null;
 		this.customConfig = [];
+		this.sticky = [];
 
 		//ToDo: change JSONdata gets called 3 times for some reason?
 		// define event triggers and listeners better
