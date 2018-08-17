@@ -369,18 +369,21 @@ Graph.prototype.measure = function(on){
 			self.measuringToolVLineStart
 				.attr("x1", self.x(self.measureStartPeak.x))
 				.attr("x2", self.x(self.measureStartPeak.x))
-				.attr("y1", self.y(self.measureStartPeak.y))
-				.attr("y2", 0);
+				.attr("y1", self.y(self.model.ymaxPrimary))
+				.attr("y2", self.y(self.measureStartPeak.y))
+			;
 			self.measuringToolLine
 				.attr("x1", self.x(self.measureStartPeak.x))
 				.attr("x2", coords[0])
 				.attr("y1", coords[1])
-				.attr("y2", coords[1]);
+				.attr("y2", coords[1])
+			;
 			self.measuringToolVLineEnd
 				.attr("x1", coords[0])
 				.attr("x2", coords[0])
 				.attr("y1", self.y(0))
-				.attr("y2", 0);
+				.attr("y2", self.y(self.model.ymaxPrimary))
+			;
 		}
 
 		function measureMove() {
@@ -407,32 +410,43 @@ Graph.prototype.measure = function(on){
 
 			//draw vertical end Line
 			if(endPeak){
-
 				//set end of the measuringTool to endPeak
 				self.measuringToolVLineEnd
 					.attr("x1", self.x(endPeak.x))
 					.attr("x2", self.x(endPeak.x))
 					.attr("y1", self.y(endPeak.y))
-					.attr("y2", 0);
+					.attr("y2", self.y(self.model.ymaxPrimary))
+				;
 			}
 			else{
 				self.measuringToolVLineEnd
 					.attr("x1", coords[0])
 					.attr("x2", coords[0])
 					.attr("y1", self.y(0))
-					.attr("y2", 0);
+					.attr("y2", self.y(self.model.ymaxPrimary))
+				;
 			}
 
 			//draw horizontal line
 			var measureStartX = parseFloat(self.measuringToolVLineStart.attr("x1"));
 			var measureEndX = parseFloat(self.measuringToolVLineEnd.attr("x1"));
-			if (coords[1] < 0)
-				var y = 0;
-			else if (coords[1] > self.y(0))
-				var y  = self.y(0);
-			else
-				var y = coords[1];
 
+			if(self.options.invert){
+				if (coords[1] > self.y(self.model.ymaxPrimary))
+					var y = self.y(self.model.ymaxPrimary);
+				else if (coords[1] < self.y(0))
+					var y  = self.y(0);
+				else
+					var y = coords[1];
+			}
+			else{
+				if (coords[1] < self.y(self.model.ymaxPrimary))
+					var y = self.y(self.model.ymaxPrimary);
+				else if (coords[1] > self.y(0))
+					var y  = self.y(0);
+				else
+					var y = coords[1];
+			}
 
 			self.measuringToolLine
 				.attr("x2", measureEndX)
