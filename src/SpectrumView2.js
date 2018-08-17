@@ -172,7 +172,7 @@ var SpectrumView = Backbone.View.extend({
 	butterflyToggle: function(toggle){
 		this.graph.options.butterfly = toggle;
 		if(this.options.invert){
-			this.options.hidden = !this.options.hidden;
+			this.options.hidden = !toggle;
 			this.render();
 		}
 		this.resize();
