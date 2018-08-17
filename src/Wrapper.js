@@ -200,14 +200,13 @@ xiSPEC.setData = function(data){
 	// requestId: 1,
 	// }
 
-
-	// if (!ignoreResultUnlessLastRequested || (json && json.annotation && json.annotation.requestId && json.annotation.requestId === CLMSUI.loadSpectra.lastRequestedID)) {
-// 	if (data.annotation && data.annotation.requestId && json.annotation.requestId === CLMSUI.loadSpectra.lastRequestedID)) {
+	this.vent.trigger('butterflyToggle', false);
+	$('#xispec_butterflyChkbx').prop('checked', false);	//ToDo: move to SpectrumControlsView
 
 	var json_request = this.convert_to_json_request(data);
 
 	// this.SpectrumModel.customConfig = data.customConfig;
-	this.originalMatchRequest = $.extend(true, {}, json_request); //ToDo: necessary?
+	this.originalMatchRequest = $.extend(true, {}, json_request);
 	this.SpectrumModel.set('changedAnnotation', false);
 	this.SpectrumModel.reset_all_modifications();
 	this.request_annotation(json_request, true);
