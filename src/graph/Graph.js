@@ -208,7 +208,8 @@ Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 	var height = cy - this.margin.top  - this.margin.bottom;
 
 	if(this.options.butterfly){
-		height = height / 2;
+		var margin = (this.model.isLinear) ? 20 : 45;
+		height = (height / 2) - margin;
 		if(this.options.invert){
 			var top = this.margin.top + height;
 			this.g.attr("transform", "translate(" + this.margin.left + "," + top + ")");

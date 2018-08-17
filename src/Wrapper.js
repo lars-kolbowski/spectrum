@@ -128,7 +128,8 @@ xiSPEC.init = function(options) {
 	this.originalFragmentationKey = new FragmentationKeyView({
 		model: this.originalSpectrumModel,
 		el: "#xispec_spectrumSVG",
-		position: bottom
+		invert: true,
+		hidden: true,
 	});
 	this.InfoView = new PrecursorInfoView ({
 		model: this.SpectrumModel,
@@ -191,8 +192,6 @@ xiSPEC.setData = function(data){
 	// this.SpectrumModel.customConfig = data.customConfig;
 	this.originalMatchRequest = $.extend(true, {}, json_request); //ToDo: necessary?
 	this.SpectrumModel.set('changedAnnotation', false);
-	// this.changedAnnotation
-	// this.vent.trigger('changedAnnotation', false);
 	this.SpectrumModel.reset_all_modifications();
 	this.request_annotation(json_request, true);
 

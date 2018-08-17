@@ -74,11 +74,8 @@ var SpectrumView = Backbone.View.extend({
 	},
 
 	render: function() {
-		// if (!this.model.get('changedAnnotation')){
-		// 	this.disableRevertAnnotation();
-		// }
+
 		this.graph.clear();
-		// this.lockZoom();
 
 		if(this.options.hidden){
 			this.graph.hide();
@@ -172,6 +169,7 @@ var SpectrumView = Backbone.View.extend({
 	butterflyToggle: function(toggle){
 		this.graph.options.butterfly = toggle;
 		if(this.options.invert){
+			this.model.clearStickyHighlights();
 			this.options.hidden = !toggle;
 			this.render();
 		}
