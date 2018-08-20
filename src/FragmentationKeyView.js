@@ -235,7 +235,7 @@ var FragmentationKeyView = Backbone.View.extend({
 				if (!self.changeMod){
 					self.tooltip.style("opacity", 0);
 					self.CLlineHighlight.attr("opacity", 1);
-					self.changeCL = self.linkPos;
+					self.changeCL = jQuery.extend(true, [], self.linkPos);
 					for (var i = 0; i < self.fraglines.length; i++) {
 						self.fraglines[i].disableCursor();
 					};
@@ -336,7 +336,8 @@ var FragmentationKeyView = Backbone.View.extend({
 						self.tooltip.transition()
 							.duration(500)
 							.style("opacity", 0);
-						changeCrossLink(d);
+// 						changeCrossLink(d);
+						self.model.changeLinkPos(self.changeCL);
 					}
 					//change the mod if changeMod is active and it's a valid modification for this aa
 					if(self.changeMod !== false && self.validModChange){
@@ -399,10 +400,10 @@ var FragmentationKeyView = Backbone.View.extend({
 				})
 			;
 
-			function changeCrossLink(d){
-				var newlinkpos = new Array(self.linkPos[0].linkSite+1, self.linkPos[1].linkSite+1);
-				self.model.changeLinkPos(newlinkpos);
-			};
+// 			function changeCrossLink(d){
+// 				var newlinkpos = new Array(self.linkPos[0].linkSite+1, self.linkPos[1].linkSite+1);
+// 				self.model.changeLinkPos(newlinkpos);
+// 			};
 
 			function changeMod(d){
 				var offset = self.pepoffset[self.changeMod.pepIndex];

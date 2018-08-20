@@ -319,19 +319,21 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 
 		if(this.get("JSONrequest") !== undefined){
 			json_req = $.extend(true, {}, this.get("JSONrequest"));
-			for (var i = 0; i < newLinkSites.length; i++) {
-				json_req.LinkSite[i].linkSite = newLinkSites[i]-1;
-			}
+			json_req.LinkSite = newLinkSites;
+// 			for (var i = 0; i < newLinkSites.length; i++) {
+// 				json_req.LinkSite[i].linkSite = newLinkSites[i]-1;
+// 			}
 			xiSPEC.request_annotation(json_req);
 		}
 		else{
-			for (var i = 0; i < newLinkSites.length; i++) {
-				if (this.get("JSONdata").LinkSite[i] === undefined){
-					this.get("JSONdata").LinkSite[i] = {id: 0, linkSite: newLinkSites[i], peptideId: i}
-				}
-				else
-					this.get("JSONdata").LinkSite[i].linkSite = newLinkSites[i];
-			}
+			this.get('JSONdata').LinkSite = newLinkSites;
+// 			for (var i = 0; i < newLinkSites.length; i++) {
+// 				if (this.get("JSONdata").LinkSite[i] === undefined){
+// 					this.get("JSONdata").LinkSite[i] = {id: 0, linkSite: newLinkSites[i], peptideId: i}
+// 				}
+// 				else
+// 					this.get("JSONdata").LinkSite[i].linkSite = newLinkSites[i];
+// 			}
 			this.setData();
 		}
 
