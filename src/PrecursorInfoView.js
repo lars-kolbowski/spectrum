@@ -34,7 +34,8 @@ var PrecursorInfoView = Backbone.View.extend({
 		this.options = _.extend(defaultOptions, viewOptions);
 
 		this.listenTo(xiSPEC.vent, 'butterflyToggle', this.butterflyToggle);
-
+		this.listenTo(xiSPEC.vent, 'resize:spectrum', this.render);
+		this.listenTo(window, 'resize', _.debounce(this.render));
 		this.expand = true;
 
 		// this.svg = d3.select(this.el.getElementsByTagName("svg")[0]); //xispec_Svg
