@@ -170,7 +170,8 @@ xiSPEC.init = function(options) {
 		margin: {top: 10, right: 30, bottom: 20, left: 65},
 		svg: "#xispec_errMzSVG",
 	});
-	xiSPEC.vent.trigger('show:QC', true);
+	if(options.showQualityControl !== 'min')
+		xiSPEC.vent.trigger('show:QC', true);
 
 	this.SettingsView = new SpectrumSettingsView({
 		model: this.SettingsSpectrumModel,

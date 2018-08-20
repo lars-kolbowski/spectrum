@@ -49,7 +49,7 @@ var QCwrapperView = Backbone.View.extend({
 			onDragEnd: function(){ xiSPEC.vent.trigger('resize:spectrum'); }
 		});
 
-		this.dock = 'bottom';
+		this.dock = this.options.showQualityControl;
 		// this.isVisible = true;
 
 		this.headerDiv = d3.select(this.el.getElementsByClassName("xispec_subViewHeader")[0]);
@@ -236,7 +236,7 @@ var QCwrapperView = Backbone.View.extend({
 // 	},
 
 	dockRight: function(){
-		this.dock = 'right';
+		this.dock = 'side';
 		$(this.dockBottomxispec_btn[0]).show();
 		$(this.dockRightxispec_btn[0]).hide();
 		this.dockSide();
