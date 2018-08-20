@@ -249,7 +249,7 @@ var SpectrumView = Backbone.View.extend({
 
 	showSpinner: function(){
 		this.graph.clear();
-		this.spinner.spin(d3.select(this.el).node());
+		this.spinner.spin(d3.select(this.el.parentNode).node());
 	},
 
 	hideSpinner: function(){
