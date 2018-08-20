@@ -107,15 +107,16 @@ var PrecursorInfoView = Backbone.View.extend({
 	},
 
 	expandToggle: function(){
-		this.expand = !this.expand,
-		  newOpacity = this.expand ? 1 : 0;
-		// Hide or show the elements
+		this.expand = !this.expand;
+		if(this.options.hidden)
+			return;
+		newOpacity = this.expand ? 1 : 0;
+
 		this.content.style("opacity", newOpacity);
 		if (!this.expand)
 			this.toggle.text("[+]")
 		else
 			this.toggle.text("[-]")
-		// Update whether or not the elements are active
 	},
 
 	butterflyToggle: function(toggle){
