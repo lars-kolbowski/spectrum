@@ -152,6 +152,12 @@ xiSPEC.init = function(options) {
 		model: this.SpectrumModel,
 		el: "#xispec_spectrumSVG"
 	});
+	this.originalInfoView = new PrecursorInfoView ({
+		model: this.originalSpectrumModel,
+		el: "#xispec_spectrumSVG",
+		invert: true,
+		hidden: true,
+	});
 	this.QCwrapper = new QCwrapperView({
 		el: '#xispec_QCdiv',
 		showQualityControl: options.showQualityControl,

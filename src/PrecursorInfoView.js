@@ -21,14 +21,21 @@
 var PrecursorInfoView = Backbone.View.extend({
 
 	events : {
-		'click .toggle' : 'toggle',
-	  },
+		'click .toggle' : 'expandToggle',
+	},
 
-	initialize: function() {
+	initialize: function(viewOptions) {
 
-		this.show = true;
+		var defaultOptions = {
+			invert: false,
+			hidden: false,
+		};
 
-		var self = this;
+		this.options = _.extend(defaultOptions, viewOptions);
+
+		this.listenTo(xiSPEC.vent, 'butterflyToggle', this.butterflyToggle);
+
+		this.expand = true;
 
 		// this.svg = d3.select(this.el.getElementsByTagName("svg")[0]); //xispec_spectrumSVG
 		this.svg = d3.select(this.el);
@@ -39,6 +46,22 @@ var PrecursorInfoView = Backbone.View.extend({
 			.attr("x", 10)
 			.attr("y", 13)
 			.attr("font-size", 12);
+
+
+
+
+		this.listenTo(this.model, 'change', this.render);
+	},
+
+	clear: function(){
+		this.wrapper.selectAll("*").remove();
+	},
+
+	render: function() {
+		this.clear();
+
+		if(this.options.hidden)
+			return;
 
 		this.toggle = this.wrapper.append('tspan')
 			.text("[-]")
@@ -55,10 +78,14 @@ var PrecursorInfoView = Backbone.View.extend({
 			.style("cursor", "default");
 
 
-		this.listenTo(this.model, 'change', this.render);
-	},
+		if(this.options.invert){
+			var $el = $(this.el)
+			var parentWidth = $el.width();
+			var parentHeight = $el.height();
+			var top = this.model.isLinear ? parentHeight - 65 : parentHeight - 115;
+			this.wrapper.attr("transform", "translate(0," + top + ")");
+		}
 
-	render: function() {
 		var precursor = this.model.precursor;
 		var content = "";
 
@@ -79,16 +106,25 @@ var PrecursorInfoView = Backbone.View.extend({
 
 	},
 
-	toggle: function(){
-		var active   = this.show ? false : true,
-		  newOpacity = active ? 1 : 0;
+	expandToggle: function(){
+		this.expand = !this.expand,
+		  newOpacity = this.expand ? 1 : 0;
 		// Hide or show the elements
 		this.content.style("opacity", newOpacity);
-		if (!active)
+		if (!this.expand)
 			this.toggle.text("[+]")
 		else
 			this.toggle.text("[-]")
 		// Update whether or not the elements are active
-		this.show = active;
-	}
+	},
+
+	butterflyToggle: function(toggle){
+		// this.graph.options.butterfly = toggle;
+		if(this.options.invert){
+			this.options.hidden = !toggle;
+			this.render();
+		}
+		this.render();
+	},
+
 });
