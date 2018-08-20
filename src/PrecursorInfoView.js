@@ -37,7 +37,7 @@ var PrecursorInfoView = Backbone.View.extend({
 
 		this.expand = true;
 
-		// this.svg = d3.select(this.el.getElementsByTagName("svg")[0]); //xispec_spectrumSVG
+		// this.svg = d3.select(this.el.getElementsByTagName("svg")[0]); //xispec_Svg
 		this.svg = d3.select(this.el);
 
 		//create

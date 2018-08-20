@@ -104,8 +104,7 @@ xiSPEC.init = function(options) {
 		+"<div id='xispec_spectrumControls'></div>"
 		+"<div class='xispec_plotsDiv'>"
 		+"  <div id='xispec_spectrumMainPlotDiv'>"
-		+"	  <svg id='xispec_spectrumSVG'></svg>"
-		+"	  <div id='xispec_measureTooltip'></div>"
+		+"	  <svg id='xispec_Svg'></svg>"
 		+"  </div>"
 		+"  <div id='xispec_QCdiv'>"
 		+"	  <div class='xispec_subViewHeader'></div>"
@@ -123,38 +122,48 @@ xiSPEC.init = function(options) {
 		.attr ("id", 'xispec_spectrumPanel')
 		.html (_html)
 	;
+	d3.select('#xispec_Svg')
+		.append('g')
+		.attr('id', 'xispec_spectrumSvgGroup')
+	;
+	d3.select('#xispec_Svg')
+		.append('g')
+		.attr('id', 'xispec_measureTooltipSvgGroup')
+	;
 	this.SpectrumControls = new SpectrumControlsView({
 		model: this.SpectrumModel,
-		el: "#xispec_spectrumControls"}
-	);
+		el: "#xispec_spectrumControls",
+	});
 	this.Spectrum = new SpectrumView({
 		model: this.SpectrumModel,
-		el: "#xispec_spectrumSVG",
+		el: "#xispec_spectrumSvgGroup",
+		measureTooltipSvgG: '#xispec_measureTooltipSvgGroup',
 	});
 	this.originalSpectrum = new SpectrumView({
 		model: this.originalSpectrumModel,
-		el: "#xispec_spectrumSVG",
+		el: "#xispec_spectrumSvgGroup",
+		measureTooltipSvgG: '#xispec_measureTooltipSvgGroup',
 		invert: true,
 		hidden: true
 	});
 	this.FragmentationKey = new FragmentationKeyView({
 		model: this.SpectrumModel,
-		el: "#xispec_spectrumSVG"
+		el: "#xispec_Svg"
 	});
 	this.originalFragmentationKey = new FragmentationKeyView({
 		model: this.originalSpectrumModel,
-		el: "#xispec_spectrumSVG",
+		el: "#xispec_Svg",
 		invert: true,
 		hidden: true,
 		disabled: true,
 	});
 	this.InfoView = new PrecursorInfoView ({
 		model: this.SpectrumModel,
-		el: "#xispec_spectrumSVG"
+		el: "#xispec_Svg"
 	});
 	this.originalInfoView = new PrecursorInfoView ({
 		model: this.originalSpectrumModel,
-		el: "#xispec_spectrumSVG",
+		el: "#xispec_Svg",
 		invert: true,
 		hidden: true,
 	});
