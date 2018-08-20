@@ -510,7 +510,7 @@ Peak.prototype.updateY = function(){
 		this.highlightLine
 			.attr("y1", yScale(this.y))
 			.attr("y2", yScale(0));
-		var yStep = 15;
+		var yStep = 13;
 
 		for (var i = 0; i < labelCount; i++) {
 			var gap = this.graph.options.invert ? -10 - (yStep * i) : 5 + (yStep * i);

@@ -28,7 +28,7 @@ Graph = function(targetSvg, model, options) {
 	this.model = model;
 	this.options = options;
 	this.margin = {
-		"top":	options.title  ? 140 : 120,
+		"top":	options.title  ? 130 : 110,
 		"right":  options.ylabelRight ? 60 : 45,
 		"bottom": options.xlabel ? 50 : 20,
 		"left":   options.ylabelLeft ? 65 : 30
@@ -177,7 +177,7 @@ Graph.prototype.setData = function(){
 		this.updatePeakColors();
 	}
 
-	this.margin.top = this.model.isLinear ? 80 : 140;
+	this.margin.top = this.model.isLinear ? 80 : 130;
 
 	this.g.attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
 
