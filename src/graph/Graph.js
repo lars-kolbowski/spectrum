@@ -196,8 +196,8 @@ Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 	if(this.model.get('measureMode'))
 		this.measureClear();
 	//see https://gist.github.com/mbostock/3019563
-	var cx = this.g.node().parentNode.parentNode.clientWidth;
-	var cy = this.g.node().parentNode.parentNode.clientHeight;
+	var cx = this.g.node().parentNode.parentNode.parentNode.clientWidth;
+	var cy = this.g.node().parentNode.parentNode.parentNode.clientHeight;
 
 	var width = cx - this.margin.left - this.margin.right;
 
