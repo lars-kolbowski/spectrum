@@ -36,21 +36,21 @@ var FragmentationKeyView = Backbone.View.extend({
 		};
 		this.options = _.extend(defaultOptions, viewOptions);
 
-		this.svg = d3.select(this.el);
-		this.fragKeyWrapper = this.svg.append("g");
-
 		this.margin = {
 			"top":    25,
-			// "right":  20,
+			"right":  25,
 			// "bottom": 40,
-			"left":   40
+			"left":   25
 		};
+
+		this.svg = d3.select(this.el);
+		this.fragKeyWrapper = this.svg.append("g").attr("class", "fragKey").attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
+
 		this.xStep = 23;
-		//this.highlights = this.fragKeyWrapper.append("g").attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
 
-		this.g =  this.fragKeyWrapper.append("g").attr("class", "fragKey").attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
+		this.scaleSvgGroup = this.fragKeyWrapper.append("g").attr("class", "scaleSvgGroup");
 
-		if(this.options.hidden) this.g.attr("visibility", "hidden");
+		if(this.options.hidden) this.fragKeyWrapper.attr("visibility", "hidden");
 
 
 		this.listenTo(this.model, 'change', this.render);
@@ -170,7 +170,8 @@ var FragmentationKeyView = Backbone.View.extend({
 			if (this.linkPos[1].linkSite > this.linkPos[0].linkSite)
 				CLpos = this.linkPos[1].linkSite+1;
 
-			this.CL = this.g.append("g");
+			// this.CL = this.scaleSvgGroup.append("g");
+			this.CL = this.scaleSvgGroup.append("g");
 			//highlight
 			this.CLlineHighlight = this.CL.append("line")
 				.attr("x1", this.xStep * (CLpos - 1))
@@ -248,7 +249,8 @@ var FragmentationKeyView = Backbone.View.extend({
 		}
 
 		//change-mod svg element
-		var changeModLetterG = this.g.append("g")
+		// var changeModLetterG = this.scaleSvgGroup.append("g");
+		var changeModLetterG = this.scaleSvgGroup.append("g");
 		this.changeModLetterHighlight = changeModLetterG.append("text")
 			.attr("text-anchor", "middle")
 			.attr("stroke", self.model.get('highlightColor'))
@@ -309,12 +311,32 @@ var FragmentationKeyView = Backbone.View.extend({
 
 		var self = this;
 
-		var peptides = [
-			{sequence: this.peptides[0], color: this.model.p1color, y: [20, 5], group: self.g.append('g').attr('class', 'peptide')},
-		];
-		if(this.peptides.length > 1)
-			peptides.push({sequence: this.peptides[1], color: this.model.p2color, y: [71, 83], group: self.g.append('g').attr('class', 'peptide')})
+		var pep1SvgGroup = self.scaleSvgGroup
+			.append('g')
+			.attr('class', 'peptide')
+			// .attr('id', 'xispec_fragKeyPep1')
+		;
 
+		var peptides = [{
+			sequence: this.peptides[0],
+			color: this.model.p1color,
+			y: [20, 5],
+			group: pep1SvgGroup
+		}];
+
+		if(this.peptides.length > 1){
+			var pep2SvgGroup = self.scaleSvgGroup
+				.append('g')
+				.attr('class', 'peptide')
+				// .attr('id', 'xispec_fragKeyPep2')
+			;
+			peptides.push({
+				sequence: this.peptides[1],
+				color: this.model.p2color,
+				y: [71, 83],
+				group: pep2SvgGroup
+			})
+		}
 		var pepIndex = 0;
 		peptides.forEach(function(pep){
 
@@ -793,17 +815,21 @@ var FragmentationKeyView = Backbone.View.extend({
 
 		var fragKeyWidth, fragKeyHeight;
 		try {
-			fragKeyWidth = $(".fragKey")[0].getBBox().width;
-			fragKeyHeight = $(".fragKey")[0].getBBox().height;
+			fragKeyWidth = this.scaleSvgGroup.node().getBBox().width;
+			fragKeyHeight = this.scaleSvgGroup.node().getBBox().height;
 		} catch (e) {
 			fragKeyWidth = 0;
 			fragKeyHeight = 0;
 		}
 
-		var scale = (parentWidth < fragKeyWidth + this.margin.left) ? parentWidth / (fragKeyWidth + this.margin.left) : 1;
-		var top = (this.options.invert) ? parentHeight - fragKeyHeight - 15 : 0;
+		var scale = 1;
+		if(parentWidth < fragKeyWidth + this.margin.left + this.margin.right){
+			scale = parentWidth / (fragKeyWidth + this.margin.left + this.margin.right)
+		}
+		this.scaleSvgGroup.attr("transform", "scale(" + scale + ")");
 
-		this.fragKeyWrapper.attr("transform", "scale(" + scale + "), translate(0," + top + ")");
+		var top = (this.options.invert) ? parentHeight - fragKeyHeight - 15 + this.margin.top : this.margin.top;
+		this.fragKeyWrapper.attr("transform", "translate("+this.margin.left+"," + top + ")");
 
 	},
 
@@ -818,7 +844,7 @@ var FragmentationKeyView = Backbone.View.extend({
 	clear: function(){
 		this.pepoffset = [];
 		this.linkPos = [];
-		this.g.selectAll("*").remove();
+		this.scaleSvgGroup.selectAll("*").remove();
 		//this.highlights.selectAll("*").remove();
 	},
 
@@ -832,11 +858,11 @@ var FragmentationKeyView = Backbone.View.extend({
 	},
 
 	hide: function(){
-		this.g.attr("visibility", "hidden");
+		this.fragKeyWrapper.attr("visibility", "hidden");
 	},
 
 	show: function(){
-		this.g.attr("visibility", "visible");
+		this.fragKeyWrapper.attr("visibility", "visible");
 	}
 
 });
