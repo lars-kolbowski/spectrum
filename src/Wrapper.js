@@ -138,17 +138,20 @@ xiSPEC.init = function(options) {
 		model: this.SpectrumModel,
 		el: "#xispec_spectrumSvgGroup",
 		measureTooltipSvgG: '#xispec_measureTooltipSvgGroup',
+		identifier: "curSpectrum",
 	});
 	this.originalSpectrum = new SpectrumView({
 		model: this.originalSpectrumModel,
 		el: "#xispec_spectrumSvgGroup",
 		measureTooltipSvgG: '#xispec_measureTooltipSvgGroup',
 		invert: true,
-		hidden: true
+		hidden: true,
+		identifier: "originalSpectrum",
 	});
 	this.FragmentationKey = new FragmentationKeyView({
 		model: this.SpectrumModel,
-		el: "#xispec_Svg"
+		el: "#xispec_Svg",
+		identifier: "curFragmentationKey",
 	});
 	this.originalFragmentationKey = new FragmentationKeyView({
 		model: this.originalSpectrumModel,
@@ -156,16 +159,19 @@ xiSPEC.init = function(options) {
 		invert: true,
 		hidden: true,
 		disabled: true,
+		identifier: "originalFragmentationKey",
 	});
 	this.InfoView = new PrecursorInfoView ({
 		model: this.SpectrumModel,
-		el: "#xispec_Svg"
+		el: "#xispec_Svg",
+		identifier: "curPrecursorInfo",
 	});
 	this.originalInfoView = new PrecursorInfoView ({
 		model: this.originalSpectrumModel,
 		el: "#xispec_Svg",
 		invert: true,
 		hidden: true,
+		identifier: "originalPrecursorInfo",
 	});
 	this.QCwrapper = new QCwrapperView({
 		el: '#xispec_QCdiv',
