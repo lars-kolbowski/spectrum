@@ -27,7 +27,7 @@ xiSPEC.init = function(options) {
 		showCustomConfig: false,
 		showQualityControl: 'bottom',
 		baseDir:  './',
-		xiAnnotatorBaseURL: 'https://xi3.bio.ed.ac.uk/xiAnnotator/',
+		xiAnnotatorBaseURL: 'https://spectrumviewer.org/xiAnnotator/',
 		knownModifications: [],
 		knownModificationsURL: false,
 	};
