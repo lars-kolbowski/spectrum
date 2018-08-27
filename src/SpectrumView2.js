@@ -258,10 +258,10 @@ var SpectrumView = Backbone.View.extend({
 
 	changedAnnotation: function(){
 		if(this.model.get('changedAnnotation')){
-			$(this.el).css('background-color', 'rgb(210, 224, 255)');
+			$(this.el.parentNode).attr('style', 'background-color:#9abaff;');
 		}
 		else{
-			$(this.el).css('background-color', '#fff');
+			$(this.el.parentNode).attr('style', 'background-color:#fff;');
 		}
 	},
 
