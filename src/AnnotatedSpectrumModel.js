@@ -124,18 +124,19 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		this.highlights = Array();
 		var JSONdata = this.get("JSONdata");
 
-		if (JSONdata.annotation.fragementTolerance !== undefined){
-			this.MSnTolerance = {
-				"value": parseFloat(JSONdata.annotation.fragementTolerance.split(" ")[0]),
-				"unit": JSONdata.annotation.fragementTolerance.split(" ")[1]
-			};
-		}
+		// if (JSONdata.annotation.fragementTolerance !== undefined){
+		// 	this.MSnTolerance = {
+		// 		"value": parseFloat(JSONdata.annotation.fragementTolerance.split(" ")[0]),
+		// 		"unit": JSONdata.annotation.fragementTolerance.split(" ")[1]
+		// 	};
+		// }
+		this.MSnTolerance = JSONdata.annotation.fragmentTolerance;
 
 		this.fragmentIons = JSONdata.annotation.ions || [];
 		this.customConfig = JSONdata.annotation.custom || [];
 		this.peakList = JSONdata.peaks || [];
-		var crossLinker = JSONdata.annotation['cross-linker'];
-		if (JSONdata.annotation['cross-linker'] !== undefined)
+		var crossLinker = JSONdata.annotation.crosslinker;
+		if (JSONdata.annotation.crosslinker !== undefined)
 			this.crossLinkerModMass = crossLinker.modMass;
 
 		this.pepStrs = [];
@@ -434,8 +435,8 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		var clModMass = 0;
 		if(this.get("clModMass") !== undefined)
 			var clModMass = parseInt(this.get("clModMass"));
-		else if (JSONdata.annotation['cross-linker'] !== undefined)
-			var clModMass = JSONdata.annotation['cross-linker'].modMass;
+		else if (JSONdata.annotation.crosslinker !== undefined)
+			var clModMass = JSONdata.annotation.crosslinker.modMass;
 
 		for (var i = 0; i < massArr.length; i++) {
 			totalMass += massArr[i];

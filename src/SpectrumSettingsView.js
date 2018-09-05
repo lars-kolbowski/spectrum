@@ -631,7 +631,7 @@ var SpectrumSettingsView = Backbone.View.extend({
 
 		this.peaklist[0][0].value = this.model.peaksToMGF();
 		this.precursorZ[0][0].value  = this.model.precursor.charge;
-		this.toleranceValue[0][0].value  = this.model.MSnTolerance.value;
+		this.toleranceValue[0][0].value  = this.model.MSnTolerance.tolerance;
 		this.toleranceUnit[0][0].value = this.model.MSnTolerance.unit;
 		this.crossLinkerModMass[0][0].value = this.model.crossLinkerModMass;
 		this.decimals[0][0].value = this.model.showDecimals;
