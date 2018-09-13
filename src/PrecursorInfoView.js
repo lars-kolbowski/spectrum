@@ -100,7 +100,7 @@ var PrecursorInfoView = Backbone.View.extend({
 		if (precursor.charge !== undefined)
 			dataArr.push("z=" + precursor.charge);
 		if (precursor.error !== undefined)
-			dataArr.push("error=" + precursor.error.tolerance + ' ' + precursor.error.unit);
+			dataArr.push("error=" + precursor.error.tolerance.toFixed(this.model.showDecimals) + ' ' + precursor.error.unit);
 
 		content += dataArr.join("; ");
 		this.content.text(content);
