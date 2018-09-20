@@ -422,7 +422,7 @@ var SpectrumSettingsView = Backbone.View.extend({
 		}
 
 		//peptideStr
-		var invalidChar = invalidChars(formData['peps'].value, /([^GALMFWKQESPVICYHRNDTa-z:;#0-9(.)\-]+)/);
+		var invalidChar = invalidChars(formData['peps'].value, /([^GALMFWKQESPVICYHRNDTXa-z:;#0-9(.)\-]+)/);
 		if (invalidChar){
 			alert('Invalid character(s) in peptide sequence: ' + invalidChar);
 			return false;
