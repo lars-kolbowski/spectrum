@@ -227,6 +227,9 @@ xiSPEC.setData = function(data){
 
 	var json_request = this.convert_to_json_request(data);
 
+	if (this.customConfigOverwrite)
+		json_request.annotation.custom = this.customConfigOverwrite;
+
 	// this.SpectrumModel.customConfig = data.customConfig;
 	this.originalMatchRequest = $.extend(true, {}, json_request);
 	this.SpectrumModel.set('changedAnnotation', false);
@@ -235,7 +238,7 @@ xiSPEC.setData = function(data){
 
 };
 
-xiSPEC.request_annotation = function(json_request, originalMatchRequest){
+xiSPEC.request_annotation = function(json_request, isOriginalMatchRequest){
 
 	// if (this.keepCustomConfig) {
 	// 	json_request['annotation']['custom'] = this.customConfig;
@@ -261,7 +264,7 @@ xiSPEC.request_annotation = function(json_request, originalMatchRequest){
 				//ToDo: Error handling -> https://github.com/Rappsilber-Laboratory/xi3-issue-tracker/issues/330
 				console.log("annotation response:", data);
 
-				if(originalMatchRequest){
+				if(isOriginalMatchRequest){
 					self.originalSpectrumModel.set({"JSONdata": data, "JSONrequest": json_request});
 				}
 
@@ -375,6 +378,13 @@ xiSPEC.convert_to_json_request = function (data) {
 	console.log("request", annotationRequest);
 	return annotationRequest;
 
+};
+
+
+xiSPEC.setCustomConfigOverwrite = function(customConfig){
+	// this.SettingsSpectrumModel.customConfigOverwrite = customConfig;
+	// this.SpectrumModel.customConfigOverwrite = customConfig;
+	this.customConfigOverwrite = customConfig;
 };
 
 xiSPEC.arrayifyPeptide = function (seq_mods) {
