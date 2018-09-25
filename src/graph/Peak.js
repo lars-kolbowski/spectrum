@@ -246,13 +246,19 @@ function Peak (id, graph){
 				var mouseY = coords[1];
 				var r = Math.sqrt((mouseX * mouseX) + ((mouseY-startY) * (mouseY-startY) ));
 				if (r > 15){
-						filteredLabelLines
-							.attr("opacity", 1)
-							.attr("x1", 0)
-							.attr("x2", mouseX)
-							.attr("y1", startY)
-							.attr("y2", mouseY)
-						;
+					var deltaY = (mouseY - startY > 0 ? -8 : 2);
+					var deltaX = 0;
+					if(Math.abs(mouseX) > 20){
+						deltaX = (mouseX > 0 ? -8 : 8)	
+					}
+					console.log(mouseX);
+					filteredLabelLines
+						.attr("opacity", 1)
+						.attr("x1", 0)
+						.attr("x2", mouseX + deltaX)
+						.attr("y1", startY)
+						.attr("y2", mouseY + deltaY)
+					;
 				}
 				else
 					filteredLabelLines.attr("opacity", 0);
@@ -536,7 +542,7 @@ Peak.prototype.removeLabels = function(){
 	if(labelCount){
 		this.labels.attr("display", "none");
 		this.labelHighlights.attr("display", "none");
-		this.labelLines.attr("opacity", 0);
+// 		this.labelLines.attr("opacity", 0);
 	}
 }
 
@@ -551,7 +557,7 @@ Peak.prototype.showLabels = function(lossyOverride){
 		};
 		this.labels.filter(ffunc).attr("display", "inline");
 		this.labelHighlights.filter(ffunc).attr("display", "inline");
-		this.labelLines.filter(ffunc).attr("opacity", 1);
+// 		this.labelLines.filter(ffunc).attr("opacity", 1);
 	}
 }
 
