@@ -125,12 +125,12 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		var JSONdata = this.get("JSONdata");
 
 		if(JSONdata.annotation){
-			this.MSnTolerance = JSONdata.annotation.fragmentTolerance;	
+			this.MSnTolerance = JSONdata.annotation.fragmentTolerance;
 			this.fragmentIons = JSONdata.annotation.ions;
-			this.customConfig = JSONdata.annotation.custom;	
+			this.customConfig = JSONdata.annotation.custom;
 			var crossLinker = JSONdata.annotation.crosslinker;
 			if (JSONdata.annotation.crosslinker)
-				this.crossLinkerModMass = crossLinker.modMass;	
+				this.crossLinkerModMass = crossLinker.modMass;
 		}
 
 		this.peakList = JSONdata.peaks || [];
@@ -153,8 +153,8 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		if (JSONdata.fragments !== undefined){
 			this.fragments = [];
 			for (var i = 0; i < JSONdata.fragments.length; i++) {
-				this.fragments[i] = JSONdata.fragments[i];
-				this.fragments[i].id = i;
+				this.fragments[i] = new Fragment(JSONdata.fragments[i]);
+				// this.fragments[i].id = i;
 			};
 		};
 
