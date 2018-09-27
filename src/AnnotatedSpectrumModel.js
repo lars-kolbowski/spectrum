@@ -125,9 +125,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		var JSONdata = this.get("JSONdata");
 
 		if(JSONdata.annotation){
-			if (JSONdata.annotation.fragementTolerance){
-				this.MSnTolerance = JSONdata.annotation.fragmentTolerance;
-			}		
+			this.MSnTolerance = JSONdata.annotation.fragmentTolerance;	
 			this.fragmentIons = JSONdata.annotation.ions;
 			this.customConfig = JSONdata.annotation.custom;	
 			var crossLinker = JSONdata.annotation.crosslinker;
