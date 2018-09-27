@@ -124,20 +124,18 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		this.highlights = Array();
 		var JSONdata = this.get("JSONdata");
 
-		// if (JSONdata.annotation.fragementTolerance !== undefined){
-		// 	this.MSnTolerance = {
-		// 		"value": parseFloat(JSONdata.annotation.fragementTolerance.split(" ")[0]),
-		// 		"unit": JSONdata.annotation.fragementTolerance.split(" ")[1]
-		// 	};
-		// }
-		this.MSnTolerance = JSONdata.annotation.fragmentTolerance;
+		if(JSONdata.annotation){
+			if (JSONdata.annotation.fragementTolerance){
+				this.MSnTolerance = JSONdata.annotation.fragmentTolerance;
+			}		
+			this.fragmentIons = JSONdata.annotation.ions;
+			this.customConfig = JSONdata.annotation.custom;	
+			var crossLinker = JSONdata.annotation.crosslinker;
+			if (JSONdata.annotation.crosslinker)
+				this.crossLinkerModMass = crossLinker.modMass;	
+		}
 
-		this.fragmentIons = JSONdata.annotation.ions || [];
-		this.customConfig = JSONdata.annotation.custom || [];
 		this.peakList = JSONdata.peaks || [];
-		var crossLinker = JSONdata.annotation.crosslinker;
-		if (JSONdata.annotation.crosslinker !== undefined)
-			this.crossLinkerModMass = crossLinker.modMass;
 
 		this.pepStrs = [];
 		this.pepStrsMods = [];
