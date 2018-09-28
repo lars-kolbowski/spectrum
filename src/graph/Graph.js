@@ -28,16 +28,13 @@ Graph = function(targetSvg, model, options) {
 	this.model = model;
 	this.options = options;
 	this.margin = {
-		"top":	options.title  ? 140 : 120,
+		"top":	options.title  ? 130 : 110,
 		"right":  options.ylabelRight ? 60 : 45,
 		"bottom": options.xlabel ? 50 : 20,
 		"left":   options.ylabelLeft ? 65 : 30
 	};
 
-	this.g = targetSvg.append("g")
-				.attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")")
-				.attr("class", "spectrum")
-				.attr("id", "spectrumGraph");
+	this.g = targetSvg.append("g").attr("class", "spectrum");
 
 	this.plot = this.g.append("rect")
 		.style("fill", "white")
@@ -49,24 +46,20 @@ Graph = function(targetSvg, model, options) {
 		.style("cursor", "crosshair")
 		.attr("pointer-events", "visible");
 
-	this.innerSVG = this.g.append("g")
-		.attr("class", "innerSpectrum");
+	this.innerSVG = this.g.append("g").attr("class", "innerSpectrum");
 
-	this.xaxisSVG = this.g.append("g")
-		.attr("class", "x axis");
+	this.xaxisSVG = this.g.append("g").attr("class", "x axis");
 
 	//brush
-	this.brush = d3.svg.brush()
-		.x(this.x);
-		// .on("brushstart", brushstart)
-		// .on("brush", brushmove)
-		// .on("brushend", brushend);
-	this.xaxisRect = this.g.append("rect")
-					.attr("height", "25")
-					.attr("opacity", 0)
-					.attr("pointer-events", "visible")
-					.style("cursor", "crosshair");
-	this.xaxisRect.call(this.brush);
+	this.brush = d3.svg.brush().x(this.x);
+
+	this.xaxisZoomRect = this.g.append("rect")
+		.attr("height", "25")
+		.attr("opacity", 0)
+		.attr("pointer-events", "all")
+		.style("cursor", "crosshair")
+	;
+	this.xaxisZoomRect.call(this.brush);
 
 	this.yAxisLeftSVG = this.g.append("g")
 		.attr("class", "y axis");
@@ -110,7 +103,7 @@ Graph = function(targetSvg, model, options) {
 		.attr("text-anchor", "middle")
 		.attr("pointer-events", "none");
 
-	this.measureTooltip = this.measuringTool.append("g")
+	this.measureTooltip = d3.select(this.options.measureTooltipSvgG).append("g")
 		.attr("style", "text-anchor: middle;")
 	;
 	this.measureTooltipBackground = this.measureTooltip.append("rect")
@@ -177,7 +170,9 @@ Graph.prototype.setData = function(){
 		this.updatePeakColors();
 	}
 
-	this.margin.top = this.model.isLinear ? 80 : 140;
+	this.margin.top = this.model.isLinear ? 80 : 120;
+	// if (this.options.butterfly)
+	// 	this.margin.bottom += (this.model.isLinear) ? 20 : 45;
 
 	this.g.attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
 
@@ -201,15 +196,15 @@ Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 	if(this.model.get('measureMode'))
 		this.measureClear();
 	//see https://gist.github.com/mbostock/3019563
-	var cx = this.g.node().parentNode.parentNode.clientWidth;
-	var cy = this.g.node().parentNode.parentNode.clientHeight;
+	var cx = this.g.node().parentNode.parentNode.parentNode.clientWidth;
+	var cy = this.g.node().parentNode.parentNode.parentNode.clientHeight;
 
 	var width = cx - this.margin.left - this.margin.right;
-	var height = cy - this.margin.top  - this.margin.bottom;
+
+	var height = (this.options.butterfly) ? cy - this.margin.top * 2 - 25 : cy - this.margin.top  - this.margin.bottom;
 
 	if(this.options.butterfly){
-		var margin = (this.model.isLinear) ? 20 : 45;
-		height = (height / 2) - margin;
+		height = (height / 2);
 		if(this.options.invert){
 			var top = this.margin.top + height;
 			this.g.attr("transform", "translate(" + this.margin.left + "," + top + ")");
@@ -234,7 +229,9 @@ Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 	}
 
 	var yTicks = height / 40;
-	var xTicks = width / 100;
+	var xTicks = 0
+	if(!this.options.butterfly || this.options.invert)
+		var xTicks = width / 100;
 
 	this.yTicks = yTicks;
 
@@ -246,39 +243,35 @@ Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 		.attr("transform", "translate(" + width + " ,0)")
 		.call(this.yAxisRight)
 	;
-	this.xaxisRect.attr("width", width);
+	this.xaxisZoomRect.attr("width", width);
 
 	// var xAxisOrient = this.options.invert ? "top" : "bottom";
 	// this.xAxis = d3.svg.axis().scale(this.x).ticks(xTicks).orient(xAxisOrient);
 	this.xAxis = d3.svg.axis().scale(this.x).ticks(xTicks).orient("bottom");
 
-	// if(this.options.invert){
-	// 	this.xaxisSVG.call(this.xAxis);
-	// }
-	// else{
-		this.xaxisSVG.attr("transform", "translate(0," + height + ")")
-			.call(this.xAxis);
-	// }
-
+	this.xaxisSVG
+		.attr("transform", "translate(0," + height + ")")
+		.call(this.xAxis)
+	;
 
 	this.g.selectAll('.axis line, .axis path')
 		.style({'stroke': 'Black', 'fill': 'none', 'stroke-width': '1.2px'});
 
-	//~ this.g.selectAll('.tick')
-		//~ .attr("pointer-events", "none");
+	this.g.selectAll('.tick')
+		.attr("pointer-events", "none");
 
 	this.plot.attr("width", width)
 		.attr("height", height);
 
-	var xAxisRectYpos = this.options.butterfly ? height * 2 : height;
+	var xaxisZoomRectYpos = (this.options.butterfly && !this.options.invert) ? height * 2 : height;
 
-	this.xaxisRect.attr("width",width).attr("y", xAxisRectYpos).attr("height", this.margin.bottom);
+	this.xaxisZoomRect.attr("width",width).attr("y", xaxisZoomRectYpos).attr("height", this.margin.bottom);
+
 	this.dragZoomHighlight.attr("height", height);
 
 	this.zoom = d3.behavior.zoom().x(this.x).on("zoom", this.redraw());
 	this.zoom.scaleExtent([0, this.model.xmaxPrimary]);
 	this.plot.call(this.zoom);
-	//this.innerSVG.call(this.zoom);
 
 	if (this.title) {
 		this.title.attr("x", width/2);
@@ -293,7 +286,7 @@ Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 Graph.prototype.disableZoom = function(){
 
 	this.plot.attr("pointer-events", "none");
-	this.xaxisRect.style("cursor", "default");
+	this.xaxisZoomRect.style("cursor", "default");
 	this.brush.on("brushstart", null)
 		.on("brush", null)
 		.on("brushend", null);
@@ -304,7 +297,7 @@ Graph.prototype.disableZoom = function(){
 Graph.prototype.enableZoom = function(){
 	this.plot.attr("pointer-events", "visible");
 	this.plot.call(this.zoom);
-	this.xaxisRect.style("cursor", "crosshair");
+	this.xaxisZoomRect.style("cursor", "crosshair");
 	this.brush.on("brushstart", brushstart)
 		.on("brush", brushmove)
 		.on("brushend", brushend);
@@ -346,8 +339,7 @@ Graph.prototype.measure = function(on){
 		self.disableZoom();
 
 		function measureStart() {
-			self.measuringTool.attr("display","inline");
-			self.measureDistance.attr("display","inline");
+			self.measureShow();
 
 			var coords = d3.mouse(this);
 			var mouseX = self.x.invert(coords[0]);
@@ -473,35 +465,36 @@ Graph.prototype.measure = function(on){
 				else
 					var positionX = coords[0] + Math.abs(measureStartX - measureEndX)/2;
 
-
 			// Because chrome is deprecating offset on svg elements
-			function getSVGOffset (svg) {
-				var pnode = svg;
-				var pBCR;
-				while (pnode && !pBCR) {
-					var posType = (pnode == document) ? "static" : d3.select(pnode).style("position");
-					if (posType !== "" && posType !== "static" && posType !== "inherit") {
-						pBCR = pnode.getBoundingClientRect();
-					}
-					pnode = pnode.parentNode;
-				}
-				var svgBCR = svg.getBoundingClientRect();
-				pBCR = pBCR || {top: 0, left: 0};
-				return {top: svgBCR.top - pBCR.top, left: svgBCR.left - pBCR.left};
-			}
-
-			var svgNode = self.g.node().parentNode;
-			var rectBounds = this.getBoundingClientRect();
-			var svgBounds = svgNode.getBoundingClientRect();
-			var rectOffX = -8; //rectBounds.left - svgBounds.left;
-			var rectOffY = rectBounds.top - svgBounds.top;
-			var svgOffset = getSVGOffset (svgNode);
-			rectOffX += svgOffset.left; // add on offsets to svg's relative parent
-			rectOffY += svgOffset.top;
-			rectOffX += positionX;
-			rectOffY += y + 10; // the offset of the drag in the rect
+			// function getSVGOffset (svg) {
+			// 	var pnode = svg;
+			// 	var pBCR;
+			// 	while (pnode && !pBCR) {
+			// 		var posType = (pnode == document) ? "static" : d3.select(pnode).style("position");
+			// 		if (posType !== "" && posType !== "static" && posType !== "inherit") {
+			// 			pBCR = pnode.getBoundingClientRect();
+			// 		}
+			// 		pnode = pnode.parentNode;
+			// 	}
+			// 	var svgBCR = svg.getBoundingClientRect();
+			// 	pBCR = pBCR || {top: 0, left: 0};
+			// 	return {top: svgBCR.top - pBCR.top, left: svgBCR.left - pBCR.left};
+			// }
+			//
+			// var svgNode = self.g.node().parentNode;
+			// var rectBounds = this.getBoundingClientRect();
+			// var svgBounds = svgNode.getBoundingClientRect();
+			// var rectOffX = -8; //rectBounds.left - svgBounds.left;
+			// var rectOffY = rectBounds.top - svgBounds.top;
+			// var svgOffset = getSVGOffset (svgNode);
+			// rectOffX += svgOffset.left; // add on offsets to svg's relative parent
+			// rectOffY += svgOffset.top;
+			// rectOffX += positionX;
+			// rectOffY += y + 10; // the offset of the drag in the rect
 
 			self.measureDistance.attr("x", positionX).attr("y", coords[1]-10);
+
+			var measureTooltipAbsOffsetY = self.options.invert ? 6 + self.margin.top * 2 : self.margin.top;
 
 			//fromText
 			var fromTextColor = self.measureStartPeak.colour;
@@ -536,7 +529,7 @@ Graph.prototype.measure = function(on){
 				massArr.push(massObj);
 			};
 
-			var yText = coords[1] + 25;
+			var yText = coords[1] + 25 + measureTooltipAbsOffsetY;
 			self.measureTooltipText['from']
 				.attr("y", yText)
 				.attr("fill", fromTextColor)
@@ -569,15 +562,17 @@ Graph.prototype.measure = function(on){
 			var maxTextWidth = Math.max.apply(Math,self.measureTooltip.selectAll('text')[0].map(function(t){return d3.select(t).node().getComputedTextLength();}));
 			var backgroundWidth = maxTextWidth + 20;
 			var backgroundWidthX = positionX - backgroundWidth / 2;
+
 			self.measureTooltipBackground
-				.attr("x", backgroundWidthX)
-				.attr("y", coords[1]+10)
+				.attr("x", backgroundWidthX + self.margin.left)
+				.attr("y", coords[1] + 10 + measureTooltipAbsOffsetY)
 				.attr("width", backgroundWidth)
 				.attr("height", 140)
 			;
 
 			self.measureTooltip.selectAll('text')
-				.attr("x", positionX)
+				.attr("x", positionX + self.margin.left)
+
 			;
 			self.measureTooltipText['masses'].selectAll('text')
 				.attr("fill", "#333")
@@ -606,8 +601,13 @@ Graph.prototype.measure = function(on){
 Graph.prototype.measureClear = function(){
 	this.measuringTool.attr("display","none");
 	this.measureDistance.attr("display","none");
-	// this.measureInfo.attr("display","none");
+	this.measureTooltip.attr("display","none");
+}
 
+Graph.prototype.measureShow = function(){
+	this.measuringTool.attr("display","inline");
+	this.measureDistance.attr("display","inline");
+	this.measureTooltip.attr("display","inline");
 }
 
 Graph.prototype.redraw = function(){
@@ -652,6 +652,7 @@ Graph.prototype.clear = function(){
 	this.peaksSVG.selectAll("*").remove();
 	this.lossyAnnotations.selectAll("*").remove();
 	this.annotations.selectAll("*").remove();
+
 }
 
 
@@ -744,7 +745,7 @@ Graph.prototype.show = function(){
 Graph.prototype.hide = function(){
 	this.g.attr("visibility", "hidden");
 	this.disableZoom();
-	//this.xaxisRect.attr("pointer-events", "none");
+	//this.xaxisZoomRect.attr("pointer-events", "none");
 	//this.g.style("pointer-events", "none");
 }
 /*

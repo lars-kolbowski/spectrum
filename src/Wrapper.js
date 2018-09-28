@@ -27,7 +27,7 @@ xiSPEC.init = function(options) {
 		showCustomConfig: false,
 		showQualityControl: 'bottom',
 		baseDir:  './',
-		xiAnnotatorBaseURL: 'https://xi3.bio.ed.ac.uk/xiAnnotator/',
+		xiAnnotatorBaseURL: 'https://spectrumviewer.org/xiAnnotator/',
 		knownModifications: [],
 		knownModificationsURL: false,
 	};
@@ -104,8 +104,7 @@ xiSPEC.init = function(options) {
 		+"<div id='xispec_spectrumControls'></div>"
 		+"<div class='xispec_plotsDiv'>"
 		+"  <div id='xispec_spectrumMainPlotDiv'>"
-		+"	  <svg id='xispec_spectrumSVG'></svg>"
-		+"	  <div id='xispec_measureTooltip'></div>"
+		+"	  <svg id='xispec_Svg'></svg>"
 		+"  </div>"
 		+"  <div id='xispec_QCdiv'>"
 		+"	  <div class='xispec_subViewHeader'></div>"
@@ -123,33 +122,56 @@ xiSPEC.init = function(options) {
 		.attr ("id", 'xispec_spectrumPanel')
 		.html (_html)
 	;
+	d3.select('#xispec_Svg')
+		.append('g')
+		.attr('id', 'xispec_spectrumSvgGroup')
+	;
+	d3.select('#xispec_Svg')
+		.append('g')
+		.attr('id', 'xispec_measureTooltipSvgGroup')
+	;
 	this.SpectrumControls = new SpectrumControlsView({
 		model: this.SpectrumModel,
-		el: "#xispec_spectrumControls"}
-	);
+		el: "#xispec_spectrumControls",
+	});
 	this.Spectrum = new SpectrumView({
 		model: this.SpectrumModel,
-		el: "#xispec_spectrumSVG",
+		el: "#xispec_spectrumSvgGroup",
+		measureTooltipSvgG: '#xispec_measureTooltipSvgGroup',
+		identifier: "curSpectrum",
 	});
 	this.originalSpectrum = new SpectrumView({
 		model: this.originalSpectrumModel,
-		el: "#xispec_spectrumSVG",
+		el: "#xispec_spectrumSvgGroup",
+		measureTooltipSvgG: '#xispec_measureTooltipSvgGroup',
 		invert: true,
-		hidden: true
+		hidden: true,
+		identifier: "originalSpectrum",
 	});
 	this.FragmentationKey = new FragmentationKeyView({
 		model: this.SpectrumModel,
-		el: "#xispec_spectrumSVG"
+		el: "#xispec_Svg",
+		identifier: "curFragmentationKey",
 	});
 	this.originalFragmentationKey = new FragmentationKeyView({
 		model: this.originalSpectrumModel,
-		el: "#xispec_spectrumSVG",
+		el: "#xispec_Svg",
 		invert: true,
 		hidden: true,
+		disabled: true,
+		identifier: "originalFragmentationKey",
 	});
 	this.InfoView = new PrecursorInfoView ({
 		model: this.SpectrumModel,
-		el: "#xispec_spectrumSVG"
+		el: "#xispec_Svg",
+		identifier: "curPrecursorInfo",
+	});
+	this.originalInfoView = new PrecursorInfoView ({
+		model: this.originalSpectrumModel,
+		el: "#xispec_Svg",
+		invert: true,
+		hidden: true,
+		identifier: "originalPrecursorInfo",
 	});
 	this.QCwrapper = new QCwrapperView({
 		el: '#xispec_QCdiv',
@@ -169,7 +191,8 @@ xiSPEC.init = function(options) {
 		margin: {top: 10, right: 30, bottom: 20, left: 65},
 		svg: "#xispec_errMzSVG",
 	});
-	xiSPEC.vent.trigger('show:QC', true);
+	if(options.showQualityControl !== 'min')
+		xiSPEC.vent.trigger('show:QC', true);
 
 	this.SettingsView = new SpectrumSettingsView({
 		model: this.SettingsSpectrumModel,
@@ -199,21 +222,23 @@ xiSPEC.setData = function(data){
 	// requestId: 1,
 	// }
 
-
-	// if (!ignoreResultUnlessLastRequested || (json && json.annotation && json.annotation.requestId && json.annotation.requestId === CLMSUI.loadSpectra.lastRequestedID)) {
-// 	if (data.annotation && data.annotation.requestId && json.annotation.requestId === CLMSUI.loadSpectra.lastRequestedID)) {
+	this.vent.trigger('butterflyToggle', false);
+	$('#xispec_butterflyChkbx').prop('checked', false);	//ToDo: move to SpectrumControlsView
 
 	var json_request = this.convert_to_json_request(data);
 
+	if (this.customConfigOverwrite)
+		json_request.annotation.custom = this.customConfigOverwrite;
+
 	// this.SpectrumModel.customConfig = data.customConfig;
-	this.originalMatchRequest = $.extend(true, {}, json_request); //ToDo: necessary?
+	this.originalMatchRequest = $.extend(true, {}, json_request);
 	this.SpectrumModel.set('changedAnnotation', false);
 	this.SpectrumModel.reset_all_modifications();
 	this.request_annotation(json_request, true);
 
 };
 
-xiSPEC.request_annotation = function(json_request, originalMatchRequest){
+xiSPEC.request_annotation = function(json_request, isOriginalMatchRequest){
 
 	// if (this.keepCustomConfig) {
 	// 	json_request['annotation']['custom'] = this.customConfig;
@@ -239,7 +264,7 @@ xiSPEC.request_annotation = function(json_request, originalMatchRequest){
 				//ToDo: Error handling -> https://github.com/Rappsilber-Laboratory/xi3-issue-tracker/issues/330
 				console.log("annotation response:", data);
 
-				if(originalMatchRequest){
+				if(isOriginalMatchRequest){
 					self.originalSpectrumModel.set({"JSONdata": data, "JSONrequest": json_request});
 				}
 
@@ -343,7 +368,7 @@ xiSPEC.convert_to_json_request = function (data) {
 	annotationRequest.annotation.fragmentTolerance = data.fragmentTolerance;
 	annotationRequest.annotation.modifications = data.modifications;
 	annotationRequest.annotation.ions = ions;
-	annotationRequest.annotation["cross-linker"] = {'modMass': data.crossLinkerModMass}; // yuk
+	annotationRequest.annotation.crosslinker = {'modMass': data.crossLinkerModMass};
 	annotationRequest.annotation.precursorMZ = +data.precursorMZ;
 	annotationRequest.annotation.precursorCharge = +data.precursorCharge;
 	annotationRequest.annotation.losses = data.losses;
@@ -353,6 +378,13 @@ xiSPEC.convert_to_json_request = function (data) {
 	console.log("request", annotationRequest);
 	return annotationRequest;
 
+};
+
+
+xiSPEC.setCustomConfigOverwrite = function(customConfig){
+	// this.SettingsSpectrumModel.customConfigOverwrite = customConfig;
+	// this.SpectrumModel.customConfigOverwrite = customConfig;
+	this.customConfigOverwrite = customConfig;
 };
 
 xiSPEC.arrayifyPeptide = function (seq_mods) {

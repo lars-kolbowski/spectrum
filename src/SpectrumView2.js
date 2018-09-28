@@ -35,6 +35,7 @@ var SpectrumView = Backbone.View.extend({
 			ylabelLeft: "Intensity",
 			ylabelRight: "% of base Peak",
 			butterfly: false,
+			accentuateCLcontainingFragments: false,
 		};
 
 		this.options = _.extend(defaultOptions, viewOptions);
@@ -60,6 +61,7 @@ var SpectrumView = Backbone.View.extend({
 		this.listenTo(this.model, 'change:mzRange', this.updateMzRange);
 
 		this.listenTo(xiSPEC.vent, 'butterflyToggle', this.butterflyToggle);
+		this.listenTo(xiSPEC.vent, 'AccentuateCrossLinkContainingFragments', this.accentuateCLcontainingToggle);
 		this.listenTo(xiSPEC.vent, 'downloadSpectrumSVG', this.downloadSVG);
 		this.listenTo(xiSPEC.vent, 'resize:spectrum', this.resize);
 		this.listenTo(xiSPEC.vent, 'clearSpectrumHighlights', this.clearHighlights);
@@ -176,6 +178,11 @@ var SpectrumView = Backbone.View.extend({
 		this.resize();
 	},
 
+	accentuateCLcontainingToggle: function(toggle){
+		this.options.accentuateCLcontainingFragments = toggle;
+		this.render();
+	},
+
 	moveLabels: function(){
 
 		var peaks = this.graph.peaks;
@@ -211,7 +218,7 @@ var SpectrumView = Backbone.View.extend({
 	},
 
 	downloadSVG: function(){
-		var svgSel = d3.select(this.el);
+		var svgSel = d3.select(this.el.parentNode);
 		var svgArr = svgSel[0];
 		var svgStrings = CLMSUI.svgUtils.capture (svgArr);
 		var svgXML = CLMSUI.svgUtils.makeXMLStr (new XMLSerializer(), svgStrings[0]);
@@ -249,7 +256,7 @@ var SpectrumView = Backbone.View.extend({
 
 	showSpinner: function(){
 		this.graph.clear();
-		this.spinner.spin(d3.select(this.el).node());
+		this.spinner.spin(d3.select(this.el.parentNode).node());
 	},
 
 	hideSpinner: function(){
@@ -258,10 +265,10 @@ var SpectrumView = Backbone.View.extend({
 
 	changedAnnotation: function(){
 		if(this.model.get('changedAnnotation')){
-			$(this.el).css('background-color', 'rgb(210, 224, 255)');
+			$(this.el.parentNode).attr('style', 'background-color:#9abaff;');
 		}
 		else{
-			$(this.el).css('background-color', '#fff');
+			$(this.el.parentNode).attr('style', 'background-color:#fff;');
 		}
 	},
 

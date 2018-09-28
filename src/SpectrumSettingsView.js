@@ -27,6 +27,7 @@ var SpectrumSettingsView = Backbone.View.extend({
 	events : {
 		'click #lossyChkBx': 'showLossy',
 		'click #absErrChkBx': 'absErrToggle',
+		'click #accentuateCLcontainingChkBx': 'accentuateCLcontainingToggle',
 		// 'click #butterflyChkBx': 'butterflyToggle',
 		'change #colorSelector': 'changeColorScheme',
 		'click .settingsTab' : 'changeTab',
@@ -280,6 +281,10 @@ var SpectrumSettingsView = Backbone.View.extend({
 			.append("input").attr("type", "checkbox").attr("id", "absErrChkBx")
 		;
 
+		this.accentuateCrossLinkContaining = appearanceTab.append("label").text("accentuate cross-link containing fragments: ")
+			.append("input").attr("type", "checkbox").attr("id", "accentuateCLcontainingChkBx")
+		;
+
 		// var butterfly = appearanceTab.append("label").text("Butterfly plot with original Spectrum: ")
 		// 	.append("input").attr("type", "checkbox").attr("id", "butterflyChkBx")
 		// ;
@@ -422,7 +427,7 @@ var SpectrumSettingsView = Backbone.View.extend({
 		}
 
 		//peptideStr
-		var invalidChar = invalidChars(formData['peps'].value, /([^GALMFWKQESPVICYHRNDTa-z:;#0-9(.)\-]+)/);
+		var invalidChar = invalidChars(formData['peps'].value, /([^GALMFWKQESPVICYHRNDTXa-z:;#0-9(.)\-]+)/);
 		if (invalidChar){
 			alert('Invalid character(s) in peptide sequence: ' + invalidChar);
 			return false;
@@ -631,7 +636,7 @@ var SpectrumSettingsView = Backbone.View.extend({
 
 		this.peaklist[0][0].value = this.model.peaksToMGF();
 		this.precursorZ[0][0].value  = this.model.precursor.charge;
-		this.toleranceValue[0][0].value  = this.model.MSnTolerance.value;
+		this.toleranceValue[0][0].value  = this.model.MSnTolerance.tolerance;
 		this.toleranceUnit[0][0].value = this.model.MSnTolerance.unit;
 		this.crossLinkerModMass[0][0].value = this.model.crossLinkerModMass;
 		this.decimals[0][0].value = this.model.showDecimals;
@@ -783,6 +788,12 @@ var SpectrumSettingsView = Backbone.View.extend({
 		var $target = $(e.target);
 		var selected = $target.is(':checked');
 		xiSPEC.vent.trigger('QCabsErr', selected);
+	},
+
+	accentuateCLcontainingToggle: function(e) {
+		var $target = $(e.target);
+		var selected = $target.is(':checked');
+		xiSPEC.vent.trigger('AccentuateCrossLinkContainingFragments', selected);
 	},
 
 	// butterflyToggle: function(e) {

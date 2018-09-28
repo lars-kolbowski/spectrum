@@ -65,6 +65,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		this.precursor = {}
 		this.precursor.charge = null;
 		this.customConfig = [];
+		this.sticky = [];
 
 		//ToDo: change JSONdata gets called 3 times for some reason?
 		// define event triggers and listeners better
@@ -123,19 +124,16 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		this.highlights = Array();
 		var JSONdata = this.get("JSONdata");
 
-		if (JSONdata.annotation.fragementTolerance !== undefined){
-			this.MSnTolerance = {
-				"value": parseFloat(JSONdata.annotation.fragementTolerance.split(" ")[0]),
-				"unit": JSONdata.annotation.fragementTolerance.split(" ")[1]
-			};
+		if(JSONdata.annotation){
+			this.MSnTolerance = JSONdata.annotation.fragmentTolerance;
+			this.fragmentIons = JSONdata.annotation.ions;
+			this.customConfig = JSONdata.annotation.custom;
+			var crossLinker = JSONdata.annotation.crosslinker;
+			if (JSONdata.annotation.crosslinker)
+				this.crossLinkerModMass = crossLinker.modMass;
 		}
 
-		this.fragmentIons = JSONdata.annotation.ions || [];
-		this.customConfig = JSONdata.annotation.custom || [];
 		this.peakList = JSONdata.peaks || [];
-		var crossLinker = JSONdata.annotation['cross-linker'];
-		if (JSONdata.annotation['cross-linker'] !== undefined)
-			this.crossLinkerModMass = crossLinker.modMass;
 
 		this.pepStrs = [];
 		this.pepStrsMods = [];
@@ -155,8 +153,8 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		if (JSONdata.fragments !== undefined){
 			this.fragments = [];
 			for (var i = 0; i < JSONdata.fragments.length; i++) {
-				this.fragments[i] = JSONdata.fragments[i];
-				this.fragments[i].id = i;
+				this.fragments[i] = new Fragment(JSONdata.fragments[i]);
+				// this.fragments[i].id = i;
 			};
 		};
 
@@ -164,7 +162,9 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 			this.precursor.charge = JSONdata.annotation.precursorCharge;
 			this.precursor.matchMz = JSONdata.annotation.precursorMZ;
 			this.precursor.error = JSONdata.annotation.precursorError;
-			this.calcPrecursorMass();
+
+			this.precursor.calcMz = JSONdata.annotation.calculatedMZ;
+			// this.calcPrecursorMass();
 		}
 
 		this.trigger("changed:data");
@@ -318,19 +318,21 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 
 		if(this.get("JSONrequest") !== undefined){
 			json_req = $.extend(true, {}, this.get("JSONrequest"));
-			for (var i = 0; i < newLinkSites.length; i++) {
-				json_req.LinkSite[i].linkSite = newLinkSites[i]-1;
-			}
+			json_req.LinkSite = newLinkSites;
+// 			for (var i = 0; i < newLinkSites.length; i++) {
+// 				json_req.LinkSite[i].linkSite = newLinkSites[i]-1;
+// 			}
 			xiSPEC.request_annotation(json_req);
 		}
 		else{
-			for (var i = 0; i < newLinkSites.length; i++) {
-				if (this.get("JSONdata").LinkSite[i] === undefined){
-					this.get("JSONdata").LinkSite[i] = {id: 0, linkSite: newLinkSites[i], peptideId: i}
-				}
-				else
-					this.get("JSONdata").LinkSite[i].linkSite = newLinkSites[i];
-			}
+			this.get('JSONdata').LinkSite = newLinkSites;
+// 			for (var i = 0; i < newLinkSites.length; i++) {
+// 				if (this.get("JSONdata").LinkSite[i] === undefined){
+// 					this.get("JSONdata").LinkSite[i] = {id: 0, linkSite: newLinkSites[i], peptideId: i}
+// 				}
+// 				else
+// 					this.get("JSONdata").LinkSite[i].linkSite = newLinkSites[i];
+// 			}
 			this.setData();
 		}
 
@@ -431,8 +433,8 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		var clModMass = 0;
 		if(this.get("clModMass") !== undefined)
 			var clModMass = parseInt(this.get("clModMass"));
-		else if (JSONdata.annotation['cross-linker'] !== undefined)
-			var clModMass = JSONdata.annotation['cross-linker'].modMass;
+		else if (JSONdata.annotation.crosslinker !== undefined)
+			var clModMass = JSONdata.annotation.crosslinker.modMass;
 
 		for (var i = 0; i < massArr.length; i++) {
 			totalMass += massArr[i];
