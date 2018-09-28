@@ -154,7 +154,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 			this.fragments = [];
 			for (var i = 0; i < JSONdata.fragments.length; i++) {
 				this.fragments[i] = new Fragment(JSONdata.fragments[i]);
-				// this.fragments[i].id = i;
+				this.fragments[i].id = i;
 			};
 		};
 
@@ -165,6 +165,8 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 
 			this.precursor.calcMz = JSONdata.annotation.calculatedMZ;
 			// this.calcPrecursorMass();
+
+			this.losses = JSONdata.annotation.losses;
 		}
 
 		this.trigger("changed:data");

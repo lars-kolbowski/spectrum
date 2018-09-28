@@ -210,11 +210,27 @@ var SpectrumSettingsView = Backbone.View.extend({
 		;
 
 		//modTable
-		var modTableWrapper = dataForm.append("div").attr("class", "xispec_form-control dataTables_wrapper").attr("id", "xispec_modificationTable_wrapperOuter");
-		var modTable = modTableWrapper.append("table").attr("id", "xispec_modificationTable").attr("style", "width: 100%");
+		var modTableWrapper = dataForm.append("div")
+			.attr("class", "xispec_settingsTable_wrapper xispec_form-control dataTables_wrapper")
+		;
+		var modTable = modTableWrapper.append("table")
+			.attr("id", "xispec_modificationTable")
+			.attr("style", "width: 100%")
+		;
 		this.initializeModTable();
-
 		//end modTable
+
+		//lossTable
+		var lossTableWrapper = dataForm.append("div")
+			.attr("class", "xispec_settingsTable_wrapper xispec_form-control dataTables_wrapper")
+		;
+		var lossTable = lossTableWrapper.append("table")
+			.attr("id", "xispec_lossTable")
+			.attr("style", "width: 100%")
+		;
+		this.initializeLossTable();
+		//end lossTable
+
 		var dataBottom = dataForm.append("div").attr("class", "xispec_settings-bottom");
 
 		var applyxispec_btn = dataBottom.append("input")
@@ -503,7 +519,7 @@ var SpectrumSettingsView = Backbone.View.extend({
 
 	initializeModTable: function(){
 		var self = this;
-		var modTableVars = {
+		var tableVars = {
 			"scrollCollapse": true,
 			"paging":   false,
 			"ordering": false,
@@ -577,7 +593,7 @@ var SpectrumSettingsView = Backbone.View.extend({
 			]
 		};
 
-	    this.modTable = $('#xispec_modificationTable').DataTable( modTableVars );
+	    this.modTable = $('#xispec_modificationTable').DataTable( tableVars );
 
 	    //ToDo: change to BB event handling
 		$('#xispec_modificationTable').on('input', 'input', function() {
@@ -606,6 +622,113 @@ var SpectrumSettingsView = Backbone.View.extend({
 			self.renderModTable();
 		});
 
+	},
+
+	initializeLossTable: function(){
+		var self = this;
+		var tableVars = {
+			"scrollCollapse": true,
+			"paging":   false,
+			"ordering": false,
+			"info":     false,
+			"searching":false,
+			"data": this.model.losses,
+			"columns": [
+				// { "title": "loss-Input" ,"className": "invisible"},
+				{ "title": "Loss", "className": "dt-center" },
+				{ "title": "Mass", "className": "dt-center" },
+				{ "title": "Specificity", "className": "dt-center" },
+			],
+			"columnDefs": [
+				// {
+				// 	"render": function ( data, type, row, meta ) {
+				// 		return '<input class="xispec_form-control" id="modName_'+meta.row+'" title="modification code" name="mods[]" readonly type="text" value='+data+'>';
+				// 	},
+				// 	"class": "invisible",
+				// 	"targets": 0,
+				// },
+				// {
+				// 	"render": function ( data, type, row, meta ) {
+				// 		return row[0]+'<i class="fa fa-undo xispec_resetMod" title="reset modification to default" aria-hidden="true"></i></span>';
+				// 	},
+				// 	"targets": 1,
+				// },
+				// {
+				// 	"render": function ( data, type, row, meta ) {
+				// 		data = 0;
+				//
+				// 		var rowNode = self.modTable.rows( meta.row ).nodes().to$();
+				//
+				// 		for (var i = 0; i < self.model.losses.length; i++) {
+				// 			if(self.model.losses[i].id == row[0]){
+				// 				data = self.model.losses[i].mass;
+				// 				if (self.model.losses[i].changed){
+				// 					displayModified(rowNode);
+				// 				}
+				// 			}
+				// 		}
+				// 		data = parseFloat(parseFloat(data).toFixed(10).toString()); // limit to 10 decimal places and get rid of tailing zeroes
+				// 		if(data.toString().indexOf('.') !== -1)
+				// 			var stepSize = '0.'+'0'.repeat(data.toString().split('.')[1].length - 1) + 1;
+				// 		else
+				// 			var stepSize = 1;
+				// 		return '<input class="xispec_form-control stepInput" id="modMass_'+meta.row+'" row="'+meta.row+'" title="modification mass" name="modMasses[]" type="text" required value='+data+' autocomplete=off>';
+				// 	},
+				// 	"targets": 1,
+				// },
+				// {
+				// 	"render": function ( data, type, row, meta ) {
+				// 		if(self.model.knownModifications !== undefined){
+				// 			for (var i = 0; i < self.model.knownModifications.length; i++) {
+				// 				if(self.model.knownModifications[i].id == row[0]){
+				// 					data = data.split("");
+				// 					if (self.model.knownModifications[i].aminoAcids == '*')
+				// 						data = '*';
+				// 					else{
+				// 						data = _.union(data, self.model.knownModifications[i].aminoAcids);
+				// 						data.sort();
+				// 						data = data.join("");
+				// 					}
+				// 					var found = true;
+				// 				}
+				// 			}
+				// 		}
+				// 		data = data.split(",").join("");
+				// 		return '<input class="xispec_form-control" id="modSpec_'+meta.row+'" row="'+meta.row+'" title="amino acids that can be modified" name="modSpecificities[]" type="text" required value='+data+' autocomplete=off>'
+				// 	},
+				// 	"targets": 3,
+				// }
+			]
+		};
+
+	    this.lossTable = $('#xispec_lossTable').DataTable( tableVars );
+
+	    //ToDo: change to BB event handling
+		// $('#xispec_lossTable').on('input', 'input', function() {
+		//
+		// 	var row = this.getAttribute("row");
+		// 	var modName = $('#modName_'+row).val();
+		// 	var modMass = parseFloat($('#modMass_'+row).val());
+		// 	var modSpec = $('#modSpec_'+row).val();
+		//
+		// 	var mod = {'id': modName, 'mass': modMass, 'aminoAcids': modSpec.split('')};
+		//
+		// 	var updatedMod = self.model.updateModification(mod);
+		// 	if (!updatedMod.userMod)
+		// 		displayModified($(this).closest("tr"));
+		//
+		//  });
+		//
+		// var displayModified = function (row){
+		// 	row.addClass('userModified');
+		// 	row.find(".xispec_resetMod").css("visibility", "visible");
+		// }
+
+		$('#xispec_lossTable').on('click', '.xispec_resetLoss', function() {
+			var id = $(this).parent()[0].innerText;
+			self.model.resetLoss(id);
+			self.renderLossTable();
+		});
 
 	},
 
@@ -701,6 +824,26 @@ var SpectrumSettingsView = Backbone.View.extend({
 			});
 		}
 	},
+
+	// renderLossTable: function(){
+	//
+	// 	var self = this;
+	// 	this.lossTable.clear();
+	//
+	// 	if(modifications.length == 0) {
+	// 		this.modTable.draw( false );
+	// 	}
+	// 	else{
+	// 		modifications.forEach(function(mod){
+	// 			self.modTable.row.add( [
+	// 				mod.id,
+	// 				mod.id,
+	// 				0,
+	// 				mod.aminoAcids,
+	// 			] ).draw( false );
+	// 		});
+	// 	}
+	// },
 
 	cancel: function(){
 		this.isVisible = false;

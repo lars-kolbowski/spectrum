@@ -6,7 +6,7 @@
     width: 550px;
     height: 500px;
     min-width: 500px;
-    min-height: 490px;
+    min-height: 530px;
     font-size: 10pt;
     border: 1px solid #333;
 }
@@ -151,12 +151,7 @@
     font-size: 1em;
 }
 
-#xispec_modificationTable_wrapper{
-  width: 100%;
-  height: auto;
-}
-
-#xispec_modificationTable_wrapperOuter{
+.xispec_settingsTable_wrapper{
   width: 100%;
   height: auto;
   margin-top: 15px;
