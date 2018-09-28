@@ -165,6 +165,8 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 
 			this.precursor.calcMz = JSONdata.annotation.calculatedMZ;
 			// this.calcPrecursorMass();
+
+			this.losses = JSONdata.annotation.losses;
 		}
 
 		this.trigger("changed:data");
