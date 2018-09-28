@@ -94,7 +94,7 @@ xiSPEC.init = function(options) {
 		+"<div class='xispec_dynDiv' id='xispec_settingsWrapper'>"
 		+"	<div class='xispec_dynDiv_moveParentDiv'>"
 		+"		<span class='xispec_dynTitle'>Spectrum settings</span>"
-		+"		<i class='fa fa-times-circle settingsCancel' id='closeSettings'></i>"
+		+"		<i class='fa fa-times-circle xispec_settingsCancel' id='closeSettings'></i>"
 		+"	</div>"
 		+"	<div class='xispec_dynDiv_resizeDiv_tl draggableCorner'></div>"
 		+"	<div class='xispec_dynDiv_resizeDiv_tr draggableCorner'></div>"

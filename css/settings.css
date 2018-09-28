@@ -4,9 +4,9 @@
     right: 5%;
     top: 10%;
     width: 550px;
-    height: 500px;
-    min-width: 500px;
-    min-height: 530px;
+    height: 520px;
+    min-width: 550px;
+    min-height: 400px;
     font-size: 10pt;
     border: 1px solid #333;
 }
@@ -56,7 +56,11 @@
     width: 100%;
 }
 
-#xispec_settings_main .xispec_midDataDiv{
+#xispec_topDataDiv{
+  min-height: 210px;
+}
+
+#xispec_settings_main .xispec_splitDataDiv{
   flex-grow: 1;
 }
 
@@ -139,11 +143,12 @@
     display: inline;
     margin-right: 2%;
     flex-grow: 5;
-    flex-basis: 340px;
+    flex-basis: 250px;
 }
 
 .xispec_settingsDataRight{
     flex-grow: 1;
+    flex-basis: 300px;
 }
 
 #xispec_modificationTable .xispec_form-control{
@@ -154,7 +159,8 @@
 .xispec_settingsTable_wrapper{
   width: 100%;
   height: auto;
-  margin-top: 15px;
+  margin: 5px 0px;
+  min-height: 85px;
 }
 
 #xispec_settingsCustomCfg-input{
