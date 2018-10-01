@@ -160,7 +160,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 
 		if (JSONdata.annotation){
 			this.precursor.charge = JSONdata.annotation.precursorCharge;
-			this.precursor.matchMz = JSONdata.annotation.precursorMZ;
+			this.precursor.expMz = JSONdata.annotation.precursorMZ;
 			this.precursor.error = JSONdata.annotation.precursorError;
 
 			this.precursor.calcMz = JSONdata.annotation.calculatedMZ;

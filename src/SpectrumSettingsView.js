@@ -436,7 +436,7 @@ var SpectrumSettingsView = Backbone.View.extend({
 				var json = JSON.parse(response);
 // 				json['annotation']['custom'] = self.displayModel.customConfig;
 				json['annotation']['custom'] = self.displayModel.get("JSONdata").annotation.custom;
-				json['annotation']['precursorMZ'] = self.displayModel.precursor.matchMz;
+				json['annotation']['precursorMZ'] = self.displayModel.precursor.expMz;
 				json['annotation']['requestID'] = xiSPEC.lastRequestedID + Date.now();
 				xiSPEC.request_annotation(json);
 				self.displayModel.set('changedAnnotation', true);
