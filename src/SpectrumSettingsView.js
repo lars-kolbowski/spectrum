@@ -27,6 +27,7 @@ var SpectrumSettingsView = Backbone.View.extend({
 	events : {
 		'click #xispec_toggleModifications' : 'toggleModTable',
 		'click #xispec_toggleLosses' : 'toggleLossTable',
+		'click #xispec_addNewLoss': 'addNewLoss',
 		'click #xispec_lossyChkBx': 'showLossy',
 		'click #xispec_absErrChkBx': 'absErrToggle',
 		'click #xispec_accentuateCLcontainingChkBx': 'accentuateCLcontainingToggle',
@@ -225,6 +226,7 @@ var SpectrumSettingsView = Backbone.View.extend({
 		;
 		var modTable = this.modTableWrapper.append("table")
 			.attr("id", "xispec_modificationTable")
+			.attr("class", "xispec_settingsTable")
 			.attr("style", "width: 100%")
 		;
 		this.initializeModTable();
@@ -235,8 +237,8 @@ var SpectrumSettingsView = Backbone.View.extend({
 			.attr('id', 'xispec_toggleLosses')
 			.attr('class', 'pointer')
 		;
-		lossToggle.append('i').attr("class", "fa fa-plus-square").attr("aria-hidden", "true");
-		lossToggle.append('span').text(' Losses:');
+		lossToggle.append('i').attr("class", "fa fa-plus-square pointer").attr("aria-hidden", "true");
+		lossToggle.append('span').text(' Losses:').append('span');
 
 		this.lossTableWrapper = dataForm.append("div")
 			.attr("class", "xispec_settingsTable_wrapper xispec_form-control dataTables_wrapper")
@@ -244,6 +246,7 @@ var SpectrumSettingsView = Backbone.View.extend({
 		;
 		var lossTable = this.lossTableWrapper.append("table")
 			.attr("id", "xispec_lossTable")
+			.attr("class", "xispec_settingsTable")
 			.attr("style", "width: 100%")
 		;
 		this.initializeLossTable();
@@ -652,65 +655,58 @@ var SpectrumSettingsView = Backbone.View.extend({
 			"searching":false,
 			"data": this.model.losses,
 			"columns": [
-				{ "title": "loss-Input" ,"className": "invisible"},
-				{ "title": "Loss", "className": "dt-center" },
+				{},
+				{
+					"title": 'Neutral Loss <i id="xispec_addNewLoss" class="fa fa-plus-circle" aria-hidden="true" title="add new neutral loss"></i>' ,
+					"className": "dt-center"
+				},
 				{ "title": "Mass", "className": "dt-center" },
 				{ "title": "Specificity", "className": "dt-center" },
 			],
 			"columnDefs": [
 				{
 					"render": function ( data, type, row, meta ) {
-						return '<input class="xispec_form-control" id="lossName_'+meta.row+'" title="loss code" name="losses[]" readonly type="text" value='+data+'>';
+						return '<i class="fa fa-trash xispec_deleteLoss" title="delete neutral loss" aria-hidden="true">';
 					},
-					"class": "invisible",
 					"targets": 0,
 				},
 				{
 					"render": function ( data, type, row, meta ) {
-						return row[0]+'<i class="fa fa-undo xispec_resetMod" title="reset modification to default" aria-hidden="true"></i></span>';
+						return '<input class="xispec_form-control" style="width:100px" id="lossName_'+meta.row+'" title="neutral loss name" name="losses[]" type="text" value='+data+'>';
 					},
 					"targets": 1,
 				},
+				// {
+				// 	"render": function ( data, type, row, meta ) {
+				// 		return row[0]+'<i class="fa fa-undo xispec_resetMod" title="reset modification to default" aria-hidden="true"></i></span>';
+				// 	},
+				// 	"targets": 1,
+				// },
 				{
 					"render": function ( data, type, row, meta ) {
-						data = 0;
-
-						var rowNode = self.lossTable.rows( meta.row ).nodes().to$();
-
-						for (var i = 0; i < self.model.losses.length; i++) {
-							if(self.model.losses[i].id == row[0]){
-								data = self.model.losses[i].mass;
-								if (self.model.losses[i].changed){
-									displayModified(rowNode);
-								}
-							}
-						}
-						data = parseFloat(parseFloat(data).toFixed(10).toString()); // limit to 10 decimal places and get rid of tailing zeroes
-						if(data.toString().indexOf('.') !== -1)
-							var stepSize = '0.'+'0'.repeat(data.toString().split('.')[1].length - 1) + 1;
-						else
-							var stepSize = 1;
-						return '<input class="xispec_form-control stepInput" id="lossMass_'+meta.row+'" row="'+meta.row+'" title="neutral loss mass" name="lossMasses[]" type="text" required value='+data+' autocomplete=off>';
+						// data = 0;
+						//
+						// var rowNode = self.lossTable.rows( meta.row ).nodes().to$();
+						//
+						// for (var i = 0; i < self.model.losses.length; i++) {
+						// 	if(self.model.losses[i].id == row[1]){
+						// 		data = self.model.losses[i].mass;
+						// 		if (self.model.losses[i].changed){
+						// 			displayModified(rowNode);
+						// 		}
+						// 	}
+						// }
+						// data = parseFloat(parseFloat(data).toFixed(10).toString()); // limit to 10 decimal places and get rid of tailing zeroes
+						// if(data.toString().indexOf('.') !== -1)
+						// 	var stepSize = '0.'+'0'.repeat(data.toString().split('.')[1].length - 1) + 1;
+						// else
+						// 	var stepSize = 1;
+						return '<input class="xispec_form-control stepInput" style="width:120px" id="lossMass_'+meta.row+'" row="'+meta.row+'" title="neutral loss mass" name="lossMasses[]" type="text" required value='+data+' autocomplete=off>';
 					},
 					"targets": 2,
 				},
 				{
 					"render": function ( data, type, row, meta ) {
-						// if(self.model.knownModifications !== undefined){
-						// 	for (var i = 0; i < self.model.knownModifications.length; i++) {
-						// 		if(self.model.knownModifications[i].id == row[0]){
-						// 			data = data.split("");
-						// 			if (self.model.knownModifications[i].aminoAcids == '*')
-						// 				data = '*';
-						// 			else{
-						// 				data = _.union(data, self.model.knownModifications[i].aminoAcids);
-						// 				data.sort();
-						// 				data = data.join("");
-						// 			}
-						// 			var found = true;
-						// 		}
-						// 	}
-						// }
 						data = data.join(", ");
 						return '<input class="xispec_form-control" id="lossSpec_'+meta.row+'" row="'+meta.row+'" title="neutral loss specificity" name="lossSpecificities[]" type="text" required value="'+data+'" autocomplete=off>'
 					},
@@ -742,11 +738,20 @@ var SpectrumSettingsView = Backbone.View.extend({
 		// 	row.find(".xispec_resetMod").css("visibility", "visible");
 		// }
 
-		$('#xispec_lossTable').on('click', '.xispec_resetLoss', function() {
-			var id = $(this).parent()[0].innerText;
-			self.model.resetLoss(id);
-			self.renderLossTable();
+		$('#xispec_lossTable ').on('click', '.xispec_deleteLoss', function() {
+			// console.log(this);
+			self.lossTable
+				.row( $(this).parents('tr') )
+		        .remove()
+		        .draw();
 		});
+
+		// ToDO:
+		// $('#xispec_lossTable').on('click', '.xispec_resetLoss', function() {
+		// 	var id = $(this).parent()[0].innerText;
+		// 	self.model.resetLoss(id);
+		// 	self.renderLossTable();
+		// });
 
 	},
 
@@ -831,8 +836,10 @@ var SpectrumSettingsView = Backbone.View.extend({
 
 		if(modifications.length == 0) {
 			this.modTable.draw( false );
+			this.hideModTable();
 		}
 		else{
+			this.showModTable();
 			modifications.forEach(function(mod){
 				self.modTable.row.add( [
 					mod.id,
@@ -844,6 +851,16 @@ var SpectrumSettingsView = Backbone.View.extend({
 		}
 	},
 
+	hideModTable: function(){
+		$('#xispec_toggleModifications').find(".fa-minus-square").removeClass("fa-minus-square").addClass("fa-plus-square");
+		$(this.modTableWrapper.node()).hide();
+	},
+
+	showModTable: function(){
+		$('#xispec_toggleModifications').find(".fa-plus-square").removeClass("fa-plus-square").addClass("fa-minus-square");
+		$(this.modTableWrapper.node()).show();
+	},
+
 	toggleModTable: function(){
 		if($(this.modTableWrapper.node()).is(":visible")){
 			$('#xispec_toggleModifications').find(".fa-minus-square").removeClass("fa-minus-square").addClass("fa-plus-square");
@@ -852,6 +869,16 @@ var SpectrumSettingsView = Backbone.View.extend({
 			$('#xispec_toggleModifications').find(".fa-plus-square").removeClass("fa-plus-square").addClass("fa-minus-square");
 		}
 		$(this.modTableWrapper.node()).toggle();
+	},
+
+	addNewLoss: function(){
+		console.log('new loss');
+		this.lossTable.row.add( [
+			'',
+			'',
+			0,
+			[],
+		] ).draw( false );
 	},
 
 	toggleLossTable: function(){
@@ -865,9 +892,6 @@ var SpectrumSettingsView = Backbone.View.extend({
 	},
 
 	renderLossTable: function(){
-
-		// this.lossTable.ajax.reload();
-
 		var self = this;
 		var losses = this.model.losses;
 		this.lossTable.clear();
@@ -878,7 +902,7 @@ var SpectrumSettingsView = Backbone.View.extend({
 		else{
 			losses.forEach(function(loss){
 				self.lossTable.row.add( [
-					loss.id,
+					'',
 					loss.id,
 					loss.mass,
 					loss.specificity,
