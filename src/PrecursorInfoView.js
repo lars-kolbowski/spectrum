@@ -93,8 +93,8 @@ var PrecursorInfoView = Backbone.View.extend({
 		var dataArr = [];
 		if (precursor.intensity !== undefined && precursor.intensity != -1)
 			dataArr.push("Intensity=" + precursor.intensity);
-		if (precursor.matchMz !== undefined && precursor.matchMz != -1)
-			dataArr.push("match m/z=" + precursor.matchMz.toFixed(this.model.showDecimals));
+		if (precursor.expMz !== undefined && precursor.expMz != -1)
+			dataArr.push("exp m/z=" + precursor.expMz.toFixed(this.model.showDecimals));
 		if(precursor.calcMz !== undefined)
 			dataArr.push("calc m/z=" + precursor.calcMz.toFixed(this.model.showDecimals));
 		if (precursor.charge !== undefined)
