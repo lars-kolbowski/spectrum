@@ -26,12 +26,12 @@ var ErrorPlotView = Backbone.View.extend({
 
 	initialize: function(viewOptions) {
 
-		this.listenTo(CLMSUI.vent, 'QCabsErr', this.toggleAbsErr);
-		this.listenTo(CLMSUI.vent, 'QCPlotToggle', this.toggleView);
+		this.listenTo(xiSPEC.vent, 'QCabsErr', this.toggleAbsErr);
+		this.listenTo(xiSPEC.vent, 'QCPlotToggle', this.toggleView);
 		this.listenTo(window, 'resize', _.debounce(this.render));
-		this.listenTo(CLMSUI.vent, 'resize:spectrum', this.render);
-		this.listenTo(CLMSUI.vent, 'downloadQCSVG', this.downloadSVG);
-		this.listenTo(CLMSUI.vent, 'show:QC', this.wrapperVisToggle);
+		this.listenTo(xiSPEC.vent, 'resize:spectrum', this.render);
+		this.listenTo(xiSPEC.vent, 'downloadQCSVG', this.downloadSVG);
+		this.listenTo(xiSPEC.vent, 'show:QC', this.wrapperVisToggle);
 
 		var self = this;
 
@@ -61,21 +61,14 @@ var ErrorPlotView = Backbone.View.extend({
 		if (CLMSUI.compositeModelInst !== undefined)
 			this.tooltip = CLMSUI.compositeModelInst.get("tooltipModel");
 		else{
-			// target = window; //this would get you #spectrumPanel
 			this.tooltip = d3.select("body").append("span")
-				.style("font-size", "small")
-				.style("padding", "0 5px")
-				.style("border-radius", "6px")
-				.attr("class", "tooltip")
-				.style("background-color", "black")
-				.style("pointer-events", "none")
-				.style("position", "absolute")
-				.style("opacity", 0)
-				.style("z-index", 100);
+				.attr("class", "xispec_tooltip")
+			;
 		}
 
 		this.listenTo(this.model, 'change', this.render);
 		this.listenTo(this.model, 'changed:ColorScheme', this.render);
+		this.listenTo(this.model, 'change:highlightColor', this.render);
 		this.listenTo(this.model, 'changed:Highlights', this.updateHighlights);
 	},
 
@@ -86,18 +79,17 @@ var ErrorPlotView = Backbone.View.extend({
 
 	//ToDo: duplicate with SpectrumView2 downloadSVG function
 	downloadSVG: function(){
-		
 		if(this.isVisible){
 			var svgSel = d3.select(this.el).selectAll("svg");
 			var svgArr = svgSel[0];
 			var svgStrings = CLMSUI.svgUtils.capture (svgArr);
 			var svgXML = CLMSUI.svgUtils.makeXMLStr (new XMLSerializer(), svgStrings[0]);
 
-			var charge = this.model.JSONdata.annotation.precursorCharge;
+			var charge = this.model.precursor.charge;
 			var pepStrs = this.model.pepStrsMods;
-			var linkSites = Array(this.model.JSONdata.LinkSite.length);
+			var linkSites = Array(this.model.get("JSONdata").LinkSite.length);
 
-			this.model.JSONdata.LinkSite.forEach(function(ls){
+			this.model.get("JSONdata").LinkSite.forEach(function(ls){
 				linkSites[ls.peptideId] = ls.linkSite;
 			});
 
@@ -139,10 +131,10 @@ var ErrorPlotView = Backbone.View.extend({
 
 	render: function() {
 
-		if (this.model.JSONdata === undefined || this.model.JSONdata === null || !this.isVisible || !this.wrapperVisible)
+		this.clear();
+		if (this.model.get("JSONdata") === undefined || this.model.get("JSONdata") === null || !this.isVisible || !this.wrapperVisible)
 			return;
 
-		this.clear();
 		//get Data
 		var fragments = this.model.fragments;
 
@@ -156,16 +148,17 @@ var ErrorPlotView = Backbone.View.extend({
 			if (fragment.type.includes("Loss"))
 				lossy = true;
 			fragment.clusterInfo.forEach(function(cluster){
-				var firstPeakId = self.model.JSONdata.clusters[cluster.Clusterid].firstPeakId;
+				var firstPeakId = self.model.get("JSONdata").clusters[cluster.Clusterid].firstPeakId;
 				var point = {
 					fragId: fragId,
 					peptideId: peptideId,
 					lossy: lossy,
-					x: self.options.xData == 'Intensity' ? self.model.JSONdata.peaks[firstPeakId].intensity : self.model.JSONdata.peaks[firstPeakId].mz,
+					x: self.options.xData == 'Intensity' ? self.model.get("JSONdata").peaks[firstPeakId].intensity : self.model.get("JSONdata").peaks[firstPeakId].mz,
 					error: cluster.error,
+					errorUnit: cluster.errorUnit,
 					y: self.absolute ? Math.abs(cluster.error) : cluster.error,
-					charge: self.model.JSONdata.clusters[cluster.Clusterid].charge,
-					//mz: self.model.JSONdata.peaks[firstPeakId].mz
+					charge: self.model.get("JSONdata").clusters[cluster.Clusterid].charge,
+					//mz: self.model.get("JSONdata").peaks[firstPeakId].mz
 				}
 				self.data.push(point);
 			});
@@ -181,7 +174,7 @@ var ErrorPlotView = Backbone.View.extend({
 
 		var xmax = d3.max(this.data, function(d) { return d['x']; });
 		// var ymax = d3.max(this.data, function(d) { return d['error']; });
-		var ymax = this.model.MSnTolerance.value;
+		var ymax = this.model.MSnTolerance.tolerance;
 
 		var ymin = this.absolute ? 0 : 0 - ymax;
 
@@ -266,7 +259,7 @@ var ErrorPlotView = Backbone.View.extend({
 			.enter().append('circle')
 			.attr("cx", function (d) { return self.x(d['x']); } )
 		 	.attr("cy", function (d) { return self.y(d['y']); } )
-			.style('fill', this.model.highlightColour)
+			.style('fill', this.model.get('highlightColor'))
 			.style('opacity', 0)
 			.style('pointer-events', 'none')
 			.attr('id', function (d) { return d.fragId })
@@ -314,10 +307,8 @@ var ErrorPlotView = Backbone.View.extend({
 	},
 
 	showTooltip: function(x, y, data){
-		if (this.model.showSpectrum)
-			return
 
-		var contents = [["charge", data.charge], ["error", data.error.toFixed(3)], [this.options.xData, data.x.toFixed(this.model.showDecimals)]];
+		var contents = [["charge", data.charge], ["error", data.error.toFixed(this.model.showDecimals) + ' ' + data.errorUnit], [this.options.xData, data.x.toFixed(this.model.showDecimals)]];
 
 		var fragId = data.fragId;
 		var fragments = this.model.fragments.filter(function(d) { return d.id == fragId; });

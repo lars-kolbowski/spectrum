@@ -19,14 +19,14 @@
 //		graph/Peak.js
 
 function Peak (id, graph){
-	var peak = graph.model.JSONdata.peaks[id];
+	var peak = graph.model.get("JSONdata").peaks[id];
 	this.id = id;
 	this.x = peak.mz;
 	this.y = peak.intensity;
 	this.IsotopeClusters = [];
 	this.labels = [];
 	for (i=0; i<peak.clusterIds.length; i++){
-		cluster = graph.model.JSONdata.clusters[peak.clusterIds[i]]
+		cluster = graph.model.get("JSONdata").clusters[peak.clusterIds[i]]
 		cluster.id = peak.clusterIds[i]
 		this.IsotopeClusters.push(cluster);
 	}
@@ -65,12 +65,13 @@ function Peak (id, graph){
 	};
 
 	//svg elements
-	this.linegroup = this.graph.peaksSVG.append('g');
+	this.lineLabelGroup = this.graph.peaksSVG.append('g');
+	this.lineGroup = this.lineLabelGroup.append('g');
 
 	if (this.fragments.length > 0) {
-		this.highlightLine = this.linegroup.append('line')
-								.attr("stroke", this.graph.model.highlightColour)
-								.attr("stroke-width", this.graph.model.highlightWidth)
+		this.highlightLine = this.lineGroup.append('line')
+								.attr("stroke", this.graph.model.get('highlightColor'))
+								.attr("stroke-width", this.graph.model.get('highlightWidth'))
 								.attr("opacity","0")
 								.attr("stroke-opacity", "0.7")
 								.attr("x1", 0)
@@ -80,8 +81,7 @@ function Peak (id, graph){
 		//set the dom events for it
 		var self = this;
 
-
-		this.linegroup
+		this.lineGroup
 			.on("mouseover", function() {
 				var evt = d3.event;
 				if (evt.ctrlKey){
@@ -130,22 +130,28 @@ function Peak (id, graph){
 			var fragCount = fragments.length;
 			for (var f = 0; f < fragCount; f++){
 					//get right cluster for peak
-					index = 0;
+// 					var index = 0;
 					for (var i = 0; i < self.clusterIds.length; i++) {
 						if(fragments[f].clusterIds.indexOf(self.clusterIds[i]) != -1){
-							index = fragments[f].clusterIds.indexOf(self.clusterIds[i])
-							cluster = graph.model.JSONdata.clusters[self.clusterIds[i]]
+							var index = fragments[f].clusterIds.indexOf(self.clusterIds[i])
+							var cluster = graph.model.get("JSONdata").clusters[self.clusterIds[i]]
 						}
 					}
-
-					charge = cluster.charge;
-					error = fragments[f].clusterInfo[index].error.toFixed(2)+" "+fragments[f].clusterInfo[index].errorUnit;
+					var matchedMissingMonoIsotopic = fragments[f].clusterInfo[index].matchedMissingMonoIsotopic;
+					var charge = cluster.charge;
+					var error = fragments[f].clusterInfo[index].error.toFixed(self.graph.model.showDecimals)+" "+fragments[f].clusterInfo[index].errorUnit;
 					var chargeStr = "";
 					for (var i = 0; i < charge; i++){
 						chargeStr += "+";
 					}
 					header.push(fragments[f].name + chargeStr);
-					contents.push([fragments[f].name + " (" + fragments[f].sequence + ")", "charge: " + charge + ", error: " + error]);
+
+					var fragName = fragments[f].name + " (" + fragments[f].sequence + ")";
+					var fragInfo = "charge: " + charge + ", error: " + error;
+					if (matchedMissingMonoIsotopic) fragInfo += ", missing monoisotopic peak";
+
+					var fragmentBodyText = [fragName, fragInfo];
+					contents.push(fragmentBodyText);
 			};
 
 
@@ -217,9 +223,8 @@ function Peak (id, graph){
 			self.graph.model.updateStickyHighlight(fragments, ctrl);
 		};
 
-
-	  	//create frag labels
-	  	//labeldrag
+		//create frag labels
+		//labeldrag
 		this.labelDrag = d3.behavior.drag();
 		this.labelDrag
 			.on("dragstart", function(){
@@ -241,13 +246,19 @@ function Peak (id, graph){
 				var mouseY = coords[1];
 				var r = Math.sqrt((mouseX * mouseX) + ((mouseY-startY) * (mouseY-startY) ));
 				if (r > 15){
-						filteredLabelLines
-							.attr("opacity", 1)
-							.attr("x1", 0)
-							.attr("x2", mouseX)
-							.attr("y1", startY)
-							.attr("y2", mouseY)
-						;
+					var deltaY = (mouseY - startY > 0 ? -8 : 2);
+					var deltaX = 0;
+					if(Math.abs(mouseX) > 20){
+						deltaX = (mouseX > 0 ? -8 : 8)
+					}
+					console.log(mouseX);
+					filteredLabelLines
+						.attr("opacity", 1)
+						.attr("x1", 0)
+						.attr("x2", mouseX + deltaX)
+						.attr("y1", startY)
+						.attr("y2", mouseY + deltaY)
+					;
 				}
 				else
 					filteredLabelLines.attr("opacity", 0);
@@ -277,19 +288,19 @@ function Peak (id, graph){
 
 			if (peakFrags.length > 0) {
 				var group = partition.group;
-				var labelgroup = self.linegroup.selectAll("g.label").data (peakFrags, makeIdentityID);
-				var labelLines = self.linegroup.selectAll("line.labelLine").data (peakFrags, makeIdentityID);
+				var labelgroup = self.lineLabelGroup.selectAll("g.xispec_label").data (peakFrags, makeIdentityID);
+				var labelLines = self.lineLabelGroup.selectAll("line.xispec_labelLine").data (peakFrags, makeIdentityID);
 
 				labelLines.enter()
 					.append("line")
-					.attr("stroke-width", 1)
+					// .attr("stroke-width", 1)
 					.attr("stroke", "Black")
-					.attr("class", "labelLine")
+					.attr("class", "xispec_labelLine")
 					.style("stroke-dasharray", ("3, 3"));
 
 				var label = labelgroup.enter()
 					.append("g")
-						.attr("class", "label")
+						.attr("class", "xispec_label")
 						.style("cursor", "pointer")
 						.on("mouseover", function(d) {
 							var evt = d3.event;
@@ -345,15 +356,23 @@ function Peak (id, graph){
 					.attr("text-anchor", "middle")
 					.style("stroke-width", "6px")
 					.style("font-size", "0.8em")
-					.attr("class", "peakAnnotHighlight")
-					.attr("stroke", this.graph.model.highlightColour);
+					.attr("class", "xispec_peakAnnotHighlight")
+					.attr("stroke", this.graph.model.get('highlightColor'));
 
-			   	label.append("text")
+				label.append("text")
 					.text(function(d) {return d.name;})
 					.attr("x", 0)
 					.attr("text-anchor", "middle")
 					.style("font-size", "0.8em")
-					.attr("class", "peakAnnot")
+					.attr("font-weight", function(d){
+						if (self.graph.options.accentuateCLcontainingFragments && d.crossLinkContaining)
+							return '900';
+						return 'normal';
+					})
+					.attr("class", function(d){
+						var pepIndex = d.peptideId+1;
+						return "xispec_peakAnnot pep" + pepIndex + " " + partition.colourClass;
+					})
 					.attr ("fill", function(d) {
 						var pepIndex = d.peptideId+1;
 						return self.graph.model["p" + pepIndex + partition.colourClass];
@@ -363,16 +382,24 @@ function Peak (id, graph){
 		}, this);
 
 		var fset = d3.set (this.fragments.map (function (frag) { return frag.id; }));
-		this.labelgroups = self.linegroup.selectAll("g.label").filter (function(d) { return fset.has(d.id); });
-		this.labels = this.labelgroups.selectAll("text.peakAnnot");
-		this.labelHighlights = this.labelgroups.selectAll("text.peakAnnotHighlight");
-		this.labelLines = self.linegroup.selectAll("line.labelLine").filter (function(d) { return fset.has(d.id); });
+		var labelgroups = this.lineLabelGroup.selectAll("g.xispec_label").filter (function(d) { return fset.has(d.id); });
+
+		this.labels = labelgroups.selectAll("text.xispec_peakAnnot");
+		this.labelHighlights = labelgroups.selectAll("text.xispec_peakAnnotHighlight");
+
+		this.labelLines = this.lineLabelGroup.selectAll("line.xispec_labelLine").filter (function(d) { return fset.has(d.id); });
+
 		this.highlight(false);
 
 	}
 
-	this.line = this.linegroup.append('line')
-					.attr("stroke-width","1")
+	var peakStrokeWidth = 1;
+	if (this.graph.options.accentuateCLcontainingFragments && this.fragments.filter(function(f){return f.crossLinkContaining}).length > 0){
+		peakStrokeWidth = 2;
+	}
+
+	this.line = this.lineGroup.append('line')
+					.attr("stroke-width", peakStrokeWidth)
 					.attr("x1", 0)
 					.attr("x2", 0);
 
@@ -382,7 +409,7 @@ function Peak (id, graph){
 	}
 
 
-	this.colour = this.graph.model.peakColour;
+	this.colour = this.graph.model.get('peakColor');
 	if (this.fragments.length > 0){
 
 		var lossy = true;
@@ -427,7 +454,7 @@ Peak.prototype.highlight = function(show, fragments){
 			;
 			this.labels.filter(ffunc).attr("display", "inline");
 		}
-		// this.graph.peaksSVG.node().appendChild(this.linegroup.node());
+		// this.graph.peaksSVG.node().appendChild(this.lineLabelGroup.node());
 		this.line.attr("stroke", this.colour);
 	} else {
 		this.highlightLine.attr("opacity",0);
@@ -439,7 +466,7 @@ Peak.prototype.highlight = function(show, fragments){
 
 Peak.prototype.update = function(){
 
-	this.linegroup.attr("transform", "translate("+this.graph.x(this.x)+",0)");
+	this.lineLabelGroup.attr("transform", "translate("+this.graph.x(this.x)+",0)");
 	var xDomain = this.graph.x.domain();
 	if (this.x > xDomain[0] && this.x < xDomain[1]){
 		//reset label lines
@@ -455,9 +482,9 @@ Peak.prototype.update = function(){
 		this.updateX(xDomain);
 		this.updateY();
 		//show peaks
-		this.linegroup.attr("display","inline");
+		this.lineLabelGroup.attr("display","inline");
 	} else {
-		this.linegroup.attr("display","none");
+		this.lineLabelGroup.attr("display","none");
 	}
 }
 
@@ -499,16 +526,14 @@ Peak.prototype.updateY = function(){
 		this.highlightLine
 			.attr("y1", yScale(this.y))
 			.attr("y2", yScale(0));
-		var yStep = 15;
-		var self = this;
+		var yStep = 13;
 
 		for (var i = 0; i < labelCount; i++) {
-			this.labels[i][0].setAttribute("y",  yScale(self.y) - 5 - (yStep * i));
-			this.labelHighlights[i][0].setAttribute("y",  yScale(self.y) - 5 - (yStep * i));
+			var gap = this.graph.options.invert ? -10 - (yStep * i) : 5 + (yStep * i);
+			this.labels[i][0].setAttribute("y",  yScale(this.y) - gap);
+			this.labelHighlights[i][0].setAttribute("y",  yScale(this.y) - gap);
 		}
 
-		//this.labels.attr("y", function(d,i) { return yScale(self.y) - 5 - (yStep * i); });
-		//this.labelHighlights.attr("y", function(d,i) { return yScale(self.y) - 5 - (yStep * i); });
 	}
 }
 
@@ -517,7 +542,7 @@ Peak.prototype.removeLabels = function(){
 	if(labelCount){
 		this.labels.attr("display", "none");
 		this.labelHighlights.attr("display", "none");
-		this.labelLines.attr("opacity", 0);
+// 		this.labelLines.attr("opacity", 0);
 	}
 }
 
@@ -532,12 +557,12 @@ Peak.prototype.showLabels = function(lossyOverride){
 		};
 		this.labels.filter(ffunc).attr("display", "inline");
 		this.labelHighlights.filter(ffunc).attr("display", "inline");
-		this.labelLines.filter(ffunc).attr("opacity", 1);
+// 		this.labelLines.filter(ffunc).attr("opacity", 1);
 	}
 }
 
 Peak.prototype.updateColor = function(){
-	this.colour = this.graph.model.peakColour;
+	this.colour = this.graph.model.get('peakColor');
 	if (this.fragments.length > 0){
 		if (this.fragments[0].peptideId == 0) {
 			if (this.fragments[0].class == "non-lossy")
@@ -560,6 +585,18 @@ Peak.prototype.updateColor = function(){
 			this.colour = this.graph.model.p2color_cluster;
 	}
 	this.line.attr("stroke", this.colour);
-	if(this.labels.length)
-		this.labels.attr("fill", this.colour);
+	if(this.labels.length){
+
+		var filter_p1 = function(label){ return label.peptideId == 0};
+		var filter_p2 = function(label){ return label.peptideId == 1};
+		var filter_lossy = function(label){ return label.class == "lossy"};
+		var filter_nonLossy = function(label){ return label.class == "non-lossy"};
+
+		this.labels.filter(filter_p1).filter(filter_nonLossy).attr("fill", this.graph.model.p1color);
+		this.labels.filter(filter_p1).filter(filter_lossy).attr("fill", this.graph.model.p1color_loss);
+		this.labels.filter(filter_p2).filter(filter_nonLossy).attr("fill", this.graph.model.p2color);
+		this.labels.filter(filter_p2).filter(filter_lossy).attr("fill", this.graph.model.p2color_loss);
+
+	}
+
 }
