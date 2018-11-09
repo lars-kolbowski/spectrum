@@ -37,11 +37,12 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 
 		var self = this;
 
-		if(this.get('knownModificationsURL') !== false){
+		if(this.get('knownModificationsURL') !== false && !("cachedKnownModifications" in AnnotatedSpectrumModel.prototype)) {    // in tells difference between variable existing and having the undefined value and it not being defined at all
 			this.getKnownModifications(this.get('knownModificationsURL'));
+            AnnotatedSpectrumModel.prototype.cachedKnownModifications = this.knownModifications;
 		}
 		else{
-			this.knownModifications = this.get('knownModifications');
+			this.knownModifications = AnnotatedSpectrumModel.prototype.cachedKnownModifications || this.get('knownModifications');
 		}
 
 		this.showDecimals = 2;
