@@ -203,6 +203,7 @@ Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 
 	if(this.options.hidden){
 		this.xlabel.attr('visibility', 'hidden');
+		this.plotBackgroundLabel.attr('visibility', 'hidden');
 		return;
 	}
 
