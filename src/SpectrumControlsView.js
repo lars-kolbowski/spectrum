@@ -293,7 +293,8 @@ var SpectrumControlsView = Backbone.View.extend({
 	},
 
 	butterflySwap: function(e) {
-		xiSPEC.vent.trigger('butterflySwap');
+		if($('#xispec_butterflyChkbx').is(':checked'))
+			xiSPEC.vent.trigger('butterflySwap');
 	},
 
 });
