@@ -62,6 +62,7 @@ var FragmentationKeyView = Backbone.View.extend({
 		this.listenTo(window, 'resize', _.debounce(this.resize));
 		this.listenTo(xiSPEC.vent, 'resize:spectrum', this.resize);
 		this.listenTo(xiSPEC.vent, 'butterflyToggle', this.butterflyToggle);
+		this.listenTo(xiSPEC.vent, 'butterflySwap', this.butterflySwap);
 		this.listenTo(xiSPEC.vent, 'AccentuateCrossLinkContainingFragments', this.accentuateCLcontainingToggle);
 
 		this.tooltip = d3.select("body").append("span")
@@ -857,6 +858,11 @@ var FragmentationKeyView = Backbone.View.extend({
 			this.render();
 		}
 		this.resize();
+	},
+
+	butterflySwap: function(){
+		this.options.invert = !this.options.invert;
+		this.render();
 	},
 
 	accentuateCLcontainingToggle: function(toggle){

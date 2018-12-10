@@ -34,6 +34,7 @@ var PrecursorInfoView = Backbone.View.extend({
 		this.options = _.extend(defaultOptions, viewOptions);
 
 		this.listenTo(xiSPEC.vent, 'butterflyToggle', this.butterflyToggle);
+		this.listenTo(xiSPEC.vent, 'butterflySwap', this.butterflySwap);
 		this.listenTo(xiSPEC.vent, 'resize:spectrum', this.render);
 		this.listenTo(window, 'resize', _.debounce(this.render));
 		this.expand = true;
@@ -47,9 +48,6 @@ var PrecursorInfoView = Backbone.View.extend({
 			.attr("x", 10)
 			.attr("y", 13)
 			.attr("font-size", 12);
-
-
-
 
 		this.listenTo(this.model, 'change', this.render);
 	},
@@ -78,14 +76,16 @@ var PrecursorInfoView = Backbone.View.extend({
 		this.content = this.wrapper.append('tspan')
 			.style("cursor", "default");
 
-
 		if(this.options.invert){
 			var $el = $(this.el)
 			var parentWidth = $el.width();
 			var parentHeight = $el.height();
 			var top = this.model.isLinear ? parentHeight - 65 : parentHeight - 115;
-			this.wrapper.attr("transform", "translate(0," + top + ")");
 		}
+		else{
+			var top = 0;
+		}
+		this.wrapper.attr("transform", "translate(0," + top + ")");
 
 		var precursor = this.model.precursor;
 		var content = "";
@@ -126,6 +126,11 @@ var PrecursorInfoView = Backbone.View.extend({
 			this.options.hidden = !toggle;
 			this.render();
 		}
+		this.render();
+	},
+
+	butterflySwap: function(){
+		this.options.invert = !this.options.invert;
 		this.render();
 	},
 

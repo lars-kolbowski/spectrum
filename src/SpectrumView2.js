@@ -61,6 +61,7 @@ var SpectrumView = Backbone.View.extend({
 		this.listenTo(this.model, 'change:mzRange', this.updateMzRange);
 
 		this.listenTo(xiSPEC.vent, 'butterflyToggle', this.butterflyToggle);
+		this.listenTo(xiSPEC.vent, 'butterflySwap', this.butterflySwap);
 		this.listenTo(xiSPEC.vent, 'AccentuateCrossLinkContainingFragments', this.accentuateCLcontainingToggle);
 		this.listenTo(xiSPEC.vent, 'downloadSpectrumSVG', this.downloadSVG);
 		this.listenTo(xiSPEC.vent, 'resize:spectrum', this.resize);
@@ -176,6 +177,11 @@ var SpectrumView = Backbone.View.extend({
 			this.render();
 		}
 		this.resize();
+	},
+
+	butterflySwap: function(){
+		this.options.invert = !this.options.invert;
+		this.render();
 	},
 
 	accentuateCLcontainingToggle: function(toggle){
