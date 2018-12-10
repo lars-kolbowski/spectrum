@@ -37,8 +37,20 @@ Graph = function(targetSvg, model, options) {
 	this.g = targetSvg.append("g").attr("class", "spectrum");
 
 	this.plot = this.g.append("rect")
+		.attr("class", "xispec_plotBackground")
 		.style("fill", "white")
-		.attr("pointer-events", "visible");
+		.attr("pointer-events", "visible")
+	;
+
+	backgroundLabel = (this.options.identifier == 'originalSpectrum') ? 'original' : 're-annotation';
+
+	this.plotBackgroundLabel = this.g.append('text')
+		.attr('visibility', 'hidden')
+		.text(backgroundLabel)
+		.attr('opacity','0.4')
+		.attr('fill', 'grey')
+		.attr('style', 'text-anchor: middle; pointer-events: none; font-size: 2em;')
+	;
 
 	this.measureBackground = this.g.append("rect")
 		.attr("width", "0")
@@ -181,7 +193,8 @@ Graph.prototype.setData = function(){
 		this.disableZoom();
 	}
 	else{
-		this.resize(this.model.xminPrimary, this.model.xmaxPrimary, this.model.ymin, this.model.ymaxPrimary);
+		this.resize(this.model.xminPrimary, this.model.xmaxPrimary,
+			 this.model.ymin, this.model.ymaxPrimary);
 		this.enableZoom();
 	}
 }
@@ -189,6 +202,7 @@ Graph.prototype.setData = function(){
 Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 
 	if(this.options.hidden){
+		this.xlabel.attr('visibility', 'hidden');
 		return;
 	}
 
@@ -273,10 +287,18 @@ Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 	this.zoom.scaleExtent([0, this.model.xmaxPrimary]);
 	this.plot.call(this.zoom);
 
-	if (this.title) {
+	if(this.title) {
 		this.title.attr("x", width/2);
 	}
+
 	this.xlabel.attr("x", width/2).attr("y", height);
+	this.plotBackgroundLabel.attr("x", width/2).attr("y", height/2);
+	if(this.options.butterfly && !this.options.invert){
+		this.xlabel.attr('visibility', 'hidden');
+	}
+	else{
+		this.xlabel.attr('visibility', 'visible');
+	}
 	this.ylabelLeft.attr("transform","translate(" + -50 + " " + height/2+") rotate(-90)");
 	this.ylabelRight.attr("transform","translate(" + (width+45) + " " + height/2+") rotate(-90)");
 
@@ -614,11 +636,14 @@ Graph.prototype.redraw = function(){
 	var self = this;
 	//self.measure();
 	return function (){
-
+		if(self.options.butterfly){
+			self.plotBackgroundLabel.attr('visibility', 'visible');
+		}
+		else{
+			self.plotBackgroundLabel.attr('visibility', 'hidden');
+		}
 		//get highest intensity from peaks in x range
 		//adjust y scale to new highest intensity
-
-		//self.measureClear();
 		if (self.peaks) {
 			var ymax = 0
 			var xDomain = self.x.domain();
@@ -626,7 +651,6 @@ Graph.prototype.redraw = function(){
 			  if (self.peaks[i].y > ymax && (self.peaks[i].x > xDomain[0] && self.peaks[i].x < xDomain[1]))
 			  	ymax = self.peaks[i].y;
 			}
-			//console.log(ymax);
 			self.y.domain([0, ymax/0.95]);
 			self.y_right.domain([0, (ymax/(self.model.ymaxPrimary*0.95))*100]);
 			self.yAxisLeftSVG.call(self.yAxisLeft);
@@ -638,9 +662,6 @@ Graph.prototype.redraw = function(){
 		self.xaxisSVG.call( self.xAxis);
 		if (self.model.measureMode)
 			self.disableZoom();
-		//d3.behavior.zoom().x(self.x).on("zoom", self.redraw()));
-		//self.plot.call( d3.behavior.zoom().x(self.x).on("zoom", self.redraw()));
-		//self.innerSVG.call( d3.behavior.zoom().x(self.x).on("zoom", self.redraw()));
 		self.model.setZoom(self.x.domain());
 	};
 }
@@ -652,9 +673,7 @@ Graph.prototype.clear = function(){
 	this.peaksSVG.selectAll("*").remove();
 	this.lossyAnnotations.selectAll("*").remove();
 	this.annotations.selectAll("*").remove();
-
 }
-
 
 Graph.prototype.clearHighlights = function(peptide, pepI){
 	var peakCount = this.peaks.length;
@@ -681,9 +700,7 @@ Graph.prototype.updatePeakColors = function(){
 				p.line.attr("stroke", p.colour);
 			else
 				p.line.attr("stroke", self.model.get('peakColor'));
-
 		});
-
 	}
 }
 
