@@ -266,6 +266,7 @@ xiSPEC.request_annotation = function(json_request, isOriginalMatchRequest){
 
 				if(isOriginalMatchRequest){
 					self.originalSpectrumModel.set({"JSONdata": data, "JSONrequest": json_request});
+					self.originalMatchRequest = $.extend(true, {}, json_request);
 				}
 
 				self.SpectrumModel.set({"JSONdata": data, "JSONrequest": json_request});
