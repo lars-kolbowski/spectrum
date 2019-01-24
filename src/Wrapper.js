@@ -360,9 +360,10 @@ xiSPEC.convert_to_json_request = function (data) {
 	annotationRequest.annotation = {};
 
 	var ionTypes = data.ionTypes.split(";");
-	var ionTypeCount = ionTypes.length;
+	//remove empty strings from list
+	ionTypes = ionTypes.filter(Boolean); 
 	var ions = [];
-	for (var it = 0; it < ionTypeCount; it++) {
+	for (var it = 0; it < ionTypes.length; it++) {
 		var ionType = ionTypes[it];
 		ions.push({"type": (ionType.charAt(0).toUpperCase() + ionType.slice(1) + "Ion")});
 	}
