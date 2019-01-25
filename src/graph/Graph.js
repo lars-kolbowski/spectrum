@@ -188,7 +188,7 @@ Graph.prototype.setData = function(){
 
 	this.g.attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
 
-	if(this.model.get('lockZoom')){
+	if(xiSPEC.lockZoom){
 		this.resize(this.model.get('mzRange')[0], this.model.get('mzRange')[1], this.model.ymin, this.model.ymax);
 		this.disableZoom();
 	}

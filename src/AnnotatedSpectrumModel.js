@@ -222,7 +222,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		//this.ymaxPrimary = ymax / 0.9;
 		this.ymaxPrimary = ymax;
 
-		if (!this.get('lockZoom')){
+		if (!xiSPEC.lockZoom){
 			this.set('mzRange', [this.xminPrimary, this.xmaxPrimary]);
 			this.ymax = this.ymaxPrimary;
 			this.ymin = 0;

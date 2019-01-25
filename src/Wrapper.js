@@ -59,6 +59,7 @@ xiSPEC.init = function(options) {
 	this.originalSpectrumModel = new AnnotatedSpectrumModel(model_options);
 
 	//ToDo: make extra spectrum controls model with mzRange, moveLabels, measureMode?
+	this.lockZoom = false;
 	//sync moveLabels and measureMode
 	this.originalSpectrumModel.listenTo(
 		this.SpectrumModel,
@@ -361,7 +362,7 @@ xiSPEC.convert_to_json_request = function (data) {
 
 	var ionTypes = data.ionTypes.split(";");
 	//remove empty strings from list
-	ionTypes = ionTypes.filter(Boolean); 
+	ionTypes = ionTypes.filter(Boolean);
 	var ions = [];
 	for (var it = 0; it < ionTypes.length; it++) {
 		var ionType = ionTypes[it];

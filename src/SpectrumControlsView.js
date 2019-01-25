@@ -205,19 +205,21 @@ var SpectrumControlsView = Backbone.View.extend({
 	},
 
 	lockZoom: function(){
+
 		if ($('#xispec_lockZoom').is(':checked')) {
 			$('#xispec_lock')[0].innerHTML = "&#128274";
 			$('#xispec_mzRangeSubmit').prop('disabled', true);
 			$('#xispec_xleft').prop('disabled', true);
 			$('#xispec_xright').prop('disabled', true);
-			this.model.set('lockZoom', true);
+			xiSPEC.lockZoom = true;
 		} else {
 			$('#xispec_lock')[0].innerHTML = "&#128275";
 			$('#xispec_mzRangeSubmit').prop('disabled', false);
 			$('#xispec_xleft').prop('disabled', false);
 			$('#xispec_xright').prop('disabled', false);
-			this.model.set('lockZoom', false);
+			xiSPEC.lockZoom = false;
 		}
+		xiSPEC.vent.trigger('lockZoomToggle');
 	},
 
 	toggleMeasuringMode: function(e){
