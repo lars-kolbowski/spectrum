@@ -183,7 +183,7 @@ var SpectrumControlsView = Backbone.View.extend({
 			.attr('href', 'http://spectrumviewer.org/help.php')
 			.attr('target', '_blank')
 		;
-		var helpButton = this.wrapper.append('i')
+		var helpButton = helpLink.append('i')
 			.attr('class', 'xispec_btn xispec_btn-1a xispec_btn-topNav fa fa-question')
 			.attr('aria-hidden', 'true')
 			.attr('title', 'Help')
