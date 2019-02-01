@@ -132,20 +132,16 @@ Peak.prototype.draw = function(){
 			var fragCount = fragments.length;
 			for (var f = 0; f < fragCount; f++){
 					//get right cluster for peak
-// 					var index = 0;
 					for (var i = 0; i < self.clusterIds.length; i++) {
 						if(fragments[f].clusterIds.indexOf(self.clusterIds[i]) != -1){
-							var index = fragments[f].clusterIds.indexOf(self.clusterIds[i])
-							var cluster = self.graph.model.get("JSONdata").clusters[self.clusterIds[i]]
+							var index = fragments[f].clusterIds.indexOf(self.clusterIds[i]);
+							var cluster = self.graph.model.get("JSONdata").clusters[self.clusterIds[i]];
 						}
 					}
 					var matchedMissingMonoIsotopic = fragments[f].clusterInfo[index].matchedMissingMonoIsotopic;
 					var charge = cluster.charge;
 					var error = fragments[f].clusterInfo[index].error.toFixed(self.graph.model.showDecimals)+" "+fragments[f].clusterInfo[index].errorUnit;
-					var chargeStr = "";
-					for (var i = 0; i < charge; i++){
-						chargeStr += "+";
-					}
+					var chargeStr = "+".repeat(charge);
 					header.push(fragments[f].name + chargeStr);
 
 					var fragName = fragments[f].name + " (" + fragments[f].sequence + ")";
@@ -350,7 +346,11 @@ Peak.prototype.draw = function(){
 					;
 
 				label.append("text")
-					.text(function(d) {return d.name;})
+					.text(function(d) {
+						if (self.graph.options.labelFragmentCharge)
+							return d.name + '+'.repeat(d.get_charge(self.id));
+						return d.name;
+					})
 					.attr("x", 0)
 					.attr("text-anchor", "middle")
 					.style("stroke-width", "6px")
@@ -359,7 +359,11 @@ Peak.prototype.draw = function(){
 					.attr("stroke", this.graph.model.get('highlightColor'));
 
 				label.append("text")
-					.text(function(d) {return d.name;})
+					.text(function(d) {
+						if (self.graph.options.labelFragmentCharge)
+							return d.name + '+'.repeat(d.get_charge(self.id));
+						return d.name;
+					})
 					.attr("x", 0)
 					.attr("text-anchor", "middle")
 					.style("font-size", "0.8em")

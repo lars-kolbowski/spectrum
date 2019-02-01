@@ -155,7 +155,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		this.fragments = [];
 		if (JSONdata.fragments !== undefined){
 			for (var i = 0; i < JSONdata.fragments.length; i++) {
-				this.fragments[i] = new Fragment(JSONdata.fragments[i]);
+				this.fragments[i] = new Fragment(JSONdata.fragments[i], JSONdata.clusters);
 				this.fragments[i].id = i;
 			};
 		};
