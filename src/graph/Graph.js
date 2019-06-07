@@ -417,9 +417,8 @@ Graph.prototype.measure = function(on){
 			var coords = d3.mouse(this);
 			var mouseX = self.x.invert(coords[0]);
 			//find start and endPeak
-			var distance = 2;
+			var distance = 4;
 			var highlighttrigger = 15;	//triggerdistance to prioritize highlighted peaks as endpoint
-			var triggerdistance = 10;	//triggerdistance to use peak as endpoint
 			var peakCount = self.peaks.length;
 			for (var p = 0; p < peakCount; p++) {
 				var peak = self.peaks[p];
@@ -428,7 +427,7 @@ Graph.prototype.measure = function(on){
 						var endPeak = peak;
 						break;
 					}
-					if (mouseX - triggerdistance < peak.x < mouseX + triggerdistance && Math.abs(peak.x - mouseX)  < distance){
+					if (Math.abs(peak.x - mouseX)  < distance){
 						var endPeak = peak
 						distance = Math.abs(peak.x - mouseX);
 					}
