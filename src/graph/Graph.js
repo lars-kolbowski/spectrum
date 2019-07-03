@@ -176,10 +176,22 @@ Graph.prototype.setData = function(){
 	this.peaks = new Array();
 	if (this.model.get("JSONdata")) {
 		for (var i = 0; i < this.model.get("JSONdata").peaks.length; i++){
-				var peak = this.model.get("JSONdata").peaks[i];
+			// var peak = this.model.get("JSONdata").peaks[i];
 			this.peaks.push(new Peak(i, this));
 		}
+
+		// draw non_fragment_peaks first then add fragment_peaks on top
+		// for correct z-layering
+		var non_fragment_peaks = this.peaks.filter(
+			function(p){if (p.fragments.length == 0) return true;});
+		non_fragment_peaks.forEach(function(p){ p.draw();});
+
+		var fragment_peaks = this.peaks.filter(
+			function(p){if (p.fragments.length > 0) return true;});
+		fragment_peaks.forEach(function(p){ p.draw();});
+
 		this.updatePeakColors();
+
 	}
 
 	this.margin.top = this.model.isLinear ? 80 : 120;
@@ -188,7 +200,7 @@ Graph.prototype.setData = function(){
 
 	this.g.attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
 
-	if(this.model.get('lockZoom')){
+	if(xiSPEC.lockZoom){
 		this.resize(this.model.get('mzRange')[0], this.model.get('mzRange')[1], this.model.ymin, this.model.ymax);
 		this.disableZoom();
 	}
@@ -203,6 +215,7 @@ Graph.prototype.resize = function(xmin, xmax, ymin, ymax) {
 
 	if(this.options.hidden){
 		this.xlabel.attr('visibility', 'hidden');
+		this.plotBackgroundLabel.attr('visibility', 'hidden');
 		return;
 	}
 
@@ -404,9 +417,8 @@ Graph.prototype.measure = function(on){
 			var coords = d3.mouse(this);
 			var mouseX = self.x.invert(coords[0]);
 			//find start and endPeak
-			var distance = 2;
+			var distance = 4;
 			var highlighttrigger = 15;	//triggerdistance to prioritize highlighted peaks as endpoint
-			var triggerdistance = 10;	//triggerdistance to use peak as endpoint
 			var peakCount = self.peaks.length;
 			for (var p = 0; p < peakCount; p++) {
 				var peak = self.peaks[p];
@@ -415,7 +427,7 @@ Graph.prototype.measure = function(on){
 						var endPeak = peak;
 						break;
 					}
-					if (mouseX - triggerdistance < peak.x < mouseX + triggerdistance && Math.abs(peak.x - mouseX)  < distance){
+					if (Math.abs(peak.x - mouseX)  < distance){
 						var endPeak = peak
 						distance = Math.abs(peak.x - mouseX);
 					}
@@ -655,6 +667,7 @@ Graph.prototype.redraw = function(){
 			self.y_right.domain([0, (ymax/(self.model.ymaxPrimary*0.95))*100]);
 			self.yAxisLeftSVG.call(self.yAxisLeft);
 			self.yAxisRightSVG.call(self.yAxisRight);
+
 			for (var i = 0; i < self.peaks.length; i++){
 				self.peaks[i].update();
 			}

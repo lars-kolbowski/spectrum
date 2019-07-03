@@ -151,10 +151,11 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 				this.pepStrsMods[i] += this.peptides[i].sequence[j].aminoAcid + this.peptides[i].sequence[j].Modification;
 			}
 		}
+
+		this.fragments = [];
 		if (JSONdata.fragments !== undefined){
-			this.fragments = [];
 			for (var i = 0; i < JSONdata.fragments.length; i++) {
-				this.fragments[i] = new Fragment(JSONdata.fragments[i]);
+				this.fragments[i] = new Fragment(JSONdata.fragments[i], JSONdata.clusters);
 				this.fragments[i].id = i;
 			};
 		};
@@ -222,7 +223,7 @@ var AnnotatedSpectrumModel = Backbone.Model.extend({
 		//this.ymaxPrimary = ymax / 0.9;
 		this.ymaxPrimary = ymax;
 
-		if (!this.get('lockZoom')){
+		if (!xiSPEC.lockZoom){
 			this.set('mzRange', [this.xminPrimary, this.xmaxPrimary]);
 			this.ymax = this.ymaxPrimary;
 			this.ymin = 0;

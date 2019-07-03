@@ -31,6 +31,7 @@ var SpectrumSettingsView = Backbone.View.extend({
 		'click #xispec_lossyChkBx': 'showLossy',
 		'click #xispec_absErrChkBx': 'absErrToggle',
 		'click #xispec_accentuateCLcontainingChkBx': 'accentuateCLcontainingToggle',
+		'click #xispec_labelFragmentCharge': 'chargeLabelToggle',
 		// 'click #butterflyChkBx': 'butterflyToggle',
 		'change #xispec_colorSelector': 'changeColorScheme',
 		'click .xispec_settingsTab' : 'changeTab',
@@ -322,6 +323,9 @@ var SpectrumSettingsView = Backbone.View.extend({
 			.append("input").attr("type", "checkbox").attr("id", "xispec_accentuateCLcontainingChkBx")
 		;
 
+		this.labelFragmentCharge = appearanceTab.append("label").text("label fragment charge: ")
+			.append("input").attr("type", "checkbox").attr("id", "xispec_labelFragmentCharge")
+
 		// var butterfly = appearanceTab.append("label").text("Butterfly plot with original Spectrum: ")
 		// 	.append("input").attr("type", "checkbox").attr("id", "butterflyChkBx")
 		// ;
@@ -338,7 +342,7 @@ var SpectrumSettingsView = Backbone.View.extend({
 			.attr("id", "xispec_customCfgHelp")
 			.attr("class", "xispec_form-control")
 			.attr("style", "display:none")
-			.text('# enable double fragmentation within one fragment\n# also fragmentation events on both peptides\nfragment:BLikeDoubleFragmentation\n\n# custom loss definition examples\n## Water\nloss:AminoAcidRestrictedLoss:NAME:H20;aminoacids:S,T,D,E;MASS:18.01056027;cterm\n## Amonia\nloss:AminoAcidRestrictedLoss:NAME:NH3;aminoacids:R,K,N,Q;MASS:17.02654493;nterm\n## AIons as loss from BIons\n## when defiend as loss the matched fragments will have less impact on the score then matching A-Ions\nloss:AIonLoss\n\n# also match peaks if they are one dalton off - assuming that sometimes the monoisotopic peak is missing\nMATCH_MISSING_MONOISOTOPIC:(true|false)')
+			.text('# enable double fragmentation within one fragment\n# also fragmentation events on both peptides\nfragment:BLikeDoubleFragmentation\n\n# also match peaks if they are one Dalton off\n# assuming that sometimes the monoisotopic peak is missing\nMATCH_MISSING_MONOISOTOPIC:(true|false)')
 		;
 		var customConfigInputLabel = customConfigTab.append('label').attr("for", "xispec_settingsCustomCfg-input").text('Custom config input:');
 		this.customConfigInput = customConfigTab.append("textarea").attr("id", "xispec_settingsCustomCfg-input").attr("class", "xispec_form-control");
@@ -1005,11 +1009,11 @@ var SpectrumSettingsView = Backbone.View.extend({
 		xiSPEC.vent.trigger('AccentuateCrossLinkContainingFragments', selected);
 	},
 
-	// butterflyToggle: function(e) {
-	// 	var $target = $(e.target);
-	// 	var selected = $target.is(':checked');
-	// 	xiSPEC.vent.trigger('butterflyToggle', selected);
-	// },
+	chargeLabelToggle: function(e) {
+		var $target = $(e.target);
+		var selected = $target.is(':checked');
+		xiSPEC.vent.trigger('labelFragmentCharge', selected);
+	},
 
 	changeColorScheme: function(e){
 		var model = this.displayModel; //apply changes directly for now
